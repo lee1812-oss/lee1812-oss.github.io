@@ -2,6 +2,10 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>종사자 건강상태 확인 일지</title>
+<meta name="theme-color" content="#fff8eb">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="건강일지">
 <style>
 html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif}
 #fr{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
@@ -10,7 +14,7 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
 #msg{padding:40px 20px;text-align:center;line-height:1.7;color:#334}
 .hide{display:none}
 </style></head><body>
-<div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 링크로 다시 열어 주세요.</div>
+<div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 QR 또는 링크로 한 번 열어 주세요.</div>
 <iframe id="fr" class="hide" allow="fullscreen" title="건강상태확인일지"></iframe>
 <button class="fb hide" id="bFs">⛶ 화면 채우기</button>
 <button class="fb hide" id="bEx" style="background:rgba(200,40,40,.85);opacity:1">✕ 채우기 취소</button>
@@ -18,7 +22,12 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
 (function(){
   var EXEC="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec";
   var q=new URLSearchParams(location.search),k=q.get("k")||"",m=q.get("m")||"tablet";
-  if(!/^[A-Za-z0-9_-]{6,60}$/.test(k)){document.getElementById("msg").classList.remove("hide");return}
+  /* 링크 키는 이 기기에만 기억합니다(저장소에 키를 올리지 않기 위해). 앱으로 설치한 뒤에는 주소에 키가 없어도 기억해 둔 키로 엽니다. */
+  var ok=/^[A-Za-z0-9_-]{6,60}$/;
+  try{if(ok.test(k))localStorage.setItem("hl_k",k);else{var sv=localStorage.getItem("hl_k")||"";if(ok.test(sv))k=sv}}catch(e){}
+  if(!ok.test(k)){document.getElementById("msg").classList.remove("hide");return}
+  if(m==="phone"){var lk=document.createElement("link");lk.rel="manifest";lk.href="manifest.webmanifest";document.head.appendChild(lk)}
+  if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){})}catch(e){}}
   if(["admin","tablet","phone"].indexOf(m)<0)m="tablet";
   var fr=document.getElementById("fr");fr.src=EXEC+"?k="+encodeURIComponent(k)+"&m="+m;fr.classList.remove("hide");
   var bFs=document.getElementById("bFs"),bEx=document.getElementById("bEx"),de=document.documentElement;
