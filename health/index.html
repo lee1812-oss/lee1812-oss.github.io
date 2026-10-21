@@ -31,7 +31,7 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
   if(["admin","tablet","phone"].indexOf(m)<0)m="tablet";
   var fr=document.getElementById("fr");fr.src=EXEC+"?k="+encodeURIComponent(k)+"&m="+m;fr.classList.remove("hide");
   var bFs=document.getElementById("bFs"),bEx=document.getElementById("bEx"),de=document.documentElement;
-  var can=!!(de.requestFullscreen||de.webkitRequestFullscreen);
+  var can=!!(de.requestFullscreen||de.webkitRequestFullscreen)&&m!=="phone";   /* 휴대폰은 한 화면 배치라 가림 방지를 위해 채우기 버튼을 두지 않음 */
   function isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
   function sync(){bFs.classList.toggle("hide",!can||isFs());bEx.classList.toggle("hide",!isFs())}
   bFs.onclick=function(){try{(de.requestFullscreen||de.webkitRequestFullscreen).call(de)}catch(e){}};
