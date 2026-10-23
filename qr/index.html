@@ -26,7 +26,7 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 .bar button{flex:1;max-width:170px;min-height:62px;border:0;border-radius:16px;background:rgba(255,255,255,.16);color:#fff;font-size:17px;font-weight:700;backdrop-filter:blur(6px)}
 .bar button.on{background:#facc15;color:#111827}
 .bar button:active{transform:scale(.97)}
-.sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(110%);transition:transform .22s ease;max-height:88vh;overflow:auto;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:640px;background:#fff;border-radius:24px 24px 0 0;padding:22px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(110%);transition:transform .22s ease;max-height:88vh;overflow:auto;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
 .sheet.show{transform:none}
 .kind{display:inline-block;font-size:15px;font-weight:700;padding:5px 12px;border-radius:999px;background:#dcfce7;color:#166534;margin-bottom:10px}
 .kind.txt{background:#e5e7eb;color:#374151}
@@ -60,14 +60,14 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 <div id="cam">
   <video id="v" playsinline muted autoplay></video>
   <div class="frame" id="frame"><div class="line"></div></div>
-  <div class="top"><b>QR 바로 찍기</b><small>v001</small></div>
+  <div class="top"><b>QR 바로 찍기</b><small>v002</small></div>
   <div class="hint" id="hint">네모 안에 QR을 비춰 주세요</div>
   <div class="bar">
     <button id="bLight" style="display:none">손전등</button>
     <button id="bPhoto">사진에서 찾기</button>
     <button id="bHist">찍은 기록</button>
   </div>
-  <div class="msg" id="msg"><div><b id="msgT"></b><span id="msgB"></span><button id="msgBtn">다시 시도</button></div></div>
+  <div class="msg" id="msg"><div><b id="msgT"></b><span id="msgB"></span><button id="msgBtn">다시 시도</button><button id="msgPhoto" style="background:#fff;color:#111827;border:2px solid #d1d5db">사진에서 QR 찾기</button></div></div>
 </div>
 
 <div class="sheet" id="sheet">
@@ -223,6 +223,7 @@ $('file').onchange=async e=>{
   toast('사진에서 QR을 못 찾았어요');again();
 };
 $('msgBtn').onclick=()=>startCam();
+$('msgPhoto').onclick=()=>$('file').click();
 
 // 화면을 벗어나면 카메라 끄기(배터리 절약), 돌아오면 다시 켜기
 document.addEventListener('visibilitychange',()=>{
