@@ -12,9 +12,15 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
 .fb{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:9;height:44px;min-width:44px;padding:0 14px;border:0;border-radius:22px;background:rgba(30,41,59,.72);color:#fff;font-size:15px;font-weight:700;cursor:pointer;opacity:.75}
 .fb:active{opacity:1}
 #msg{padding:40px 20px;text-align:center;line-height:1.7;color:#334}
-.hide{display:none}
+.hide{display:none!important}
+#ib{position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));z-index:20;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.18);display:flex;gap:8px;align-items:flex-start}
+#ib.ok{background:#e9f7ee;color:#14532d;border:1px solid #86efac}#ib.in{background:#eaf1fe;color:#1e3a8a;border:1px solid #9db7f3}
+#ib .t{flex:1}#ib button{font:inherit;font-weight:700;border-radius:10px;border:1px solid currentColor;background:#fff;color:inherit;min-height:40px;padding:0 10px;cursor:pointer}#ib .x{border:0;background:transparent;font-size:18px;min-width:36px}
+#isht{position:fixed;inset:0;z-index:30;background:rgba(17,24,39,.5);display:flex;align-items:flex-end}#isht .in{background:#fff;width:100%;max-width:560px;margin:0 auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));font-size:16px;line-height:1.6;max-height:88vh;overflow:auto}
+#isht h3{margin:0 0 8px;font-size:18px}#isht .n{border-radius:10px;padding:10px 12px;margin:8px 0}#isht .b{background:#eaf1fe;color:#1e3a8a}#isht .w{background:#fff4e5;color:#7c2d12}#isht .r{background:#fef2f2;color:#7f1d1d}#isht button{width:100%;min-height:52px;border-radius:12px;border:0;background:#1d4ed8;color:#fff;font:inherit;font-weight:700;margin-top:8px}
 </style></head><body>
-<div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 QR 또는 링크로 한 번 열어 주세요.</div>
+<div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 QR 또는 링크로 한 번 열어 주세요.<br><br><small style="color:#667">홈 화면 아이콘으로 열었는데 이 화면이 나오면:<br>① 홈 화면의 「건강일지」 앱을 지우고<br>② 팀장에게 받은 QR(링크)을 <b>크롬</b>으로 열어<br>③ ⋮ → 「앱 설치」로 다시 설치해 주세요.</small></div>
+<div id="ib" class="hide"></div><div id="isht" class="hide"></div>
 <iframe id="fr" class="hide" allow="fullscreen" title="건강상태확인일지"></iframe>
 <button class="fb hide" id="bFs">⛶ 화면 채우기</button>
 <button class="fb hide" id="bEx" style="background:rgba(200,40,40,.85);opacity:1">✕ 채우기 취소</button>
@@ -26,7 +32,9 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
   var ok=/^[A-Za-z0-9_-]{6,60}$/;
   try{if(ok.test(k))localStorage.setItem("hl_k",k);else{var sv=localStorage.getItem("hl_k")||"";if(ok.test(sv))k=sv}}catch(e){}
   if(!ok.test(k)){document.getElementById("msg").classList.remove("hide");return}
-  if(m==="phone"){var lk=document.createElement("link");lk.rel="manifest";lk.href="manifest.webmanifest";document.head.appendChild(lk)}
+  var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  /* 아이폰은 manifest를 붙이지 않는다: 붙이면 홈 화면 앱이 열쇠(k) 없는 주소로 열리고, 아이폰 홈 화면 앱은 사파리와 저장 공간이 달라 「잘못된 링크」가 된다. 붙이지 않으면 지금 주소(열쇠 포함)로 설치된다. */
+  if(m==="phone"&&!isIOS){var lk=document.createElement("link");lk.rel="manifest";lk.href="manifest.webmanifest";document.head.appendChild(lk)}
   if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){})}catch(e){}}
   if(["admin","tablet","phone"].indexOf(m)<0)m="tablet";
   var fr=document.getElementById("fr");fr.src=EXEC+"?k="+encodeURIComponent(k)+"&m="+m;fr.classList.remove("hide");
@@ -38,5 +46,35 @@ html,body{margin:0;height:100%;background:#eef0f6;font-family:"Malgun Gothic","A
   bEx.onclick=function(){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}};
   document.addEventListener("fullscreenchange",sync);document.addEventListener("webkitfullscreenchange",sync);
   sync();
+  if(m==="phone")instHelp(isIOS);
+  verCheck();
 })();
+/* ---------- 설치 상태 안내 (바로연락 v007과 같은 방식) ---------- */
+var WRAP_VER="w2";
+function instFix(){var s=document.getElementById("isht");s.innerHTML='<div class="in"><h3>앱이 안 보이거나 안 열릴 때 (완전히 지우고 다시 설치)</h3>'+
+ '<div class="n b"><b>1. 먼저 찾아보기</b><br>홈 화면을 위로 쓸어 올려 <b>앱스 화면</b> 맨 위 검색 칸에 <b>「건강일지」</b>를 쳐 보세요. 보이면 꾹 눌러 홈 화면으로 끌어오면 돼요.</div>'+
+ '<div class="n w"><b>2. 「앱을 열 수 없음」이나 「잘못된 링크」가 뜨면</b><br>① 설정 → 애플리케이션 → 「건강일지」 → <b>삭제</b><br>② 휴대폰을 껐다 켜기<br>③ 팀장에게 받은 <b>QR(링크)</b>을 <b>크롬</b>으로 열기<br>④ ⋮ → <b>「앱 설치」</b> → 1분쯤 기다리기</div>'+
+ '<div class="n r">⚠️ 크롬 설정의 <b>「사이트 데이터 삭제」는 하지 마세요.</b> 지우면 이 휴대폰이 기억한 열쇠도 지워져서, 꼭 팀장 링크로 다시 열어야 해요.</div>'+
+ '<div class="n b"><b>3. 그래도 안 되면</b><br>삼성 인터넷으로 팀장 링크를 열고 ≡ → 「현재 페이지 추가」 → 「홈 화면」.</div><button id="iok">확인</button></div>';
+ s.classList.remove("hide");document.getElementById("iok").onclick=function(){s.classList.add("hide")}}
+function instHelp(isIOS){
+ var standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;if(standalone)return;
+ var ib=document.getElementById("ib"),evt=null,shown=false;
+ var close='<button class="x" aria-label="닫기">✕</button>';
+ function bind(){var x=ib.querySelector(".x");if(x)x.onclick=function(){ib.classList.add("hide");try{sessionStorage.setItem("hl_ib_x","1")}catch(e){}};var f=ib.querySelector(".fx");if(f)f.onclick=instFix;var g=ib.querySelector(".go");if(g)g.onclick=function(){if(!evt)return;evt.prompt();evt.userChoice.then(function(c){evt=null;ib.classList.add("hide")}).catch(function(){})}}
+ function show(kind){try{if(sessionStorage.getItem("hl_ib_x"))return}catch(e){}shown=true;
+  if(kind==="ok")ib.innerHTML='<div class="t">✓ 이 휴대폰에 <b>「건강일지」 앱이 이미 설치돼 있어요.</b> 홈 화면·앱스 화면의 아이콘으로 여세요.<br><button class="fx">안 보이거나 안 열려요 →</button></div>'+close,ib.className="ok";
+  else if(kind==="in")ib.innerHTML='<div class="t">📲 홈 화면에 <b>앱으로 설치</b>하면 다음부터 바로 열려요.<br><button class="go">설치하기</button> <button class="fx">설치 문제 해결</button></div>'+close,ib.className="in";
+  else if(kind==="ios")ib.innerHTML='<div class="t">📲 아이폰은 사파리 <b>공유(□↑) → 「홈 화면에 추가」</b>로 설치해요. <b>이 링크로 연 상태에서</b> 추가해 주세요.</div>'+close,ib.className="in";
+  bind()}
+ if(isIOS){show("ios");return}
+ window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();evt=e;if(!shown||ib.className!=="ok")show("in")});
+ window.addEventListener("appinstalled",function(){ib.classList.add("hide")});
+ try{if(navigator.getInstalledRelatedApps)navigator.getInstalledRelatedApps().then(function(r){if(r&&r.length)show("ok")}).catch(function(){})}catch(e){}
+}
+/* ---------- 새 버전 확인: GitHub Pages가 화면을 최대 10분 저장본으로 줄 때 ---------- */
+function verCheck(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
+ if(!j||!j.v||j.v===WRAP_VER)return;var key="hl_reload_"+j.v;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");
+ var u=new URL(location.href);u.searchParams.set("v",j.v);location.replace(u.toString())}).catch(function(){})}catch(e){}}
+</script><script>/* end */
 </script></body></html>
