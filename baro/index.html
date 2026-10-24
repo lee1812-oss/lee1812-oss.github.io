@@ -114,7 +114,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v015</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v016</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -134,7 +134,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v015';
+const VER='v016';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -298,16 +298,42 @@ function openTmap(addr,c){
       <a class="btn opt" href="https://apps.apple.com/kr/app/id431589174" target="_blank">티맵 설치하기</a>
       <button class="opt" onclick="sheet()">닫기</button>`)},1800)}
 }
+/* ---------- 길안내 고르기: 티맵 · 카카오내비 ---------- */
+const NAVN={tmap:'티맵',kakaonavi:'카카오내비'};
+const KN={k:null,sdk:false,xy:{}};
+async function knPrep(c){try{if(!c||!c.address&&!c.lat)return;
+  if(!KN.k){const r=await srv({act:'kjs'});if(r.ok&&r.k)KN.k=r.k}
+  if(KN.k&&!KN.sdk){await loadScript('https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js');if(!Kakao.isInitialized())Kakao.init(KN.k);KN.sdk=true}
+  if(!(c.lat&&c.lng)&&!KN.xy[c.id]){const g=await srv({act:'geo',addr:c.address});if(g.ok&&g.lat)KN.xy[c.id]={lat:g.lat,lng:g.lng}}
+}catch(e){}knBtn()}
+const knXY=c=>c.lat&&c.lng?{lat:c.lat,lng:c.lng}:KN.xy[c.id];
+const knReady=c=>KN.sdk&&!!knXY(c);
+function knBtn(){const b=$('#knGo');if(!b)return;const c=cur();if(knReady(c)){b.disabled=false;b.textContent='🧭 카카오내비로 길안내'}}
+function kakaoNavi(c){const xy=knXY(c);if(KN.sdk&&xy){try{Kakao.Navi.start({name:(c.company||c.name||c.address||'목적지').slice(0,40),x:+xy.lng,y:+xy.lat,coordType:'wgs84'});return}catch(e){}}
+  kakaoMapRoute(c)}
+function kakaoMapRoute(c){const xy=knXY(c);const nm=encodeURIComponent((c.company||c.name||'목적지').replace(/,/g,' '));
+  if(xy){if(isAnd)location.href='intent://route?ep='+xy.lat+','+xy.lng+'&by=CAR#Intent;scheme=kakaomap;package=net.daum.android.map;S.browser_fallback_url='+encodeURIComponent('https://map.kakao.com/link/to/'+nm+','+xy.lat+','+xy.lng)+';end';else location.href='https://map.kakao.com/link/to/'+nm+','+xy.lat+','+xy.lng}
+  else location.href='https://map.kakao.com/link/search/'+encodeURIComponent(c.address)}
+function navGo(c){if(!c||!(c.address||c.lat))return;
+  if(S.navApp==='tmap')return openTmap(c.address,c);
+  if(S.navApp==='kakaonavi'&&knReady(c))return kakaoNavi(c);
+  navMenu(c)}
+function navMenu(c){knPrep(c);
+  sheet(`<h3>📍 ${esc(c.address||'찍은 위치')}</h3>
+  <button class="opt pri" id="tmGo">🚗 티맵으로 길안내</button>
+  <button class="opt pri" id="knGo" ${knReady(c)?'':'disabled'}>${knReady(c)?'🧭 카카오내비로 길안내':'🧭 카카오내비 준비 중…'}</button>
+  <label class="phc" style="margin:8px 0"><input type="checkbox" id="navRem"><span>다음부터 주소를 누르면 <b>고른 앱으로 바로</b> 열기<br><small class="muted">설정에서 다시 바꿀 수 있어요</small></span></label>
+  <button class="opt" onclick="sheet();kakaoMapRoute(cur())">카카오맵 길찾기</button>
+  <button class="opt" onclick="openNaver(cur().address)">네이버 지도로 보기</button>
+  <button class="opt" onclick="copy(cur().address,'주소를 복사했어요');sheet()">주소 복사</button>
+  <button class="opt" onclick="sheet()">닫기</button>`);
+  const rem=a=>{if($('#navRem')&&$('#navRem').checked){S.navApp=a;saveS();toast('다음부터 '+NAVN[a]+'로 바로 열어요')}};
+  $('#tmGo').onclick=()=>{rem('tmap');sheet();openTmap(cur().address,cur())};
+  $('#knGo').onclick=()=>{if(!knReady(cur()))return;rem('kakaonavi');sheet();kakaoNavi(cur())}}
+function mapMenu(c){navMenu(c)}
 function openKakao(addr){sheet();location.href='https://map.kakao.com/link/search/'+encodeURIComponent(addr)}
 function openNaver(addr){sheet();location.href='https://map.naver.com/p/search/'+encodeURIComponent(addr)}
-function mapMenu(c){
-  sheet(`<h3>📍 ${esc(c.address)}</h3>
-  <button class="opt pri" onclick="sheet();openTmap(cur().address,cur())">티맵으로 길안내</button>
-  <button class="opt" onclick="openKakao(cur().address)">카카오맵으로 보기</button>
-  <button class="opt" onclick="openNaver(cur().address)">네이버 지도로 보기</button>
-  <button class="opt" onclick="copy(cur().address);sheet()">주소 복사</button>
-  <button class="opt" onclick="sheet()">닫기</button>`)
-}
+function mapMenuOld(c){}
 async function copy(t,msg){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast(msg||'복사했어요')}
 function mailMenu(c){
   sheet(`<h3>✉️ ${esc(c.email)}</h3>
@@ -376,7 +402,7 @@ function render(){
   const a=$('#app');$('#backBtn').style.display=view==='list'?'none':'';const ib=$('#instBar');if(ib&&ib.innerHTML)ib.style.display=view==='list'?'block':'none';$('#fab').style.display=view==='list'?'':'none';
   $('#setBtn').style.display=view==='list'?'':'none';
   if(view==='list')return renderList(a);
-  if(view==='detail'){renderDetail(a);phLoad();return}
+  if(view==='detail'){renderDetail(a);phLoad();if(S.navApp==='kakaonavi')knPrep(cur());return}
   if(view==='edit')return renderEdit(a);
   if(view==='set')return renderSet(a);
   if(view==='paste')return renderPaste(a);
@@ -405,7 +431,7 @@ function renderList(a){
   a.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderList(a)});$('#meStrip').onclick=()=>go('me');
   a.querySelectorAll('.item').forEach(el=>el.onclick=e=>{const id=el.dataset.id;const act=e.target.closest('button')?.dataset.act;curId=id;
     if(act==='tel'){e.stopPropagation();telMenu(cur());return}
-    if(act==='map'){e.stopPropagation();S.tmapFirst?openTmap(cur().address,cur()):mapMenu(cur());return}
+    if(act==='map'){e.stopPropagation();navGo(cur());return}
     go('detail',id)});
 }
 function renderDetail(a){
@@ -415,7 +441,7 @@ function renderDetail(a){
    <div><div class="nm" style="font-size:22px">${c.kind==='shop'?'🏪 ':''}${esc(c.name||c.company||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc(c.kind==='shop'&&!c.name?((String(c.memo||'').match(/업종: ([^\n]*)/)||[])[1]||'거래처'):[c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
    <button class="ghost" style="margin-left:auto;font-size:24px" onclick="toggleFav()" aria-label="즐겨찾기">${c.fav?'★':'☆'}</button></div></div>
   <div class="big">
-   <button onclick="${c.address?'openTmap(cur().address,cur())':''}" ${c.address?'':'disabled'}><b>📍</b>티맵 길안내</button>
+   <button onclick="${c.address?'navGo(cur())':''}" ${c.address?'':'disabled'}><b>📍</b>길안내${S.navApp?' ('+NAVN[S.navApp]+')':''}</button>
    <button onclick="telMenu(cur())" ${(c.mobile||c.tel)?'':'disabled'}><b>📞</b>전화·문자</button>
    <button onclick="mailMenu(cur())" ${c.email?'':'disabled'}><b>✉️</b>메일 보내기</button>
    <button onclick="kakaoMenu(cur())"><b>💬</b>카톡</button>
@@ -423,7 +449,7 @@ function renderDetail(a){
   <button class="full phb" onclick="saveVcf([cur()],(cur().name||cur().company||'연락처')+'.vcf')">📱 내 휴대폰 연락처에 저장${c.phoneAt?` <small>(저장함 ${md(c.phoneAt)})</small>`:''}</button>
   <div class="card">
    ${row('휴대폰',c.mobile,'tel:'+digits(c.mobile),1)}${row('전화',c.tel,'tel:'+digits(c.tel),1)}${row('팩스',c.fax,'',1)}
-   ${row('메일',c.email,'mailto:'+c.email,1)}${c.address?`<div class="kv"><div class="k">주소</div><div class="v"><a href="#" onclick="event.preventDefault();mapMenu(cur())">${esc(c.address)}</a></div><button class="cp" onclick="copy(cur().address)">복사</button></div>`:''}
+   ${row('메일',c.email,'mailto:'+c.email,1)}${c.address?`<div class="kv"><div class="k">주소</div><div class="v"><a href="#" onclick="event.preventDefault();navGo(cur())">${esc(c.address)} <small>🚗</small></a></div><button class="cp" onclick="copy(cur().address)">복사</button></div>`:''}
    ${row('홈페이지',c.web,/^http/.test(c.web)?c.web:'https://'+c.web)}${row('카톡 ID',c.kakao,'',1)}
    ${row('사업자번호',c.bizNo,'',1)}${c.shotLat?`<div class="kv"><div class="k">찍은 곳</div><div class="v"><a href="https://map.kakao.com/link/map/${encodeURIComponent((c.company||c.name||'찍은 곳').replace(/,/g,' '))},${c.shotLat},${c.shotLng}" target="_blank">지도에서 보기</a> <span class="muted">${c.shotAt?new Date(c.shotAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</span></div></div>`:''}${row('만난 날',c.metAt)}${row('만난 곳',c.metPlace)}${row('메모',c.memo)}
    ${c.tags?`<div class="kv"><div class="k">묶음</div><div class="v">${c.tags.split(/[,\s]+/).filter(Boolean).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`:''}
@@ -519,7 +545,7 @@ function renderPaste(a){
 function renderSet(a){
   const days=S.lastBak?Math.floor((Date.now()-S.lastBak)/864e5):null;
   a.innerHTML=`<h2>메일 끝 인사(서명)</h2><textarea id="sg" placeholder="예)&#10;감사합니다.&#10;이혜영 드림&#10;010-0000-0000">${esc(S.sign)}</textarea>
-  <h2>지도 버튼</h2><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="tf" style="width:26px;min-height:26px" ${S.tmapFirst?'checked':''}> 목록의 📍를 누르면 바로 티맵 열기</label>
+  <h2>주소를 누르면 (길안내 앱)</h2><select id="navSel"><option value="" ${!S.navApp?'selected':''}>매번 고르기 (티맵 · 카카오내비)</option><option value="tmap" ${S.navApp==='tmap'?'selected':''}>항상 티맵</option><option value="kakaonavi" ${S.navApp==='kakaonavi'?'selected':''}>항상 카카오내비</option></select>
   <h2>백업 (휴대폰 바꿀 때)</h2>
   <div class="note">연락처와 사진은 서버에 올리지 않고 <b>이 휴대폰 안에만</b> 저장돼요. 앱을 지우거나 크롬의 사이트 데이터를 지우면 함께 사라지니, 가끔 백업해 주세요. <b>백업 파일에는 추가 사진도 들어가요</b>(사진이 많으면 파일이 커져요). ${days===null?'아직 백업한 적이 없어요.':`마지막 백업: ${days}일 전`}</div>
   <div class="row"><button id="bk">백업 파일 저장</button><button id="rs">백업 불러오기</button></div><p></p>
@@ -529,7 +555,7 @@ function renderSet(a){
   <button class="full" onclick="instFix()">「이미 설치됨」인데 안 보이거나 안 열릴 때</button>
   <p class="muted">바로연락 ${VER} · 저장된 연락처 ${C.length}명</p>
   <button class="pri full" id="sv">설정 저장</button>`;
-  $('#sv').onclick=()=>{S.sign=$('#sg').value;S.tmapFirst=$('#tf').checked;saveS();toast('설정을 저장했어요');history.back()};
+  $('#sv').onclick=()=>{S.sign=$('#sg').value;S.navApp=$('#navSel').value;saveS();toast('설정을 저장했어요');history.back()};
   $('#bk').onclick=async()=>{let photos=[];try{const A=await DB.phAll();toast('사진 '+A.length+'장을 백업에 담는 중…');const b64=bl=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(bl)});for(const p of A)photos.push({id:p.id,cid:p.cid,at:p.at,memo:p.memo,lat:p.lat,lng:p.lng,full:await b64(p.full),thumb:await b64(p.thumb)})}catch(e){}
     const f=new File([JSON.stringify({app:'barolink',ver:VER,at:new Date().toISOString(),contacts:C,me:ME,photos})],'바로연락_백업_'+today().replace(/-/g,'')+'.json',{type:'application/json'});
     if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>dl(f));else dl(f);S.lastBak=Date.now();saveS();toast('백업 파일을 만들었어요. 구글 드라이브 등에 보관하세요')};
