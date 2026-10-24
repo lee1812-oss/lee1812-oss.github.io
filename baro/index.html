@@ -66,7 +66,7 @@ label.f{display:block;margin:12px 0 4px;font-weight:600;color:var(--sub);font-si
 #sheet .in{background:#fff;width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
 #sheet h3{margin:4px 0 10px;font-size:19px}
 #sheet .opt{width:100%;margin:6px 0;justify-content:flex-start;text-align:left}
-#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:16px;opacity:0;transition:opacity .2s;z-index:30;pointer-events:none;max-width:90%}
+#toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:16px;opacity:0;transition:opacity .2s;z-index:30;pointer-events:none;max-width:90%}
 #toast.on{opacity:1}
 .tag{display:inline-block;background:#eef2f7;border-radius:8px;padding:2px 8px;font-size:14px;color:#374151;margin:2px 4px 0 0}
 h2{font-size:19px;margin:18px 0 8px}
@@ -82,7 +82,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v005</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v006</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <main id="app"></main>
@@ -95,7 +95,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v005';
+const VER='v006';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -231,7 +231,7 @@ function saveVcf(list,fname){
   sheet(`<h3>📱 휴대폰 연락처에 저장</h3><div class="note">${n>1?n+'명의 ':''}연락처 파일을 받았어요.<br>화면 아래나 알림창의 <b>「열기」</b>를 누르고, 연락처 앱에서 <b>「저장」</b>(또는 「가져오기」)을 누르면 끝나요.</div><button class="opt" onclick="shareVcfAgain()">다른 방법: 공유 창으로 연락처 앱에 보내기</button><button class="opt pri" onclick="sheet()">확인</button>`);
 }
 function shareVcfAgain(){const f=window._lastVcf;sheet();if(f&&navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>{});else dl(f)}
-async function markPhone(list){const t=Date.now();for(const c of list){const x=C.find(y=>y.id===c.id);if(x){x.phoneAt=t;await DB.put(x)}}}
+async function markPhone(list){const t=Date.now();for(const c of list){const x=C.find(y=>y.id===c.id);if(x){x.phoneAt=t;await DB.put(x)}}if(view==='detail')render()}
 const md=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()};
 function dl(file){const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
 
