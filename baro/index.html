@@ -117,7 +117,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v019</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v020</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -137,7 +137,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v019';
+const VER='v020';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -172,7 +172,9 @@ function fmtPhone(s){let d=digits(s);if(d.startsWith('82')&&d.length>=11)d='0'+d
 const TITLES='대표이사|대표|회장|부회장|사장|부사장|전무|상무|이사|본부장|센터장|원장|소장|실장|국장|부장|차장|과장|팀장|대리|주임|계장|사원|연구원|선임|책임|수석|매니저|간사|교수|박사|변호사|세무사|회계사|노무사|변리사|관세사|기자|PD|CEO|CTO|COO|CFO|Manager|Director|President|Engineer|Designer|Owner|셰프|파트장|그룹장|지점장|점장';
 const REG='서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|충청|전북|전남|전라|경북|경남|경상|제주';
 const COMP=/(\(주\)|㈜|주식회사|유한회사|\(유\)|㈔|사단법인|재단법인|협회|조합|공사|공단|센터|연구소|연구원|병원|의원|학교|대학교|은행|카페|베이커리|제과|식품|그룹|컴퍼니|코리아|Co\.|Corp|Inc|Ltd|LLC|Company)/i;
+function normPh(t){return String(t||'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).replace(/[–—‒−―]/g,'-').replace(/[·∙・•]/g,'.').replace(/([0-9])\s*[-.]\s*\n\s*([0-9])/g,'$1-$2')}
 function parseCard(txt){
+  txt=normPh(txt);
   const o={name:'',company:'',dept:'',title:'',mobile:'',tel:'',fax:'',email:'',address:'',web:'',kakao:''};
   let lines=String(txt||'').replace(/\r/g,'').split(/\n|\s{3,}|\|/).map(s=>s.trim()).filter(Boolean);
   const used=new Set();
@@ -181,15 +183,7 @@ function parseCard(txt){
   const wb=all.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/i);if(wb&&!(o.email&&wb[0].includes('@')))o.web=wb[0];
   const kk=all.match(/(?:카카오톡|카톡|kakao(?:talk)?)\s*(?:id|ID|아이디)?\s*[:：]?\s*([A-Za-z0-9._-]{3,})/i);if(kk)o.kakao=kk[1];
   lines.forEach((l,i)=>{
-    const phones=l.match(/(?:\+?82[\s.-]?\(?0?\)?|(?<!\d)0)\d{1,2}[\s.)-]{0,2}\d{3,4}[\s.-]?\d{4}(?!\d)/g);
-    if(phones){
-      phones.forEach(p=>{
-        const before=l.slice(0,l.indexOf(p)).slice(-12);
-        let d=digits(p);if(/^82/.test(d))d='0'+d.slice(2).replace(/^0/,'');
-        if(/F|팩스|fax/i.test(before)&&!/[MH]/.test(before.slice(-3))){if(!o.fax)o.fax=fmtPhone(d)}
-        else if(/^01[016789]/.test(d)){if(!o.mobile)o.mobile=fmtPhone(d)}
-        else if(!o.tel)o.tel=fmtPhone(d); else if(!o.fax&&/F/i.test(before))o.fax=fmtPhone(d);
-      });used.add(i);return}
+    if(signPhones(l).length){used.add(i);return}
     if(o.email&&l.replace(/\s/g,'').includes(o.email)){used.add(i);return}
     if(o.web&&l.includes(o.web)){used.add(i);return}
     const AP='^(?:(?:제?\\d+\\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터)\\s*[:：.]?\\s*)?(?:\\(?\\d{5}\\)?\\s*)?(주소|Add(ress)?|A\\.|A:)?\\s*[:：.]?\\s*(?:\\(?\\d{5}\\)?\\s*)?('+REG+')';
@@ -232,6 +226,7 @@ function parseCard(txt){
   if(!o.name){
     const m=rest.join(' ').match(/(?:^|\s)([가-힣]{2,4})(?:\s|$)/);if(m&&!tRe.test(m[1])&&m[1]!==o.dept)o.name=m[1]
   }
+  const PP=signPhones(all,'사무실');if(PP.length){o.mobile='';o.tel='';o.fax='';const X=[];for(const p of PP){const sl=p.l==='팩스'?'fax':(p.l==='휴대폰'?'mobile':'tel');if(!o[sl])o[sl]=p.n;else X.push({l:p.l,n:p.n})}if(X.length)o.xph=X}
   if(!o.company){const c=rest.find(l=>l!==o.dept&&!/^[가-힣]{2,4}$/.test(l.replace(/\s/g,''))&&!tRe.test(l)&&l.length>=2&&l.length<=24&&!/\d{3,}/.test(l));if(c)o.company=c}
   return o;
 }
@@ -246,7 +241,7 @@ function toVcf(c){
   if(c.mobile)L.push('TEL;TYPE=CELL:'+c.mobile);
   if(c.tel)L.push('TEL;TYPE=WORK,VOICE:'+c.tel);
   if(c.fax)L.push('TEL;TYPE=WORK,FAX:'+c.fax);
-  (c.xph||[]).forEach((x,i)=>{const t=/팩스/.test(x.l)?'WORK,FAX':(/^01/.test(digits(x.n))?'CELL':'WORK,VOICE');L.push('item'+(i+1)+'.TEL;TYPE='+t+':'+x.n);L.push('item'+(i+1)+'.X-ABLabel:'+vEsc(x.l))});
+  (c.xph||[]).forEach((x,i)=>{const std={'휴대폰':'CELL','팩스':'WORK,FAX','사무실':'WORK,VOICE','매장':'WORK,VOICE'}[x.l];const t=std||(/팩스/.test(x.l)?'WORK,FAX':'X-'+String(x.l).replace(/[;:,\s]+/g,''));L.push('item'+(i+1)+'.TEL;TYPE='+t+':'+x.n);L.push('item'+(i+1)+'.X-ABLabel:'+vEsc(x.l))});
   if(c.email)L.push('EMAIL;TYPE=INTERNET,WORK:'+c.email);
   if(c.address)L.push('ADR;TYPE=WORK:;;'+vEsc(c.address)+';;;;');
   if(c.web)L.push('URL:'+c.web);
@@ -592,7 +587,7 @@ function fieldScore(k,v){if(!v)return -1;const d=digits(v);
   if(k==='tel'||k==='fax')return d.length>=9&&d.length<=11?3:0;
   if(k==='address')return /(시|군|구)\s/.test(v)&&/(로|길|동|읍|면)/.test(v)?2:1;
   return 1}
-function mergeParse(a,b){const o={},alt={};for(const k of Object.keys(a)){const x=a[k]||'',y=b[k]||'';
+function mergeParse(a,b){const o={},alt={};for(const k of new Set([...Object.keys(a),...Object.keys(b)])){if(typeof a[k]==='object'||typeof b[k]==='object'){const v=(a[k]&&a[k].length?a[k]:b[k]);if(v)o[k]=v;continue}const x=a[k]||'',y=b[k]||'';
   if(x===y||!y){o[k]=x;continue}if(!x){o[k]=y;continue}
   const sx=fieldScore(k,x),sy=fieldScore(k,y);o[k]=sy>sx?y:x;alt[k]=sy>sx?x:y}return {o,alt}}
 async function onPhoto(file){
@@ -638,13 +633,13 @@ function signStart(){geoStart();sheet(`<h3>🏪 간판 찍어 거래처 등록</
   <button class="opt pri" onclick="sheet();$('#signCam').click()">📷 간판 사진 찍기</button><button class="opt" onclick="sheet();$('#signPic').click()">🖼️ 앨범에서 고르기 (지금 그 가게 앞일 때)</button><button class="opt" onclick="sheet()">닫기</button>`)}
 async function onSignPhoto(file){if(!file)return;let cv;try{cv=await imgToCanvas(file,2000)}catch(e){return toast('사진을 열지 못했어요')}openEditor(cv,readSignCv,{read:true})}
 const SIGN_SKIP=/^(영업중|open|close|closed|오픈|주차|주차장|tel|전화|무료|할인|세일|sale|입구|출구|화장실|배달|포장|예약|환영|welcome|since|\d+층|\d+f|b\d|wifi|와이파이)$/i;
-const PH_LBL=['매장','사장님 휴대폰','휴대폰','팩스','기타'];
-function phLabelOf(n,ctx){const d=digits(n);if(/(F|FAX|팩스|팩)\s*[.:)]?\s*$/i.test(ctx))return '팩스';if(/^01/.test(d))return '휴대폰';return '매장'}
+const PH_LBL=['매장','사무실','사장님 휴대폰','휴대폰','팩스','기타'];
+function phLabelOf(n,ctx,def){const d=digits(n);const c=String(ctx||'').replace(/[☎✆📞☏]/g,' ');if(/(^|[^A-Za-z])(F|FAX|Fax|팩스|팩)\s*[.:)\]]?\s*$/i.test(c))return '팩스';if(/^01/.test(d))return '휴대폰';if(/(M|Mobile|MOBILE|H\.?\s?P|C\.?\s?P|휴대폰|핸드폰|모바일)\s*[.:)\]]?\s*$/i.test(c))return '휴대폰';return def||'매장'}
 function phValid(d){if(/^1[5-9]\d{6}$/.test(d))return true;if(!/^0/.test(d))return false;if(/^01[016789]\d{7,8}$/.test(d))return true;if(/^02\d{7,8}$/.test(d))return true;if(/^0(3[1-3]|4[1-4]|5[1-5]|6[1-4]|70|50\d|80)\d{7,8}$/.test(d))return d.length>=10&&d.length<=12;return false}
-function signPhones(t){const s=String(t||'').replace(/\r/g,''),o=[];
+function signPhones(t,def){const s=normPh(String(t||'').replace(/\r/g,'')),o=[];
   const fix=x=>x.replace(/[Oo○ㅇ]/g,'0').replace(/[lI|ㅣ!]/g,'1').replace(/[Ss]/g,'5').replace(/[Bb]/g,'8');
-  const add=(raw,idx)=>{let d=digits(fix(raw));if(d.startsWith('82')&&d.length>=11)d='0'+d.slice(2).replace(/^0/,'');if(!phValid(d))return;const n=fmtPhone(d);if(o.some(y=>digits(y.n)===d))return;
-    const ctx=s.slice(Math.max(0,idx-8),idx);o.push({n,l:phLabelOf(n,ctx),on:true})};
+  const add=(raw,idx)=>{let d=digits(fix(raw));if(d.startsWith('82')&&d.length>=10)d='0'+d.slice(2).replace(/^0/,'');if(!phValid(d))return;const n=fmtPhone(d);if(o.some(y=>digits(y.n)===d))return;
+    const ctx=s.slice(Math.max(0,idx-14),idx).split(/[\n]/).pop();o.push({n,l:phLabelOf(n,ctx,def),on:true})};
   const re1=/(?:\+?82[\s.-]?)?\(?[0OoIl|]?[0-9OoIl|]{1,3}\)?[\s.)\-~]{0,3}[0-9OoIl|SsBb]{3,4}[\s.\-~]{0,3}[0-9OoIl|SsBb]{4}(?![0-9])/g;
   for(const m of s.matchAll(re1)){const raw=m[0];if((raw.match(/[0-9]/g)||[]).length<6)continue;add(raw,m.index)}
   for(const m of s.matchAll(/(?<![0-9])(1[5-9][0-9OoIl|]{2})[\s.\-~]{0,3}([0-9OoIl|]{4})(?![0-9])/g))add(m[1]+m[2],m.index);
