@@ -120,7 +120,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v021</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v022</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -140,7 +140,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v021';
+const VER='v022';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -229,7 +229,7 @@ function parseCard(txt){
   if(!o.name){
     const m=rest.join(' ').match(/(?:^|\s)([가-힣]{2,4})(?:\s|$)/);if(m&&!tRe.test(m[1])&&m[1]!==o.dept)o.name=m[1]
   }
-  const PP=signPhones(all,'사무실');if(PP.length){o.mobile='';o.tel='';o.fax='';const X=[];for(const p of PP){const sl=p.l==='팩스'?'fax':(p.l==='휴대폰'?'mobile':'tel');if(!o[sl])o[sl]=p.n;else X.push({l:p.l,n:p.n})}if(X.length)o.xph=X}
+  const PP=signPhones(all,'사무실');PP.forEach(p=>{if(p.local){p.n=phFull(p,o.address);p.local=0}});if(PP.length){o.mobile='';o.tel='';o.fax='';const X=[];for(const p of PP){const sl=p.l==='팩스'?'fax':(p.l==='휴대폰'?'mobile':'tel');if(!o[sl])o[sl]=p.n;else X.push({l:p.l,n:p.n})}if(X.length)o.xph=X}
   if(!o.company){const c=rest.find(l=>l!==o.dept&&!/^[가-힣]{2,4}$/.test(l.replace(/\s/g,''))&&!tRe.test(l)&&l.length>=2&&l.length<=24&&!/\d{3,}/.test(l));if(c)o.company=c}
   return o;
 }
@@ -695,11 +695,21 @@ function phValid(d){if(/^1[5-9]\d{6}$/.test(d))return true;if(!/^0/.test(d))retu
 function signPhones(t,def){const s=normPh(String(t||'').replace(/\r/g,'')),o=[];
   const fix=x=>x.replace(/[Oo○ㅇ]/g,'0').replace(/[lI|ㅣ!]/g,'1').replace(/[Ss]/g,'5').replace(/[Bb]/g,'8');
   const add=(raw,idx)=>{let d=digits(fix(raw));if(d.startsWith('82')&&d.length>=10)d='0'+d.slice(2).replace(/^0/,'');if(!phValid(d))return;const n=fmtPhone(d);if(o.some(y=>digits(y.n)===d))return;
-    const ctx=s.slice(Math.max(0,idx-14),idx).split(/[\n]/).pop();o.push({n,l:phLabelOf(n,ctx,def),on:true})};
-  const re1=/(?:\+?82[\s.-]?)?\(?[0OoIl|]?[0-9OoIl|]{1,3}\)?[\s.)\-~]{0,3}[0-9OoIl|SsBb]{3,4}[\s.\-~]{0,3}[0-9OoIl|SsBb]{4}(?![0-9])/g;
+    const ctx=s.slice(Math.max(0,idx-14),idx).split(/[\n]/).pop();o.push(Object.assign({n,l:phLabelOf(n,ctx,def),on:true},phScore(s,idx,ctx)))};
+  const re1=/(?<![A-Za-z])(?:\+?82[\s.-]?)?\(?[0OoIl|]?[0-9OoIl|]{1,3}\)?[\s.)\-~]{0,3}[0-9OoIl|SsBb]{3,4}[\s.\-~]{0,3}[0-9OoIl|SsBb]{4}(?![0-9])/g;
   for(const m of s.matchAll(re1)){const raw=m[0];if((raw.match(/[0-9]/g)||[]).length<6)continue;add(raw,m.index)}
-  for(const m of s.matchAll(/(?<![0-9])(1[5-9][0-9OoIl|]{2})[\s.\-~]{0,3}([0-9OoIl|]{4})(?![0-9])/g))add(m[1]+m[2],m.index);
-  return o.slice(0,6)}
+  for(const m of s.matchAll(/(?<![0-9A-Za-z])(1[5-9][0-9OoIl|]{2})[\s.\-~]{0,3}([0-9OoIl|]{4})(?![0-9])/g))add(m[1]+m[2],m.index);
+  // 지역번호 없이 적힌 번호 (예: T.635-5652) → 찍은 곳·주소의 지역번호를 붙여 쓴다
+  for(const m of s.matchAll(/(?<![0-9,\-)(])(?<![0-9]\.)([2-9][0-9OoIl|]{2,3})[\s.\-~]{1,2}([0-9OoIl|]{4})(?![0-9])/g)){const idx=m.index;const ctx=s.slice(Math.max(0,idx-14),idx).split(/[\n]/).pop();
+    const d=digits(fix(m[1]+m[2]));if(d.length<7||o.some(y=>digits(y.n).endsWith(d)))continue;const lab=PH_TAG.test(ctx);if(!lab&&!/-/.test(m[0]))continue;
+    o.push(Object.assign({n:d.slice(0,d.length-4)+'-'+d.slice(-4),local:1,l:phLabelOf(d,ctx,def),on:true},phScore(s,idx,ctx)))}
+  return o.slice(0,8)}
+const PH_TAG=/(^|[^A-Za-z가-힣])(T|TEL|Tel|tel|전화|☎|✆|☏|📞|대표|H\.?\s?P|C\.?\s?P|M|Mobile|휴대폰|핸드폰|F|FAX|Fax|팩스)\s*[.:)\]]?\s*$/;
+const PH_BAD=/(임대|분양|엘리베이터|매매|부동산|공인중개|월세|전세|상가|건물|문의처|입점)/;
+function phScore(s,idx,ctx){const L=s.split('\n');const li=s.slice(0,idx).split('\n').length-1;const line=L[li]||'';const only=line.replace(/[0-9\s.\-()~:+]/g,'').length<4;
+  let sc=PH_TAG.test(ctx)?3:0;if(PH_BAD.test(line)||(only&&PH_BAD.test(L[li-1]||'')))sc-=5;return {li,score:sc}}
+function areaOf(addr){const a=String(addr||'');const M=[[/서울/,'02'],[/경기/,'031'],[/인천/,'032'],[/강원/,'033'],[/충청남|충남/,'041'],[/대전/,'042'],[/충청북|충북/,'043'],[/세종/,'044'],[/부산/,'051'],[/울산/,'052'],[/대구/,'053'],[/경상북|경북/,'054'],[/경상남|경남/,'055'],[/전라남|전남/,'061'],[/광주/,'062'],[/전라북|전북/,'063'],[/제주/,'064']];for(const [r,c] of M)if(r.test(a))return c;return ''}
+function phFull(p,addr){if(!p.local)return p.n;const a=areaOf(addr);return a?fmtPhone(a+digits(p.n)):p.n}
 function signCands(t){const out=[];String(t||'').split(/\n/).map(s=>s.replace(/[|*•·~"'“”‘’<>\[\]{}]/g,' ').replace(/\s+/g,' ').trim()).forEach(l=>{
   if(!l||l.length<2||l.length>24)return;if(/\d{2,4}[-.\s]\d{3,4}[-.\s]\d{4}/.test(l)||/(www\.|https?:|@|\.com|\.kr)/i.test(l))return;if(SIGN_SKIP.test(l))return;if(!/[가-힣A-Za-z]/.test(l))return;if(!out.includes(l))out.push(l)});
   return out.sort((a,b)=>(/[가-힣]/.test(b)-/[가-힣]/.test(a))).slice(0,6)}
@@ -708,8 +718,10 @@ async function readSignCv(cv){
   SG={photo:thumb,photoFull:full,name:'',cands:[],phones:[],res:null,busy:false,shotAt:Date.now()};
   if(GEO.st==='none')geoStart();
   sheet('<h3>간판 글자 읽는 중…</h3><p class="muted">보통 5초쯤 걸려요.</p><div class="prog"><i style="width:55%"></i></div>');
-  try{const base=scaleCv(cv,1600);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);
-    const t=[...new Set([r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n').split('\n').map(s=>s.trim()).filter(Boolean))].join('\n');SG.raw=t;SG.phones=signPhones(t);SG.cands=signCands(t);SG.name=SG.cands[0]||''}catch(e){}
+  try{const base=scaleCv(cv,2000);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);
+    const t=[...new Set([r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n').split('\n').map(s=>s.trim()).filter(Boolean))].join('\n');SG.raw=t;SG.phones=signPhones(t);SG.cands=signCands(t);SG.name=SG.cands[0]||'';
+    const L=t.split('\n');const nl=SG.name?L.findIndex(l=>l.includes(SG.name)):-1;SG.phones.forEach(p=>{if(nl>=0&&p.li>nl&&p.li<=nl+3)p.score+=2});
+    SG.phones.sort((a,b)=>b.score-a.score);const good=SG.phones.filter(p=>p.score>=3);SG.phones.forEach((p,i)=>{p.on=good.length?p.score>=3:(i===0&&p.score>-3)})}catch(e){}
   sheet();go('sign');if(SG.name&&GEO.st==='ok')sgSearch()}
 function sgRefresh(){if(view==='sign'){const g=$('#sgGeo');if(g)g.innerHTML=geoLine()}}
 function geoLine(){if(GEO.st==='ok')return '📍 찍은 곳: <b>'+esc(GEO.addr||(GEO.lat+', '+GEO.lng))+'</b> <span class="muted">(오차 약 ±'+GEO.acc+'m)</span>';
@@ -732,7 +744,7 @@ function renderSign(a){if(!SG){view='list';return render()}
   sgPhBind();
   a.querySelectorAll('[data-p]').forEach(el=>el.onclick=()=>sgPick(SG.res[+el.dataset.p]))}
 function sgPhHtml(){const P=SG.phones||[];
-  return '<b>☎ 간판에서 찾은 번호</b> <small class="muted">체크한 번호를 연락처에 넣어요</small>'+(P.length?P.map((p,i)=>'<label class="sgp"><input type="checkbox" data-pi="'+i+'" '+(p.on?'checked':'')+'><span class="nw" style="font-size:18px">'+esc(p.n)+'</span><select data-pl="'+i+'">'+PH_LBL.map(l=>'<option '+(l===p.l?'selected':'')+'>'+l+'</option>').join('')+'</select></label>').join(''):'<p class="muted" style="margin:6px 0">간판에서 번호를 못 찾았어요. 아래 원문에서 번호를 누르거나 직접 넣어 주세요.</p>')+
+  return '<b>☎ 간판에서 찾은 번호</b> <small class="muted">체크한 번호를 연락처에 넣어요</small>'+(P.length?P.map((p,i)=>'<label class="sgp"><input type="checkbox" data-pi="'+i+'" '+(p.on?'checked':'')+'><span><span class="nw" style="font-size:18px">'+esc(phFull(p,GEO.addr))+'</span>'+(p.local?'<br><small class="muted">간판엔 '+esc(p.n)+' · '+(areaOf(GEO.addr)?'찍은 곳 지역번호 '+areaOf(GEO.addr)+' 붙임':'지역번호 확인 필요')+'</small>':'')+(p.score<0?'<br><small style="color:#b91c1c">현수막·임대 번호 같아요</small>':'')+'</span><select data-pl="'+i+'">'+PH_LBL.map(l=>'<option '+(l===p.l?'selected':'')+'>'+l+'</option>').join('')+'</select></label>').join(''):'<p class="muted" style="margin:6px 0">간판에서 번호를 못 찾았어요. 아래 원문에서 번호를 누르거나 직접 넣어 주세요.</p>')+
   '<div class="row" style="margin-top:8px"><input id="sgAddN" inputmode="tel" placeholder="번호 직접 넣기 (예: 031-123-4567)"><button id="sgAddB" style="flex:0 0 96px;white-space:nowrap">＋ 추가</button></div>'+
   (SG.raw?'<details style="margin-top:8px"><summary class="muted">간판에서 읽은 글자 원문 보기 (숫자를 누르면 번호로 넣어요)</summary><div class="rawt">'+esc(SG.raw).replace(/[0-9OoIl|()+.\-\s]{7,}/g,m=>/[0-9].*[0-9].*[0-9].*[0-9]/.test(m)?'<button class="rawn" data-r="'+m.replace(/"/g,'')+'">'+m+'</button>':m).replace(/\n/g,'<br>')+'</div></details>':'')}
 function sgPhBind(){const box=$('#sgPh');if(!box)return;
@@ -749,7 +761,7 @@ async function sgSearch(){if(!SG||!SG.name)return;SG.busy=true;if(view==='sign')
 function sgPick(p){const g=GEO.st==='ok'?GEO:{};
   draft=Object.assign(blank(),{kind:'shop',company:p?p.name:(SG.name||''),address:p?p.addr:(g.addr||''),memo:[p&&p.cat?'업종: '+p.cat:'',p&&p.url?'카카오맵: '+p.url:''].filter(Boolean).join('\n'),
     lat:p?p.lat:(g.lat||null),lng:p?p.lng:(g.lng||null),shotLat:g.lat||null,shotLng:g.lng||null,shotAt:SG.shotAt,photo:SG.photo,photoFull:SG.photoFull,tags:'거래처',metPlace:'간판 촬영'+(g.addr?' · '+g.addr:''),_ocr:0,_raw:SG.raw||''});
-  const SP=(SG.phones||[]).filter(x=>x.on),sp=SP.map(x=>x.n),mp=p&&p.tel?fmtPhone(p.tel):'';const fld=ph=>/^01/.test(digits(ph))?'mobile':'tel';
+  const mp=p&&p.tel?fmtPhone(p.tel):'';const SP=(SG.phones||[]).filter(x=>x.on).map(x=>{let n=phFull(x,p?p.addr:(g.addr||''));if(x.local&&mp&&digits(mp).endsWith(digits(x.n)))n=mp;return {n,l:x.l}}),sp=SP.map(x=>x.n);const fld=ph=>/^01/.test(digits(ph))?'mobile':'tel';
   draft.xph=[];const DEF={tel:'매장',mobile:'휴대폰',fax:'팩스'};const put=(ph,l)=>{const f=l==='팩스'?'fax':fld(ph);if(!draft[f]&&(!l||l===DEF[f])){draft[f]=ph;return}draft.xph.push({l:l||'기타',n:ph})};
   SP.forEach(x=>put(x.n,x.l));
   if(!draft.tel&&!draft.mobile&&draft.xph.length){const x=draft.xph.find(y=>!/팩스/.test(y.l));if(x){draft.xph=draft.xph.filter(y=>y!==x);draft[fld(x.n)]=x.n;if(x.l&&x.l!==DEF[fld(x.n)])draft.memo=[draft.memo,'대표 번호('+x.n+'): '+x.l].filter(Boolean).join('\n')}}
@@ -867,7 +879,7 @@ async function editPhoto(){const d=draft;if(!d||!d.photoFull)return;const FF=d._
 async function rereadPhoto(){const d=draft;if(!d)return;const FF=d._me?ME_FIELDS:FIELDS;FF.forEach(([k])=>{const el=$('#f_'+k);if(el)d[k]=el.value});
   let cv=d._edited;if(!cv){try{cv=await loadCv(d.photoFull)}catch(e){return toast('사진을 열지 못했어요')}}
   sheet('<h3>글자 다시 읽는 중…</h3><div class="prog"><i style="width:60%"></i></div>');
-  try{const base=scaleCv(cv,1600);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);const t1=r1.status==='fulfilled'?r1.value:'',t2=r2.status==='fulfilled'?r2.value:'';
+  try{const base=scaleCv(cv,2000);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);const t1=r1.status==='fulfilled'?r1.value:'',t2=r2.status==='fulfilled'?r2.value:'';
     if(!t1&&!t2)throw 0;const m=mergeParse(parseCard(t1||t2),parseCard(t2||t1));let n=0;FF.forEach(([k])=>{if(m.o[k]&&m.o[k]!==d[k]){d[k]=m.o[k];n++}});d._alt=m.alt;d._raw=t1||t2;d._ocr=1;sheet();render();toast(n?n+'칸을 새로 읽은 값으로 바꿨어요':'바뀐 칸이 없어요')}
   catch(e){sheet();toast('글자를 못 읽었어요. 인터넷을 확인해 주세요')}}
 async function onMePhoto(file){if(!file)return;let cv;try{cv=await imgToCanvas(file,2000)}catch(e){return toast('사진을 열지 못했어요')}openCrop(cv,meReadCv)}
