@@ -61,12 +61,12 @@ label.f{display:block;margin:12px 0 4px;font-weight:600;color:var(--sub);font-si
 .photo{width:100%;border-radius:12px;border:1px solid var(--bd);margin:8px 0}
 .prog{height:10px;background:#e5e7eb;border-radius:5px;overflow:hidden;margin:10px 0}
 .prog i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
-#sheet{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:flex-end;z-index:20}
+#sheet{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:flex-end;z-index:50}
 #sheet.on{display:flex}
 #sheet .in{background:#fff;width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
 #sheet h3{margin:4px 0 10px;font-size:19px}
 #sheet .opt{width:100%;margin:6px 0;justify-content:flex-start;text-align:left}
-#toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:16px;opacity:0;transition:opacity .2s;z-index:30;pointer-events:none;max-width:90%}
+#toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:16px;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none;max-width:90%}
 #toast.on{opacity:1}
 .tag{display:inline-block;background:#eef2f7;border-radius:8px;padding:2px 8px;font-size:14px;color:#374151;margin:2px 4px 0 0}
 h2{font-size:19px;margin:18px 0 8px}
@@ -91,6 +91,9 @@ h2{font-size:19px;margin:18px 0 8px}
 .sgp{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #eef0f3}.sgp input{width:24px;min-height:24px;flex:none}.sgp select{width:auto;min-height:42px;margin-left:auto}
 .rawt{font-size:15px;line-height:1.9;background:#f7f7f7;border-radius:8px;padding:8px;margin-top:6px}.rawn{min-height:34px;padding:0 6px;font-weight:600;color:#1d4ed8;border-color:#9db7f3;display:inline}
 .xrow{display:flex;gap:6px;margin-top:8px}.xrow .xl{flex:0 0 38%}.xrow .xd{flex:0 0 48px;padding:0}.xadd{margin-top:10px;border-style:dashed;color:#1d4ed8}
+.locs{display:flex;flex-direction:column;gap:8px;margin:8px 0}.locopt{min-height:56px;justify-content:flex-start;text-align:left;flex-direction:column;align-items:flex-start;gap:0;padding:8px 14px}.locopt small{font-weight:400;color:#4b5563;font-size:14px}.locopt.on{border:2px solid #1d4ed8;background:#eaf1fe}.locopt:disabled{opacity:.45}
+.phpin{position:absolute;top:4px;right:4px;font-style:normal;background:rgba(255,255,255,.85);border-radius:8px;padding:0 3px;font-size:13px}
+#phV .pvloc{justify-content:flex-start;text-align:left;font-weight:500;background:#1f2937;color:#fff;border-color:#4b5563;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .shopbtn{margin:0 0 12px;border-color:#86c5a0;color:#15803d}
 .alt{min-height:40px;margin-top:6px;font-size:15px;font-weight:500;color:#9a3412;background:#fff7ed;border-color:#fed7aa}
 .mecard{display:flex;gap:12px;align-items:center;cursor:pointer;border:2px solid var(--ac)}
@@ -117,7 +120,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v020</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v021</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -137,7 +140,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v020';
+const VER='v021';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -289,7 +292,7 @@ function dl(file){const a=document.createElement('a');a.href=URL.createObjectURL
 
 /* ---------- 바로 실행 (지도·전화·메일·카톡) ---------- */
 function openTmap(addr,c){
-  const q=encodeURIComponent(addr);const hasXY=c&&c.lat&&c.lng;const gq=hasXY?'route?goalname='+encodeURIComponent(c.company||c.name||addr)+'&goalx='+c.lng+'&goaly='+c.lat:'search?name='+q;
+  const q=encodeURIComponent(addr||'');const hasXY=c&&c.lat&&c.lng;const gq=hasXY?'route?goalname='+encodeURIComponent(c.company||c.name||addr)+'&goalx='+c.lng+'&goaly='+c.lat:'search?name='+q;
   if(isAnd)location.href='intent://'+gq+'#Intent;scheme=tmap;package=com.skt.tmap.ku;end';
   else{location.href='tmap://'+gq;
     setTimeout(()=>{if(!document.hidden)sheet(`<h3>티맵이 안 열렸나요?</h3><p class="muted">티맵이 설치돼 있지 않으면 다른 지도로 열 수 있어요.</p>
@@ -307,7 +310,7 @@ async function knPrep(c){try{if(!c||!c.address&&!c.lat)return;
 }catch(e){}knBtn()}
 const knXY=c=>c.lat&&c.lng?{lat:c.lat,lng:c.lng}:KN.xy[c.id];
 const knReady=c=>KN.sdk&&!!knXY(c);
-function knBtn(){const b=$('#knGo');if(!b)return;const c=cur();if(knReady(c)){b.disabled=false;b.textContent='🧭 카카오내비로 길안내'}}
+function knBtn(){const b=$('#knGo');if(!b)return;const c=KN.cur||cur();if(knReady(c)){b.disabled=false;b.textContent='🧭 카카오내비로 길안내'}}
 function kakaoNavi(c){const xy=knXY(c);if(KN.sdk&&xy){try{Kakao.Navi.start({name:(c.company||c.name||c.address||'목적지').slice(0,40),x:+xy.lng,y:+xy.lat,coordType:'wgs84'});return}catch(e){}}
   kakaoMapRoute(c)}
 function kakaoMapRoute(c){const xy=knXY(c);const nm=encodeURIComponent((c.company||c.name||'목적지').replace(/,/g,' '));
@@ -317,18 +320,19 @@ function navGo(c){if(!c||!(c.address||c.lat))return;
   if(S.navApp==='tmap')return openTmap(c.address,c);
   if(S.navApp==='kakaonavi'&&knReady(c))return kakaoNavi(c);
   navMenu(c)}
-function navMenu(c){knPrep(c);
+function navMenu(c){KN.cur=c;knPrep(c);
   sheet(`<h3>📍 ${esc(c.address||'찍은 위치')}</h3>
   <button class="opt pri" id="tmGo">🚗 티맵으로 길안내</button>
   <button class="opt pri" id="knGo" ${knReady(c)?'':'disabled'}>${knReady(c)?'🧭 카카오내비로 길안내':'🧭 카카오내비 준비 중…'}</button>
-  <label class="phc" style="margin:8px 0"><input type="checkbox" id="navRem"><span>다음부터 주소를 누르면 <b>고른 앱으로 바로</b> 열기<br><small class="muted">설정에서 다시 바꿀 수 있어요</small></span></label>
-  <button class="opt" onclick="sheet();kakaoMapRoute(cur())">카카오맵 길찾기</button>
-  <button class="opt" onclick="openNaver(cur().address)">네이버 지도로 보기</button>
-  <button class="opt" onclick="copy(cur().address,'주소를 복사했어요');sheet()">주소 복사</button>
+  ${c._ph?'':'<label class="phc" style="margin:8px 0"><input type="checkbox" id="navRem"><span>다음부터 주소를 누르면 <b>고른 앱으로 바로</b> 열기<br><small class="muted">설정에서 다시 바꿀 수 있어요</small></span></label>'}
+  <button class="opt" id="kmGo">카카오맵 길찾기</button>
+  ${c.address?'<button class="opt" id="nvGo">네이버 지도로 보기</button><button class="opt" id="cpGo">주소 복사</button>':''}
   <button class="opt" onclick="sheet()">닫기</button>`);
   const rem=a=>{if($('#navRem')&&$('#navRem').checked){S.navApp=a;saveS();toast('다음부터 '+NAVN[a]+'로 바로 열어요')}};
-  $('#tmGo').onclick=()=>{rem('tmap');sheet();openTmap(cur().address,cur())};
-  $('#knGo').onclick=()=>{if(!knReady(cur()))return;rem('kakaonavi');sheet();kakaoNavi(cur())}}
+  $('#tmGo').onclick=()=>{rem('tmap');sheet();openTmap(c.address||'',c)};
+  $('#knGo').onclick=()=>{if(!knReady(c))return;rem('kakaonavi');sheet();kakaoNavi(c)};
+  $('#kmGo').onclick=()=>{sheet();kakaoMapRoute(c)};
+  if($('#nvGo'))$('#nvGo').onclick=()=>openNaver(c.address);if($('#cpGo'))$('#cpGo').onclick=()=>{copy(c.address,'주소를 복사했어요');sheet()}}
 function mapMenu(c){navMenu(c)}
 function openKakao(addr){sheet();location.href='https://map.kakao.com/link/search/'+encodeURIComponent(addr)}
 function openNaver(addr){sheet();location.href='https://map.naver.com/p/search/'+encodeURIComponent(addr)}
@@ -463,31 +467,83 @@ function renderDetail(a){
 let PH=[],phUrls=[];
 async function phLoad(){const c=cur();if(!c||view!=='detail')return;phUrls.forEach(u=>URL.revokeObjectURL(u));phUrls=[];PH=await DB.phList(c.id);
   if((c.photoN||0)!==PH.length){c.photoN=PH.length;await DB.put(c)}const st=$('#phStrip'),cn=$('#phCnt');if(cn)cn.textContent=PH.length+'장';if(!st)return;if(!PH.length){st.innerHTML='<p class="muted" style="margin:8px 0 0">메뉴·가게 앞·주차장처럼 기억해 둘 사진을 넣어 보세요. 사진마다 메모를 달 수 있어요.</p>';return}
-  st.innerHTML=PH.map((p,i)=>{const u=URL.createObjectURL(p.thumb);phUrls.push(u);return '<button class="phth" data-i="'+i+'"><img src="'+u+'" alt="">'+(p.memo?'<span>'+esc(p.memo.slice(0,14))+'</span>':'')+'</button>'}).join('');
+  st.innerHTML=PH.map((p,i)=>{const u=URL.createObjectURL(p.thumb);phUrls.push(u);return '<button class="phth" data-i="'+i+'"><img src="'+u+'" alt="">'+(p.memo?'<span>'+esc(p.memo.slice(0,14))+'</span>':'')+(p.lat||p.locAddr?'<i class="phpin">📍</i>':'')+'</button>'}).join('');
   st.querySelectorAll('.phth').forEach(b=>b.onclick=()=>phView(+b.dataset.i))}
 function phAddMenu(){sheet(`<h3>📷 사진 추가</h3><p class="muted">메뉴판·음식·가게 앞·주차장 등. 여러 장을 한 번에 넣을 수 있어요.</p><button class="opt pri" onclick="sheet();$('#phCam').click()">📷 지금 찍기</button><button class="opt" onclick="sheet();$('#phPic').click()">🖼️ 앨범에서 고르기 (여러 장)</button><button class="opt" onclick="sheet()">닫기</button>`)}
 function getPos(){return new Promise(ok=>{if(!navigator.geolocation)return ok(null);navigator.geolocation.getCurrentPosition(p=>ok({lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6)}),()=>ok(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000})})}
 const cvBlob=(cv,q)=>new Promise(ok=>cv.toBlob(ok,'image/jpeg',q));
-async function phAddFiles(files,fromCam){const c=cur();if(!c||!files.length)return;const posP=fromCam?getPos():Promise.resolve(null);
+/* 사진 속 촬영 정보(EXIF) 읽기: 크기를 줄이기 전에 원본에서 읽는다 (JPEG·HEIC 공통, 외부 도구 없음) */
+async function readExif(file){try{const buf=await file.slice(0,Math.min(file.size,1024*1024)).arrayBuffer();const u8=new Uint8Array(buf);let t=-1;
+  for(let i=0;i<u8.length-10;i++){if(u8[i]===0x45&&u8[i+1]===0x78&&u8[i+2]===0x69&&u8[i+3]===0x66&&u8[i+4]===0&&u8[i+5]===0){t=i+6;break}}
+  if(t<0)return {};const dv=new DataView(buf);const le=dv.getUint16(t)===0x4949;const g16=o=>dv.getUint16(t+o,le),g32=o=>dv.getUint32(t+o,le);
+  const ifd=(o)=>{const n=g16(o),m={};for(let i=0;i<n;i++){const e=o+2+i*12;m[g16(e)]={type:g16(e+2),cnt:g32(e+4),vo:e+8}}return m};
+  const val=(en)=>{if(!en)return null;const sz={1:1,2:1,3:2,4:4,5:8}[en.type]||1;const off=en.cnt*sz>4?g32(en.vo):en.vo;
+    if(en.type===2){let s='';for(let i=0;i<en.cnt-1;i++)s+=String.fromCharCode(dv.getUint8(t+off+i));return s}
+    if(en.type===5){const a=[];for(let i=0;i<en.cnt;i++){const nu=g32(off+i*8),de=g32(off+i*8+4);a.push(de?nu/de:0)}return a}
+    if(en.type===3)return g16(off);if(en.type===4)return g32(off);return null};
+  const i0=ifd(g32(4));const out={};
+  if(i0[0x8769]){const ex=ifd(val(i0[0x8769]));const dt=val(ex[0x9003])||val(i0[0x0132]);if(dt){const m=dt.match(/(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);if(m)out.at=new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6]).getTime()}}
+  if(i0[0x8825]){const gp=ifd(val(i0[0x8825]));const la=val(gp[2]),lo=val(gp[4]);if(la&&lo&&la.length===3){let lat=la[0]+la[1]/60+la[2]/3600,lng=lo[0]+lo[1]/60+lo[2]/3600;if(val(gp[1])==='S')lat=-lat;if(val(gp[3])==='W')lng=-lng;if(lat||lng){out.lat=+lat.toFixed(6);out.lng=+lng.toFixed(6)}}}
+  return out}catch(e){return {}}}
+const LOCN={exif:'📷 사진 찍은 곳',here:'📡 사진 넣은 곳(그때 있던 곳)',addr:'🏠 연락처 주소',manual:'✏️ 직접 입력',none:'위치 없음'};
+async function addrOf(lat,lng){try{const r=await srv({act:'rgeo',lat,lng});return r.ok?r.addr:''}catch(e){return ''}}
+/* 위치 고르기 창: recs(사진들)에 적용. done() 호출 */
+async function locChooser(recs,c,title,done,fromCam){
+  const ex=recs.filter(r=>r.exifLat);const one=recs.length===1;
+  let pick=ex.length?'exif':(fromCam?'here':'none');let here=null,manual={q:'',lat:null,lng:null,addr:''};
+  const exAddr=ex.length?await addrOf(ex[0].exifLat,ex[0].exifLng):'';
+  const draw=()=>{sheet(`<h3>${title}</h3>
+   <div class="note ${ex.length?'ok':'warn'}" style="margin-top:0">${ex.length?'📷 '+(one?'':ex.length+'장에 ')+'사진 찍은 위치가 들어 있어요'+(exAddr?': <b>'+esc(exAddr)+'</b>':''):'이 사진'+(one?'':'들')+'엔 찍은 위치 정보가 없어요. 아래에서 골라 주세요.<br><small>앨범에서 고를 때 휴대폰이 개인정보 보호로 위치를 지우는 경우가 많아요. 「내 파일」 앱에서 고르면 남는 경우가 있어요.</small>'}</div>
+   <div class="locs">
+    <button class="locopt ${pick==='exif'?'on':''}" data-l="exif" ${ex.length?'':'disabled'}>📷 사진 찍은 곳${ex.length?'':' (정보 없음)'}</button>
+    <button class="locopt ${pick==='here'?'on':''}" data-l="here">📡 지금 있는 곳${here?'<small>'+esc(here.addr||(here.lat+', '+here.lng))+'</small>':(pick==='here'?'<small>위치 찾는 중…</small>':'')}</button>
+    <button class="locopt ${pick==='addr'?'on':''}" data-l="addr" ${c&&c.address?'':'disabled'}>🏠 이 연락처 주소${c&&c.address?'<small>'+esc(c.address)+'</small>':''}</button>
+    <button class="locopt ${pick==='manual'?'on':''}" data-l="manual">✏️ 직접 입력</button>
+    ${pick==='manual'?'<div class="row"><input id="locQ" placeholder="주소나 장소 이름 (예: 곤지암읍 만선로 75-1)" value="'+esc(manual.q)+'"><button id="locFind" style="flex:0 0 80px">찾기</button></div>'+(manual.addr?'<p class="muted" style="margin:4px 0">→ '+esc(manual.addr)+'</p>':''):''}
+    <button class="locopt ${pick==='none'?'on':''}" data-l="none">위치 없음</button></div>
+   ${recs.length&&recs[0]._isNew?'<label class="f" for="phMemo">메모 (선택 · 예: 메뉴명·가격·주차)</label><input id="phMemo" value="'+esc(recs[0].memo||'')+'" placeholder="예) 크루아상 4,500원 · 뒤편 주차 가능">':''}
+   <button class="opt pri" id="locOk">저장</button><button class="opt" id="locNo">취소</button>`);
+   document.querySelectorAll('.locopt').forEach(b=>b.onclick=()=>{const m=$('#phMemo');if(m)recs.forEach(r=>r.memo=m.value);pick=b.dataset.l;if(pick==='here'&&!here)getPos().then(async p=>{here=p?Object.assign(p,{addr:await addrOf(p.lat,p.lng)}):{fail:1};if(here.fail){here=null;toast('지금 위치를 못 받았어요 (위치 권한 확인)')}draw()});draw()});
+   if($('#locFind'))$('#locFind').onclick=async()=>{manual.q=$('#locQ').value.trim();if(!manual.q)return;const m=$('#phMemo');if(m)recs.forEach(r=>r.memo=m.value);
+     try{let g=await srv({act:'geo',addr:manual.q});if(g.ok&&g.lat){manual.lat=g.lat;manual.lng=g.lng;manual.addr=(await addrOf(g.lat,g.lng))||manual.q}else{const b={act:'place',q:manual.q};if(GEO.st==='ok'){b.lat=GEO.lat;b.lng=GEO.lng}const p=await srv(b);const f=p.ok&&p.list&&p.list[0];if(f){manual.lat=f.lat;manual.lng=f.lng;manual.addr=f.name+' · '+f.addr}else{manual.addr=manual.q+' (지도에서 못 찾음, 글자만 저장)'}}}catch(e){manual.addr=manual.q}draw()};
+   $('#locNo').onclick=()=>{sheet();done(false)};
+   $('#locOk').onclick=async()=>{const m=$('#phMemo');if(m)recs.forEach(r=>r.memo=m.value.trim());
+     if(pick==='here'&&!here){here=await getPos();if(here)here.addr=await addrOf(here.lat,here.lng)}
+     if(pick==='manual'&&!manual.addr&&$('#locQ')&&$('#locQ').value.trim()){manual.q=$('#locQ').value.trim();manual.addr=manual.q}
+     for(const r of recs){r.locSrc=pick;r.lat=null;r.lng=null;r.locAddr='';
+       if(pick==='exif'&&r.exifLat){r.lat=r.exifLat;r.lng=r.exifLng;r.locAddr=(r===ex[0]?exAddr:'')}
+       else if(pick==='exif'){r.locSrc='none'}
+       else if(pick==='here'&&here){r.lat=here.lat;r.lng=here.lng;r.locAddr=here.addr||''}
+       else if(pick==='addr'&&c){r.lat=c.lat||null;r.lng=c.lng||null;r.locAddr=c.address||''}
+       else if(pick==='manual'){r.lat=manual.lat;r.lng=manual.lng;r.locAddr=manual.addr||manual.q}
+       else if(pick!=='none'){r.locSrc='none'}}
+     sheet();done(true)};
+   if(pick==='here'&&!here)getPos().then(async p=>{if(p){here=Object.assign(p,{addr:await addrOf(p.lat,p.lng)});draw()}})};
+  draw()}
+async function phAddFiles(files,fromCam){const c=cur();if(!c||!files.length)return;
   sheet('<h3>사진 넣는 중…</h3><div class="prog"><i style="width:50%"></i></div>');const recs=[];
-  try{for(const f of files){const cv=await imgToCanvas(f,1600);const full=await cvBlob(cv,.8),thumb=await cvBlob(scaleCv(cv,320),.72);recs.push({id:newId(),cid:c.id,at:fromCam?Date.now():(f.lastModified||Date.now()),memo:'',full,thumb})}}catch(e){sheet();return toast('사진을 열지 못했어요')}
-  const pos=await posP;recs.forEach(r=>{if(pos){r.lat=pos.lat;r.lng=pos.lng}});
-  const prev=recs.map(r=>URL.createObjectURL(r.thumb));
-  sheet(`<h3>사진 ${recs.length}장 넣기</h3><div class="phstrip" style="margin-bottom:8px">${prev.map(u=>'<span class="phth"><img src="'+u+'"></span>').join('')}</div><label class="f" for="phMemo">메모 (선택 · 예: 메뉴명·가격·주차)</label><input id="phMemo" placeholder="예) 크루아상 4,500원 · 뒤편 주차 가능"><p class="muted">${pos?'📍 찍은 위치도 함께 저장해요':(fromCam?'위치는 못 받았어요 (위치 권한 확인)':'앨범 사진은 사진의 날짜로 저장해요')}</p><button class="opt pri" id="phOk">저장</button><button class="opt" id="phNo">취소</button>`);
-  $('#phNo').onclick=()=>{prev.forEach(u=>URL.revokeObjectURL(u));sheet()};
-  $('#phOk').onclick=async()=>{const m=$('#phMemo').value.trim();try{for(const r of recs){r.memo=m;await DB.phPut(r)}}catch(e){sheet();return toast('휴대폰 저장 공간이 부족해요')}prev.forEach(u=>URL.revokeObjectURL(u));sheet();c.photoN=(c.photoN||0)+recs.length;c.updated=Date.now();await DB.put(c);toast('사진 '+recs.length+'장을 넣었어요');phLoad()}}
+  try{for(const f of files){const ex=await readExif(f);const cv=await imgToCanvas(f,1600);const full=await cvBlob(cv,.8),thumb=await cvBlob(scaleCv(cv,320),.72);
+    recs.push({id:newId(),cid:c.id,at:ex.at||(fromCam?Date.now():(f.lastModified||Date.now())),atSrc:ex.at?'exif':(fromCam?'now':'file'),exifLat:ex.lat||null,exifLng:ex.lng||null,memo:'',full,thumb,_isNew:1})}}catch(e){sheet();return toast('사진을 열지 못했어요')}
+  locChooser(recs,c,'📷 사진 '+recs.length+'장 넣기 · 📍 위치 고르기',async ok=>{if(!ok)return;try{for(const r of recs){delete r._isNew;await DB.phPut(r)}}catch(e){return toast('휴대폰 저장 공간이 부족해요')}
+    c.photoN=(c.photoN||0)+recs.length;c.updated=Date.now();await DB.put(c);toast('사진 '+recs.length+'장을 넣었어요');phLoad()},fromCam)}
+function phLocText(p){if(!p.lat&&!p.locAddr)return '';const src=p.locSrc==='exif'?'사진 찍은 곳':p.locSrc==='addr'?'연락처 주소':p.locSrc==='manual'?'직접 입력':'넣을 때 있던 곳';return (p.locAddr||(p.lat+', '+p.lng))+' · '+src}
 function phView(i){const p=PH[i];if(!p)return;const old=$('#phV');if(old)old.remove();const u=URL.createObjectURL(p.full);const o=document.createElement('div');o.id='phV';
-  const dt=new Date(p.at).toLocaleString('ko-KR',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const dt=new Date(p.at).toLocaleString('ko-KR',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+(p.atSrc==='exif'?' 촬영':'');
+  const lt=phLocText(p);
   o.innerHTML=`<div class="pvtop"><span>${i+1} / ${PH.length} · ${dt}</span><button id="pvX">닫기 ✕</button></div><div class="pvimg"><img src="${u}" alt=""></div>
    <div class="pvbot"><div class="cb"><button id="pvP" ${i?'':'disabled'}>◀ 이전</button><button id="pvN" ${i<PH.length-1?'':'disabled'}>다음 ▶</button></div>
+   <div class="cb"><button id="pvLoc" class="pvloc">📍 ${lt?esc(lt):'위치 없음'}</button><button id="pvLc" style="flex:0 0 96px">위치 바꾸기</button></div>
    <input id="pvM" placeholder="메모 (예: 메뉴명·가격·주차)" value="${esc(p.memo||'')}">
-   <div class="cb"><button class="pri" id="pvS">메모 저장</button>${p.lat?'<a class="btn" target="_blank" href="https://map.kakao.com/link/map/'+encodeURIComponent('찍은 곳')+','+p.lat+','+p.lng+'">📍 찍은 곳</a>':''}<button id="pvSh">보내기</button><button class="danger" id="pvD">🗑 지우기</button></div></div>`;
+   <div class="cb"><button class="pri" id="pvS">메모 저장</button><button id="pvSh">보내기</button><button class="danger" id="pvD">🗑 지우기</button></div></div>`;
   document.body.appendChild(o);const close=()=>{URL.revokeObjectURL(u);o.remove()};
   o.querySelector('#pvX').onclick=close;o.querySelector('#pvP').onclick=()=>{close();phView(i-1)};o.querySelector('#pvN').onclick=()=>{close();phView(i+1)};
   let sx=null;const im=o.querySelector('.pvimg');im.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});im.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(dx<-60&&i<PH.length-1){close();phView(i+1)}else if(dx>60&&i>0){close();phView(i-1)}});
+  o.querySelector('#pvLoc').onclick=()=>{if(!lt)return o.querySelector('#pvLc').click();const c=cur()||{};navMenu({_ph:1,id:'ph_'+p.id,company:(c.company||c.name||'사진 찍은 곳'),address:p.locAddr||'',lat:p.lat,lng:p.lng})};
+  o.querySelector('#pvLc').onclick=()=>{locChooser([p],cur(),'📍 이 사진 위치 바꾸기',async ok=>{if(!ok)return;await DB.phPut(p);toast('위치를 바꿨어요');close();await phLoad();phView(i)})};
   o.querySelector('#pvS').onclick=async()=>{p.memo=o.querySelector('#pvM').value.trim();await DB.phPut(p);toast('메모를 저장했어요');phLoad()};
   o.querySelector('#pvSh').onclick=async()=>{const f=new File([p.full],'사진_'+((cur()&&(cur().company||cur().name))||'')+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:p.memo||''})}catch(e){}}else dl(f)};
   o.querySelector('#pvD').onclick=async()=>{if(!confirm('이 사진을 지울까요? 되돌릴 수 없어요.'))return;await DB.phDel(p.id);const c=cur();if(c){c.photoN=Math.max(0,(c.photoN||1)-1);await DB.put(c)}close();toast('사진을 지웠어요');await phLoad()}}
+
 async function toggleFav(){const c=cur();c.fav=!c.fav;c.updated=Date.now();await DB.put(c);render()}
 async function delCur(){const c=cur();if(!confirm((c.name||c.company||'이 연락처')+'를 지울까요?'+(c.photoN?' 사진 '+c.photoN+'장도 같이 지워져요.':'')+' 되돌릴 수 없어요.'))return;try{for(const p of await DB.phList(c.id))await DB.phDel(p.id)}catch(e){}await DB.del(c.id);C=C.filter(x=>x.id!==c.id);toast('지웠어요');history.back()}
 const FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['bizNo','사업자등록번호 (나중에 받으면 입력)'],['metAt','만난 날','date'],['metPlace','만난 곳 (예: 박람회, 거래처 방문)'],['tags','묶음 (예: 거래처 협력사)'],['memo','메모']];
@@ -560,7 +616,7 @@ function renderSet(a){
   <p class="muted">바로연락 ${VER} · 저장된 연락처 ${C.length}명</p>
   <button class="pri full" id="sv">설정 저장</button>`;
   $('#sv').onclick=()=>{S.sign=$('#sg').value;S.navApp=$('#navSel').value;saveS();toast('설정을 저장했어요');history.back()};
-  $('#bk').onclick=async()=>{let photos=[];try{const A=await DB.phAll();toast('사진 '+A.length+'장을 백업에 담는 중…');const b64=bl=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(bl)});for(const p of A)photos.push({id:p.id,cid:p.cid,at:p.at,memo:p.memo,lat:p.lat,lng:p.lng,full:await b64(p.full),thumb:await b64(p.thumb)})}catch(e){}
+  $('#bk').onclick=async()=>{let photos=[];try{const A=await DB.phAll();toast('사진 '+A.length+'장을 백업에 담는 중…');const b64=bl=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(bl)});for(const p of A)photos.push({id:p.id,cid:p.cid,at:p.at,atSrc:p.atSrc,memo:p.memo,lat:p.lat,lng:p.lng,locSrc:p.locSrc,locAddr:p.locAddr,exifLat:p.exifLat,exifLng:p.exifLng,full:await b64(p.full),thumb:await b64(p.thumb)})}catch(e){}
     const f=new File([JSON.stringify({app:'barolink',ver:VER,at:new Date().toISOString(),contacts:C,me:ME,photos})],'바로연락_백업_'+today().replace(/-/g,'')+'.json',{type:'application/json'});
     if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>dl(f));else dl(f);S.lastBak=Date.now();saveS();toast('백업 파일을 만들었어요. 구글 드라이브 등에 보관하세요')};
   $('#rs').onclick=()=>$('#bakIn').click();
