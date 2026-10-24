@@ -102,7 +102,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v011</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v012</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -120,7 +120,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v011';
+const VER='v012';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -394,7 +394,7 @@ function renderDetail(a){
   const c=cur();if(!c){view='list';return render()}
   const row=(k,v,href,cp)=>v?`<div class="kv"><div class="k">${k}</div><div class="v">${href?`<a href="${href}">${esc(v)}</a>`:esc(v)}</div>${cp?`<button class="cp" onclick="copy('${esc(v).replace(/'/g,'')}')">복사</button>`:''}</div>`:'';
   a.innerHTML=`<div class="card"><div class="item" style="cursor:default"><div class="av" style="width:64px;height:64px;font-size:26px">${c.photo?`<img src="${c.photo}" alt="">`:esc(initial(c))}</div>
-   <div><div class="nm" style="font-size:22px">${c.kind==='shop'?'🏪 ':''}${esc(c.name||c.company||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
+   <div><div class="nm" style="font-size:22px">${c.kind==='shop'?'🏪 ':''}${esc(c.name||c.company||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc(c.kind==='shop'&&!c.name?((String(c.memo||'').match(/업종: ([^\n]*)/)||[])[1]||'거래처'):[c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
    <button class="ghost" style="margin-left:auto;font-size:24px" onclick="toggleFav()" aria-label="즐겨찾기">${c.fav?'★':'☆'}</button></div></div>
   <div class="big">
    <button onclick="${c.address?'openTmap(cur().address,cur())':''}" ${c.address?'':'disabled'}><b>📍</b>티맵 길안내</button>
@@ -610,7 +610,7 @@ function renderMe(a){
    <p class="muted">내 명함도 서버에 올리지 않고 이 휴대폰 안에만 저장돼요.</p>`;return}
   const c=ME;const row=(k,v)=>v?`<div class="kv"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`:'';
   a.innerHTML=`${c.photoFull?`<img class="photo mephoto" src="${c.photoFull}" alt="내 명함" onclick="meShow()"><p class="muted" style="text-align:center;margin:0 0 10px">사진을 누르면 화면 가득 크게 보여줘요</p>`:''}
-  <div class="card"><div class="nm" style="font-size:21px">${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
+  <div class="card"><div class="nm" style="font-size:21px">${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc(c.kind==='shop'&&!c.name?((String(c.memo||'').match(/업종: ([^\n]*)/)||[])[1]||'거래처'):[c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
   <button class="pri full" onclick="meShare()">💬 내 명함 보내기 (카톡·문자)</button><p></p>
   <div class="row"><button onclick="meVcf()">📇 연락처 파일로 보내기</button><button onclick="copy(meText(),'내 명함 글자를 복사했어요')">📋 글자로 복사</button></div>
   <div class="card" style="margin-top:12px">${row('휴대폰',c.mobile)}${row('전화',c.tel)}${row('팩스',c.fax)}${row('메일',c.email)}${row('주소',c.address)}${row('홈페이지',c.web)}${row('카톡 ID',c.kakao)}${row('추가 정보',c.memo)}</div>
