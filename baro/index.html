@@ -70,13 +70,19 @@ label.f{display:block;margin:12px 0 4px;font-weight:600;color:var(--sub);font-si
 #toast.on{opacity:1}
 .tag{display:inline-block;background:#eef2f7;border-radius:8px;padding:2px 8px;font-size:14px;color:#374151;margin:2px 4px 0 0}
 h2{font-size:19px;margin:18px 0 8px}
+.phc{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px;margin:16px 0 10px;font-weight:600;cursor:pointer}
+.phc input{width:26px;min-height:26px;flex:none;margin-top:2px}
+.phc small{font-weight:400}
+.phb{margin-bottom:12px;border-color:#9db7f3;color:#1d4ed8}
+.pk{cursor:pointer}.pk input{width:26px;min-height:26px;flex:none}
+.fab:disabled{opacity:.5}
 .alt{min-height:40px;margin-top:6px;font-size:15px;font-weight:500;color:#9a3412;background:#fff7ed;border-color:#fed7aa}
 </style>
 </head>
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v004</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v005</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <main id="app"></main>
@@ -89,7 +95,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v004';
+const VER='v005';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -216,12 +222,17 @@ function parseVcf(t){
 }
 function saveVcf(list,fname){
   const txt=list.map(toVcf).join('');
-  const file=new File([txt],fname,{type:'text/vcard'});
-  if(isIOS&&list.length===1){location.href='data:text/vcard;charset=utf-8,'+encodeURIComponent(txt);return}
-  if(navigator.canShare&&navigator.canShare({files:[file]})&&isAnd){
-    navigator.share({files:[file],title:fname}).catch(()=>dl(file));return}
+  const file=new File([txt],fname,{type:'text/vcard'});window._lastVcf=file;
+  markPhone(list);
+  const n=list.length;
+  if(isIOS){const u=URL.createObjectURL(file);location.href=u;
+    setTimeout(()=>sheet(`<h3>📱 휴대폰 연락처에 저장</h3><div class="note">연락처 화면이 열리면 <b>「새로운 연락처 생성」</b>${n>1?'(여러 명이면 「모든 연락처 추가」)':''}을 누르세요.</div><button class="opt" onclick="shareVcfAgain()">안 열리면: 공유 창으로 연락처 앱에 보내기</button><button class="opt pri" onclick="sheet()">확인</button>`),1200);return}
   dl(file);
+  sheet(`<h3>📱 휴대폰 연락처에 저장</h3><div class="note">${n>1?n+'명의 ':''}연락처 파일을 받았어요.<br>화면 아래나 알림창의 <b>「열기」</b>를 누르고, 연락처 앱에서 <b>「저장」</b>(또는 「가져오기」)을 누르면 끝나요.</div><button class="opt" onclick="shareVcfAgain()">다른 방법: 공유 창으로 연락처 앱에 보내기</button><button class="opt pri" onclick="sheet()">확인</button>`);
 }
+function shareVcfAgain(){const f=window._lastVcf;sheet();if(f&&navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>{});else dl(f)}
+async function markPhone(list){const t=Date.now();for(const c of list){const x=C.find(y=>y.id===c.id);if(x){x.phoneAt=t;await DB.put(x)}}}
+const md=t=>{const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()};
 function dl(file){const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
 
 /* ---------- 바로 실행 (지도·전화·메일·카톡) ---------- */
@@ -272,7 +283,7 @@ function telMenu(c){
 }
 function kakaoMenu(c){
   sheet(`<h3>💬 카톡·연락처</h3>
-  <button class="opt pri" onclick="sheet();saveVcf([cur()],(cur().name||'연락처')+'.vcf')">① 휴대폰 연락처에 저장</button>
+  <button class="opt pri" onclick="saveVcf([cur()],(cur().name||'연락처')+'.vcf')">① 휴대폰 연락처에 저장</button>
   <div class="note">카톡은 다른 앱이 친구를 직접 추가하는 걸 막아 두었어요. 대신 <b>휴대폰 연락처에 저장</b>하면 카톡이 알아서 친구로 넣어 줘요.<br>카톡 → 친구 탭 → 설정(톱니) → <b>「자동 친구 추가」 켜기</b> (한 번만)</div>
   ${c.kakao?`<button class="opt" onclick="copy(cur().kakao,'카톡 ID를 복사했어요. 카톡 친구 추가 → ID로 붙여넣기');sheet()">② 카톡 ID 복사 (${esc(c.kakao)})</button>`:''}
   <button class="opt" onclick="shareCard(cur())">${c.kakao?'③':'②'} 이 명함을 카톡으로 보내기</button>
@@ -315,6 +326,7 @@ function render(){
   if(view==='edit')return renderEdit(a);
   if(view==='set')return renderSet(a);
   if(view==='paste')return renderPaste(a);
+  if(view==='pick')return renderPick(a);
 }
 function renderList(a){
   const tags=[...new Set(C.flatMap(c=>(c.tags||'').split(/[,\s]+/).filter(Boolean)))].slice(0,12);
@@ -325,10 +337,11 @@ function renderList(a){
   const needBak=C.length>=10&&Date.now()-(S.lastBak||0)>14*864e5;
   a.innerHTML=`<div class="search"><span>🔍</span><input id="qIn" type="search" placeholder="이름·회사·번호·주소로 찾기" value="${esc(q)}"></div>
   <div class="chips"><button class="chip ${filt==='all'?'on':''}" data-f="all">전체 ${C.length}</button><button class="chip ${filt==='fav'?'on':''}" data-f="fav">★ 즐겨찾기</button>${tags.map(t=>`<button class="chip ${filt==='#'+t?'on':''}" data-f="#${esc(t)}">#${esc(t)}</button>`).join('')}</div>
+  ${C.length?`<button class="full" style="margin-bottom:12px" onclick="pickSel=new Set();go('pick')">📱 여러 명 골라서 휴대폰 연락처에 저장</button>`:''}
   ${needBak?`<div class="note warn">연락처는 이 휴대폰 안에만 저장돼요. 휴대폰을 바꾸거나 잃어버리면 사라지니 <b>설정 → 백업 파일 저장</b>을 가끔 해 주세요.</div>`:''}
   ${L.length?L.map(c=>`<div class="card item" data-id="${c.id}">
      <div class="av">${c.photo?`<img src="${c.photo}" alt="">`:esc(initial(c))}</div>
-     <div style="min-width:0"><div class="nm">${c.fav?'★ ':''}${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
+     <div style="min-width:0"><div class="nm">${c.fav?'★ ':''}${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span>${c.phoneAt?' <span class="muted" title="휴대폰에 저장함">📱</span>':''}</div><div class="co">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
      <div class="mini">${(c.mobile||c.tel)?`<button data-act="tel" aria-label="전화">📞</button>`:''}${c.address?`<button data-act="map" aria-label="지도">📍</button>`:''}</div></div>`).join('')
    :(C.length?`<div class="empty"><b>찾는 연락처가 없어요</b>다른 말로 찾아보세요.</div>`
    :`<div class="empty"><b>아직 저장한 명함이 없어요</b>아래 「＋ 명함 추가」를 눌러<br>명함 사진을 찍어 보세요.<br><br><span class="muted">사진에서 이름·전화·메일·주소를 알아서 나눠 넣어요.</span></div>`)}`;
@@ -349,8 +362,9 @@ function renderDetail(a){
    <button onclick="${c.address?'openTmap(cur().address)':''}" ${c.address?'':'disabled'}><b>📍</b>티맵 길안내</button>
    <button onclick="telMenu(cur())" ${(c.mobile||c.tel)?'':'disabled'}><b>📞</b>전화·문자</button>
    <button onclick="mailMenu(cur())" ${c.email?'':'disabled'}><b>✉️</b>메일 보내기</button>
-   <button onclick="kakaoMenu(cur())"><b>💬</b>카톡·연락처 저장</button>
+   <button onclick="kakaoMenu(cur())"><b>💬</b>카톡</button>
   </div>
+  <button class="full phb" onclick="saveVcf([cur()],(cur().name||cur().company||'연락처')+'.vcf')">📱 내 휴대폰 연락처에 저장${c.phoneAt?` <small>(저장함 ${md(c.phoneAt)})</small>`:''}</button>
   <div class="card">
    ${row('휴대폰',c.mobile,'tel:'+digits(c.mobile),1)}${row('전화',c.tel,'tel:'+digits(c.tel),1)}${row('팩스',c.fax,'',1)}
    ${row('메일',c.email,'mailto:'+c.email,1)}${c.address?`<div class="kv"><div class="k">주소</div><div class="v"><a href="#" onclick="event.preventDefault();mapMenu(cur())">${esc(c.address)}</a></div><button class="cp" onclick="copy(cur().address)">복사</button></div>`:''}
@@ -371,23 +385,41 @@ function renderEdit(a){
   ${d.photoFull?`<img class="photo" src="${d.photoFull}" alt="명함 사진">`:''}
   ${FIELDS.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}${d._alt&&d._alt[k]?`<button class="alt" data-k="${k}">↺ 다른 읽기: ${esc(d._alt[k])}</button>`:''}`).join('')}
   ${d._raw?`<details style="margin-top:12px"><summary class="muted">사진에서 읽은 글자 전체 보기</summary><pre style="white-space:pre-wrap;font-size:14px">${esc(d._raw)}</pre></details>`:''}
-  <p></p><button class="pri full" id="saveBtn">저장</button>`;
+  <label class="phc"><input type="checkbox" id="phChk" ${(d.id?false:S.autoPhone!==false)?'checked':''}><span>📱 내 휴대폰 연락처에도 저장<br><small class="muted">${d.phoneAt?'전에 휴대폰에 저장함 ('+md(d.phoneAt)+') · 고친 내용을 다시 넣으려면 체크':'카톡 친구 자동 추가도 이걸로 돼요'}</small></span></label>
+  <button class="pri full" id="saveBtn">저장</button>`;
   $('#saveBtn').onclick=saveDraft;
   a.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,inp=$('#f_'+k),v=inp.value;inp.value=d._alt[k];d._alt[k]=v;b.textContent='↺ 다른 읽기: '+v});
 }
 async function saveDraft(){
-  const d=draft;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
+  const d=draft;const toPhone=$('#phChk')&&$('#phChk').checked;if(!d.id){S.autoPhone=toPhone;saveS()}FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
   ['mobile','tel','fax'].forEach(k=>{if(d[k])d[k]=fmtPhone(d[k])});
   if(!d.name&&!d.company&&!d.mobile&&!d.email){toast('이름·회사·번호·메일 중 하나는 넣어 주세요');return}
   if(!d.id){const dup=C.find(x=>(d.mobile&&digits(x.mobile)===digits(d.mobile))||(d.email&&x.email&&x.email.toLowerCase()===d.email.toLowerCase()));
     if(dup&&confirm((dup.name||'같은 사람')+'이(가) 이미 있어요. 기존 연락처에 합칠까요?\n(취소를 누르면 따로 저장해요)')){
-      for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';return render()}
+      for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';render();if(toPhone)saveVcf([dup],(dup.name||'연락처')+'.vcf');return}
     d.id=newId();d.created=Date.now()}
   d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;
   await DB.put(d);const i=C.findIndex(x=>x.id===d.id);if(i>=0)C[i]=d;else C.push(d);
   draft=null;curId=d.id;toast('저장했어요');history.replaceState({v:'detail',id:d.id},'');view='detail';render();
+  if(toPhone)saveVcf([d],(d.name||d.company||'연락처')+'.vcf');
 }
 function startPaste(){go('paste')}
+let pickSel=new Set();
+function renderPick(a){
+  const L=[...C].sort((x,y)=>(x.name||'').localeCompare(y.name||'','ko'));
+  const notYet=L.filter(c=>!c.phoneAt).length;
+  a.innerHTML=`<h2>휴대폰 연락처에 저장할 사람 고르기</h2>
+  <div class="row"><button id="pkNew">아직 안 넣은 ${notYet}명</button><button id="pkAll">${pickSel.size===L.length?'모두 해제':'모두 고르기'}</button></div><p></p>
+  ${L.map(c=>`<label class="card item pk"><input type="checkbox" data-id="${c.id}" ${pickSel.has(c.id)?'checked':''}>
+    <div style="min-width:0"><div class="nm">${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co">${esc([c.company,c.mobile||c.tel].filter(Boolean).join(' · '))}</div></div>
+    <span class="muted" style="margin-left:auto;white-space:nowrap">${c.phoneAt?'📱 '+md(c.phoneAt):'안 넣음'}</span></label>`).join('')}
+  <div style="height:70px"></div>
+  <button class="pri fab" id="pkGo" style="display:flex" ${pickSel.size?'':'disabled'}>고른 ${pickSel.size}명 휴대폰에 저장</button>`;
+  a.querySelectorAll('.pk input').forEach(i=>i.onchange=()=>{i.checked?pickSel.add(i.dataset.id):pickSel.delete(i.dataset.id);renderPick(a)});
+  $('#pkNew').onclick=()=>{pickSel=new Set(L.filter(c=>!c.phoneAt).map(c=>c.id));renderPick(a)};
+  $('#pkAll').onclick=()=>{pickSel=pickSel.size===L.length?new Set():new Set(L.map(c=>c.id));renderPick(a)};
+  $('#pkGo').onclick=()=>{const S2=C.filter(c=>pickSel.has(c.id));if(!S2.length)return;saveVcf(S2,S2.length===1?(S2[0].name||'연락처')+'.vcf':'바로연락_'+S2.length+'명.vcf');pickSel=new Set();setTimeout(()=>renderPick(a),300)};
+}
 function renderPaste(a){
   a.innerHTML=`<h2>명함 글자 붙여넣기</h2><p class="muted">카톡·문자로 받은 명함 내용이나, 휴대폰 카메라의 「글자 인식(텍스트 복사)」으로 복사한 글자를 붙여넣으세요.</p>
   <textarea id="pt" style="min-height:220px" placeholder="예)&#10;빵을그리다&#10;홍길동 팀장&#10;010-1234-5678&#10;hong@example.com&#10;경기도 화성시 ..."></textarea>
