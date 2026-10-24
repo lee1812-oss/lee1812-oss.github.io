@@ -76,7 +76,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v003</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v004</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <main id="app"></main>
@@ -89,7 +89,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v003';
+const VER='v004';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -148,22 +148,27 @@ function parseCard(txt){
   const rest=lines.filter((l,i)=>!used.has(i));
   for(const l of rest){if(!o.company&&COMP.test(l)){o.company=l;used.add(lines.indexOf(l))}}
   const tRe=new RegExp('('+TITLES+')','i');
+  const DS='(팀|부|실|본부|사업부|사업본부|센터|그룹|파트|지점|사업단)';
+  const isDept=t=>new RegExp('^[가-힣A-Za-z0-9]{1,10}'+DS+'$').test(t)&&t.length>=2;
+  let nameC=[];
   for(const l of rest){
     if(l===o.company)continue;
-    const m=l.match(tRe);
-    if(m&&!o.title){o.title=m[1];
-      const nm=l.replace(m[1],'').replace(/[\/|·,]/g,' ').trim();
-      const hn=nm.match(/[가-힣]{2,4}/g);
-      if(hn&&!o.name){const cand=hn.filter(x=>!/(팀|부|실|본부|센터|사업|영업|기획|관리|생산|개발|구매|품질|마케팅|디자인)$/.test(x));
-        if(cand.length)o.name=cand[cand.length-1];
-        const dp=hn.find(x=>/(팀|부|실|본부|센터)$/.test(x)&&x!==o.name);if(dp)o.dept=dp}
-      continue}
-    if(!o.dept&&/[가-힣]+(팀|부|실|본부|사업부|사업본부|센터)$/.test(l)&&l.length<=14){o.dept=l;continue}
+    if(/^[A-Za-z .,&-]+$/.test(l)){if(!o.title&&l.length<=30&&new RegExp('^('+TITLES+')$','i').test(l.trim()))o.title=l.trim();continue}
+    let tk=l.split(/[\s\/|·,()]+/).filter(Boolean);
+    const j=[];for(const t of tk){if(/^[가-힣]$/.test(t)&&j.length&&/^[가-힣]{1,3}$/.test(j[j.length-1])&&j[j.length-1].length<4&&j._s){j[j.length-1]+=t}else{j.push(t);j._s=/^[가-힣]$/.test(t)}}tk=j;
+    let hit=false;const loose=[];
+    for(const t of tk){
+      const dm=t.match(/^([가-힣A-Za-z0-9]{1,10}?)(사업본부장|사업부장|본부장|센터장|사업단장|지점장|그룹장|파트장|팀장|부장|실장)$/);
+      if(dm&&!o.title){o.dept=o.dept||(dm[1]+dm[2].slice(0,-1));o.title=dm[2].replace(/^사업/,'');hit=true;continue}
+      if(!o.title&&tRe.test(t)&&t.length<=8&&!isDept(t)){o.title=t;hit=true;continue}
+      if(isDept(t)&&!tRe.test(t)){if(!o.dept)o.dept=t;else if(hit&&!o.dept.includes(t))o.dept+=' '+t;hit=true;continue}
+      if(/^[가-힣]{2,4}$/.test(t)&&!COMP.test(t)&&!tRe.test(t))loose.push(t);
+    }
+    if(loose.length&&(hit||tk.length<=2))nameC.push({n:loose[0],w:hit?2:1});
   }
+  if(!o.name&&nameC.length){nameC.sort((x,y)=>y.w-x.w);o.name=nameC[0].n}
   if(!o.name){
-    const c=rest.map(l=>l.replace(/\s/g,'')).filter(l=>/^[가-힣]{2,4}$/.test(l)&&l!==o.dept&&!COMP.test(l)&&!tRe.test(l));
-    if(c.length)o.name=c[0];
-    else{const m=rest.join(' ').match(/(?:^|\s)([가-힣]{2,4})(?:\s|$)/);if(m&&!tRe.test(m[1]))o.name=m[1]}
+    const m=rest.join(' ').match(/(?:^|\s)([가-힣]{2,4})(?:\s|$)/);if(m&&!tRe.test(m[1])&&m[1]!==o.dept)o.name=m[1]
   }
   if(!o.company){const c=rest.find(l=>l!==o.dept&&!/^[가-힣]{2,4}$/.test(l.replace(/\s/g,''))&&!tRe.test(l)&&l.length>=2&&l.length<=24&&!/\d{3,}/.test(l));if(c)o.company=c}
   return o;
