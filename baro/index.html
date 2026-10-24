@@ -102,7 +102,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v010</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v011</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -120,7 +120,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v010';
+const VER='v011';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -544,7 +544,7 @@ let ocrCancel=false;
 let GEO={st:'none'},SG=null;
 function geoStart(){if(!navigator.geolocation){GEO={st:'fail',why:'이 휴대폰은 위치를 못 줘요'};return}
   GEO={st:'wait'};navigator.geolocation.getCurrentPosition(async p=>{GEO={st:'ok',lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy),at:Date.now()};sgRefresh();
-    try{const r=await srv({act:'rgeo',lat:GEO.lat,lng:GEO.lng});if(r.ok){GEO.addr=r.addr;GEO.dong=r.dong}}catch(e){}sgRefresh();if(SG&&SG.name&&!SG.res&&!SG.busy)sgSearch()},
+    try{const r=await srv({act:'rgeo',lat:GEO.lat,lng:GEO.lng});if(r.ok){GEO.addr=r.addr;GEO.dong=r.dong;GEO.gu=r.gu}}catch(e){}sgRefresh();if(SG&&SG.name&&!SG.res&&!SG.busy)sgSearch()},
    e=>{GEO={st:'fail',why:e.code===1?'위치 권한이 꺼져 있어요':'위치를 못 찾았어요'};sgRefresh()},{enableHighAccuracy:true,timeout:20000,maximumAge:30000})}
 async function srv(b){const r=await fetch(OCR_URL,{method:'POST',body:JSON.stringify(Object.assign({k:OCR_KEY},b))});return r.json()}
 function signStart(){geoStart();sheet(`<h3>🏪 간판 찍어 거래처 등록</h3><div class="note">가게 <b>간판이 잘 보이게</b> 찍어 주세요. 찍는 곳의 <b>위치(GPS)</b>도 함께 저장해서 주변 가게 중에서 찾아요.</div>
@@ -583,7 +583,7 @@ function renderSign(a){if(!SG){view='list';return render()}
 function sgResHtml(){if(SG.busy)return '<p class="muted">찾는 중…</p>';if(!SG.res)return '';if(!SG.res.length)return '<div class="note warn">주변에서 같은 이름의 가게를 못 찾았어요. 이름을 고쳐 다시 찾거나, 아래 「찍은 곳 주소로 등록」을 누르세요.</div>';
   return '<h2>이 중에 맞는 가게를 누르세요</h2>'+SG.res.map((p,i)=>'<div class="card item" data-p="'+i+'"><div class="av">🏪</div><div style="min-width:0"><div class="nm">'+esc(p.name)+'</div><div class="co">'+esc(p.cat||'')+'</div><div class="co">'+esc(p.addr||'')+'</div>'+(p.tel?'<div class="co">☎ '+esc(p.tel)+'</div>':'')+'</div>'+(p.dist!=null?'<span class="muted nw" style="margin-left:auto">'+(p.dist<1000?p.dist+'m':(p.dist/1000).toFixed(1)+'km')+'</span>':'')+'</div>').join('')}
 async function sgSearch(){if(!SG||!SG.name)return;SG.busy=true;if(view==='sign'){const r=$('#sgRes');if(r)r.innerHTML=sgResHtml()}
-  try{const b={act:'place',q:SG.name};if(GEO.st==='ok'){b.lat=GEO.lat;b.lng=GEO.lng;b.hint=GEO.dong||''}const r=await srv(b);SG.res=r.ok?r.list:[]}catch(e){SG.res=[];toast('인터넷 연결을 확인해 주세요')}
+  try{const b={act:'place',q:SG.name};if(GEO.st==='ok'){b.lat=GEO.lat;b.lng=GEO.lng;b.hint=[GEO.dong,GEO.gu].filter(Boolean).join('|')}const r=await srv(b);SG.res=r.ok?r.list:[]}catch(e){SG.res=[];toast('인터넷 연결을 확인해 주세요')}
   SG.busy=false;if(view==='sign')renderSign($('#app'))}
 function sgPick(p){const g=GEO.st==='ok'?GEO:{};
   draft=Object.assign(blank(),{kind:'shop',company:p?p.name:(SG.name||''),address:p?p.addr:(g.addr||''),memo:[p&&p.cat?'업종: '+p.cat:'',p&&p.url?'카카오맵: '+p.url:''].filter(Boolean).join('\n'),
