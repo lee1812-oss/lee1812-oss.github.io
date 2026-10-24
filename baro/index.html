@@ -76,6 +76,7 @@ h2{font-size:19px;margin:18px 0 8px}
 .phb{margin-bottom:12px;border-color:#9db7f3;color:#1d4ed8}
 .pk{cursor:pointer}.pk input{width:26px;min-height:26px;flex:none}
 .fab:disabled{opacity:.5}
+.bigopt{min-height:66px!important;font-size:19px}
 .shopbtn{margin:0 0 12px;border-color:#86c5a0;color:#15803d}
 .alt{min-height:40px;margin-top:6px;font-size:15px;font-weight:500;color:#9a3412;background:#fff7ed;border-color:#fed7aa}
 .mecard{display:flex;gap:12px;align-items:center;cursor:pointer;border:2px solid var(--ac)}
@@ -102,7 +103,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v012</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v013</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -120,7 +121,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v012';
+const VER='v013';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -228,7 +229,7 @@ function toVcf(c){
   if(c.email)L.push('EMAIL;TYPE=INTERNET,WORK:'+c.email);
   if(c.address)L.push('ADR;TYPE=WORK:;;'+vEsc(c.address)+';;;;');
   if(c.web)L.push('URL:'+c.web);
-  const note=[c.metAt?'만난 날 '+c.metAt:'',c.metPlace?'만난 곳 '+c.metPlace:'',c.kakao?'카톡 ID '+c.kakao:'',c.bizNo?'사업자번호 '+c.bizNo:'',c.memo||''].filter(Boolean).join(' / ');
+  const note=[c.metAt?'만난 날 '+c.metAt:'',c.shotAt?'간판 찍은 날 '+new Date(c.shotAt).toLocaleDateString('ko-KR'):'',c.metPlace?'만난 곳 '+c.metPlace:'',c.kakao?'카톡 ID '+c.kakao:'',c.bizNo?'사업자번호 '+c.bizNo:'',c.memo||''].filter(Boolean).join(' / ');
   if(note)L.push('NOTE:'+vEsc(note));
   L.push('END:VCARD');return L.join('\r\n')+'\r\n';
 }
@@ -419,29 +420,32 @@ async function delCur(){const c=cur();if(!confirm((c.name||'이 연락처')+'를
 const FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['bizNo','사업자등록번호 (나중에 받으면 입력)'],['metAt','만난 날','date'],['metPlace','만난 곳 (예: 박람회, 거래처 방문)'],['tags','묶음 (예: 거래처 협력사)'],['memo','메모']];
 function renderEdit(a){
   const d=draft||blank();draft=d;const FF=d._me?ME_FIELDS:FIELDS;
-  a.innerHTML=`${d._me?'<h2 style="margin-top:4px">🪪 내 명함 정보</h2>':''}${d.kind==='shop'&&!d.id?'<div class="note ok">🏪 간판으로 찾은 가게 정보예요. 틀린 곳만 고치고 저장하세요.<br><small>사업자등록번호는 상호로는 찾을 수 없어서, 나중에 받으면 칸에 넣어 주세요.</small></div>':''}${d._ocr?`<div class="note ok">명함에서 글자를 읽어 칸을 채웠어요. <b>틀린 곳만 고치고 저장</b>하세요.${d._alt&&Object.keys(d._alt).length?'<br>주황 버튼은 사진을 한 번 더 읽었을 때 다르게 나온 값이에요. 맞는 쪽을 누르세요.':''}</div>`:''}
+  a.innerHTML=`${d._me?'<h2 style="margin-top:4px">🪪 내 명함 정보</h2>':''}${d.kind==='shop'&&!d.id?'<div class="note ok">🏪 간판으로 찾은 가게 정보예요. 틀린 곳만 고치고 저장하세요.<br><small>사업자등록번호는 상호로는 찾을 수 없어서, 나중에 받으면 칸에 넣어 주세요.</small>'+(d._phoneNote?'<br><b>☎ '+esc(d._phoneNote)+'</b>':'')+'<br><small>저장하면 바로 「📱 휴대폰 연락처에도 저장」 버튼이 나와요.</small></div>':''}${d._ocr?`<div class="note ok">명함에서 글자를 읽어 칸을 채웠어요. <b>틀린 곳만 고치고 저장</b>하세요.${d._alt&&Object.keys(d._alt).length?'<br>주황 버튼은 사진을 한 번 더 읽었을 때 다르게 나온 값이에요. 맞는 쪽을 누르세요.':''}</div>`:''}
   ${d.photoFull?`<img class="photo" src="${d.photoFull}" alt="명함 사진"><div class="row" style="margin-bottom:6px"><button onclick="editPhoto()">✂️ 사진 편집</button>${d.kind==='shop'?'':'<button onclick="rereadPhoto()">🔁 글자 다시 읽기</button>'}</div><p class="muted" style="margin:0 0 6px">자르기·돌리기·기울기·밝기·대비를 고칠 수 있어요</p>`:''}
-  ${FF.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}${d._alt&&d._alt[k]?`<button class="alt" data-k="${k}">↺ 다른 읽기: ${esc(d._alt[k])}</button>`:''}`).join('')}
+  ${FF.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}${d._alt&&d._alt[k]?`<button class="alt" data-k="${k}" data-l="${d.kind==='shop'?'↺ 다른 번호':'↺ 다른 읽기'}">${d.kind==='shop'?'↺ 다른 번호':'↺ 다른 읽기'}: ${esc(d._alt[k])}</button>`:''}`).join('')}
   ${d._raw?`<details style="margin-top:12px"><summary class="muted">사진에서 읽은 글자 전체 보기</summary><pre style="white-space:pre-wrap;font-size:14px">${esc(d._raw)}</pre></details>`:''}
-  ${d._me?'':`<label class="phc"><input type="checkbox" id="phChk" ${(d.id?false:S.autoPhone!==false)?'checked':''}><span>📱 내 휴대폰 연락처에도 저장<br><small class="muted">${d.phoneAt?'전에 휴대폰에 저장함 ('+md(d.phoneAt)+') · 고친 내용을 다시 넣으려면 체크':'카톡 친구 자동 추가도 이걸로 돼요'}</small></span></label>`}
+  ${d._me||(d.kind==='shop'&&!d.id)?'':`<label class="phc"><input type="checkbox" id="phChk" ${(d.id?false:S.autoPhone!==false)?'checked':''}><span>📱 내 휴대폰 연락처에도 저장<br><small class="muted">${d.phoneAt?'전에 휴대폰에 저장함 ('+md(d.phoneAt)+') · 고친 내용을 다시 넣으려면 체크':'카톡 친구 자동 추가도 이걸로 돼요'}</small></span></label>`}
   <button class="pri full" id="saveBtn">저장</button>`;
   $('#saveBtn').onclick=saveDraft;
-  a.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,inp=$('#f_'+k),v=inp.value;inp.value=d._alt[k];d._alt[k]=v;b.textContent='↺ 다른 읽기: '+v});
+  a.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,inp=$('#f_'+k),v=inp.value;inp.value=d._alt[k];d._alt[k]=v;b.textContent=(b.dataset.l||'↺ 다른 읽기')+': '+v});
 }
 async function saveDraft(){
   if(draft&&draft._me)return saveMeDraft();
-  const d=draft;const toPhone=$('#phChk')&&$('#phChk').checked;if(!d.id){S.autoPhone=toPhone;saveS()}FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
+  const d=draft;const toPhone=$('#phChk')&&$('#phChk').checked;if(!d.id&&$('#phChk')){S.autoPhone=toPhone;saveS()}const newShop=d.kind==='shop'&&!d.id;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
   ['mobile','tel','fax'].forEach(k=>{if(d[k])d[k]=fmtPhone(d[k])});
   if(!d.name&&!d.company&&!d.mobile&&!d.email){toast('이름·회사·번호·메일 중 하나는 넣어 주세요');return}
   if(!d.id){const dup=C.find(x=>(d.mobile&&digits(x.mobile)===digits(d.mobile))||(d.email&&x.email&&x.email.toLowerCase()===d.email.toLowerCase()));
     if(dup&&confirm((dup.name||'같은 사람')+'이(가) 이미 있어요. 기존 연락처에 합칠까요?\n(취소를 누르면 따로 저장해요)')){
       for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';render();if(toPhone)saveVcf([dup],(dup.name||'연락처')+'.vcf');return}
     d.id=newId();d.created=Date.now()}
-  d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;delete d._edited;
+  d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;delete d._edited;delete d._phoneNote;
   await DB.put(d);const i=C.findIndex(x=>x.id===d.id);if(i>=0)C[i]=d;else C.push(d);
   draft=null;curId=d.id;toast('저장했어요');history.replaceState({v:'detail',id:d.id},'');view='detail';render();
   if(toPhone)saveVcf([d],(d.name||d.company||'연락처')+'.vcf');
+  if(newShop)setTimeout(()=>shopPhoneSheet(d),350);
 }
+function shopPhoneSheet(d){sheet(`<h3>✓ 「${esc(d.company||d.name||'가게')}」 저장했어요</h3><div class="note">내 휴대폰 연락처에도 넣을까요?<br>상호·전화·주소가 들어가고, 메모에 업종·찍은 날짜가 들어가요.</div>
+  <button class="opt pri bigopt" onclick="saveVcf([cur()],(cur().company||cur().name||'가게')+'.vcf')">📱 휴대폰 연락처에도 저장</button><button class="opt" onclick="sheet()">나중에 (상세 화면에서도 할 수 있어요)</button>`)}
 function startPaste(){go('paste')}
 let pickSel=new Set();
 function renderPick(a){
@@ -551,16 +555,19 @@ function signStart(){geoStart();sheet(`<h3>🏪 간판 찍어 거래처 등록</
   <button class="opt pri" onclick="sheet();$('#signCam').click()">📷 간판 사진 찍기</button><button class="opt" onclick="sheet();$('#signPic').click()">🖼️ 앨범에서 고르기 (지금 그 가게 앞일 때)</button><button class="opt" onclick="sheet()">닫기</button>`)}
 async function onSignPhoto(file){if(!file)return;let cv;try{cv=await imgToCanvas(file,2000)}catch(e){return toast('사진을 열지 못했어요')}openEditor(cv,readSignCv,{read:true})}
 const SIGN_SKIP=/^(영업중|open|close|closed|오픈|주차|주차장|tel|전화|무료|할인|세일|sale|입구|출구|화장실|배달|포장|예약|환영|welcome|since|\d+층|\d+f|b\d|wifi|와이파이)$/i;
+function signPhones(t){const s=String(t||''),o=[];const add=x=>{const f=fmtPhone(x);if(!o.some(y=>digits(y)===digits(f)))o.push(f)};
+  for(const m of s.matchAll(/(?:\+?82[\s.-]?)?(?<!\d)(0\d{1,2})[\s.)-]{0,2}(\d{3,4})[\s.-]?(\d{4})(?!\d)/g))add(m[1]+m[2]+m[3]);
+  for(const m of s.matchAll(/(?<!\d)(1[5-9]\d{2})[\s.-]?(\d{4})(?!\d)/g))add(m[1]+m[2]);return o.slice(0,3)}
 function signCands(t){const out=[];String(t||'').split(/\n/).map(s=>s.replace(/[|*•·~"'“”‘’<>\[\]{}]/g,' ').replace(/\s+/g,' ').trim()).forEach(l=>{
   if(!l||l.length<2||l.length>24)return;if(/\d{2,4}[-.\s]\d{3,4}[-.\s]\d{4}/.test(l)||/(www\.|https?:|@|\.com|\.kr)/i.test(l))return;if(SIGN_SKIP.test(l))return;if(!/[가-힣A-Za-z]/.test(l))return;if(!out.includes(l))out.push(l)});
   return out.sort((a,b)=>(/[가-힣]/.test(b)-/[가-힣]/.test(a))).slice(0,6)}
 async function readSignCv(cv){
   const full=scaleCv(cv,900).toDataURL('image/jpeg',.75),thumb=scaleCv(cv,160).toDataURL('image/jpeg',.7);
-  SG={photo:thumb,photoFull:full,name:'',cands:[],res:null,busy:false,shotAt:Date.now()};
+  SG={photo:thumb,photoFull:full,name:'',cands:[],phones:[],res:null,busy:false,shotAt:Date.now()};
   if(GEO.st==='none')geoStart();
   sheet('<h3>간판 글자 읽는 중…</h3><p class="muted">보통 5초쯤 걸려요.</p><div class="prog"><i style="width:55%"></i></div>');
   try{const base=scaleCv(cv,1600);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);
-    const t=[r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n');SG.raw=t;SG.cands=signCands(t);SG.name=SG.cands[0]||''}catch(e){}
+    const t=[r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n');SG.raw=t;SG.phones=signPhones(t);SG.cands=signCands(t);SG.name=SG.cands[0]||''}catch(e){}
   sheet();go('sign');if(SG.name&&GEO.st==='ok')sgSearch()}
 function sgRefresh(){if(view==='sign'){const g=$('#sgGeo');if(g)g.innerHTML=geoLine()}}
 function geoLine(){if(GEO.st==='ok')return '📍 찍은 곳: <b>'+esc(GEO.addr||(GEO.lat+', '+GEO.lng))+'</b> <span class="muted">(오차 약 ±'+GEO.acc+'m)</span>';
@@ -572,6 +579,7 @@ function renderSign(a){if(!SG){view='list';return render()}
   <div class="note" id="sgGeo">${geoLine()}</div>
   <label class="f" for="sgName">가게 이름 (간판에서 읽은 글자 · 틀리면 고치세요)</label><input id="sgName" value="${esc(SG.name)}">
   ${SG.cands.length>1?'<div class="chips" style="margin-top:8px">'+SG.cands.map((c,i)=>'<button class="chip" data-i="'+i+'">'+esc(c)+'</button>').join('')+'</div>':''}
+  ${SG.phones&&SG.phones.length?'<div class="note ok" style="margin-top:10px">☎ 간판에서 찾은 전화번호: <b>'+SG.phones.map(esc).join(', ')+'</b><br><small>가게를 고르면 이 번호를 연락처 전화 칸에 먼저 넣어요.</small></div>':''}
   <button class="pri full" id="sgGo" style="margin-top:6px">🔍 주변에서 이 가게 찾기</button>
   <div id="sgRes">${sgResHtml()}</div>
   <button class="full" id="sgNone" style="margin-top:10px">목록에 없어요 → 찍은 곳 주소로 등록</button>`;
@@ -588,7 +596,11 @@ async function sgSearch(){if(!SG||!SG.name)return;SG.busy=true;if(view==='sign')
 function sgPick(p){const g=GEO.st==='ok'?GEO:{};
   draft=Object.assign(blank(),{kind:'shop',company:p?p.name:(SG.name||''),address:p?p.addr:(g.addr||''),memo:[p&&p.cat?'업종: '+p.cat:'',p&&p.url?'카카오맵: '+p.url:''].filter(Boolean).join('\n'),
     lat:p?p.lat:(g.lat||null),lng:p?p.lng:(g.lng||null),shotLat:g.lat||null,shotLng:g.lng||null,shotAt:SG.shotAt,photo:SG.photo,photoFull:SG.photoFull,tags:'거래처',metPlace:'간판 촬영'+(g.addr?' · '+g.addr:''),_ocr:0,_raw:SG.raw||''});
-  if(p&&p.tel){const ph=fmtPhone(p.tel);if(/^01/.test(digits(ph)))draft.mobile=ph;else draft.tel=ph}
+  const sp=SG.phones||[],mp=p&&p.tel?fmtPhone(p.tel):'';const fld=ph=>/^01/.test(digits(ph))?'mobile':'tel';
+  const put=ph=>{const f=fld(ph);if(!draft[f])draft[f]=ph;else if(f==='tel'&&!draft.mobile&&false){}};
+  sp.forEach(put);
+  if(mp){if(!sp.length)put(mp);else if(!sp.some(x=>digits(x)===digits(mp))){const f=fld(mp);if(draft[f]){draft._alt=Object.assign(draft._alt||{},{[f]:mp});draft._phoneNote='간판 번호를 넣었어요. 지도에 나온 번호('+mp+')와 달라요. 아래 주황 버튼을 누르면 지도 번호로 바뀌어요.'}else put(mp)}}
+  if(sp.length)draft.memo=[draft.memo,'간판 전화: '+sp.join(', ')].filter(Boolean).join('\n');
   history.replaceState({v:'edit'},'');view='edit';render()}
 $('#signCam').onchange=e=>{onSignPhoto(e.target.files[0]);e.target.value=''};
 $('#signPic').onchange=e=>{onSignPhoto(e.target.files[0]);e.target.value=''};
