@@ -117,7 +117,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v017</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v018</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -137,7 +137,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v017';
+const VER='v018';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -658,7 +658,7 @@ async function readSignCv(cv){
   if(GEO.st==='none')geoStart();
   sheet('<h3>간판 글자 읽는 중…</h3><p class="muted">보통 5초쯤 걸려요.</p><div class="prog"><i style="width:55%"></i></div>');
   try{const base=scaleCv(cv,1600);const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);
-    const t=[r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n');SG.raw=t;SG.phones=signPhones(t);SG.cands=signCands(t);SG.name=SG.cands[0]||''}catch(e){}
+    const t=[...new Set([r1,r2].filter(r=>r.status==='fulfilled').map(r=>r.value).join('\n').split('\n').map(s=>s.trim()).filter(Boolean))].join('\n');SG.raw=t;SG.phones=signPhones(t);SG.cands=signCands(t);SG.name=SG.cands[0]||''}catch(e){}
   sheet();go('sign');if(SG.name&&GEO.st==='ok')sgSearch()}
 function sgRefresh(){if(view==='sign'){const g=$('#sgGeo');if(g)g.innerHTML=geoLine()}}
 function geoLine(){if(GEO.st==='ok')return '📍 찍은 곳: <b>'+esc(GEO.addr||(GEO.lat+', '+GEO.lng))+'</b> <span class="muted">(오차 약 ±'+GEO.acc+'m)</span>';
@@ -682,7 +682,7 @@ function renderSign(a){if(!SG){view='list';return render()}
   a.querySelectorAll('[data-p]').forEach(el=>el.onclick=()=>sgPick(SG.res[+el.dataset.p]))}
 function sgPhHtml(){const P=SG.phones||[];
   return '<b>☎ 간판에서 찾은 번호</b> <small class="muted">체크한 번호를 연락처에 넣어요</small>'+(P.length?P.map((p,i)=>'<label class="sgp"><input type="checkbox" data-pi="'+i+'" '+(p.on?'checked':'')+'><span class="nw" style="font-size:18px">'+esc(p.n)+'</span><select data-pl="'+i+'">'+PH_LBL.map(l=>'<option '+(l===p.l?'selected':'')+'>'+l+'</option>').join('')+'</select></label>').join(''):'<p class="muted" style="margin:6px 0">간판에서 번호를 못 찾았어요. 아래 원문에서 번호를 누르거나 직접 넣어 주세요.</p>')+
-  '<div class="row" style="margin-top:8px"><input id="sgAddN" inputmode="tel" placeholder="번호 직접 넣기 (예: 031-123-4567)"><button id="sgAddB" style="flex:0 0 90px">＋ 추가</button></div>'+
+  '<div class="row" style="margin-top:8px"><input id="sgAddN" inputmode="tel" placeholder="번호 직접 넣기 (예: 031-123-4567)"><button id="sgAddB" style="flex:0 0 96px;white-space:nowrap">＋ 추가</button></div>'+
   (SG.raw?'<details style="margin-top:8px"><summary class="muted">간판에서 읽은 글자 원문 보기 (숫자를 누르면 번호로 넣어요)</summary><div class="rawt">'+esc(SG.raw).replace(/[0-9OoIl|()+.\-\s]{7,}/g,m=>/[0-9].*[0-9].*[0-9].*[0-9]/.test(m)?'<button class="rawn" data-r="'+m.replace(/"/g,'')+'">'+m+'</button>':m).replace(/\n/g,'<br>')+'</div></details>':'')}
 function sgPhBind(){const box=$('#sgPh');if(!box)return;
   box.querySelectorAll('[data-pi]').forEach(c=>c.onchange=()=>{SG.phones[+c.dataset.pi].on=c.checked});
@@ -699,8 +699,9 @@ function sgPick(p){const g=GEO.st==='ok'?GEO:{};
   draft=Object.assign(blank(),{kind:'shop',company:p?p.name:(SG.name||''),address:p?p.addr:(g.addr||''),memo:[p&&p.cat?'업종: '+p.cat:'',p&&p.url?'카카오맵: '+p.url:''].filter(Boolean).join('\n'),
     lat:p?p.lat:(g.lat||null),lng:p?p.lng:(g.lng||null),shotLat:g.lat||null,shotLng:g.lng||null,shotAt:SG.shotAt,photo:SG.photo,photoFull:SG.photoFull,tags:'거래처',metPlace:'간판 촬영'+(g.addr?' · '+g.addr:''),_ocr:0,_raw:SG.raw||''});
   const SP=(SG.phones||[]).filter(x=>x.on),sp=SP.map(x=>x.n),mp=p&&p.tel?fmtPhone(p.tel):'';const fld=ph=>/^01/.test(digits(ph))?'mobile':'tel';
-  draft.xph=[];const put=(ph,l)=>{if(l==='팩스'){if(!draft.fax){draft.fax=ph;return}}else{const f=fld(ph);if(!draft[f]&&!(l==='기타')){draft[f]=ph;return}}draft.xph.push({l:l||'기타',n:ph})};
+  draft.xph=[];const DEF={tel:'매장',mobile:'휴대폰',fax:'팩스'};const put=(ph,l)=>{const f=l==='팩스'?'fax':fld(ph);if(!draft[f]&&(!l||l===DEF[f])){draft[f]=ph;return}draft.xph.push({l:l||'기타',n:ph})};
   SP.forEach(x=>put(x.n,x.l));
+  if(!draft.tel&&!draft.mobile&&draft.xph.length){const x=draft.xph.find(y=>!/팩스/.test(y.l));if(x){draft.xph=draft.xph.filter(y=>y!==x);draft[fld(x.n)]=x.n;if(x.l&&x.l!==DEF[fld(x.n)])draft.memo=[draft.memo,'대표 번호('+x.n+'): '+x.l].filter(Boolean).join('\n')}}
   if(mp){if(!sp.length)put(mp);else if(!sp.some(x=>digits(x)===digits(mp))){const f=fld(mp);if(draft[f]){draft._alt=Object.assign(draft._alt||{},{[f]:mp});draft._phoneNote='간판 번호를 넣었어요. 지도에 나온 번호('+mp+')와 달라요. 아래 주황 버튼을 누르면 지도 번호로 바뀌어요.'}else put(mp)}}
   if(sp.length)draft.memo=[draft.memo,'간판 전화: '+sp.join(', ')].filter(Boolean).join('\n');
   if(!draft.xph.length)delete draft.xph;
