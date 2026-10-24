@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>바로연락</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--ac:#1d4ed8;--acb:#eaf1fe;--bd:#d6dbe3;--bg:#f4f6f9;--tx:#111827;--sub:#4b5563;--ok:#15803d;--warn:#c2410c;--bad:#b91c1c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;font-size:17px;line-height:1.55;word-break:keep-all;overflow-wrap:break-word}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;gap:10px}
+header h1{font-size:21px;margin:0;flex:1;color:var(--ac)}
+header .ver{font-size:13px;color:#6b7280;font-weight:400;margin-left:6px}
+main{max-width:640px;margin:0 auto;padding:14px 14px 120px}
+button,.btn{font:inherit;min-height:54px;border-radius:12px;border:1px solid var(--bd);background:#fff;color:var(--tx);padding:0 16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+button:active,.btn:active{transform:scale(.98)}
+.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.ghost{background:transparent;border-color:transparent;color:var(--ac);min-height:44px;padding:0 8px}
+.danger{color:var(--bad);border-color:#f3c4c4}
+.full{width:100%}
+.row{display:flex;gap:8px}.row>*{flex:1}
+input,textarea,select{font:inherit;width:100%;min-height:52px;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;background:#fff;color:var(--tx)}
+textarea{min-height:110px;resize:vertical}
+label.f{display:block;margin:12px 0 4px;font-weight:600;color:var(--sub);font-size:15px}
+.search{position:relative;margin-bottom:12px}
+.search input{padding-left:40px;font-size:18px}
+.search span{position:absolute;left:13px;top:13px;color:#9ca3af}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.chip{min-height:40px;border-radius:20px;padding:0 14px;font-weight:600;font-size:15px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px}
+.item{display:flex;gap:12px;align-items:center;cursor:pointer}
+.av{width:52px;height:52px;border-radius:12px;background:var(--acb);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex:none;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.item .nm{font-weight:700;font-size:18px}
+.item .co{color:var(--sub);font-size:15px}
+.item .mini{display:flex;gap:6px;margin-left:auto}
+.item .mini button{min-height:46px;width:46px;padding:0;font-size:20px}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));width:min(612px,calc(100% - 28px));font-size:19px;box-shadow:0 6px 18px rgba(29,78,216,.3);z-index:6}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.big button{min-height:76px;flex-direction:column;gap:2px;font-size:16px}
+.big button b{font-size:24px;line-height:1}
+.big button:disabled{opacity:.4}
+.kv{display:flex;gap:10px;padding:10px 0;border-top:1px solid #eef0f3;align-items:flex-start}
+.kv:first-child{border-top:0}
+.kv .k{width:64px;flex:none;color:var(--sub);font-size:15px;padding-top:2px}
+.kv .v{flex:1;font-size:18px}
+.kv .v a{color:var(--ac);text-decoration:none}
+.kv .cp{min-height:40px;padding:0 12px;font-size:14px}
+.nw{white-space:nowrap}
+.muted{color:var(--sub);font-size:15px}
+.note{background:var(--acb);border-radius:12px;padding:12px 14px;font-size:15px;color:#1e3a8a;margin:10px 0}
+.note.warn{background:#fff4e5;color:#7c2d12}
+.note.ok{background:#e9f7ee;color:#14532d}
+.empty{text-align:center;padding:40px 10px;color:var(--sub)}
+.empty b{display:block;font-size:20px;color:var(--tx);margin-bottom:6px}
+.photo{width:100%;border-radius:12px;border:1px solid var(--bd);margin:8px 0}
+.prog{height:10px;background:#e5e7eb;border-radius:5px;overflow:hidden;margin:10px 0}
+.prog i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
+#sheet{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:flex-end;z-index:20}
+#sheet.on{display:flex}
+#sheet .in{background:#fff;width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+#sheet h3{margin:4px 0 10px;font-size:19px}
+#sheet .opt{width:100%;margin:6px 0;justify-content:flex-start;text-align:left}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-size:16px;opacity:0;transition:opacity .2s;z-index:30;pointer-events:none;max-width:90%}
+#toast.on{opacity:1}
+.tag{display:inline-block;background:#eef2f7;border-radius:8px;padding:2px 8px;font-size:14px;color:#374151;margin:2px 4px 0 0}
+h2{font-size:19px;margin:18px 0 8px}
+</style>
+</head>
+<body>
+<header>
+  <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
+  <h1 id="ttl">바로연락<span class="ver">v001</span></h1>
+  <button class="ghost" id="setBtn" aria-label="설정">설정</button>
+</header>
+<main id="app"></main>
+<button class="pri fab" id="fab">＋ 명함 추가</button>
+<input type="file" id="camIn" accept="image/*" capture="environment" hidden>
+<input type="file" id="picIn" accept="image/*" hidden>
+<input type="file" id="vcfIn" accept=".vcf,text/vcard,text/x-vcard" hidden>
+<input type="file" id="bakIn" accept=".json,application/json" hidden>
+<div id="sheet"><div class="in" id="sheetIn"></div></div>
+<div id="toast"></div>
+<script>
+'use strict';
+const VER='v001';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAnd=/Android/i.test(navigator.userAgent);
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* ---------- 저장 (이 휴대폰 안에만) ---------- */
+const DB={db:null,
+  open(){return new Promise((ok,no)=>{const r=indexedDB.open('barolink',1);r.onupgradeneeded=()=>{r.result.createObjectStore('c',{keyPath:'id'})};r.onsuccess=()=>{this.db=r.result;ok()};r.onerror=()=>no(r.error)})},
+  all(){return new Promise((ok,no)=>{const q=this.db.transaction('c').objectStore('c').getAll();q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
+  put(o){return new Promise((ok,no)=>{const t=this.db.transaction('c','readwrite');t.objectStore('c').put(o);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
+  del(id){return new Promise((ok,no)=>{const t=this.db.transaction('c','readwrite');t.objectStore('c').delete(id);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}
+};
+let C=[];
+const S=Object.assign({sign:'',mailVia:'app',tmapFirst:true,lastBak:0},JSON.parse(localStorage.getItem('baro_set')||'{}'));
+const saveS=()=>localStorage.setItem('baro_set',JSON.stringify(S));
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const digits=s=>String(s||'').replace(/\D/g,'');
+function fmtPhone(s){let d=digits(s);if(d.startsWith('82')&&d.length>=11)d='0'+d.slice(2);
+  if(/^02/.test(d)){return d.length===9?d.replace(/(02)(\d{3})(\d{4})/,'$1-$2-$3'):d.replace(/(02)(\d{4})(\d{4})/,'$1-$2-$3')}
+  if(d.length===11)return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+  if(d.length===10)return d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3');
+  if(d.length===8)return d.replace(/(\d{4})(\d{4})/,'$1-$2');
+  return String(s||'').trim()}
+
+/* ---------- 명함 글자 → 칸 나누기 ---------- */
+const TITLES='대표이사|대표|회장|부회장|사장|부사장|전무|상무|이사|본부장|센터장|원장|소장|실장|국장|부장|차장|과장|팀장|대리|주임|계장|사원|연구원|선임|책임|수석|매니저|간사|교수|박사|변호사|세무사|회계사|노무사|변리사|관세사|기자|PD|CEO|CTO|COO|CFO|Manager|Director|President|Engineer|Designer|Owner|셰프|파트장|그룹장|지점장|점장';
+const REG='서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|충청|전북|전남|전라|경북|경남|경상|제주';
+const COMP=/(\(주\)|㈜|주식회사|유한회사|\(유\)|㈔|사단법인|재단법인|협회|조합|공사|공단|센터|연구소|연구원|병원|의원|학교|대학교|은행|카페|베이커리|제과|식품|그룹|컴퍼니|코리아|Co\.|Corp|Inc|Ltd|LLC|Company)/i;
+function parseCard(txt){
+  const o={name:'',company:'',dept:'',title:'',mobile:'',tel:'',fax:'',email:'',address:'',web:'',kakao:''};
+  let lines=String(txt||'').replace(/\r/g,'').split(/\n|\s{3,}|\|/).map(s=>s.trim()).filter(Boolean);
+  const used=new Set();
+  const all=lines.join('\n');
+  const em=all.match(/[A-Za-z0-9._%+-]+\s?@\s?[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);if(em)o.email=em[0].replace(/\s/g,'');
+  const wb=all.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/i);if(wb&&!(o.email&&wb[0].includes('@')))o.web=wb[0];
+  const kk=all.match(/(?:카카오톡|카톡|kakao(?:talk)?)\s*(?:id|ID|아이디)?\s*[:：]?\s*([A-Za-z0-9._-]{3,})/i);if(kk)o.kakao=kk[1];
+  lines.forEach((l,i)=>{
+    const phones=l.match(/(\+?82[\s.-]?)?0?\d{1,3}[\s.)-]{0,2}\d{3,4}[\s.-]{1}\d{4}/g)||l.match(/(\+?82[\s.-]?)?01\d{8,9}|0\d{8,10}/g);
+    if(phones){
+      phones.forEach(p=>{
+        const before=l.slice(0,l.indexOf(p)).slice(-12);
+        const d=digits(p).replace(/^82/,'0');
+        if(/F|팩스|fax/i.test(before)&&!/[MH]/.test(before.slice(-3))){if(!o.fax)o.fax=fmtPhone(d)}
+        else if(/^01[016789]/.test(d)){if(!o.mobile)o.mobile=fmtPhone(d)}
+        else if(!o.tel)o.tel=fmtPhone(d); else if(!o.fax&&/F/i.test(before))o.fax=fmtPhone(d);
+      });used.add(i);return}
+    if(o.email&&l.replace(/\s/g,'').includes(o.email)){used.add(i);return}
+    if(o.web&&l.includes(o.web)){used.add(i);return}
+    if(!o.address&&(new RegExp('^(주소|Add(ress)?|A\\.|A:)?\\s*[:：.]?\\s*('+REG+')').test(l))&&/(시|군|구|읍|면|동|로|길|번지|\d)/.test(l)){
+      let a=l.replace(/^(주소|Add(ress)?|A\.|A:)\s*[:：.]?\s*/i,'');
+      const nx=lines[i+1];if(nx&&(/^(\d|[가-힣]+(동|층|호)|\(|,)/.test(nx)||/(\d+층|\d+호|빌딩|타워|프라자|상가|오피스텔)/.test(nx))&&!/[@]|\d{3,4}-\d{4}/.test(nx)){a+=' '+nx;used.add(i+1)}
+      o.address=a.trim();used.add(i);return}
+  });
+  const rest=lines.filter((l,i)=>!used.has(i));
+  for(const l of rest){if(!o.company&&COMP.test(l)){o.company=l;used.add(lines.indexOf(l))}}
+  const tRe=new RegExp('('+TITLES+')','i');
+  for(const l of rest){
+    if(l===o.company)continue;
+    const m=l.match(tRe);
+    if(m&&!o.title){o.title=m[1];
+      const nm=l.replace(m[1],'').replace(/[\/|·,]/g,' ').trim();
+      const hn=nm.match(/[가-힣]{2,4}/g);
+      if(hn&&!o.name){const cand=hn.filter(x=>!/(팀|부|실|본부|센터|사업|영업|기획|관리|생산|개발|구매|품질|마케팅|디자인)$/.test(x));
+        if(cand.length)o.name=cand[cand.length-1];
+        const dp=hn.find(x=>/(팀|부|실|본부|센터)$/.test(x)&&x!==o.name);if(dp)o.dept=dp}
+      continue}
+    if(!o.dept&&/[가-힣]+(팀|부|실|본부|사업부|사업본부|센터)$/.test(l)&&l.length<=14){o.dept=l;continue}
+  }
+  if(!o.name){
+    const c=rest.map(l=>l.replace(/\s/g,'')).filter(l=>/^[가-힣]{2,4}$/.test(l)&&l!==o.dept&&!COMP.test(l)&&!tRe.test(l));
+    if(c.length)o.name=c[0];
+    else{const m=rest.join(' ').match(/(?:^|\s)([가-힣]{2,4})(?:\s|$)/);if(m&&!tRe.test(m[1]))o.name=m[1]}
+  }
+  if(!o.company){const c=rest.find(l=>l!==o.dept&&!/^[가-힣]{2,4}$/.test(l.replace(/\s/g,''))&&!tRe.test(l)&&l.length>=2&&l.length<=24&&!/\d{3,}/.test(l));if(c)o.company=c}
+  return o;
+}
+
+/* ---------- 휴대폰 연락처 파일(vCard) ---------- */
+const vEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
+function toVcf(c){
+  const n=c.name||'';const fam=/^[가-힣]{2,4}$/.test(n)?n[0]:'';const giv=fam?n.slice(1):n;
+  const L=['BEGIN:VCARD','VERSION:3.0','N:'+vEsc(fam)+';'+vEsc(giv)+';;;','FN:'+vEsc(n||c.company||'이름 없음')];
+  if(c.company||c.dept)L.push('ORG:'+vEsc(c.company)+(c.dept?';'+vEsc(c.dept):''));
+  if(c.title)L.push('TITLE:'+vEsc(c.title));
+  if(c.mobile)L.push('TEL;TYPE=CELL:'+c.mobile);
+  if(c.tel)L.push('TEL;TYPE=WORK,VOICE:'+c.tel);
+  if(c.fax)L.push('TEL;TYPE=WORK,FAX:'+c.fax);
+  if(c.email)L.push('EMAIL;TYPE=INTERNET,WORK:'+c.email);
+  if(c.address)L.push('ADR;TYPE=WORK:;;'+vEsc(c.address)+';;;;');
+  if(c.web)L.push('URL:'+c.web);
+  const note=[c.metAt?'만난 날 '+c.metAt:'',c.metPlace?'만난 곳 '+c.metPlace:'',c.kakao?'카톡 ID '+c.kakao:'',c.memo||''].filter(Boolean).join(' / ');
+  if(note)L.push('NOTE:'+vEsc(note));
+  L.push('END:VCARD');return L.join('\r\n')+'\r\n';
+}
+function parseVcf(t){
+  const out=[];const un=s=>s.replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1');
+  t=t.replace(/\r\n[ \t]/g,'').replace(/\n[ \t]/g,'');
+  for(const blk of t.split(/BEGIN:VCARD/i).slice(1)){
+    const c={name:'',company:'',dept:'',title:'',mobile:'',tel:'',fax:'',email:'',address:'',web:'',kakao:'',memo:''};
+    for(const ln of blk.split(/\r?\n/)){
+      const i=ln.indexOf(':');if(i<0)continue;const k=ln.slice(0,i).toUpperCase();let v=ln.slice(i+1);
+      if(/CHARSET=UTF-8/i.test(k)&&/ENCODING=QUOTED-PRINTABLE/i.test(k)){try{v=decodeURIComponent(v.replace(/=([0-9A-F]{2})/gi,'%$1'))}catch(e){}}
+      const key=k.split(';')[0].replace(/^ITEM\d+\./,'');
+      if(key==='FN')c.name=un(v);
+      else if(key==='N'&&!c.name){const p=v.split(';');c.name=un((p[0]||'')+(p[1]||''))}
+      else if(key==='ORG'){const p=v.split(';');c.company=un(p[0]||'');c.dept=un(p[1]||'')}
+      else if(key==='TITLE')c.title=un(v);
+      else if(key==='TEL'){const ph=fmtPhone(v);if(/FAX/.test(k))c.fax=c.fax||ph;else if(/CELL|MOBILE/.test(k)||/^01/.test(digits(ph)))c.mobile=c.mobile||ph;else c.tel=c.tel||ph}
+      else if(key==='EMAIL')c.email=c.email||v.trim();
+      else if(key==='ADR')c.address=c.address||un(v.split(';').filter(Boolean).join(' '));
+      else if(key==='URL')c.web=c.web||un(v);
+      else if(key==='NOTE')c.memo=un(v);
+    }
+    if(c.name||c.mobile||c.email)out.push(c);
+  }
+  return out;
+}
+function saveVcf(list,fname){
+  const txt=list.map(toVcf).join('');
+  const file=new File([txt],fname,{type:'text/vcard'});
+  if(isIOS&&list.length===1){location.href='data:text/vcard;charset=utf-8,'+encodeURIComponent(txt);return}
+  if(navigator.canShare&&navigator.canShare({files:[file]})&&isAnd){
+    navigator.share({files:[file],title:fname}).catch(()=>dl(file));return}
+  dl(file);
+}
+function dl(file){const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+
+/* ---------- 바로 실행 (지도·전화·메일·카톡) ---------- */
+function openTmap(addr){
+  const q=encodeURIComponent(addr);
+  if(isAnd)location.href='intent://search?name='+q+'#Intent;scheme=tmap;package=com.skt.tmap.ku;end';
+  else{location.href='tmap://search?name='+q;
+    setTimeout(()=>{if(!document.hidden)sheet(`<h3>티맵이 안 열렸나요?</h3><p class="muted">티맵이 설치돼 있지 않으면 다른 지도로 열 수 있어요.</p>
+      <button class="opt" onclick="openKakao('${esc(addr).replace(/'/g,'')}')">카카오맵으로 열기</button>
+      <a class="btn opt" href="https://apps.apple.com/kr/app/id431589174" target="_blank">티맵 설치하기</a>
+      <button class="opt" onclick="sheet()">닫기</button>`)},1800)}
+}
+function openKakao(addr){sheet();location.href='https://map.kakao.com/link/search/'+encodeURIComponent(addr)}
+function openNaver(addr){sheet();location.href='https://map.naver.com/p/search/'+encodeURIComponent(addr)}
+function mapMenu(c){
+  sheet(`<h3>📍 ${esc(c.address)}</h3>
+  <button class="opt pri" onclick="sheet();openTmap(cur().address)">티맵으로 길안내</button>
+  <button class="opt" onclick="openKakao(cur().address)">카카오맵으로 보기</button>
+  <button class="opt" onclick="openNaver(cur().address)">네이버 지도로 보기</button>
+  <button class="opt" onclick="copy(cur().address);sheet()">주소 복사</button>
+  <button class="opt" onclick="sheet()">닫기</button>`)
+}
+async function copy(t,msg){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast(msg||'복사했어요')}
+function mailMenu(c){
+  sheet(`<h3>✉️ ${esc(c.email)}</h3>
+  <button class="opt pri" onclick="sendMail(cur(),'app')">메일 쓰기 (휴대폰 메일 앱)</button>
+  <button class="opt" onclick="sendMail(cur(),'gmail')">Gmail로 쓰기</button>
+  <button class="opt" onclick="copy(cur().email,'메일 주소를 복사했어요');sheet()">메일 주소만 복사</button>
+  <p class="muted">제목·첫 인사가 자동으로 들어가요. 끝 인사(서명)는 설정에서 바꿀 수 있어요.</p>
+  <button class="opt" onclick="sheet()">닫기</button>`)
+}
+function sendMail(c,via){
+  sheet();
+  const who=(c.name||'')+(c.title?' '+c.title:'')+'님';
+  const sub=(c.company?'['+c.company+'] ':'')+(c.name||'')+(c.name?' '+(c.title||'')+'님께':'');
+  const body='안녕하세요 '+who+',\n\n'+(c.metAt?c.metAt.slice(5).replace('-','월 ')+'일 ':'')+'만나 뵙게 되어 반가웠습니다.\n\n\n'+(S.sign||'');
+  if(via==='gmail')window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(c.email)+'&su='+encodeURIComponent(sub.trim())+'&body='+encodeURIComponent(body),'_blank');
+  else location.href='mailto:'+c.email+'?subject='+encodeURIComponent(sub.trim())+'&body='+encodeURIComponent(body);
+}
+function telMenu(c){
+  const ph=c.mobile||c.tel;
+  sheet(`<h3>📞 ${esc(c.name||c.company)}</h3>
+  ${c.mobile?`<a class="btn opt pri" href="tel:${digits(c.mobile)}">휴대폰 전화 <span class="nw">${esc(c.mobile)}</span></a>
+  <a class="btn opt" href="sms:${digits(c.mobile)}">문자 보내기</a>`:''}
+  ${c.tel?`<a class="btn opt" href="tel:${digits(c.tel)}">회사 전화 <span class="nw">${esc(c.tel)}</span></a>`:''}
+  <button class="opt" onclick="copy('${esc(ph)}','번호를 복사했어요');sheet()">번호 복사</button>
+  <button class="opt" onclick="sheet()">닫기</button>`)
+}
+function kakaoMenu(c){
+  sheet(`<h3>💬 카톡·연락처</h3>
+  <button class="opt pri" onclick="sheet();saveVcf([cur()],(cur().name||'연락처')+'.vcf')">① 휴대폰 연락처에 저장</button>
+  <div class="note">카톡은 다른 앱이 친구를 직접 추가하는 걸 막아 두었어요. 대신 <b>휴대폰 연락처에 저장</b>하면 카톡이 알아서 친구로 넣어 줘요.<br>카톡 → 친구 탭 → 설정(톱니) → <b>「자동 친구 추가」 켜기</b> (한 번만)</div>
+  ${c.kakao?`<button class="opt" onclick="copy(cur().kakao,'카톡 ID를 복사했어요. 카톡 친구 추가 → ID로 붙여넣기');sheet()">② 카톡 ID 복사 (${esc(c.kakao)})</button>`:''}
+  <button class="opt" onclick="shareCard(cur())">${c.kakao?'③':'②'} 이 명함을 카톡으로 보내기</button>
+  <a class="btn opt" href="kakaotalk://launch">카톡 열기</a>
+  <button class="opt" onclick="sheet()">닫기</button>`)
+}
+function cardText(c){return [c.name&&(c.name+(c.title?' '+c.title:'')),[c.company,c.dept].filter(Boolean).join(' '),c.mobile&&'휴대폰 '+c.mobile,c.tel&&'전화 '+c.tel,c.email&&'메일 '+c.email,c.address&&'주소 '+c.address].filter(Boolean).join('\n')}
+async function shareCard(c){sheet();const t=cardText(c);if(navigator.share){try{await navigator.share({text:t});return}catch(e){if(e.name==='AbortError')return}}copy(t,'명함 내용을 복사했어요. 카톡에 붙여넣으세요')}
+
+/* ---------- 화면 ---------- */
+let view='list',curId=null,draft=null,filt='all',q='';
+const cur=()=>C.find(x=>x.id===curId)||draft;
+function sheet(html){const s=$('#sheet');if(!html){s.classList.remove('on');return}$('#sheetIn').innerHTML=html;s.classList.add('on')}
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')sheet()});
+function go(v,id){view=v;if(id!==undefined)curId=id;history.pushState({v,id:curId},'');render();scrollTo(0,0)}
+addEventListener('popstate',e=>{if($('#sheet').classList.contains('on')){sheet();history.pushState({v:view,id:curId},'');return}
+  const st=e.state||{v:'list'};view=st.v;curId=st.id;render()});
+$('#backBtn').onclick=()=>history.back();
+$('#setBtn').onclick=()=>go('set');
+$('#fab').onclick=addMenu;
+function addMenu(){
+  sheet(`<h3>명함 추가</h3>
+  <button class="opt pri" onclick="sheet();$('#camIn').click()">📷 명함 사진 찍기</button>
+  <button class="opt" onclick="sheet();$('#picIn').click()">🖼️ 앨범에서 명함 사진 고르기</button>
+  <button class="opt" onclick="sheet();startPaste()">📋 명함 글자 붙여넣기 (카톡·문자로 받은 명함)</button>
+  <button class="opt" onclick="sheet();$('#vcfIn').click()">📇 연락처 파일(.vcf) 가져오기</button>
+  ${('contacts' in navigator&&'ContactsManager' in window)?`<button class="opt" onclick="sheet();pickContacts()">📱 휴대폰 연락처에서 가져오기</button>`:''}
+  <button class="opt" onclick="sheet();draft=blank();go('edit',null)">✏️ 직접 입력</button>
+  <button class="opt" onclick="sheet()">닫기</button>`)
+}
+const blank=()=>({id:'',name:'',company:'',dept:'',title:'',mobile:'',tel:'',fax:'',email:'',address:'',web:'',kakao:'',memo:'',tags:'',metAt:today(),metPlace:'',photo:'',fav:false});
+function initial(c){return (c.name||c.company||'?').trim().slice(0,1)}
+
+function render(){
+  const a=$('#app');$('#backBtn').style.display=view==='list'?'none':'';$('#fab').style.display=view==='list'?'':'none';
+  $('#setBtn').style.display=view==='list'?'':'none';
+  if(view==='list')return renderList(a);
+  if(view==='detail')return renderDetail(a);
+  if(view==='edit')return renderEdit(a);
+  if(view==='set')return renderSet(a);
+  if(view==='paste')return renderPaste(a);
+}
+function renderList(a){
+  const tags=[...new Set(C.flatMap(c=>(c.tags||'').split(/[,\s]+/).filter(Boolean)))].slice(0,12);
+  const qq=q.trim().toLowerCase().replace(/-/g,'');
+  let L=C.filter(c=>{if(filt==='fav'&&!c.fav)return false;if(filt.startsWith('#')&&!(c.tags||'').split(/[,\s]+/).includes(filt.slice(1)))return false;
+    if(!qq)return true;return [c.name,c.company,c.dept,c.title,c.email,c.address,c.memo,c.tags,c.metPlace,digits(c.mobile),digits(c.tel)].join(' ').toLowerCase().includes(qq)});
+  L.sort((x,y)=>(y.fav-x.fav)||((y.updated||0)-(x.updated||0)));
+  const needBak=C.length>=10&&Date.now()-(S.lastBak||0)>14*864e5;
+  a.innerHTML=`<div class="search"><span>🔍</span><input id="qIn" type="search" placeholder="이름·회사·번호·주소로 찾기" value="${esc(q)}"></div>
+  <div class="chips"><button class="chip ${filt==='all'?'on':''}" data-f="all">전체 ${C.length}</button><button class="chip ${filt==='fav'?'on':''}" data-f="fav">★ 즐겨찾기</button>${tags.map(t=>`<button class="chip ${filt==='#'+t?'on':''}" data-f="#${esc(t)}">#${esc(t)}</button>`).join('')}</div>
+  ${needBak?`<div class="note warn">연락처는 이 휴대폰 안에만 저장돼요. 휴대폰을 바꾸거나 잃어버리면 사라지니 <b>설정 → 백업 파일 저장</b>을 가끔 해 주세요.</div>`:''}
+  ${L.length?L.map(c=>`<div class="card item" data-id="${c.id}">
+     <div class="av">${c.photo?`<img src="${c.photo}" alt="">`:esc(initial(c))}</div>
+     <div style="min-width:0"><div class="nm">${c.fav?'★ ':''}${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
+     <div class="mini">${(c.mobile||c.tel)?`<button data-act="tel" aria-label="전화">📞</button>`:''}${c.address?`<button data-act="map" aria-label="지도">📍</button>`:''}</div></div>`).join('')
+   :(C.length?`<div class="empty"><b>찾는 연락처가 없어요</b>다른 말로 찾아보세요.</div>`
+   :`<div class="empty"><b>아직 저장한 명함이 없어요</b>아래 「＋ 명함 추가」를 눌러<br>명함 사진을 찍어 보세요.<br><br><span class="muted">사진에서 이름·전화·메일·주소를 알아서 나눠 넣어요.</span></div>`)}`;
+  const qi=$('#qIn');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;renderList(a);const n=$('#qIn');n.focus();n.setSelectionRange(p,p)};
+  a.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderList(a)});
+  a.querySelectorAll('.item').forEach(el=>el.onclick=e=>{const id=el.dataset.id;const act=e.target.closest('button')?.dataset.act;curId=id;
+    if(act==='tel'){e.stopPropagation();telMenu(cur());return}
+    if(act==='map'){e.stopPropagation();S.tmapFirst?openTmap(cur().address):mapMenu(cur());return}
+    go('detail',id)});
+}
+function renderDetail(a){
+  const c=cur();if(!c){view='list';return render()}
+  const row=(k,v,href,cp)=>v?`<div class="kv"><div class="k">${k}</div><div class="v">${href?`<a href="${href}">${esc(v)}</a>`:esc(v)}</div>${cp?`<button class="cp" onclick="copy('${esc(v).replace(/'/g,'')}')">복사</button>`:''}</div>`:'';
+  a.innerHTML=`<div class="card"><div class="item" style="cursor:default"><div class="av" style="width:64px;height:64px;font-size:26px">${c.photo?`<img src="${c.photo}" alt="">`:esc(initial(c))}</div>
+   <div><div class="nm" style="font-size:22px">${esc(c.name||'(이름 없음)')} <span class="muted">${esc(c.title)}</span></div><div class="co" style="font-size:16px">${esc([c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
+   <button class="ghost" style="margin-left:auto;font-size:24px" onclick="toggleFav()" aria-label="즐겨찾기">${c.fav?'★':'☆'}</button></div></div>
+  <div class="big">
+   <button onclick="${c.address?'openTmap(cur().address)':''}" ${c.address?'':'disabled'}><b>📍</b>티맵 길안내</button>
+   <button onclick="telMenu(cur())" ${(c.mobile||c.tel)?'':'disabled'}><b>📞</b>전화·문자</button>
+   <button onclick="mailMenu(cur())" ${c.email?'':'disabled'}><b>✉️</b>메일 보내기</button>
+   <button onclick="kakaoMenu(cur())"><b>💬</b>카톡·연락처 저장</button>
+  </div>
+  <div class="card">
+   ${row('휴대폰',c.mobile,'tel:'+digits(c.mobile),1)}${row('전화',c.tel,'tel:'+digits(c.tel),1)}${row('팩스',c.fax,'',1)}
+   ${row('메일',c.email,'mailto:'+c.email,1)}${c.address?`<div class="kv"><div class="k">주소</div><div class="v"><a href="#" onclick="event.preventDefault();mapMenu(cur())">${esc(c.address)}</a></div><button class="cp" onclick="copy(cur().address)">복사</button></div>`:''}
+   ${row('홈페이지',c.web,/^http/.test(c.web)?c.web:'https://'+c.web)}${row('카톡 ID',c.kakao,'',1)}
+   ${row('만난 날',c.metAt)}${row('만난 곳',c.metPlace)}${row('메모',c.memo)}
+   ${c.tags?`<div class="kv"><div class="k">묶음</div><div class="v">${c.tags.split(/[,\s]+/).filter(Boolean).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`:''}
+  </div>
+  ${c.photoFull?`<img class="photo" src="${c.photoFull}" alt="명함 사진">`:''}
+  <div class="row"><button onclick="draft=JSON.parse(JSON.stringify(cur()));go('edit',curId)">고치기</button><button onclick="shareCard(cur())">명함 보내기</button></div>
+  <p></p><button class="danger full" onclick="delCur()">이 연락처 지우기</button>`;
+}
+async function toggleFav(){const c=cur();c.fav=!c.fav;c.updated=Date.now();await DB.put(c);render()}
+async function delCur(){const c=cur();if(!confirm((c.name||'이 연락처')+'를 지울까요? 되돌릴 수 없어요.'))return;await DB.del(c.id);C=C.filter(x=>x.id!==c.id);toast('지웠어요');history.back()}
+const FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['metAt','만난 날','date'],['metPlace','만난 곳 (예: 박람회, 거래처 방문)'],['tags','묶음 (예: 거래처 협력사)'],['memo','메모']];
+function renderEdit(a){
+  const d=draft||blank();draft=d;
+  a.innerHTML=`${d._ocr?`<div class="note ok">명함에서 글자를 읽어 칸을 채웠어요. <b>틀린 곳만 고치고 저장</b>하세요.</div>`:''}
+  ${d.photoFull?`<img class="photo" src="${d.photoFull}" alt="명함 사진">`:''}
+  ${FIELDS.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}`).join('')}
+  ${d._raw?`<details style="margin-top:12px"><summary class="muted">사진에서 읽은 글자 전체 보기</summary><pre style="white-space:pre-wrap;font-size:14px">${esc(d._raw)}</pre></details>`:''}
+  <p></p><button class="pri full" id="saveBtn">저장</button>`;
+  $('#saveBtn').onclick=saveDraft;
+}
+async function saveDraft(){
+  const d=draft;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
+  ['mobile','tel','fax'].forEach(k=>{if(d[k])d[k]=fmtPhone(d[k])});
+  if(!d.name&&!d.company&&!d.mobile&&!d.email){toast('이름·회사·번호·메일 중 하나는 넣어 주세요');return}
+  if(!d.id){const dup=C.find(x=>(d.mobile&&digits(x.mobile)===digits(d.mobile))||(d.email&&x.email&&x.email.toLowerCase()===d.email.toLowerCase()));
+    if(dup&&confirm((dup.name||'같은 사람')+'이(가) 이미 있어요. 기존 연락처에 합칠까요?\n(취소를 누르면 따로 저장해요)')){
+      for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';return render()}
+    d.id=newId();d.created=Date.now()}
+  d.updated=Date.now();delete d._ocr;delete d._raw;
+  await DB.put(d);const i=C.findIndex(x=>x.id===d.id);if(i>=0)C[i]=d;else C.push(d);
+  draft=null;curId=d.id;toast('저장했어요');history.replaceState({v:'detail',id:d.id},'');view='detail';render();
+}
+function startPaste(){go('paste')}
+function renderPaste(a){
+  a.innerHTML=`<h2>명함 글자 붙여넣기</h2><p class="muted">카톡·문자로 받은 명함 내용이나, 휴대폰 카메라의 「글자 인식(텍스트 복사)」으로 복사한 글자를 붙여넣으세요.</p>
+  <textarea id="pt" style="min-height:220px" placeholder="예)&#10;빵을그리다&#10;홍길동 팀장&#10;010-1234-5678&#10;hong@example.com&#10;경기도 화성시 ..."></textarea>
+  <p></p><button class="pri full" id="ptGo">칸 나누기</button>`;
+  $('#ptGo').onclick=()=>{const t=$('#pt').value;if(!t.trim())return toast('글자를 붙여넣어 주세요');draft=Object.assign(blank(),parseCard(t),{_ocr:1,_raw:t});history.replaceState({v:'edit'},'');view='edit';render()};
+}
+function renderSet(a){
+  const days=S.lastBak?Math.floor((Date.now()-S.lastBak)/864e5):null;
+  a.innerHTML=`<h2>메일 끝 인사(서명)</h2><textarea id="sg" placeholder="예)&#10;감사합니다.&#10;이혜영 드림&#10;010-0000-0000">${esc(S.sign)}</textarea>
+  <h2>지도 버튼</h2><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="tf" style="width:26px;min-height:26px" ${S.tmapFirst?'checked':''}> 목록의 📍를 누르면 바로 티맵 열기</label>
+  <h2>백업 (휴대폰 바꿀 때)</h2>
+  <div class="note">연락처는 서버에 올리지 않고 <b>이 휴대폰 안에만</b> 저장돼요. ${days===null?'아직 백업한 적이 없어요.':`마지막 백업: ${days}일 전`}</div>
+  <div class="row"><button id="bk">백업 파일 저장</button><button id="rs">백업 불러오기</button></div><p></p>
+  <button class="full" id="allv">전체를 휴대폰 연락처 파일(.vcf)로 저장</button>
+  <h2>도움말</h2>
+  <div class="note"><b>홈 화면에 앱으로 설치</b>: 크롬 메뉴(⋮) 또는 사파리 공유(□↑) → 「홈 화면에 추가」<br><b>카톡 친구 자동 추가</b>: 카톡 → 친구 → 설정 → 「자동 친구 추가」 켜기</div>
+  <p class="muted">바로연락 ${VER} · 저장된 연락처 ${C.length}명</p>
+  <button class="pri full" id="sv">설정 저장</button>`;
+  $('#sv').onclick=()=>{S.sign=$('#sg').value;S.tmapFirst=$('#tf').checked;saveS();toast('설정을 저장했어요');history.back()};
+  $('#bk').onclick=()=>{const f=new File([JSON.stringify({app:'barolink',ver:VER,at:new Date().toISOString(),contacts:C})],'바로연락_백업_'+today().replace(/-/g,'')+'.json',{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>dl(f));else dl(f);S.lastBak=Date.now();saveS();toast('백업 파일을 만들었어요. 구글 드라이브 등에 보관하세요')};
+  $('#rs').onclick=()=>$('#bakIn').click();
+  $('#allv').onclick=()=>{if(!C.length)return toast('저장된 연락처가 없어요');saveVcf(C,'바로연락_전체_'+C.length+'명.vcf')};
+}
+
+/* ---------- 명함 사진 → 글자 읽기 ---------- */
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('load'));document.head.appendChild(s)})}
+function imgToCanvas(file,max){return new Promise((ok,no)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{const r=Math.min(1,max/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*r);cv.height=Math.round(im.height*r);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);ok(cv)};im.onerror=no;im.src=u})}
+async function onPhoto(file){
+  if(!file)return;
+  sheet(`<h3>명함 글자 읽는 중…</h3><p class="muted" id="ocrMsg">처음 한 번은 글자 인식 도구를 받느라 30초쯤 걸려요.</p><div class="prog"><i id="ocrBar"></i></div><button class="opt" onclick="ocrCancel=true;sheet()">그만두고 직접 입력</button>`);
+  ocrCancel=false;
+  try{
+    const big=await imgToCanvas(file,1800);
+    const thumb=await imgToCanvas(file,160);window._lastThumb=thumb.toDataURL('image/jpeg',.7);const full=await imgToCanvas(file,900);
+    const g=big.getContext('2d');const id=g.getImageData(0,0,big.width,big.height);const p=id.data;
+    for(let i=0;i<p.length;i+=4){const y=.299*p[i]+.587*p[i+1]+.114*p[i+2];p[i]=p[i+1]=p[i+2]=y}g.putImageData(id,0,0);
+    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+    const w=await Tesseract.createWorker(['kor','eng'],1,{logger:m=>{const b=$('#ocrBar'),t=$('#ocrMsg');if(!b)return;
+      if(m.status==='recognizing text'){b.style.width=Math.round(40+m.progress*60)+'%';t.textContent='글자 읽는 중… '+Math.round(m.progress*100)+'%'}
+      else{b.style.width=Math.round((m.progress||0)*40)+'%'}}});
+    const r=await w.recognize(big);await w.terminate();
+    if(ocrCancel)return;
+    const raw=r.data.text.replace(/[ \t]+/g,' ').split('\n').map(s=>s.trim()).filter(Boolean).join('\n');
+    sheet();
+    draft=Object.assign(blank(),parseCard(raw),{_ocr:1,_raw:raw,photo:thumb.toDataURL('image/jpeg',.7),photoFull:full.toDataURL('image/jpeg',.72)});
+    go('edit',null);
+  }catch(e){
+    sheet(`<h3>글자를 못 읽었어요</h3><p class="muted">인터넷이 연결돼 있는지 확인해 주세요. 사진은 그대로 붙여 두고 직접 입력할 수 있어요.</p>
+     <button class="opt pri" onclick="sheet();draft=Object.assign(blank(),{photo:window._lastThumb||''});go('edit',null)">직접 입력하기</button><button class="opt" onclick="sheet()">닫기</button>`);
+  }
+}
+let ocrCancel=false;
+$('#camIn').onchange=e=>{onPhoto(e.target.files[0]);e.target.value=''};
+$('#picIn').onchange=e=>{onPhoto(e.target.files[0]);e.target.value=''};
+$('#vcfIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const L=parseVcf(await f.text());if(!L.length)return toast('연락처를 찾지 못했어요');
+  if(L.length===1){draft=Object.assign(blank(),L[0]);go('edit',null);return}
+  if(!confirm(L.length+'명을 가져올까요?'))return;let n=0;for(const c of L){const o=Object.assign(blank(),c,{id:newId(),created:Date.now(),updated:Date.now(),metAt:''});await DB.put(o);C.push(o);n++}toast(n+'명을 가져왔어요');render()};
+$('#bakIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());const L=j.contacts||[];
+  if(!confirm('백업의 '+L.length+'명을 불러올까요? 같은 연락처는 백업 내용으로 바뀌어요.'))return;for(const c of L){await DB.put(c)}C=await DB.all();toast(L.length+'명을 불러왔어요');history.back()}catch(err){toast('백업 파일이 아니에요')}};
+async function pickContacts(){try{const L=await navigator.contacts.select(['name','tel','email','address'],{multiple:true});let n=0;
+  for(const x of L){const o=Object.assign(blank(),{id:newId(),name:(x.name||[])[0]||'',email:(x.email||[])[0]||'',metAt:'',created:Date.now(),updated:Date.now()});
+    for(const t of (x.tel||[])){const ph=fmtPhone(t);if(/^01/.test(digits(ph))&&!o.mobile)o.mobile=ph;else if(!o.tel)o.tel=ph}
+    const ad=(x.address||[])[0];if(ad)o.address=(ad.addressLine||[]).join(' ')||[ad.region,ad.city].filter(Boolean).join(' ');
+    await DB.put(o);C.push(o);n++}toast(n+'명을 가져왔어요');render()}catch(e){toast('가져오기를 취소했어요')}}
+
+(async()=>{
+  await DB.open();C=await DB.all();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  history.replaceState({v:'list'},'');render();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
