@@ -117,7 +117,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v018</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v019</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -137,7 +137,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v018';
+const VER='v019';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -867,7 +867,18 @@ async function instCheck(){
 }
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEvt=e;instCheck()});
 addEventListener('appinstalled',()=>{instEvt=null;instCheck()});
+/* ---------- 새 버전 확인 (GitHub Pages가 화면을 최대 10분 저장본으로 줄 때 대비) ---------- */
+const verNum=v=>parseInt(String(v||'').replace(/\D/g,''),10)||0;
+async function verCheck(){try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();
+  if(verNum(j.v)<=verNum(VER))return;
+  const key='baro_reload_'+j.v;
+  if(!sessionStorage.getItem(key)){sessionStorage.setItem(key,'1');const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString());return}
+  // 한 번 새로고침했는데도 옛 화면이면 버튼으로 안내 (무한 새로고침 방지)
+  if(!$('#verBar')){const b=document.createElement('div');b.id='verBar';b.className='note warn';b.style.cssText='max-width:612px;margin:10px auto 0';b.innerHTML='새 버전('+esc(j.v)+')이 있어요. <button class="ghost" style="min-height:36px" id="verGo">지금 새로 고치기</button>';document.body.insertBefore(b,$('main'));$('#verGo').onclick=()=>{const u=new URL(location.href);u.searchParams.set('v',j.v+'_'+Date.now());location.replace(u.toString())}}
+}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')verCheck()});
 (async()=>{
+  verCheck();
   await DB.open();C=await DB.all();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const mq=new URLSearchParams(location.search).get('me');
