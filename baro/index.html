@@ -103,7 +103,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v013</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v014</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -121,7 +121,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v013';
+const VER='v014';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -219,7 +219,7 @@ function parseCard(txt){
 /* ---------- 휴대폰 연락처 파일(vCard) ---------- */
 const vEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
 function toVcf(c){
-  const n=c.name||'';const fam=/^[가-힣]{2,4}$/.test(n)?n[0]:'';const giv=fam?n.slice(1):n;
+  const n=c.name||'';const fam=/^[가-힣]{2,4}$/.test(n)?n[0]:'';const giv=fam?n.slice(1):(n||c.company||'');
   const L=['BEGIN:VCARD','VERSION:3.0','N:'+vEsc(fam)+';'+vEsc(giv)+';;;','FN:'+vEsc(n||c.company||'이름 없음')];
   if(c.company||c.dept)L.push('ORG:'+vEsc(c.company)+(c.dept?';'+vEsc(c.dept):''));
   if(c.title)L.push('TITLE:'+vEsc(c.title));
