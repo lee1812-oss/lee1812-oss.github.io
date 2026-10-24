@@ -70,12 +70,13 @@ label.f{display:block;margin:12px 0 4px;font-weight:600;color:var(--sub);font-si
 #toast.on{opacity:1}
 .tag{display:inline-block;background:#eef2f7;border-radius:8px;padding:2px 8px;font-size:14px;color:#374151;margin:2px 4px 0 0}
 h2{font-size:19px;margin:18px 0 8px}
+.alt{min-height:40px;margin-top:6px;font-size:15px;font-weight:500;color:#9a3412;background:#fff7ed;border-color:#fed7aa}
 </style>
 </head>
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v002</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v003</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <main id="app"></main>
@@ -88,7 +89,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v002';
+const VER='v003';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -290,6 +291,7 @@ $('#fab').onclick=addMenu;
 function addMenu(){
   sheet(`<h3>명함 추가</h3>
   <button class="opt pri" onclick="sheet();$('#camIn').click()">📷 명함 사진 찍기</button>
+  <p class="muted" style="margin:2px 4px 8px">요령: 밝은 곳에서 명함을 화면에 꽉 차게 찍으면 더 정확해요.</p>
   <button class="opt" onclick="sheet();$('#picIn').click()">🖼️ 앨범에서 명함 사진 고르기</button>
   <button class="opt" onclick="sheet();startPaste()">📋 명함 글자 붙여넣기 (카톡·문자로 받은 명함)</button>
   <button class="opt" onclick="sheet();$('#vcfIn').click()">📇 연락처 파일(.vcf) 가져오기</button>
@@ -360,12 +362,13 @@ async function delCur(){const c=cur();if(!confirm((c.name||'이 연락처')+'를
 const FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['metAt','만난 날','date'],['metPlace','만난 곳 (예: 박람회, 거래처 방문)'],['tags','묶음 (예: 거래처 협력사)'],['memo','메모']];
 function renderEdit(a){
   const d=draft||blank();draft=d;
-  a.innerHTML=`${d._ocr?`<div class="note ok">명함에서 글자를 읽어 칸을 채웠어요. <b>틀린 곳만 고치고 저장</b>하세요.</div>`:''}
+  a.innerHTML=`${d._ocr?`<div class="note ok">명함에서 글자를 읽어 칸을 채웠어요. <b>틀린 곳만 고치고 저장</b>하세요.${d._alt&&Object.keys(d._alt).length?'<br>주황 버튼은 사진을 한 번 더 읽었을 때 다르게 나온 값이에요. 맞는 쪽을 누르세요.':''}</div>`:''}
   ${d.photoFull?`<img class="photo" src="${d.photoFull}" alt="명함 사진">`:''}
-  ${FIELDS.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}`).join('')}
+  ${FIELDS.map(([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}${d._alt&&d._alt[k]?`<button class="alt" data-k="${k}">↺ 다른 읽기: ${esc(d._alt[k])}</button>`:''}`).join('')}
   ${d._raw?`<details style="margin-top:12px"><summary class="muted">사진에서 읽은 글자 전체 보기</summary><pre style="white-space:pre-wrap;font-size:14px">${esc(d._raw)}</pre></details>`:''}
   <p></p><button class="pri full" id="saveBtn">저장</button>`;
   $('#saveBtn').onclick=saveDraft;
+  a.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,inp=$('#f_'+k),v=inp.value;inp.value=d._alt[k];d._alt[k]=v;b.textContent='↺ 다른 읽기: '+v});
 }
 async function saveDraft(){
   const d=draft;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
@@ -375,7 +378,7 @@ async function saveDraft(){
     if(dup&&confirm((dup.name||'같은 사람')+'이(가) 이미 있어요. 기존 연락처에 합칠까요?\n(취소를 누르면 따로 저장해요)')){
       for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';return render()}
     d.id=newId();d.created=Date.now()}
-  d.updated=Date.now();delete d._ocr;delete d._raw;
+  d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;
   await DB.put(d);const i=C.findIndex(x=>x.id===d.id);if(i>=0)C[i]=d;else C.push(d);
   draft=null;curId=d.id;toast('저장했어요');history.replaceState({v:'detail',id:d.id},'');view='detail';render();
 }
@@ -408,24 +411,48 @@ function renderSet(a){
 /* ---------- 명함 사진 → 글자 읽기 ---------- */
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('load'));document.head.appendChild(s)})}
 function imgToCanvas(file,max){return new Promise((ok,no)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{const r=Math.min(1,max/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*r);cv.height=Math.round(im.height*r);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);ok(cv)};im.onerror=no;im.src=u})}
+const OCR_URL='https://script.google.com/macros/s/AKfycbyd7xpHYYQs_qEvUvi1G8TuRotUry38pDevJxFJ7jnp9e6I9r4Qd_ooEGNoHNgtzFM/exec';const OCR_KEY='brl-ocr-v1';
+function enhance(src){const W=src.width,H=src.height;const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');g.drawImage(src,0,0);
+  const d=g.getImageData(0,0,W,H),p=d.data,N=W*H;const L=new Float32Array(N);for(let i=0;i<N;i++)L[i]=.299*p[i*4]+.587*p[i*4+1]+.114*p[i*4+2];
+  const blur=s=>{const o=new Float32Array(N);o.set(s);for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const i=y*W+x;o[i]=(s[i-W-1]+s[i-W]+s[i-W+1]+s[i-1]+s[i]+s[i+1]+s[i+W-1]+s[i+W]+s[i+W+1])/9}return o};
+  const B=blur(blur(L));const S=new Float32Array(N);for(let i=0;i<N;i++)S[i]=L[i]+1.2*(L[i]-B[i]);
+  const smp=[];for(let i=0;i<N;i+=37)smp.push(S[i]);smp.sort((a,b)=>a-b);const lo=smp[Math.floor(smp.length*.01)],hi=smp[Math.floor(smp.length*.99)]||255;
+  for(let i=0;i<N;i++){let v=(S[i]-lo)/((hi-lo)||1)*255;v=v<0?0:v>255?255:v;p[i*4]=p[i*4+1]=p[i*4+2]=v}g.putImageData(d,0,0);return c}
+async function ocrServer(cv){const b=cv.toDataURL('image/jpeg',.88).split(',')[1];
+  const ac=new AbortController();const tm=setTimeout(()=>ac.abort(),40000);
+  try{const r=await fetch(OCR_URL,{method:'POST',body:JSON.stringify({k:OCR_KEY,img:b,mime:'image/jpeg'}),signal:ac.signal});const j=await r.json();if(!j.ok)throw new Error(j.err);return j.text.replace(/\r/g,'')}finally{clearTimeout(tm)}}
+const TLD=/\.(co\.kr|or\.kr|go\.kr|ac\.kr|re\.kr|ne\.kr|kr|com|net|org|biz|info|io|me|jp|cn|us|co)$/i;
+function fieldScore(k,v){if(!v)return -1;const d=digits(v);
+  if(k==='email')return /^[\w.%+-]+@[\w-]+(\.[\w-]+)+$/.test(v)?(TLD.test(v)?3:1):0;
+  if(k==='mobile')return /^01[016789]\d{7,8}$/.test(d)&&(d.length===11||d.length===10)?3:0;
+  if(k==='tel'||k==='fax')return d.length>=9&&d.length<=11?3:0;
+  if(k==='address')return /(시|군|구)\s/.test(v)&&/(로|길|동|읍|면)/.test(v)?2:1;
+  return 1}
+function mergeParse(a,b){const o={},alt={};for(const k of Object.keys(a)){const x=a[k]||'',y=b[k]||'';
+  if(x===y||!y){o[k]=x;continue}if(!x){o[k]=y;continue}
+  const sx=fieldScore(k,x),sy=fieldScore(k,y);o[k]=sy>sx?y:x;alt[k]=sy>sx?x:y}return {o,alt}}
 async function onPhoto(file){
   if(!file)return;
-  sheet(`<h3>명함 글자 읽는 중…</h3><p class="muted" id="ocrMsg">처음 한 번은 글자 인식 도구를 받느라 30초쯤 걸려요.</p><div class="prog"><i id="ocrBar"></i></div><button class="opt" onclick="ocrCancel=true;sheet()">그만두고 직접 입력</button>`);
+  sheet(`<h3>명함 글자 읽는 중…</h3><p class="muted" id="ocrMsg">구글 글자인식으로 읽고 있어요. 보통 5~10초 걸려요.</p><div class="prog"><i id="ocrBar" style="width:15%"></i></div><button class="opt" onclick="ocrCancel=true;sheet()">그만두고 직접 입력</button>`);
   ocrCancel=false;
+  let thumb,full;
   try{
-    const big=await imgToCanvas(file,1800);
-    const thumb=await imgToCanvas(file,160);window._lastThumb=thumb.toDataURL('image/jpeg',.7);const full=await imgToCanvas(file,900);
-    const g=big.getContext('2d');const id=g.getImageData(0,0,big.width,big.height);const p=id.data;
-    for(let i=0;i<p.length;i+=4){const y=.299*p[i]+.587*p[i+1]+.114*p[i+2];p[i]=p[i+1]=p[i+2]=y}g.putImageData(id,0,0);
-    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
-    const w=await Tesseract.createWorker(['kor','eng'],1,{logger:m=>{const b=$('#ocrBar'),t=$('#ocrMsg');if(!b)return;
-      if(m.status==='recognizing text'){b.style.width=Math.round(40+m.progress*60)+'%';t.textContent='글자 읽는 중… '+Math.round(m.progress*100)+'%'}
-      else{b.style.width=Math.round((m.progress||0)*40)+'%'}}});
-    const r=await w.recognize(big);await w.terminate();
+    const base=await imgToCanvas(file,1600);
+    thumb=await imgToCanvas(file,160);full=await imgToCanvas(file,900);window._lastThumb=thumb.toDataURL('image/jpeg',.7);
+    const bar=()=>{const b=$('#ocrBar');if(b)b.style.width=Math.min(95,parseFloat(b.style.width)+8)+'%'};const iv=setInterval(bar,700);
+    let t1='',t2='',raw='',alt={},p;
+    const [r1,r2]=await Promise.allSettled([ocrServer(base),ocrServer(enhance(base))]);clearInterval(iv);
+    if(r1.status==='fulfilled')t1=r1.value;if(r2.status==='fulfilled')t2=r2.value;
+    if(t1||t2){const a=parseCard(t1||t2),b=parseCard(t2||t1);const m=mergeParse(a,b);p=m.o;alt=m.alt;raw=t1||t2}
+    else{ // 인터넷·서버 문제일 때 휴대폰 안에서 읽기 (정확도 낮음)
+      const t=$('#ocrMsg');if(t)t.textContent='서버 연결이 안 돼 휴대폰 안에서 읽는 중… (정확도가 낮을 수 있어요)';
+      const big=await imgToCanvas(file,1800);
+      if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+      const w=await Tesseract.createWorker(['kor','eng']);const r=await w.recognize(big);await w.terminate();
+      raw=r.data.text.replace(/[ \t]+/g,' ').split('\n').map(s=>s.trim()).filter(Boolean).join('\n');p=parseCard(raw)}
     if(ocrCancel)return;
-    const raw=r.data.text.replace(/[ \t]+/g,' ').split('\n').map(s=>s.trim()).filter(Boolean).join('\n');
     sheet();
-    draft=Object.assign(blank(),parseCard(raw),{_ocr:1,_raw:raw,photo:thumb.toDataURL('image/jpeg',.7),photoFull:full.toDataURL('image/jpeg',.72)});
+    draft=Object.assign(blank(),p,{_ocr:1,_raw:raw,_alt:alt,photo:thumb.toDataURL('image/jpeg',.7),photoFull:full.toDataURL('image/jpeg',.72)});
     go('edit',null);
   }catch(e){
     sheet(`<h3>글자를 못 읽었어요</h3><p class="muted">인터넷이 연결돼 있는지 확인해 주세요. 사진은 그대로 붙여 두고 직접 입력할 수 있어요.</p>
