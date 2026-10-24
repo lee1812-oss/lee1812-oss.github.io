@@ -82,9 +82,10 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v006</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v007</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
+<div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
 <main id="app"></main>
 <button class="pri fab" id="fab">＋ 명함 추가</button>
 <input type="file" id="camIn" accept="image/*" capture="environment" hidden>
@@ -95,7 +96,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v006';
+const VER='v007';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -319,7 +320,7 @@ const blank=()=>({id:'',name:'',company:'',dept:'',title:'',mobile:'',tel:'',fax
 function initial(c){return (c.name||c.company||'?').trim().slice(0,1)}
 
 function render(){
-  const a=$('#app');$('#backBtn').style.display=view==='list'?'none':'';$('#fab').style.display=view==='list'?'':'none';
+  const a=$('#app');$('#backBtn').style.display=view==='list'?'none':'';const ib=$('#instBar');if(ib&&ib.innerHTML)ib.style.display=view==='list'?'block':'none';$('#fab').style.display=view==='list'?'':'none';
   $('#setBtn').style.display=view==='list'?'':'none';
   if(view==='list')return renderList(a);
   if(view==='detail')return renderDetail(a);
@@ -436,6 +437,7 @@ function renderSet(a){
   <button class="full" id="allv">전체를 휴대폰 연락처 파일(.vcf)로 저장</button>
   <h2>도움말</h2>
   <div class="note"><b>홈 화면에 앱으로 설치</b>: 크롬 메뉴(⋮) 또는 사파리 공유(□↑) → 「홈 화면에 추가」<br><b>카톡 친구 자동 추가</b>: 카톡 → 친구 → 설정 → 「자동 친구 추가」 켜기</div>
+  <button class="full" onclick="instFix()">「이미 설치됨」인데 안 보이거나 안 열릴 때</button>
   <p class="muted">바로연락 ${VER} · 저장된 연락처 ${C.length}명</p>
   <button class="pri full" id="sv">설정 저장</button>`;
   $('#sv').onclick=()=>{S.sign=$('#sg').value;S.tmapFirst=$('#tf').checked;saveS();toast('설정을 저장했어요');history.back()};
@@ -510,11 +512,31 @@ async function pickContacts(){try{const L=await navigator.contacts.select(['name
     const ad=(x.address||[])[0];if(ad)o.address=(ad.addressLine||[]).join(' ')||[ad.region,ad.city].filter(Boolean).join(' ');
     await DB.put(o);C.push(o);n++}toast(n+'명을 가져왔어요');render()}catch(e){toast('가져오기를 취소했어요')}}
 
+/* ---------- 설치 상태 안내 ---------- */
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let instEvt=null;
+function instFix(){sheet(`<h3>설치돼 있다는데 안 보이거나 안 열릴 때</h3>
+  <div class="note"><b>1. 먼저 찾아보기</b><br>홈 화면을 위로 쓸어 올려 <b>앱스 화면</b>을 열고, 맨 위 검색 칸에 <b>「바로연락」</b>을 쳐 보세요. 보이면 꾹 눌러 홈 화면으로 끌어오면 돼요.</div>
+  <div class="note warn"><b>2. 아이콘을 눌러도 「앱을 열 수 없음」이 뜨면</b> (설치가 중간에 꼬인 경우)<br>① 설정 → 애플리케이션 → 「바로연락」 → <b>삭제</b><br>② 휴대폰을 껐다 켜기<br>③ 크롬에서 이 주소를 다시 열고 ⋮ → <b>「앱 설치」</b> → 1분쯤 기다리기</div>
+  <div class="note"><b>3. 그래도 안 되면</b><br>삼성 인터넷으로 이 주소를 열고 ≡ → 「현재 페이지 추가」 → 「홈 화면」을 누르세요.</div>
+  <p class="muted">저장한 연락처는 휴대폰 안 같은 곳에 있어서, 앱으로 열든 크롬으로 열든 그대로 보여요. (앱을 삭제할 때는 크롬의 사이트 데이터만 지우지 않으면 돼요)</p>
+  <button class="opt pri" onclick="sheet()">확인</button>`)}
+async function instCheck(){
+  const bar=$('#instBar');if(standalone){bar.style.display='none';return}
+  let installed=false;
+  try{if(navigator.getInstalledRelatedApps){const r=await navigator.getInstalledRelatedApps();installed=r.length>0}}catch(e){}
+  if(installed){bar.innerHTML='<div class="note ok" style="margin:0">✓ 이 휴대폰에 「바로연락」 앱이 <b>이미 설치돼 있어요.</b><br>홈 화면이나 앱스 화면에서 「바로연락」 아이콘을 눌러 여세요.<br><button class="ghost" style="padding:0;min-height:36px" onclick="instFix()">아이콘이 안 보이거나 안 열려요 →</button></div>';bar.style.display='block';return}
+  if(instEvt){bar.innerHTML='<button class="full pri" id="instBtn">📲 이 휴대폰에 앱으로 설치</button>';bar.style.display='block';$('#instBtn').onclick=async()=>{instEvt.prompt();const c=await instEvt.userChoice.catch(()=>({}));instEvt=null;bar.style.display='none';if(c.outcome==='accepted')toast('설치하고 있어요. 1분쯤 뒤 홈 화면을 확인하세요')};return}
+  bar.style.display='none';
+}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEvt=e;instCheck()});
+addEventListener('appinstalled',()=>{instEvt=null;instCheck()});
 (async()=>{
   await DB.open();C=await DB.all();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   history.replaceState({v:'list'},'');render();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  instCheck();
 })();
 </script>
 </body>

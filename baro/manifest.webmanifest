@@ -1,4 +1,5 @@
 {
+ "id": "/baro/",
  "name": "바로연락",
  "short_name": "바로연락",
  "description": "명함을 찍으면 연락처 정리, 티맵·전화·메일·카톡으로 바로 연결",
@@ -20,6 +21,12 @@
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "any maskable"
+  }
+ ],
+ "related_applications": [
+  {
+   "platform": "webapp",
+   "url": "https://lee1812-oss.github.io/baro/manifest.webmanifest"
   }
  ]
 }
