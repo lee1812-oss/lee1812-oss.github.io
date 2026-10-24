@@ -77,6 +77,17 @@ h2{font-size:19px;margin:18px 0 8px}
 .pk{cursor:pointer}.pk input{width:26px;min-height:26px;flex:none}
 .fab:disabled{opacity:.5}
 .bigopt{min-height:66px!important;font-size:19px}
+.phstrip{display:flex;gap:8px;overflow-x:auto;padding:8px 0 2px;-webkit-overflow-scrolling:touch}
+.phth{flex:none;width:104px;height:104px;padding:0;border-radius:10px;overflow:hidden;position:relative;border:1px solid var(--bd);background:#eee;display:block;min-height:0}
+.phth img{width:100%;height:100%;object-fit:cover;display:block}
+.phth span{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:2px 4px;font-weight:500;white-space:nowrap;overflow:hidden}
+#phV{position:fixed;inset:0;background:#000;z-index:40;display:flex;flex-direction:column}
+#phV .pvtop{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:10px 12px;font-size:15px}
+#phV .pvtop button{min-height:44px;background:#374151;color:#fff;border-color:#4b5563}
+#phV .pvimg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#phV .pvimg img{max-width:100%;max-height:100%;object-fit:contain}
+#phV .pvbot{padding:10px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;max-width:640px;width:100%;margin:0 auto}
+#phV .cb{display:flex;gap:8px}#phV .cb>*{flex:1;min-height:50px}
 .shopbtn{margin:0 0 12px;border-color:#86c5a0;color:#15803d}
 .alt{min-height:40px;margin-top:6px;font-size:15px;font-weight:500;color:#9a3412;background:#fff7ed;border-color:#fed7aa}
 .mecard{display:flex;gap:12px;align-items:center;cursor:pointer;border:2px solid var(--ac)}
@@ -103,7 +114,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v014</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v015</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -116,12 +127,14 @@ h2{font-size:19px;margin:18px 0 8px}
 <input type="file" id="mePic" accept="image/*" hidden>
 <input type="file" id="signCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="signPic" accept="image/*" hidden>
+<input type="file" id="phCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="phPic" accept="image/*" multiple hidden>
 <input type="file" id="bakIn" accept=".json,application/json" hidden>
 <div id="sheet"><div class="in" id="sheetIn"></div></div>
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v014';
+const VER='v015';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -131,9 +144,13 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 
 /* ---------- 저장 (이 휴대폰 안에만) ---------- */
 const DB={db:null,
-  open(){return new Promise((ok,no)=>{const r=indexedDB.open('barolink',1);r.onupgradeneeded=()=>{r.result.createObjectStore('c',{keyPath:'id'})};r.onsuccess=()=>{this.db=r.result;ok()};r.onerror=()=>no(r.error)})},
+  open(){return new Promise((ok,no)=>{const r=indexedDB.open('barolink',2);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('c'))db.createObjectStore('c',{keyPath:'id'});if(!db.objectStoreNames.contains('ph')){const s=db.createObjectStore('ph',{keyPath:'id'});s.createIndex('cid','cid')}};r.onsuccess=()=>{this.db=r.result;ok()};r.onerror=()=>no(r.error)})},
   all(){return new Promise((ok,no)=>{const q=this.db.transaction('c').objectStore('c').getAll();q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
   put(o){return new Promise((ok,no)=>{const t=this.db.transaction('c','readwrite');t.objectStore('c').put(o);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
+  phList(cid){return new Promise((ok,no)=>{const q=this.db.transaction('ph').objectStore('ph').index('cid').getAll(cid);q.onsuccess=()=>ok(q.result.sort((a,b)=>a.at-b.at));q.onerror=()=>no(q.error)})},
+  phAll(){return new Promise((ok,no)=>{const q=this.db.transaction('ph').objectStore('ph').getAll();q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
+  phPut(o){return new Promise((ok,no)=>{const t=this.db.transaction('ph','readwrite');t.objectStore('ph').put(o);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
+  phDel(id){return new Promise((ok,no)=>{const t=this.db.transaction('ph','readwrite');t.objectStore('ph').delete(id);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
   del(id){return new Promise((ok,no)=>{const t=this.db.transaction('c','readwrite');t.objectStore('c').delete(id);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}
 };
 let C=[];
@@ -359,7 +376,7 @@ function render(){
   const a=$('#app');$('#backBtn').style.display=view==='list'?'none':'';const ib=$('#instBar');if(ib&&ib.innerHTML)ib.style.display=view==='list'?'block':'none';$('#fab').style.display=view==='list'?'':'none';
   $('#setBtn').style.display=view==='list'?'':'none';
   if(view==='list')return renderList(a);
-  if(view==='detail')return renderDetail(a);
+  if(view==='detail'){renderDetail(a);phLoad();return}
   if(view==='edit')return renderEdit(a);
   if(view==='set')return renderSet(a);
   if(view==='paste')return renderPaste(a);
@@ -381,7 +398,7 @@ function renderList(a){
   ${L.length?L.map(c=>`<div class="card item" data-id="${c.id}">
      <div class="av">${c.photo?`<img src="${c.photo}" alt="">`:esc(initial(c))}</div>
      <div style="min-width:0"><div class="nm">${c.fav?'★ ':''}${c.kind==='shop'?'🏪 ':''}${esc(c.name||c.company||'(이름 없음)')} <span class="muted">${esc(c.title)}</span>${c.phoneAt?' <span class="muted" title="휴대폰에 저장함">📱</span>':''}</div><div class="co">${esc(c.kind==='shop'&&!c.name?(c.address||''):[c.company,c.dept].filter(Boolean).join(' · '))}</div></div>
-     <div class="mini">${(c.mobile||c.tel)?`<button data-act="tel" aria-label="전화">📞</button>`:''}${c.address?`<button data-act="map" aria-label="지도">📍</button>`:''}</div></div>`).join('')
+     <div class="mini">${c.photoN?`<span class="muted nw" style="align-self:center">📷${c.photoN}</span>`:''}${(c.mobile||c.tel)?`<button data-act="tel" aria-label="전화">📞</button>`:''}${c.address?`<button data-act="map" aria-label="지도">📍</button>`:''}</div></div>`).join('')
    :(C.length?`<div class="empty"><b>찾는 연락처가 없어요</b>다른 말로 찾아보세요.</div>`
    :`<div class="empty"><b>아직 저장한 명함이 없어요</b>아래 「＋ 명함 추가」를 눌러<br>명함 사진을 찍어 보세요.<br><br><span class="muted">사진에서 이름·전화·메일·주소를 알아서 나눠 넣어요.</span></div>`)}`;
   const qi=$('#qIn');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;renderList(a);const n=$('#qIn');n.focus();n.setSelectionRange(p,p)};
@@ -411,12 +428,42 @@ function renderDetail(a){
    ${row('사업자번호',c.bizNo,'',1)}${c.shotLat?`<div class="kv"><div class="k">찍은 곳</div><div class="v"><a href="https://map.kakao.com/link/map/${encodeURIComponent((c.company||c.name||'찍은 곳').replace(/,/g,' '))},${c.shotLat},${c.shotLng}" target="_blank">지도에서 보기</a> <span class="muted">${c.shotAt?new Date(c.shotAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</span></div></div>`:''}${row('만난 날',c.metAt)}${row('만난 곳',c.metPlace)}${row('메모',c.memo)}
    ${c.tags?`<div class="kv"><div class="k">묶음</div><div class="v">${c.tags.split(/[,\s]+/).filter(Boolean).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`:''}
   </div>
-  ${c.photoFull?`<img class="photo" src="${c.photoFull}" alt="명함 사진">`:''}
+  <div class="card"><div style="display:flex;align-items:center;gap:8px"><b style="font-size:18px;flex:1">📷 사진 <span class="muted" id="phCnt">${c.photoN||0}장</span></b><button class="pri" style="min-height:46px" onclick="phAddMenu()">＋ 사진 추가</button></div>
+   <div class="phstrip" id="phStrip">${c.photoN?'<p class="muted">불러오는 중…</p>':'<p class="muted" style="margin:8px 0 0">메뉴·가게 앞·주차장처럼 기억해 둘 사진을 넣어 보세요. 사진마다 메모를 달 수 있어요.</p>'}</div></div>
+  ${c.photoFull?`<p class="muted" style="margin:4px 0">${c.kind==='shop'?'간판 사진':'명함 사진'}</p><img class="photo" src="${c.photoFull}" alt="명함 사진">`:''}
   <div class="row"><button onclick="draft=JSON.parse(JSON.stringify(cur()));go('edit',curId)">고치기</button><button onclick="shareCard(cur())">명함 보내기</button></div>
   <p></p><button class="danger full" onclick="delCur()">이 연락처 지우기</button>`;
 }
+let PH=[],phUrls=[];
+async function phLoad(){const c=cur();if(!c||view!=='detail')return;phUrls.forEach(u=>URL.revokeObjectURL(u));phUrls=[];PH=await DB.phList(c.id);
+  if((c.photoN||0)!==PH.length){c.photoN=PH.length;await DB.put(c)}const st=$('#phStrip'),cn=$('#phCnt');if(cn)cn.textContent=PH.length+'장';if(!st)return;if(!PH.length){st.innerHTML='<p class="muted" style="margin:8px 0 0">메뉴·가게 앞·주차장처럼 기억해 둘 사진을 넣어 보세요. 사진마다 메모를 달 수 있어요.</p>';return}
+  st.innerHTML=PH.map((p,i)=>{const u=URL.createObjectURL(p.thumb);phUrls.push(u);return '<button class="phth" data-i="'+i+'"><img src="'+u+'" alt="">'+(p.memo?'<span>'+esc(p.memo.slice(0,14))+'</span>':'')+'</button>'}).join('');
+  st.querySelectorAll('.phth').forEach(b=>b.onclick=()=>phView(+b.dataset.i))}
+function phAddMenu(){sheet(`<h3>📷 사진 추가</h3><p class="muted">메뉴판·음식·가게 앞·주차장 등. 여러 장을 한 번에 넣을 수 있어요.</p><button class="opt pri" onclick="sheet();$('#phCam').click()">📷 지금 찍기</button><button class="opt" onclick="sheet();$('#phPic').click()">🖼️ 앨범에서 고르기 (여러 장)</button><button class="opt" onclick="sheet()">닫기</button>`)}
+function getPos(){return new Promise(ok=>{if(!navigator.geolocation)return ok(null);navigator.geolocation.getCurrentPosition(p=>ok({lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6)}),()=>ok(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000})})}
+const cvBlob=(cv,q)=>new Promise(ok=>cv.toBlob(ok,'image/jpeg',q));
+async function phAddFiles(files,fromCam){const c=cur();if(!c||!files.length)return;const posP=fromCam?getPos():Promise.resolve(null);
+  sheet('<h3>사진 넣는 중…</h3><div class="prog"><i style="width:50%"></i></div>');const recs=[];
+  try{for(const f of files){const cv=await imgToCanvas(f,1600);const full=await cvBlob(cv,.8),thumb=await cvBlob(scaleCv(cv,320),.72);recs.push({id:newId(),cid:c.id,at:fromCam?Date.now():(f.lastModified||Date.now()),memo:'',full,thumb})}}catch(e){sheet();return toast('사진을 열지 못했어요')}
+  const pos=await posP;recs.forEach(r=>{if(pos){r.lat=pos.lat;r.lng=pos.lng}});
+  const prev=recs.map(r=>URL.createObjectURL(r.thumb));
+  sheet(`<h3>사진 ${recs.length}장 넣기</h3><div class="phstrip" style="margin-bottom:8px">${prev.map(u=>'<span class="phth"><img src="'+u+'"></span>').join('')}</div><label class="f" for="phMemo">메모 (선택 · 예: 메뉴명·가격·주차)</label><input id="phMemo" placeholder="예) 크루아상 4,500원 · 뒤편 주차 가능"><p class="muted">${pos?'📍 찍은 위치도 함께 저장해요':(fromCam?'위치는 못 받았어요 (위치 권한 확인)':'앨범 사진은 사진의 날짜로 저장해요')}</p><button class="opt pri" id="phOk">저장</button><button class="opt" id="phNo">취소</button>`);
+  $('#phNo').onclick=()=>{prev.forEach(u=>URL.revokeObjectURL(u));sheet()};
+  $('#phOk').onclick=async()=>{const m=$('#phMemo').value.trim();try{for(const r of recs){r.memo=m;await DB.phPut(r)}}catch(e){sheet();return toast('휴대폰 저장 공간이 부족해요')}prev.forEach(u=>URL.revokeObjectURL(u));sheet();c.photoN=(c.photoN||0)+recs.length;c.updated=Date.now();await DB.put(c);toast('사진 '+recs.length+'장을 넣었어요');phLoad()}}
+function phView(i){const p=PH[i];if(!p)return;const old=$('#phV');if(old)old.remove();const u=URL.createObjectURL(p.full);const o=document.createElement('div');o.id='phV';
+  const dt=new Date(p.at).toLocaleString('ko-KR',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  o.innerHTML=`<div class="pvtop"><span>${i+1} / ${PH.length} · ${dt}</span><button id="pvX">닫기 ✕</button></div><div class="pvimg"><img src="${u}" alt=""></div>
+   <div class="pvbot"><div class="cb"><button id="pvP" ${i?'':'disabled'}>◀ 이전</button><button id="pvN" ${i<PH.length-1?'':'disabled'}>다음 ▶</button></div>
+   <input id="pvM" placeholder="메모 (예: 메뉴명·가격·주차)" value="${esc(p.memo||'')}">
+   <div class="cb"><button class="pri" id="pvS">메모 저장</button>${p.lat?'<a class="btn" target="_blank" href="https://map.kakao.com/link/map/'+encodeURIComponent('찍은 곳')+','+p.lat+','+p.lng+'">📍 찍은 곳</a>':''}<button id="pvSh">보내기</button><button class="danger" id="pvD">🗑 지우기</button></div></div>`;
+  document.body.appendChild(o);const close=()=>{URL.revokeObjectURL(u);o.remove()};
+  o.querySelector('#pvX').onclick=close;o.querySelector('#pvP').onclick=()=>{close();phView(i-1)};o.querySelector('#pvN').onclick=()=>{close();phView(i+1)};
+  let sx=null;const im=o.querySelector('.pvimg');im.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});im.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(dx<-60&&i<PH.length-1){close();phView(i+1)}else if(dx>60&&i>0){close();phView(i-1)}});
+  o.querySelector('#pvS').onclick=async()=>{p.memo=o.querySelector('#pvM').value.trim();await DB.phPut(p);toast('메모를 저장했어요');phLoad()};
+  o.querySelector('#pvSh').onclick=async()=>{const f=new File([p.full],'사진_'+((cur()&&(cur().company||cur().name))||'')+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:p.memo||''})}catch(e){}}else dl(f)};
+  o.querySelector('#pvD').onclick=async()=>{if(!confirm('이 사진을 지울까요? 되돌릴 수 없어요.'))return;await DB.phDel(p.id);const c=cur();if(c){c.photoN=Math.max(0,(c.photoN||1)-1);await DB.put(c)}close();toast('사진을 지웠어요');await phLoad()}}
 async function toggleFav(){const c=cur();c.fav=!c.fav;c.updated=Date.now();await DB.put(c);render()}
-async function delCur(){const c=cur();if(!confirm((c.name||'이 연락처')+'를 지울까요? 되돌릴 수 없어요.'))return;await DB.del(c.id);C=C.filter(x=>x.id!==c.id);toast('지웠어요');history.back()}
+async function delCur(){const c=cur();if(!confirm((c.name||c.company||'이 연락처')+'를 지울까요?'+(c.photoN?' 사진 '+c.photoN+'장도 같이 지워져요.':'')+' 되돌릴 수 없어요.'))return;try{for(const p of await DB.phList(c.id))await DB.phDel(p.id)}catch(e){}await DB.del(c.id);C=C.filter(x=>x.id!==c.id);toast('지웠어요');history.back()}
 const FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['bizNo','사업자등록번호 (나중에 받으면 입력)'],['metAt','만난 날','date'],['metPlace','만난 곳 (예: 박람회, 거래처 방문)'],['tags','묶음 (예: 거래처 협력사)'],['memo','메모']];
 function renderEdit(a){
   const d=draft||blank();draft=d;const FF=d._me?ME_FIELDS:FIELDS;
@@ -474,7 +521,7 @@ function renderSet(a){
   a.innerHTML=`<h2>메일 끝 인사(서명)</h2><textarea id="sg" placeholder="예)&#10;감사합니다.&#10;이혜영 드림&#10;010-0000-0000">${esc(S.sign)}</textarea>
   <h2>지도 버튼</h2><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="tf" style="width:26px;min-height:26px" ${S.tmapFirst?'checked':''}> 목록의 📍를 누르면 바로 티맵 열기</label>
   <h2>백업 (휴대폰 바꿀 때)</h2>
-  <div class="note">연락처는 서버에 올리지 않고 <b>이 휴대폰 안에만</b> 저장돼요. ${days===null?'아직 백업한 적이 없어요.':`마지막 백업: ${days}일 전`}</div>
+  <div class="note">연락처와 사진은 서버에 올리지 않고 <b>이 휴대폰 안에만</b> 저장돼요. 앱을 지우거나 크롬의 사이트 데이터를 지우면 함께 사라지니, 가끔 백업해 주세요. <b>백업 파일에는 추가 사진도 들어가요</b>(사진이 많으면 파일이 커져요). ${days===null?'아직 백업한 적이 없어요.':`마지막 백업: ${days}일 전`}</div>
   <div class="row"><button id="bk">백업 파일 저장</button><button id="rs">백업 불러오기</button></div><p></p>
   <button class="full" id="allv">전체를 휴대폰 연락처 파일(.vcf)로 저장</button>
   <h2>도움말</h2>
@@ -483,7 +530,8 @@ function renderSet(a){
   <p class="muted">바로연락 ${VER} · 저장된 연락처 ${C.length}명</p>
   <button class="pri full" id="sv">설정 저장</button>`;
   $('#sv').onclick=()=>{S.sign=$('#sg').value;S.tmapFirst=$('#tf').checked;saveS();toast('설정을 저장했어요');history.back()};
-  $('#bk').onclick=()=>{const f=new File([JSON.stringify({app:'barolink',ver:VER,at:new Date().toISOString(),contacts:C,me:ME})],'바로연락_백업_'+today().replace(/-/g,'')+'.json',{type:'application/json'});
+  $('#bk').onclick=async()=>{let photos=[];try{const A=await DB.phAll();toast('사진 '+A.length+'장을 백업에 담는 중…');const b64=bl=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(bl)});for(const p of A)photos.push({id:p.id,cid:p.cid,at:p.at,memo:p.memo,lat:p.lat,lng:p.lng,full:await b64(p.full),thumb:await b64(p.thumb)})}catch(e){}
+    const f=new File([JSON.stringify({app:'barolink',ver:VER,at:new Date().toISOString(),contacts:C,me:ME,photos})],'바로연락_백업_'+today().replace(/-/g,'')+'.json',{type:'application/json'});
     if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>dl(f));else dl(f);S.lastBak=Date.now();saveS();toast('백업 파일을 만들었어요. 구글 드라이브 등에 보관하세요')};
   $('#rs').onclick=()=>$('#bakIn').click();
   $('#allv').onclick=()=>{if(!C.length)return toast('저장된 연락처가 없어요');saveVcf(C,'바로연락_전체_'+C.length+'명.vcf')};
@@ -602,6 +650,8 @@ function sgPick(p){const g=GEO.st==='ok'?GEO:{};
   if(mp){if(!sp.length)put(mp);else if(!sp.some(x=>digits(x)===digits(mp))){const f=fld(mp);if(draft[f]){draft._alt=Object.assign(draft._alt||{},{[f]:mp});draft._phoneNote='간판 번호를 넣었어요. 지도에 나온 번호('+mp+')와 달라요. 아래 주황 버튼을 누르면 지도 번호로 바뀌어요.'}else put(mp)}}
   if(sp.length)draft.memo=[draft.memo,'간판 전화: '+sp.join(', ')].filter(Boolean).join('\n');
   history.replaceState({v:'edit'},'');view='edit';render()}
+$('#phCam').onchange=e=>{const f=[...e.target.files];e.target.value='';phAddFiles(f,true)};
+$('#phPic').onchange=e=>{const f=[...e.target.files];e.target.value='';phAddFiles(f,false)};
 $('#signCam').onchange=e=>{onSignPhoto(e.target.files[0]);e.target.value=''};
 $('#signPic').onchange=e=>{onSignPhoto(e.target.files[0]);e.target.value=''};
 
@@ -733,8 +783,9 @@ $('#picIn').onchange=e=>{onPhoto(e.target.files[0]);e.target.value=''};
 $('#vcfIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const L=parseVcf(await f.text());if(!L.length)return toast('연락처를 찾지 못했어요');
   if(L.length===1){draft=Object.assign(blank(),L[0]);go('edit',null);return}
   if(!confirm(L.length+'명을 가져올까요?'))return;let n=0;for(const c of L){const o=Object.assign(blank(),c,{id:newId(),created:Date.now(),updated:Date.now(),metAt:''});await DB.put(o);C.push(o);n++}toast(n+'명을 가져왔어요');render()};
-$('#bakIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());const L=j.contacts||[];
-  if(!confirm('백업의 '+L.length+'명을 불러올까요? 같은 연락처는 백업 내용으로 바뀌어요.'))return;if(j.me&&(!ME||confirm('백업에 있는 내 명함으로도 바꿀까요?'))){ME=j.me;saveMeLS()}for(const c of L){await DB.put(c)}C=await DB.all();toast(L.length+'명을 불러왔어요');history.back()}catch(err){toast('백업 파일이 아니에요')}};
+$('#bakIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());const L=j.contacts||[];const P=j.photos||[];
+  if(!confirm('백업의 '+L.length+'명'+(P.length?'과 사진 '+P.length+'장':'')+'을 불러올까요? 같은 연락처는 백업 내용으로 바뀌어요.'))return;if(j.me&&(!ME||confirm('백업에 있는 내 명함으로도 바꿀까요?'))){ME=j.me;saveMeLS()}for(const c of L){await DB.put(c)}
+  for(const p of P){try{p.full=await (await fetch(p.full)).blob();p.thumb=await (await fetch(p.thumb)).blob();await DB.phPut(p)}catch(e){}}C=await DB.all();toast(L.length+'명을 불러왔어요');history.back()}catch(err){toast('백업 파일이 아니에요')}};
 async function pickContacts(){try{const L=await navigator.contacts.select(['name','tel','email','address'],{multiple:true});let n=0;
   for(const x of L){const o=Object.assign(blank(),{id:newId(),name:(x.name||[])[0]||'',email:(x.email||[])[0]||'',metAt:'',created:Date.now(),updated:Date.now()});
     for(const t of (x.tel||[])){const ph=fmtPhone(t);if(/^01/.test(digits(ph))&&!o.mobile)o.mobile=ph;else if(!o.tel)o.tel=ph}
