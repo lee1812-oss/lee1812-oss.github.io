@@ -1,7 +1,7 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>만성교회</title><meta name="theme-color" content="#E00000">
-<link rel="manifest" href="manifest.webmanifest?v=1"><link rel="icon" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<link rel="manifest" href="manifest.webmanifest?v=3"><link rel="icon" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="만성교회">
 <script>
 var CH='UCOp1NMZk2VqnvuLZCHTay0Q',P='/channel/'+CH;
@@ -12,11 +12,33 @@ function go(){
  else if(isIOS){var t=Date.now();location.href='youtube://www.youtube.com'+P;setTimeout(function(){if(!document.hidden&&Date.now()-t<2500)location.href=WEB;},1500);}
  else{location.href=WEB;}
 }
-go();
-// 유튜브로 넘어가면 이 창은 스스로 닫아서, 다음에 아이콘을 누를 때 다시 바로 열리게 함
-document.addEventListener('visibilitychange',function(){if(document.hidden&&(isAnd||isIOS)){setTimeout(function(){try{window.close();}catch(e){}},300);}});
+// 바탕화면 아이콘으로 열었을 때만 바로 유튜브로. 주소로 열었을 때(설치할 때)는 설치 화면을 보여 줌
+var APP=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true||/[?&]app=1/.test(location.search);
+if(APP){go();document.addEventListener('visibilitychange',function(){if(document.hidden){setTimeout(function(){try{window.close();}catch(e){}},300);}});}
 </script>
-<style>html,body{margin:0;height:100%}body{background:#E00000;color:#fff;font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;word-break:keep-all;cursor:pointer;-webkit-tap-highlight-color:transparent}
-img{width:120px;height:120px;border-radius:50%;border:4px solid #fff;object-fit:cover}h1{font-size:30px;margin:18px 0 8px}p{font-size:19px;margin:6px 20px;opacity:.95}.v{position:fixed;bottom:12px;left:0;right:0;font-size:12px;opacity:.7}</style></head>
-<body onclick="go()"><div><img src="icon-192.png?v=1" alt=""><h1>만성교회</h1><p>유튜브를 여는 중이에요…</p><p>안 열리면 화면 아무 곳이나 눌러 주세요</p></div><div class="v">v002</div>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script></body></html>
+<style>html,body{margin:0;min-height:100%}body{font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;-webkit-tap-highlight-color:transparent;text-align:center}
+.app{background:#E00000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ins{background:#f4f4f5;color:#18181b;min-height:100vh;padding:36px 20px;box-sizing:border-box;max-width:520px;margin:0 auto}
+img{width:120px;height:120px;border-radius:50%;border:4px solid #fff;object-fit:cover;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+h1{font-size:30px;margin:18px 0 8px}p{font-size:19px;margin:8px 10px;line-height:1.5}
+button{display:block;width:100%;min-height:72px;margin:14px 0;border:0;border-radius:16px;font-size:23px;font-weight:700;font-family:inherit}
+.b1{background:#E00000;color:#fff}.b2{background:#fff;color:#18181b;border:1px solid #d4d4d8!important}
+.box{background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:14px 16px;text-align:left;font-size:18px;line-height:1.6;margin-top:10px}
+.ok{background:#16a34a;color:#fff;border-radius:14px;padding:16px;font-size:20px;font-weight:700;margin-top:14px}
+.v{font-size:12px;opacity:.6;margin-top:18px}[hidden]{display:none!important}</style></head>
+<body>
+<div id="a" class="app" onclick="go()" hidden><div><img src="icon-192.png?v=1" alt=""><h1>만성교회</h1><p>유튜브를 여는 중이에요…</p><p>안 열리면 화면을 눌러 주세요</p><div class="v">v003</div></div></div>
+<div id="i" class="ins" hidden><img src="icon-192.png?v=1" alt=""><h1>만성교회 유튜브</h1>
+<p>바탕화면에 아이콘을 만들면<br>누르자마자 만성교회 유튜브가 열려요.</p>
+<button class="b1" id="inst" hidden>📲 바탕화면에 아이콘 만들기</button>
+<div class="box" id="how">크롬 오른쪽 위 <b>⋮</b> 메뉴 → <b>「앱 설치」</b> 또는 <b>「홈 화면에 추가」</b>를 눌러 주세요.<br><span id="ios" hidden>아이폰은 사파리 아래 <b>공유 버튼</b> → <b>「홈 화면에 추가」</b>예요.</span></div>
+<div class="ok" id="done" hidden>✅ 아이콘을 만들었어요!<br>이제 바탕화면의 「만성교회」 아이콘을 눌러 주세요.</div>
+<button class="b2" onclick="go()">지금 유튜브로 보기</button><div class="v">v003</div></div>
+<script>
+document.getElementById(APP?'a':'i').hidden=false;
+if(isIOS)document.getElementById('ios').hidden=false;
+var dp=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;document.getElementById('inst').hidden=false;});
+document.getElementById('inst').onclick=function(){if(dp){dp.prompt();dp.userChoice.then(function(c){if(c.outcome==='accepted'){document.getElementById('inst').hidden=true;document.getElementById('how').hidden=true;document.getElementById('done').hidden=false;}dp=null;});}};
+window.addEventListener('appinstalled',function(){document.getElementById('inst').hidden=true;document.getElementById('how').hidden=true;document.getElementById('done').hidden=false;});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>

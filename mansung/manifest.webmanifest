@@ -1,7 +1,7 @@
 {
  "name": "만성교회 유튜브",
  "short_name": "만성교회",
- "start_url": "./",
+ "start_url": "./?app=1",
  "scope": "./",
  "display": "standalone",
  "background_color": "#f4f4f5",
@@ -25,5 +25,6 @@
    "type": "image/png",
    "purpose": "maskable"
   }
- ]
+ ],
+ "id": "/mansung/"
 }
