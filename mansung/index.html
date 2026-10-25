@@ -127,7 +127,7 @@ function render(){
   return;}
  const s=D.services.find(x=>x.id===cur);
  let h=`<div class="card svc"><h2>${esc(s.name)}</h2><div class="meta">${esc(s.time)}${s.place?' · '+esc(s.place):''}${s.leader?' · 인도 '+esc(s.leader):''}</div></div>`;
- if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">오늘의 말씀</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
+ if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">${ymd(new Date())===sel?'오늘의 말씀':md(sel)+' 말씀'}</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
  h+=`<div class="card">${s.items.map(itemHtml).join('')}</div>`;
  m.innerHTML=h;}
 function show(d){D=d;document.getElementById('when').textContent=d.title;dateBar();
