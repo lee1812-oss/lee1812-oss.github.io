@@ -353,7 +353,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v025';
+const VER='v026';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -729,15 +729,16 @@ function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${m
 async function openY(){
  ysv=D.services.find(x=>x.id===cur)||D.services.find(x=>x.id==='w2')||D.services[0];
  yList=ysv.items.map((it,i)=>[it,i]);
- const id=ysv.yt&&ysv.yt.id;yLive=!id;yIdx=0;yAuto=-1;yPend=-1;yReady=false;yWant=null;
- $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?'🔴 생중계 · ◀ ▶로 순서를 넘겨요':(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
- $('ynote').textContent=yLive?'이 예배 영상이 아직 등록되지 않아 생중계 화면을 열었어요. 순서는 ◀ ▶로 넘겨 주세요.':'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 ⏱를 눌러 맞춰 주세요.';
+ const id=ysv.yt&&ysv.yt.id;const nw=new Date(),dw=nw.getDay(),hm=nw.getHours()*60+nw.getMinutes();const onAir=!id&&sel===ymd(nw.getDay()===3?new Date(nw-3*864e5):nw)&&((dw===0&&((hm>=650&&hm<=760)||(hm>=830&&hm<=930)))||(dw===3&&hm>=1130&&hm<=1240));yLive=!id;yIdx=0;yAuto=-1;yPend=-1;yReady=false;yWant=null;
+ $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?(onAir?'🔴 생중계 · ◀ ▶로 순서를 넘겨요':'최신 영상 · ◀ ▶로 순서를 넘겨요'):(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
+ $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 ◀ ▶로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 ◀ ▶로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 ⏱를 눌러 맞춰 주세요.';
  $('yfx').hidden=yLive;
  $('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=false;document.body.style.overflow='hidden';window.yOpen=true;history.pushState({yv:1},'');drawNow();
  try{await api();}catch(e){err('영상을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.');return;}
  if(!window.yOpen)return;
- const ev={onError:()=>err(yLive?'지금은 생중계 시간이 아니에요.<br><span style="font-size:15px;font-weight:700">주일 오전 11시 · 오후 2시 · 수요일 오후 7시</span>':'이 영상은 앱 안에서 틀 수 없어요.'),onStateChange:e=>{if(e.data===1)setTimeout(tick,300);},onReady:()=>{yReady=true;if(yPend>=0){const k=yPend;yPend=-1;go(k,1);}else tick();}};
- if(yLive){$('yvp').outerHTML=`<iframe id="yvp" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen src="https://www.youtube.com/embed/live_stream?channel=${CH}&enablejsapi=1&playsinline=1&rel=0&origin=${encodeURIComponent(location.origin)}"></iframe>`;yp=new YT.Player('yvp',{events:ev});}
+ const ev={onError:()=>err(onAir?'지금은 생중계 중이 아니에요.<br><span style="font-size:15px;font-weight:700">주일 오전 11시 · 오후 2시 · 수요일 오후 7시</span>':'이 영상은 앱 안에서 틀 수 없어요.'),onStateChange:e=>{if(e.data===1)setTimeout(tick,300);},onReady:()=>{yReady=true;if(yPend>=0){const k=yPend;yPend=-1;go(k,1);}else tick();}};
+ if(yLive&&!onAir){yp=new YT.Player('yvp',{playerVars:{listType:'playlist',list:'UU'+CH.slice(2),playsinline:1,rel:0},events:ev});}
+ else if(yLive){$('yvp').outerHTML=`<iframe id="yvp" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen src="https://www.youtube.com/embed/live_stream?channel=${CH}&enablejsapi=1&playsinline=1&rel=0&origin=${encodeURIComponent(location.origin)}"></iframe>`;yp=new YT.Player('yvp',{events:ev});}
  else{const mk=marks();const k0=yList.findIndex(([it,i])=>mk[i]!=null);yp=new YT.Player('yvp',{videoId:id,playerVars:{playsinline:1,rel:0,start:k0>=0?mk[yList[k0][1]]:0},events:ev});}
  clearInterval(yTimer);yTimer=setInterval(tick,1000);}
 window.closeY=fromPop=>{if(!window.yOpen)return;window.yOpen=false;yReady=false;clearInterval(yTimer);try{yp&&yp.destroy&&yp.destroy();}catch(e){}yp=null;$('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=true;document.body.style.overflow='';if(!fromPop)history.back();};
