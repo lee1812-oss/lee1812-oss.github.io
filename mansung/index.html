@@ -125,7 +125,10 @@ td:first-child{font-weight:700}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v009';
+const VER='v010';
+const CREED_PARTS=[['성부 하나님',['나는 전능하신 아버지 하나님,','천지의 창조주를 믿습니다.']],
+ ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를 믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서 나시고,','본디오 빌라도에게 고난을 받아','십자가에 못 박혀 죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서 다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님 우편에','앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
+ ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // 글자 크기
 let fs=+(localStorage.getItem('jb_fs')||18);
@@ -165,7 +168,7 @@ function itemHtml(it){
  if(it.hymn){const ri=R.push({k:'h',n:it.hymn,verses:it.verses,t:it.t})-1;what=`찬송 ${esc(it.hymn)}장 · ${esc(hInfo(it.hymn).title)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=hymnBtns(it.hymn,ri);}
  else if(it.song){what=`${esc(it.song)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=songBtns(it.song);}
  else if(it.bible){const rs=String(it.bible).split(/\s*,\s*/).filter(Boolean);what=esc(rs.map(r=>(D.passages&&D.passages[r]&&D.passages[r].label)||r).join(', '));extra=rs.map((r,i)=>{const ri=R.push({k:'b',ref:r,page:i===0?it.page:'',t:it.t})-1;return bibleBox(r,i===0?it.page:'',ri);}).join('');}
- else if(it.creed){what='사도신경';extra=`<div class="btns"><button onclick="this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden">✝ 사도신경 펼치기</button></div><div class="creed" hidden>${CREED}</div>`;}
+ else if(it.creed){const ri=R.push({k:'c',t:it.t,stand:it.stand})-1;what='사도신경';extra=`<div class="btns"><button onclick="openR(${ri})">✝ 사도신경 크게 보기</button></div>`;}
  else if(it.sermon&&D.sermon){what=`「${esc(D.sermon.title)}」`;extra=`<div class="who">${esc(D.sermon.series||'')}</div>`;}
  else if(it.msg){what=esc(it.msg);}
  else if(it.info){what=`<span style="font-weight:500;font-size:.92rem">${esc(it.info)}</span>`;}
@@ -204,6 +207,8 @@ function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
    if(ref&&(!sing.length||on))h+=`<div class="st ref"><span class="lb">후렴</span>${lines(ref)}</div>`;});
   if(hi.stanzas.some(x=>x.type==='amen'))h+='<div class="amen">아멘</div>';
   h+=`<div class="copy">가사 출처: 새찬송가 (하나성경) · <a href="https://www.hbible.co.kr/hb/hymn/view/${r.n}" target="_blank" rel="noopener">원문 보기</a></div>`;}
+ else if(r.k==='c'){title='✝ 사도신경';sub=`${r.t}${r.stand?' · 일어서서 함께 고백합니다':''}`;
+  h=CREED_PARTS.map(([lb,ls])=>`<div class="st"><span class="lb">${esc(lb)}</span>${ls.map(l=>`<span class="ln">${esc(l)}</span>`).join('')}</div>`).join('')+'<div class="amen">아멘</div>';}
  else{const p=D.passages[r.ref]||{};title=`📖 ${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
   h=(p.verses||[]).map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`;}
  document.getElementById('rdt').innerHTML=`${esc(title)}<small>${esc(sub)}</small>`;rdb.innerHTML=h;rdb.scrollTop=0;
