@@ -97,6 +97,13 @@ td:first-child{font-weight:700}
 .rdf button{flex:1;min-height:58px;border-radius:14px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:800;font-family:inherit}
 .rdf button:disabled{opacity:.35}
 .rdf .nx{background:#1E3A5F;color:#fff;border:0}
+.fsz{display:flex;align-items:center;border:1px solid #a1a1aa;border-radius:14px;background:#fff;overflow:hidden;flex:0 0 auto}
+.fsz button{width:50px;min-height:54px;border:0;background:#fff;font-size:28px;font-weight:900;color:#1E3A5F;font-family:inherit;line-height:1}
+.fsz button:active{background:#EEF3F9}
+.fsz span{font-size:13px;font-weight:800;color:#52525b;padding:0 2px}
+.toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(30,58,95,.92);color:#fff;font-weight:900;font-size:20px;padding:14px 22px;border-radius:16px;z-index:80;pointer-events:none}
+.st .ln.b .ph{display:block}
+.bitem{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:8px 12px;margin-top:6px;font-size:.88rem;color:#92400e;font-weight:700}
 .foot{color:#71717a;font-size:.75rem;text-align:center;margin:14px 10px}
 .empty{padding:40px 20px;text-align:center;color:var(--sub)}
 [hidden]{display:none!important}
@@ -104,7 +111,7 @@ td:first-child{font-weight:700}
 <body><div class="wrap">
 <header>
  <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
- <div class="tools"><a class="yt" href="#" id="yt">▶ 유튜브 예배 보기</a><button class="fsb" id="fsm" aria-label="글자 작게">가−</button><button class="fsb" id="fsp" aria-label="글자 크게">가+</button></div>
+ <div class="tools"><a class="yt" href="#" id="yt">▶ 유튜브 예배 보기</a><div class="fsz"><button id="fsm" aria-label="글자 작게">−</button><span>글자</span><button id="fsp" aria-label="글자 크게">+</button></div></div>
 </header>
 <div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div></div>
 <nav id="tabs"></nav>
@@ -112,18 +119,18 @@ td:first-child{font-weight:700}
 <div class="foot" id="foot"></div>
 </div>
 <div class="rd" id="rd" hidden>
- <div class="rdh"><button class="x" id="rdx">✕ 닫기</button><div class="rdt" id="rdt"></div><button class="fsb" id="rfm" aria-label="글자 작게">가−</button><button class="fsb" id="rfp" aria-label="글자 크게">가+</button></div>
+ <div class="rdh"><button class="x" id="rdx">✕ 닫기</button><div class="rdt" id="rdt"></div><div class="fsz"><button id="rfm" aria-label="글자 작게">−</button><span>글자</span><button id="rfp" aria-label="글자 크게">+</button></div></div>
  <div class="rdb" id="rdb"></div>
  <div class="rdf"><button id="rprev">◀ 이전 순서</button><button class="nx" id="rnext">다음 순서 ▶</button></div>
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v008';
+const VER='v009';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // 글자 크기
 let fs=+(localStorage.getItem('jb_fs')||18);
-const setFs=v=>{fs=Math.max(15,Math.min(28,v));document.documentElement.style.setProperty('--fs',fs+'px');localStorage.setItem('jb_fs',fs);};
-setFs(fs);document.getElementById('fsm').onclick=()=>setFs(fs-2);document.getElementById('fsp').onclick=()=>setFs(fs+2);
+const setFs=(v,show)=>{fs=Math.max(14,Math.min(30,v));if(show&&window.toast)toast('글자 크기 '+(fs-12));document.documentElement.style.setProperty('--fs',fs+'px');localStorage.setItem('jb_fs',fs);};
+setFs(fs);document.getElementById('fsm').onclick=()=>setFs(fs-2,1);document.getElementById('fsp').onclick=()=>setFs(fs+2,1);
 // 유튜브 앱으로 열기 (누를 때 열리므로 휴대폰이 막지 않음)
 const CH='UCOp1NMZk2VqnvuLZCHTay0Q',P='/channel/'+CH,WEB='https://www.youtube.com'+P;
 const ua=navigator.userAgent,isAnd=/Android/i.test(ua),isIOS=/iPhone|iPad|iPod/i.test(ua);
@@ -149,14 +156,15 @@ const hInfo=n=>{const h=(D.hymns||{})[n];return typeof h==='string'?{title:h,sta
 let R=[];
 function hymnBtns(n,ri){const has=hInfo(n).stanzas.length;return `<div class="btns">${has?`<button onclick="openR(${ri})">🎵 가사 크게 보기</button>`:`<a href="https://www.hbible.co.kr/hb/hymn/view/${n}" target="_blank" rel="noopener">🎵 가사 보기</a>`}<a href="https://www.youtube.com/results?search_query=${encodeURIComponent('새찬송가 '+n+'장')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
 function songBtns(t){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><a href="https://www.google.com/search?q=${encodeURIComponent(q+' 가사')}" target="_blank" rel="noopener">🎵 가사 찾기</a><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
-function bibleBox(ref,page,ri){const p=D.passages&&D.passages[ref];if(!p||!p.verses||!p.verses.length)return `<div class="bible"><div class="bt">${esc(ref)}</div><p>본문을 불러오지 못했어요.</p></div>`;
+function bibleBox(ref,page,ri){const p0=D.passages&&D.passages[ref];if(p0&&p0.verses&&p0.verses.length){const v=p0.verses;return `<div class="bitem">📖 ${page?esc(page)+' · ':''}${v.length}절 (${esc(String(v[0][0]))}~${esc(String(v[v.length-1][0]))}절)</div><div class="btns"><button onclick="openR(${ri})">📖 말씀 크게 보기</button></div>`;}
+const p=D.passages&&D.passages[ref];if(!p||!p.verses||!p.verses.length)return `<div class="bible"><div class="bt">${esc(ref)}</div><p>본문을 불러오지 못했어요.</p></div>`;
  return `<div class="bible" onclick="if(!event.target.closest('a'))openR(${ri})"><div class="bt">📖 ${esc(p.label)}${page?` · ${esc(page)}`:''}</div>${p.verses.map(([v,t])=>`<p><sup>${esc(v)}</sup>${phHtml(biblePh(t))}</p>`).join('')}<span class="more">눌러서 크게 보기 ›</span><div class="copy">성경전서 개역개정판 © 대한성서공회 · <a href="${esc(p.link)}" target="_blank" rel="noopener">성서공회에서 앞뒤 보기</a></div></div>`;}
 function itemHtml(it){
  if(it.section)return `<div class="sec">— ${esc(it.t)} —</div>`;
  let what='',extra='';
  if(it.hymn){const ri=R.push({k:'h',n:it.hymn,verses:it.verses,t:it.t})-1;what=`찬송 ${esc(it.hymn)}장 · ${esc(hInfo(it.hymn).title)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=hymnBtns(it.hymn,ri);}
  else if(it.song){what=`${esc(it.song)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=songBtns(it.song);}
- else if(it.bible){const rs=String(it.bible).split(/\s*,\s*/).filter(Boolean);what=esc(rs.map(r=>r.replace(/(\D)(\d)/,'$1 $2')).join(', '));extra=rs.map((r,i)=>{const ri=R.push({k:'b',ref:r,page:i===0?it.page:'',t:it.t})-1;return bibleBox(r,i===0?it.page:'',ri);}).join('');}
+ else if(it.bible){const rs=String(it.bible).split(/\s*,\s*/).filter(Boolean);what=esc(rs.map(r=>(D.passages&&D.passages[r]&&D.passages[r].label)||r).join(', '));extra=rs.map((r,i)=>{const ri=R.push({k:'b',ref:r,page:i===0?it.page:'',t:it.t})-1;return bibleBox(r,i===0?it.page:'',ri);}).join('');}
  else if(it.creed){what='사도신경';extra=`<div class="btns"><button onclick="this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden">✝ 사도신경 펼치기</button></div><div class="creed" hidden>${CREED}</div>`;}
  else if(it.sermon&&D.sermon){what=`「${esc(D.sermon.title)}」`;extra=`<div class="who">${esc(D.sermon.series||'')}</div>`;}
  else if(it.msg){what=esc(it.msg);}
@@ -183,8 +191,9 @@ function show(d){D=d;document.getElementById('when').textContent=d.title;dateBar
 let ri0=-1,rOpen=false;
 let rfs=+(localStorage.getItem('jb_rfs')||23);
 const rd=document.getElementById('rd'),rdb=document.getElementById('rdb');
-const setRfs=v=>{rfs=Math.max(17,Math.min(36,v));rd.style.setProperty('--rfs',rfs+'px');localStorage.setItem('jb_rfs',rfs);};setRfs(rfs);
-document.getElementById('rfm').onclick=()=>setRfs(rfs-2);document.getElementById('rfp').onclick=()=>setRfs(rfs+2);
+let tt=null;function toast(m){let e=document.querySelector('.toast');if(!e){e=document.createElement('div');e.className='toast';document.body.appendChild(e);}e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,900);}
+const setRfs=(v,show)=>{rfs=Math.max(16,Math.min(40,v));rd.style.setProperty('--rfs',rfs+'px');localStorage.setItem('jb_rfs',rfs);if(show)toast('글자 크기 '+(rfs-14));};setRfs(rfs);
+document.getElementById('rfm').onclick=()=>setRfs(rfs-2,1);document.getElementById('rfp').onclick=()=>setRfs(rfs+2,1);
 const nums=s=>String(s||'').match(/\d+/g)?.map(Number)||[];
 function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
  if(r.k==='h'){const hi=hInfo(r.n);title=`찬송 ${r.n}장 · ${hi.title}`;const sing=nums(r.verses);sub=`${r.t}${r.verses?` · ${r.verses}만 부릅니다`:''}`;
@@ -196,7 +205,7 @@ function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
   if(hi.stanzas.some(x=>x.type==='amen'))h+='<div class="amen">아멘</div>';
   h+=`<div class="copy">가사 출처: 새찬송가 (하나성경) · <a href="https://www.hbible.co.kr/hb/hymn/view/${r.n}" target="_blank" rel="noopener">원문 보기</a></div>`;}
  else{const p=D.passages[r.ref]||{};title=`📖 ${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
-  h=(p.verses||[]).map(([v,t])=>`<div class="vs"><div class="vn">${esc(v)}</div><div class="vt">${phHtml(biblePh(t))}</div></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`;}
+  h=(p.verses||[]).map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`;}
  document.getElementById('rdt').innerHTML=`${esc(title)}<small>${esc(sub)}</small>`;rdb.innerHTML=h;rdb.scrollTop=0;
  const first=rdb.querySelector('.st.sing');if(first)setTimeout(()=>rdb.scrollTop=first.offsetTop-rdb.offsetTop-8,30);
  document.getElementById('rprev').disabled=ri0<=0;const nx=document.getElementById('rnext');nx.disabled=ri0>=R.length-1;
