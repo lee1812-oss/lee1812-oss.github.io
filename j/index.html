@@ -17,9 +17,9 @@ html,body{margin:0;height:100%;background:#f2f3f5;font-family:"Malgun Gothic","A
 </style></head><body>
 <div id="msg" class="hide">열쇠가 없어요.<br>조조가 준 <b>QR</b>을 다시 찍어서 열어 주세요.</div>
 <div id="ib" class="hide"></div>
-<iframe id="fr" class="hide" title="조조 알림 전광판"></iframe>
+<iframe id="fr" class="hide" title="조조 알림 전광판" allow="autoplay; screen-wake-lock"></iframe>
 <script>
-// 조조 알림 전광판 앱 껍데기 v2 (2026-10-25). 열쇠는 주소 # 뒤(또는 ?k=)로 한 번 받아 이 기기에만 기억한다. 이 파일·저장소에는 열쇠가 없다.
+// 조조 알림 전광판 앱 껍데기 v3 (2026-10-25, 화면 켜 두기 추가). 열쇠는 주소 # 뒤(또는 ?k=)로 한 번 받아 이 기기에만 기억한다. 이 파일·저장소에는 열쇠가 없다.
 (function(){
   var EXEC="https://script.google.com/macros/s/AKfycbzHH0cAFytvYowJoHLHfSZ2NtixRRBFUkYw76lyLwv3iAooKnegWLYCS5ecSuojob9Fkw/exec";
   var ok=/^[a-z0-9]{8,40}$/i;
@@ -39,5 +39,14 @@ html,body{margin:0;height:100%;background:#f2f3f5;font-family:"Malgun Gothic","A
   if(isIOS){show('📲 사파리 <b>공유(□↑) → 「홈 화면에 추가」</b>로 설치해요.');return}
   window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();evt=e;show('📲 <b>앱으로 설치</b>하면 다음부터 아이콘으로 바로 열려요.<br><button class="go">설치하기</button>')});
   window.addEventListener("appinstalled",function(){ib.classList.add("hide")});
+})();
+
+/* v3: 안쪽 전광판이 「소리로 읽기」를 켜면 화면이 꺼지지 않게 잡아 둔다 (운전 중 거치대용) */
+(function(){
+  var lock=null,want=false;
+  function grab(){if(!want||!("wakeLock" in navigator)||document.hidden)return;navigator.wakeLock.request("screen").then(function(l){lock=l;l.addEventListener("release",function(){lock=null})}).catch(function(){})}
+  function drop(){want=false;if(lock){try{lock.release()}catch(e){}lock=null}}
+  window.addEventListener("message",function(e){var d=e.data;if(d&&d.jb==="wake"){if(d.on){want=true;if(!lock)grab()}else drop()}});
+  document.addEventListener("visibilitychange",function(){if(!document.hidden&&want&&!lock)grab()});
 })();
 </script></body></html>
