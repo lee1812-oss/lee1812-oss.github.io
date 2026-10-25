@@ -261,10 +261,11 @@ main{padding-top:14px}
 .svc .kick2{white-space:normal}
 @media (min-width:700px){.top{padding-left:max(20px,calc((100% - 1400px)/2));padding-right:max(20px,calc((100% - 1400px)/2))}}
 @media (max-width:360px){.yt .yt2{display:none}}
+.t2 .ar{font-size:30px;font-weight:700;line-height:1}
 </style></head>
 <body><header class="top" id="top">
- <div class="t1"><img src="icon-192.png?v=1" alt=""><b class="tn">만성교회</b><a class="yt" href="#" id="yt"><span class="yi">▶</span>예배<span class="yt2"> 영상</span></a><div class="fsz"><button id="fsm" aria-label="글자 작게">가−</button><button id="fsp" aria-label="글자 크게">가+</button></div></div>
- <div class="t2"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><span id="dti"></span><span class="rel" id="drel" hidden></span></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div>
+ <div class="t1"><img src="icon-192.png?v=1" alt=""><b class="tn">만성교회</b><a class="yt" href="#" id="yt">예배<span class="yt2"> 영상</span></a><div class="fsz"><button id="fsm" aria-label="글자 작게">가−</button><button id="fsp" aria-label="글자 크게">가+</button></div></div>
+ <div class="t2"><button class="ar" id="dprev" aria-label="이전 주">‹</button><div class="dnow"><span id="dti"></span><span class="rel" id="drel" hidden></span></div><button class="ar" id="dnext" aria-label="다음 주">›</button></div>
  <div class="tabs" id="tabs"></div>
  <div class="dmsg" id="dmsg" hidden></div>
 </header>
@@ -273,20 +274,20 @@ main{padding-top:14px}
 <div class="foot" id="foot"></div>
 </div>
 <div class="rd" id="rd" hidden>
- <div class="rdh"><button class="x" id="rdx">✕ 닫기</button><div class="rdt" id="rdt"></div><div class="fsz"><button id="rfm" aria-label="글자 작게">−</button><span>글자</span><button id="rfp" aria-label="글자 크게">+</button></div></div>
+ <div class="rdh"><button class="x" id="rdx">닫기</button><div class="rdt" id="rdt"></div><div class="fsz"><button id="rfm" aria-label="글자 작게">−</button><span>글자</span><button id="rfp" aria-label="글자 크게">+</button></div></div>
  <div class="rdb" id="rdb"></div>
- <div class="rdf"><button id="rprev">◀ 이전 순서</button><button class="nx" id="rnext">다음 순서 ▶</button></div>
+ <div class="rdf"><button id="rprev">이전 순서</button><button class="nx" id="rnext">다음 순서</button></div>
 </div>
 <div class="rd md" id="md" hidden>
- <div class="rdh"><button class="x" id="mdx">✕ 닫기</button><div class="rdt" id="mdt">✍ 은혜 메모</div><div class="fsz"><button id="mfm" aria-label="글자 작게">−</button><span>글자</span><button id="mfp" aria-label="글자 크게">+</button></div></div>
- <div class="rdb mdb" id="mdbx"><div class="mdi" id="mdi"></div><div class="msp"><div class="mbp" id="mbp"></div><div class="mgut" id="mgut" role="separator" aria-label="성경과 메모 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 가운데로"><span></span></div><div class="mwp"><div class="mmode" role="group" aria-label="쓰는 방법"><button id="mmk">⌨ 글자로 쓰기</button><button id="mmh">✍ 손으로 쓰기</button></div>
+ <div class="rdh"><button class="x" id="mdx">닫기</button><div class="rdt" id="mdt">은혜 메모</div><div class="fsz"><button id="mfm" aria-label="글자 작게">−</button><span>글자</span><button id="mfp" aria-label="글자 크게">+</button></div></div>
+ <div class="rdb mdb" id="mdbx"><div class="mdi" id="mdi"></div><div class="msp"><div class="mbp" id="mbp"></div><div class="mgut" id="mgut" role="separator" aria-label="성경과 메모 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 가운데로"><span></span></div><div class="mwp"><div class="mmode" role="group" aria-label="쓰는 방법"><button id="mmk">글자로 쓰기</button><button id="mmh">손으로 쓰기</button></div>
 <div class="ink" id="ink" hidden><div class="itool"><button class="ic on" data-c="#1f1f1f" style="--c:#1f1f1f" aria-label="검정 펜"></button><button class="ic" data-c="#1d4ed8" style="--c:#1d4ed8" aria-label="파랑 펜"></button><button class="ic" data-c="#dc2626" style="--c:#dc2626" aria-label="빨강 펜"></button><button id="iwd">굵은 펜</button><button id="ier">지우개</button><button id="iun">↶ 되돌리기</button><button id="icl">모두 지우기</button></div><div class="ipad" id="ipad"><canvas id="icv"></canvas></div><div class="ihelp">손가락이나 펜으로 쓰세요. 두 손가락으로 밀면 위아래로 움직이고, 아래 끝까지 쓰면 칸이 저절로 늘어나요.</div></div>
 <textarea class="mta" id="mta" placeholder="말씀을 들으며 마음에 남은 구절, 받은 은혜, 결단을 적어 보세요."></textarea><div class="mst" id="mst"></div><div class="mhelp"><span class="h1">적는 대로 바로 저장돼요. 이 휴대폰에만 보관되고 다른 사람은 볼 수 없어요.</span><span class="sh"> 가운데 막대를 끌면 성경·메모 폭이 바뀌어요(두 번 누르면 가운데로).</span></div></div></div></div>
- <div class="rdf"><button id="msh">📤 보내기·복사</button><button class="nx" id="mok">다 썼어요 ✓</button></div>
+ <div class="rdf"><button id="msh">보내기·복사</button><button class="nx" id="mok">다 썼어요</button></div>
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v028';
+const VER='v029';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -328,24 +329,24 @@ const phHtml=arr=>arr.map(p=>`<span class="ph">${esc(p)}</span>`).join(' ');
 const hInfo=n=>{const h=(D.hymns||{})[n];return typeof h==='string'?{title:h,stanzas:[]}:(h||{title:'',stanzas:[]});};
 // 지금 화면(예배)에서 크게 볼 수 있는 순서 목록
 let R=[];
-function hymnBtns(n,ri){const has=hInfo(n).stanzas.length;return `<div class="btns">${has?`<button onclick="openR(${ri})">🎵 가사 크게 보기</button>`:`<a href="https://www.hbible.co.kr/hb/hymn/view/${n}" target="_blank" rel="noopener">🎵 가사 보기</a>`}<a href="https://www.youtube.com/results?search_query=${encodeURIComponent('새찬송가 '+n+'장')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
-function songBtns(t){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><a href="https://www.google.com/search?q=${encodeURIComponent(q+' 가사')}" target="_blank" rel="noopener">🎵 가사 찾기</a><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
+function hymnBtns(n,ri){const has=hInfo(n).stanzas.length;return `<div class="btns">${has?`<button onclick="openR(${ri})">가사 크게 보기</button>`:`<a href="https://www.hbible.co.kr/hb/hymn/view/${n}" target="_blank" rel="noopener">가사 보기</a>`}<a href="https://www.youtube.com/results?search_query=${encodeURIComponent('새찬송가 '+n+'장')}" target="_blank" rel="noopener">듣기</a></div>`;}
+function songBtns(t){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><a href="https://www.google.com/search?q=${encodeURIComponent(q+' 가사')}" target="_blank" rel="noopener">가사 찾기</a><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">듣기</a></div>`;}
 const sInfo=t=>{const s=(D.songs||{})[t];return s&&s.stanzas&&s.stanzas.length?s:null;};
-function songBtns2(t,ri){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><button onclick="openR(${ri})">🎵 가사 크게 보기</button><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
-function bibleBox(ref,page,ri){const p0=D.passages&&D.passages[ref];if(p0&&p0.verses&&p0.verses.length){const v=p0.verses;return `<div class="bitem">📖 ${page?esc(page)+' · ':''}${v.length}절 (${esc(String(v[0][0]))}~${esc(String(v[v.length-1][0]))}절)</div><div class="btns"><button onclick="openR(${ri})">📖 말씀 크게 보기</button></div>`;}
+function songBtns2(t,ri){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><button onclick="openR(${ri})">가사 크게 보기</button><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">듣기</a></div>`;}
+function bibleBox(ref,page,ri){const p0=D.passages&&D.passages[ref];if(p0&&p0.verses&&p0.verses.length){const v=p0.verses;return `<div class="bitem">${page?esc(page)+' · ':''}${v.length}절 (${esc(String(v[0][0]))}~${esc(String(v[v.length-1][0]))}절)</div><div class="btns"><button onclick="openR(${ri})">말씀 크게 보기</button></div>`;}
 const p=D.passages&&D.passages[ref];if(!p||!p.verses||!p.verses.length)return `<div class="bible"><div class="bt">${esc(ref)}</div><p>본문을 불러오지 못했어요.</p></div>`;
- return `<div class="bible" onclick="if(!event.target.closest('a'))openR(${ri})"><div class="bt">📖 ${esc(p.label)}${page?` · ${esc(page)}`:''}</div>${p.verses.map(([v,t])=>`<p><sup>${esc(v)}</sup>${phHtml(biblePh(t))}</p>`).join('')}<span class="more">눌러서 크게 보기 ›</span><div class="copy">성경전서 개역개정판 © 대한성서공회 · <a href="${esc(p.link)}" target="_blank" rel="noopener">성서공회에서 앞뒤 보기</a></div></div>`;}
+ return `<div class="bible" onclick="if(!event.target.closest('a'))openR(${ri})"><div class="bt">${esc(p.label)}${page?` · ${esc(page)}`:''}</div>${p.verses.map(([v,t])=>`<p><sup>${esc(v)}</sup>${phHtml(biblePh(t))}</p>`).join('')}<span class="more">눌러서 크게 보기 ›</span><div class="copy">성경전서 개역개정판 © 대한성서공회 · <a href="${esc(p.link)}" target="_blank" rel="noopener">성서공회에서 앞뒤 보기</a></div></div>`;}
 // ===== 은혜 메모 (휴대폰에만 저장) =====
 const mKey=(d,s)=>'jb_memo_'+d+'_'+s;
 const mGet=(d,s)=>{try{return JSON.parse(localStorage.getItem(mKey(d,s))||'null');}catch(e){return null;}};
-function memoBtn(){const m=mGet(sel,cur);const hasT=m&&m.text&&m.text.trim(),has=hasT||(m&&m.ink&&m.ink.length);return (has?`<div class="mprev" onclick="openM()">${hasT?esc(m.text.trim()):''}${inkThumb(m)}</div>`:'')+`<div class="btns"><button class="memo" onclick="openM()">✍ ${has?'은혜 메모 이어 쓰기':'은혜 메모 쓰기'}</button></div>`;}
+function memoBtn(){const m=mGet(sel,cur);const hasT=m&&m.text&&m.text.trim(),has=hasT||(m&&m.ink&&m.ink.length);return (has?`<div class="mprev" onclick="openM()">${hasT?esc(m.text.trim()):''}${inkThumb(m)}</div>`:'')+`<div class="btns"><button class="memo" onclick="openM()">${has?'은혜 메모 이어 쓰기':'은혜 메모 쓰기'}</button></div>`;}
 function itemHtml(it){
  if(it.section)return `<div class="sec">— ${esc(it.t)} —</div>`;
  let what='',extra='';
  if(it.hymn){const ri=R.push({k:'h',n:it.hymn,verses:it.verses,t:it.t})-1;what=`찬송 ${esc(it.hymn)}장 · ${esc(hInfo(it.hymn).title)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=hymnBtns(it.hymn,ri);}
  else if(it.song){const so=sInfo(it.song);const ri=so?R.push({k:'s',name:it.song,t:it.t})-1:-1;what=`${esc(it.song)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}${so?'<span class="ptag">PPT 가사</span>':''}`;extra=so?songBtns2(it.song,ri):songBtns(it.song);}
  else if(it.bible){const rs=String(it.bible).split(/\s*,\s*/).filter(Boolean);what=esc(rs.map(r=>(D.passages&&D.passages[r]&&D.passages[r].label)||r).join(', '));extra=rs.map((r,i)=>{const ri=R.push({k:'b',ref:r,page:i===0?it.page:'',t:it.t})-1;return bibleBox(r,i===0?it.page:'',ri);}).join('');}
- else if(it.creed){const ri=R.push({k:'c',t:it.t,stand:it.stand})-1;what='사도신경';extra=`<div class="btns"><button onclick="openR(${ri})">✝ 사도신경 크게 보기</button></div>`;}
+ else if(it.creed){const ri=R.push({k:'c',t:it.t,stand:it.stand})-1;what='사도신경';extra=`<div class="btns"><button onclick="openR(${ri})">사도신경 크게 보기</button></div>`;}
  else if(it.sermon&&D.sermon){what=`「${esc(D.sermon.title)}」`;extra=`<div class="who">${esc(D.sermon.series||'')}</div>`+memoBtn();}
  else if(it.sermon){extra=memoBtn();}
  else if(it.msg){what=esc(it.msg);}
@@ -355,7 +356,7 @@ function itemHtml(it){
 function render(){
  const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식'],['memo','은혜 메모']];
  if(!tabs.some(t=>t[0]===cur)){const dow=new Date().getDay();cur=(dow>=1&&dow<=3&&D.services.some(s=>s.id==='wed'))?'wed':D.services[0].id;}
- const ICO={w1:'🌅',w2:'☀️',pm:'🌤️',wed:'🌙'};
+ const ICO={w1:'',w2:'',pm:'',wed:''};
   const tb=document.getElementById('tabs');const sn=n=>({news:'소식',memo:'메모'})[n]||n;tb.innerHTML=tabs.map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}" title="${esc(n)}"><span class="f">${esc(n)}</span><span class="s">${esc(sn(id)===id?String(n).replace(/\s*(예배|기도회)$/,'').replace(/^(주일|청년)\s+/,'$1'):sn(id))}</span></button>`).join('');
   tb.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();const mt=document.getElementById('main').getBoundingClientRect().top-document.getElementById('top').offsetHeight;if(mt<0)window.scrollTo({top:scrollY+mt-8});});
   const on=tb.querySelector('.on');if(on)tb.scrollLeft=Math.max(0,on.offsetLeft-(tb.clientWidth-on.offsetWidth)/2);
@@ -366,11 +367,11 @@ function render(){
   return;}
  if(cur==='memo'){const all=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('jb_memo_')){try{const o=JSON.parse(localStorage.getItem(k));if(o&&((o.text&&o.text.trim())||(o.ink&&o.ink.length)))all.push(o);}catch(e){}}}
   all.sort((a,b)=>(b.d+b.svc).localeCompare(a.d+a.svc));
-  m.innerHTML=`<div class="card"><h3 style="margin:0 0 4px;font-size:1.05rem;color:var(--navy)">✍ 내 은혜 메모</h3><div class="who" style="color:var(--sub);font-size:.88rem">말씀을 들으며 적은 메모가 날짜별로 모여요. 이 휴대폰에만 보관돼요.</div><div class="btns"><button class="memo" onclick="openM()">✍ ${md(sel)} 메모 쓰기</button></div></div>`+
-   (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}${o.text&&o.text.trim()?`<div class="mt">${esc(o.text.trim())}</div>`:''}${inkThumb(o)}<div class="btns"><button onclick="openM('${o.d}','${o.svc}')">✏ 고치기</button><button onclick="shareM('${o.d}','${o.svc}')">📤 보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「✍ 은혜 메모 쓰기」를 눌러 보세요.</div>');
+  m.innerHTML=`<div class="card"><h3 style="margin:0 0 4px;font-size:1.05rem;color:var(--navy)">내 은혜 메모</h3><div class="who" style="color:var(--sub);font-size:.88rem">말씀을 들으며 적은 메모가 날짜별로 모여요. 이 휴대폰에만 보관돼요.</div><div class="btns"><button class="memo" onclick="openM()">${md(sel)} 메모 쓰기</button></div></div>`+
+   (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}${o.text&&o.text.trim()?`<div class="mt">${esc(o.text.trim())}</div>`:''}${inkThumb(o)}<div class="btns"><button onclick="openM('${o.d}','${o.svc}')">고치기</button><button onclick="shareM('${o.d}','${o.svc}')">보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「은혜 메모 쓰기」를 눌러 보세요.</div>');
   return;}
  const s=D.services.find(x=>x.id===cur);R=[];
- let h=`<div class="card svc"><div class="kick2">${esc(D.title||md(sel)+' 예배 순서')}</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>🕚 ${esc(s.time)}</span>`:''}${s.place?`<span>📍 ${esc(s.place)}</span>`:''}${s.leader?`<span>🙏 인도 ${esc(s.leader)}</span>`:''}</div></div>`;
+ let h=`<div class="card svc"><div class="kick2">${esc(D.title||md(sel)+' 예배 순서')}</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>${esc(s.time)}</span>`:''}${s.place?`<span>${esc(s.place)}</span>`:''}${s.leader?`<span>인도 ${esc(s.leader)}</span>`:''}</div></div>`;
  if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">${ymd(new Date())===sel?'오늘의 말씀':md(sel)+' 말씀'}</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
  h+=`<div class="card order">${s.items.map(itemHtml).join('')}</div>`;
  m.innerHTML=h;}
@@ -393,18 +394,18 @@ function rCont(r){let title='',sub='',h='';
    if(ref&&(!sing.length||on))h+=`<div class="st ref"><span class="lb">후렴</span>${lines(ref)}</div>`;});
   if(hi.stanzas.some(x=>x.type==='amen'))h+='<div class="amen">아멘</div>';
   h+=`<div class="copy">가사 출처: 새찬송가 (하나성경) · <a href="https://www.hbible.co.kr/hb/hymn/view/${r.n}" target="_blank" rel="noopener">원문 보기</a></div>`;}
- else if(r.k==='s'){const so=sInfo(r.name)||{stanzas:[]};title=`🎵 ${so.title||r.name}`;sub=`${r.t} · 목사님이 올려 주신 PPT 가사`;
+ else if(r.k==='s'){const so=sInfo(r.name)||{stanzas:[]};title=`${so.title||r.name}`;sub=`${r.t} · 목사님이 올려 주신 PPT 가사`;
   h=so.stanzas.map(st=>`<div class="st${st.type==='refrain'?' ref':''}">${st.label?`<span class="lb">${esc(st.label)}</span>`:''}${st.lines.map(l=>`<span class="ln">${phHtml(hymnPh(l))}</span>`).join('')}</div>`).join('')+`<div class="copy">가사 출처: ${esc(so.from||'교회방송실 PPT')}</div>`;}
- else if(r.k==='c'){title='✝ 사도신경';sub=`${r.t}${r.stand?' · 일어서서 함께 고백합니다':''}`;
+ else if(r.k==='c'){title='사도신경';sub=`${r.t}${r.stand?' · 일어서서 함께 고백합니다':''}`;
   h=CREED_PARTS.map(([lb,ls])=>`<div class="st"><span class="lb">${esc(lb)}</span>${ls.map(l=>`<span class="ln">${esc(l)}</span>`).join('')}</div>`).join('')+'<div class="amen">아멘</div>';}
- else{const p=D.passages[r.ref]||{};title=`📖 ${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
-  h=(p.verses||[]).map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`+(D.services.find(x=>x.id===cur)?.items.some(i=>i.sermon)?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="memo" style="min-height:56px;font-size:17px" onclick="openM()">✍ 은혜 메모 쓰기</button></div>`:'');}
+ else{const p=D.passages[r.ref]||{};title=`${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
+  h=(p.verses||[]).map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`+(D.services.find(x=>x.id===cur)?.items.some(i=>i.sermon)?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="memo" style="min-height:56px;font-size:17px" onclick="openM()">은혜 메모 쓰기</button></div>`:'');}
  return {title,sub,h};}
 function renderR(){const r=R[ri0];if(!r)return;const {title,sub,h}=rCont(r);
  document.getElementById('rdt').innerHTML=`${esc(title)}<small>${esc(sub)}</small>`;rdb.innerHTML=h;rdb.scrollTop=0;
  const first=rdb.querySelector('.st.sing');if(first)setTimeout(()=>rdb.scrollTop=first.offsetTop-rdb.offsetTop-8,30);
  document.getElementById('rprev').disabled=ri0<=0;const nx=document.getElementById('rnext');nx.disabled=ri0>=R.length-1;
- nx.textContent=ri0>=R.length-1?'마지막 순서':`다음: ${R[ri0+1].t} ▶`;}
+ nx.textContent=ri0>=R.length-1?'마지막 순서':`다음: ${R[ri0+1].t}`;}
 function openR(i){ri0=i;renderR();if(!rOpen){rOpen=true;rd.hidden=false;document.body.style.overflow='hidden';history.pushState({rd:1},'');}}
 function closeR(){if(!rOpen)return;rOpen=false;rd.hidden=true;document.body.style.overflow='';}
 document.getElementById('rdx').onclick=()=>{if(history.state&&history.state.rd)history.back();else closeR();};
@@ -429,17 +430,17 @@ function openM(d,s){mD=d||sel;mS=s||(cur==='memo'||cur==='news'?(D.services.find
  const o=mGet(mD,mS)||{};const sv=(mD===sel&&D.services.find(x=>x.id===mS))||null;
  const title=o.title||(sv&&D.sermon&&sv.items.some(i=>i.sermon)?D.sermon.title:'')||'';const ref=o.ref||(sv&&D.sermon?D.sermon.ref:'')||'';
  mdv.dataset.title=title;mdv.dataset.ref=ref;mdv.dataset.svc=o.svcName||(sv?sv.name:'');
- document.getElementById('mdt').innerHTML=`✍ 은혜 메모<small>${esc(md(mD))} · ${esc(mdv.dataset.svc)}</small>`;
+ document.getElementById('mdt').innerHTML=`은혜 메모<small>${esc(md(mD))} · ${esc(mdv.dataset.svc)}</small>`;
  document.getElementById('mdi').innerHTML=title?`<b>「${esc(title)}」</b>${esc(ref)}${D.sermon&&D.sermon.preacher&&mD===sel?' · '+esc(D.sermon.preacher):''}`:'오늘 받은 은혜를 적어 보세요';
  {let pr=ref,p=D.passages&&D.passages[pr];if(!(p&&p.verses&&p.verses.length)&&sv){const bi=sv.items.find(i=>i.bible);if(bi){pr=String(bi.bible).split(/\s*,\s*/)[0];p=D.passages&&D.passages[pr];}}
-  if(p&&p.verses&&p.verses.length){mbp.innerHTML=`<div class="bh">📖 ${esc(p.label||pr)}</div>`+p.verses.map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+'<div class="copy">성경전서 개역개정판 © 대한성서공회</div>';mbp.scrollTop=0;mdbEl.classList.add('split');}
+  if(p&&p.verses&&p.verses.length){mbp.innerHTML=`<div class="bh">${esc(p.label||pr)}</div>`+p.verses.map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+'<div class="copy">성경전서 개역개정판 © 대한성서공회</div>';mbp.scrollTop=0;mdbEl.classList.add('split');}
   else{mbp.innerHTML='';mdbEl.classList.remove('split');}}
  mta.value=o.text||'';INK=Array.isArray(o.ink)?o.ink.map(s=>({c:s.c,w:s.w,e:s.e,p:s.p})):[];inkH=o.inkH||0;inkLW=0;inkCur=null;ipad.scrollTop=0;mst.textContent=o.at?'저장됨 · '+o.at.slice(5,16).replace('T',' ').replace('-','/'):'';mst.className='mst';
  if(!mOpen){mOpen=true;mdv.hidden=false;document.body.style.overflow='hidden';history.pushState({md:1},'');}
  setTimeout(()=>{setMode(mMode);if(mMode!=='h')mta.setSelectionRange(mta.value.length,mta.value.length);},60);}
 function saveM(){const t=mta.value;const at=new Date(Date.now()+9*36e5).toISOString().slice(0,16);
  if(!t.trim()&&!INK.length){localStorage.removeItem(mKey(mD,mS));mst.textContent='';return;}
- try{localStorage.setItem(mKey(mD,mS),JSON.stringify({d:mD,svc:mS,svcName:mdv.dataset.svc,title:mdv.dataset.title,ref:mdv.dataset.ref,text:t,ink:INK.length?INK:undefined,inkH:INK.length?inkH:undefined,at}));mst.textContent='저장됨 ✓';mst.className='mst';}catch(e){mst.textContent='저장하지 못했어요. 휴대폰 저장 공간을 확인해 주세요.';mst.className='mst w';}}
+ try{localStorage.setItem(mKey(mD,mS),JSON.stringify({d:mD,svc:mS,svcName:mdv.dataset.svc,title:mdv.dataset.title,ref:mdv.dataset.ref,text:t,ink:INK.length?INK:undefined,inkH:INK.length?inkH:undefined,at}));mst.textContent='저장됨';mst.className='mst';}catch(e){mst.textContent='저장하지 못했어요. 휴대폰 저장 공간을 확인해 주세요.';mst.className='mst w';}}
 // ===== 손글씨 메모 =====
 const inkEl=document.getElementById('ink'),ipad=document.getElementById('ipad'),icv=document.getElementById('icv'),ictx=icv.getContext('2d'),mmk=document.getElementById('mmk'),mmh=document.getElementById('mmh');
 let INK=[],inkH=0,inkC='#1f1f1f',inkThick=false,inkEr=false,inkCur=null,penSeen=false,inkLW=0,mMode=localStorage.getItem('jb_mmode')||'h';
@@ -615,18 +616,18 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
 @media (orientation:landscape) and (max-height:500px){.yvh{padding-top:4px;padding-bottom:4px}.yvh .x,.ytog,.yvh .fsz button{min-height:44px}.yvn button{min-height:46px}.ychips button{min-height:38px}.ynote{display:none}}
 </style>
 <div class="ysh" id="ysh" hidden><div class="yshc">
- <h3>▶ 유튜브 예배, 어떻게 볼까요?</h3>
- <button class="rec" id="ysA"><span class="bi">📺</span><span>앱 안에서 보기 + 순서 자막<span class="rtag">추천</span><small>영상 옆(휴대폰은 아래)에 지금 순서·찬송 가사·성경 말씀이 나와요</small></span></button>
- <button id="ysB"><span class="bi">▶</span><span>유튜브 앱으로 보기<small>지금처럼 만성교회 유튜브 채널을 열어요</small></span></button>
+ <h3>유튜브 예배, 어떻게 볼까요?</h3>
+ <button class="rec" id="ysA"><span>앱 안에서 보기 + 순서 자막<span class="rtag">추천</span><small>영상 옆(휴대폰은 아래)에 지금 순서·찬송 가사·성경 말씀이 나와요</small></span></button>
+ <button id="ysB"><span>유튜브 앱으로 보기<small>지금처럼 만성교회 유튜브 채널을 열어요</small></span></button>
  <button class="cx" id="ysX">닫기</button>
 </div></div>
 <div class="yv" id="yv" hidden>
- <div class="yvh"><button class="x" id="yvx">✕ 닫기</button><div class="yvt" id="yvt"></div><button class="ytog on" id="ytog">자막 켜짐</button><div class="fsz"><button id="yfm" aria-label="자막 글자 작게">−</button><button id="yfp" aria-label="자막 글자 크게">+</button></div></div>
+ <div class="yvh"><button class="x" id="yvx">닫기</button><div class="yvt" id="yvt"></div><button class="ytog on" id="ytog">자막 켜짐</button><div class="fsz"><button id="yfm" aria-label="자막 글자 작게">−</button><button id="yfp" aria-label="자막 글자 크게">+</button></div></div>
  <div class="yvb" id="yvb">
   <div class="yvv"><div class="yvr" id="yvr"><div id="yvp"></div></div></div>
   <div class="ygut" id="ygut" role="separator" tabindex="0" aria-label="영상과 자막 크기 조절" title="끌어서 영상·자막 크기 조절 · 두 번 누르면 처음 크기로"><span></span></div>
   <div class="yvs"><div class="ychips" id="ychips"></div><div class="ynow" id="ynow"></div><div class="ynote" id="ynote"></div><div class="yvc" id="yvc"></div>
-   <div class="yvn"><button id="ypv">◀ 이전</button><button class="fx" id="yfx">⏱ 지금 이 순서</button><button class="nx" id="ynx">다음 ▶</button></div></div>
+   <div class="yvn"><button id="ypv">이전</button><button class="fx" id="yfx">지금 이 순서</button><button class="nx" id="ynx">다음</button></div></div>
  </div>
 </div>
 <script>
@@ -650,9 +651,9 @@ function itemCont(it){
  if(it.song&&sInfo(it.song))return rCont({k:'s',name:it.song,t:it.t}).h;
  if(it.bible)return String(it.bible).split(/\s*,\s*/).filter(Boolean).map((r,i)=>rCont({k:'b',ref:r,page:i===0?it.page:'',t:it.t}).h).join('');
  if(it.creed)return rCont({k:'c',t:it.t,stand:it.stand}).h;
- if(it.sermon&&D.sermon){const s=D.sermon;return `<div class="ybig" style="padding-top:8px">「${esc(s.title)}」<small>${esc([s.series,s.preacher].filter(Boolean).join(' · '))}</small></div><div style="text-align:center;margin:0 0 14px"><button class="ymemo" onclick="openM()">✍ 은혜 메모 쓰기</button></div>`+(s.ref&&D.passages&&D.passages[s.ref]?rCont({k:'b',ref:s.ref,t:it.t}).h:'');}
+ if(it.sermon&&D.sermon){const s=D.sermon;return `<div class="ybig" style="padding-top:8px">「${esc(s.title)}」<small>${esc([s.series,s.preacher].filter(Boolean).join(' · '))}</small></div><div style="text-align:center;margin:0 0 14px"><button class="ymemo" onclick="openM()">은혜 메모 쓰기</button></div>`+(s.ref&&D.passages&&D.passages[s.ref]?rCont({k:'b',ref:s.ref,t:it.t}).h:'');}
  const nm=itemName(it)||it.t;
- return `<div class="ybig">${esc(nm)}${it.who?`<small>${esc(it.who)}</small>`:''}${it.stand?'<small>🙋 일어서서</small>':''}</div>`;}
+ return `<div class="ybig">${esc(nm)}${it.who?`<small>${esc(it.who)}</small>`:''}${it.stand?'<small>일어서서</small>':''}</div>`;}
 function drawChips(){const mk=marks();$('ychips').innerHTML=yList.map(([it,i],k)=>`<button data-k="${k}" class="${k===yIdx?'on':''}">${esc(it.t)}${mk[i]!=null&&!yLive?`<span class="tm">${fmt(mk[i])}</span>`:''}</button>`).join('');
  $('ychips').querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.k,1));
  const on=$('ychips').querySelector('.on');if(on){const c=$('ychips');c.scrollTo({left:on.offsetLeft-c.clientWidth/2+on.offsetWidth/2,behavior:'smooth'});}}
@@ -667,13 +668,13 @@ $('ypv').onclick=()=>go(yIdx-1,1);$('ynx').onclick=()=>go(yIdx+1,1);
 $('yfx').onclick=()=>{if(!yp||!yp.getCurrentTime){toast('영상이 나온 뒤에 눌러 주세요');return;}const t=Math.round(yp.getCurrentTime());let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}l[yList[yIdx][1]]=t;localStorage.setItem(lKey(),JSON.stringify(l));yAuto=yIdx;drawChips();toast(`「${yList[yIdx][0].t}」 → ${fmt(t)}로 맞췄어요`);};
 function tick(){if(!yReady||!yp||!yp.getCurrentTime||yLive||Date.now()<yHold)return;let t=0,st=-1;try{t=yp.getCurrentTime()||0;st=yp.getPlayerState();}catch(e){return;}if(st!==1)return;if(yWant!=null){const w=yWant;yWant=null;if(Math.abs(t-w)>4){yp.seekTo(w,true);yHold=Date.now()+2500;return;}}const mk=marks();let best=-1,bt=-1;yList.forEach(([it,i],k)=>{const m=mk[i];if(m!=null&&m<=t+1.5&&m>=bt){bt=m;best=k;}});
  if(best>=0&&best!==yAuto){yAuto=best;if(best!==yIdx){yIdx=best;drawNow();}}}
-function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${msg}<button onclick="ytApp()">▶ 유튜브 앱으로 보기</button></div>`);}
+function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${msg}<button onclick="ytApp()">유튜브 앱으로 보기</button></div>`);}
 async function openY(){
  ysv=D.services.find(x=>x.id===cur)||D.services.find(x=>x.id==='w2')||D.services[0];
  yList=ysv.items.map((it,i)=>[it,i]);
  const id=ysv.yt&&ysv.yt.id;const nw=new Date(),dw=nw.getDay(),hm=nw.getHours()*60+nw.getMinutes();const onAir=!id&&sel===ymd(nw.getDay()===3?new Date(nw-3*864e5):nw)&&((dw===0&&((hm>=650&&hm<=760)||(hm>=830&&hm<=930)))||(dw===3&&hm>=1130&&hm<=1240));yLive=!id;yIdx=0;yAuto=-1;yPend=-1;yReady=false;yWant=null;
- $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?(onAir?'🔴 생중계 · ◀ ▶로 순서를 넘겨요':'최신 영상 · ◀ ▶로 순서를 넘겨요'):(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
- $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 ◀ ▶로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 ◀ ▶로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 ⏱를 눌러 맞춰 주세요.';
+ $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?(onAir?'생중계 · 이전·다음 버튼으로 순서를 넘겨요':'최신 영상 · 이전·다음 버튼으로 순서를 넘겨요'):(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
+ $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 이전·다음 버튼으로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 이전·다음 버튼으로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 를 눌러 맞춰 주세요.';
  $('yfx').hidden=yLive;
  $('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=false;document.body.style.overflow='hidden';window.yOpen=true;history.pushState({yv:1},'');drawNow();
  try{await api();}catch(e){err('영상을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.');return;}
