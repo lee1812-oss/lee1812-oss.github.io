@@ -41,7 +41,7 @@ html,body{margin:0;height:100%;background:#FAF4EA;font-family:"Malgun Gothic","A
   if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){})}catch(e){}}
   if(["admin","tablet","phone"].indexOf(m)<0)m="tablet";
   var fr=document.getElementById("fr");/* w3: 화면은 같은 곳의 app.html(빠름)로 열고, 자료만 구글에서 받는다. app.html이 실패하면 스스로 예전 주소(EXEC)로 넘어간다 */
-  fr.src="app.html?v="+WRAP_VER+"&m="+m+"&k="+encodeURIComponent(k);fr.classList.remove("hide");
+  fr.src="app.html?v=a033&m="+m+"&k="+encodeURIComponent(k);fr.classList.remove("hide");
   var bFs=document.getElementById("bFs"),bEx=document.getElementById("bEx"),de=document.documentElement;
   var can=!!(de.requestFullscreen||de.webkitRequestFullscreen)&&m!=="phone";   /* 휴대폰은 한 화면 배치라 가림 방지를 위해 채우기 버튼을 두지 않음 */
   function isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
