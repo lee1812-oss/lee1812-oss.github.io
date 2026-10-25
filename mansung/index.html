@@ -286,7 +286,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v027';
+const VER='v028';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -567,6 +567,14 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
 .yvs{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--cream)}
 .yvb.off .yvs{display:none}
 .yvb.off .yvv{flex:1}
+.ygut{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;background:var(--cream);border-bottom:1px solid #E7E1D6}
+.ygut span{width:84px;height:8px;border-radius:999px;background:#C9D7EA;box-shadow:0 0 0 4px rgba(201,215,234,.35);transition:background .15s}
+.ygut.on span,.ygut:hover span,.ygut:focus-visible span{background:#1E3A5F}
+.yvb.off .ygut{display:none}
+.yv.drag iframe{pointer-events:none}
+.yv.drag{user-select:none;-webkit-user-select:none}
+.yvb.vh:not(.off) .yvv{height:var(--yvh)}
+.yvb.vh .yvr{aspect-ratio:auto;height:100%}
 .ychips{position:relative;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid #EFEAE0;scrollbar-width:none;flex:none}
 .ychips::-webkit-scrollbar{display:none}
 .ychips button{flex:none;min-height:44px;border-radius:999px;border:1.5px solid #E7E1D6;background:#fff;color:#44403c;font-size:15px;font-weight:800;padding:0 13px;font-family:inherit}
@@ -597,7 +605,11 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
  .yvb{flex-direction:row}
  .yvv{flex:1;min-width:0;align-self:stretch}
  .yvr{max-height:100%}
- .yvs{flex:none;width:var(--ysw,38%);min-width:300px;border-left:1px solid #E7E1D6}
+ .yvs{flex:none;width:var(--ysw,38%);min-width:220px;max-width:calc(100% - 240px)}
+ .ygut{height:auto;width:26px;align-self:stretch;cursor:col-resize;border-bottom:0;border-left:1px solid #E7E1D6}
+ .ygut span{width:8px;height:84px}
+ .yvb.vh:not(.off) .yvv{height:auto}
+ .yvb.vh .yvr{aspect-ratio:16/9;height:auto}
 }
 @media (max-width:480px){.yvh{gap:6px;padding-left:8px;padding-right:8px}.yvh .x{min-width:64px;font-size:16px}.ytog{font-size:14px;padding:0 9px}.yvh .fsz button{min-width:40px}.yvt{font-size:15px}}
 @media (orientation:landscape) and (max-height:500px){.yvh{padding-top:4px;padding-bottom:4px}.yvh .x,.ytog,.yvh .fsz button{min-height:44px}.yvn button{min-height:46px}.ychips button{min-height:38px}.ynote{display:none}}
@@ -612,6 +624,7 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
  <div class="yvh"><button class="x" id="yvx">✕ 닫기</button><div class="yvt" id="yvt"></div><button class="ytog on" id="ytog">자막 켜짐</button><div class="fsz"><button id="yfm" aria-label="자막 글자 작게">−</button><button id="yfp" aria-label="자막 글자 크게">+</button></div></div>
  <div class="yvb" id="yvb">
   <div class="yvv"><div class="yvr" id="yvr"><div id="yvp"></div></div></div>
+  <div class="ygut" id="ygut" role="separator" tabindex="0" aria-label="영상과 자막 크기 조절" title="끌어서 영상·자막 크기 조절 · 두 번 누르면 처음 크기로"><span></span></div>
   <div class="yvs"><div class="ychips" id="ychips"></div><div class="ynow" id="ynow"></div><div class="ynote" id="ynote"></div><div class="yvc" id="yvc"></div>
    <div class="yvn"><button id="ypv">◀ 이전</button><button class="fx" id="yfx">⏱ 지금 이 순서</button><button class="nx" id="ynx">다음 ▶</button></div></div>
  </div>
@@ -675,6 +688,19 @@ $('yvx').onclick=()=>closeY();
 const subOff=off=>{$('yvb').classList.toggle('off',off);$('ytog').classList.toggle('on',!off);$('ytog').textContent=off?'자막 꺼짐':'자막 켜짐';};
 $('ytog').onclick=()=>{const off=!$('yvb').classList.contains('off');subOff(off);localStorage.setItem('jb_ysub',off?'0':'1');};
 subOff(localStorage.getItem('jb_ysub')==='0');
+// 영상·자막 크기 조절 막대 (넓은 화면: 좌우로 자막 폭 / 휴대폰 세로: 위아래로 영상 높이)
+const yb=$('yvb'),yg=$('ygut');const yWide=()=>matchMedia('(orientation:landscape) and (min-width:640px),(min-width:900px)').matches;
+function ySz(){const w=+localStorage.getItem('jb_ysw')||38;yb.style.setProperty('--ysw',w+'%');const v=+localStorage.getItem('jb_yvh')||0;yb.classList.toggle('vh',!!v);if(v&&yb.clientHeight)yb.style.setProperty('--yvh',Math.round(yb.clientHeight*v/100)+'px');}
+ySz();addEventListener('resize',()=>{if(window.yOpen)ySz();});
+function ySet(k,p){p=Math.round(Math.max(k==='jb_ysw'?20:15,Math.min(k==='jb_ysw'?70:80,p)));localStorage.setItem(k,p);ySz();}
+let yDrag=false;
+yg.addEventListener('pointerdown',e=>{yDrag=true;yg.classList.add('on');$('yv').classList.add('drag');try{yg.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+yg.addEventListener('pointermove',e=>{if(!yDrag)return;const r=yb.getBoundingClientRect();if(yWide())ySet('jb_ysw',(r.right-e.clientX-13)/r.width*100);else ySet('jb_yvh',(e.clientY-r.top-13)/r.height*100);});
+const yEnd=()=>{if(!yDrag)return;yDrag=false;yg.classList.remove('on');$('yv').classList.remove('drag');};
+yg.addEventListener('pointerup',yEnd);yg.addEventListener('pointercancel',yEnd);yg.addEventListener('lostpointercapture',yEnd);
+yg.addEventListener('dblclick',()=>{localStorage.removeItem(yWide()?'jb_ysw':'jb_yvh');ySz();toast('처음 크기로 되돌렸어요');});
+yg.addEventListener('keydown',e=>{const w=yWide(),ks=w?['ArrowRight','ArrowLeft']:['ArrowUp','ArrowDown'],i=ks.indexOf(e.key);if(i<0)return;e.preventDefault();const k=w?'jb_ysw':'jb_yvh';const c=+localStorage.getItem(k)||(w?38:Math.round(yb.querySelector('.yvv').offsetHeight/yb.clientHeight*100));ySet(k,c+(i?5:-5));});
+$('ysA').addEventListener('click',()=>{setTimeout(ySz,50);if(!localStorage.getItem('jb_ygt')){localStorage.setItem('jb_ygt','1');setTimeout(()=>toast('가운데 막대를 끌면 영상·자막 크기를 바꿀 수 있어요'),900);}});
 })();
 </script>
 </body></html>
