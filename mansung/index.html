@@ -303,6 +303,30 @@ main{padding-top:14px}
 .mini button{flex:0 0 auto;min-height:48px;padding:0 16px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-weight:900;font-size:.9rem;font-family:inherit;box-shadow:0 4px 12px rgba(30,58,95,.28)}
 @media (max-width:699px){.dmain{gap:6px}.dmain button.ar{flex:0 0 44px;min-height:54px}.dnow{gap:10px;padding:8px 10px}.dinfo .dti{font-size:1.08rem}}
 @media (min-width:700px){.svg{grid-template-columns:repeat(4,1fr)}.svx{max-width:50%}.mini{padding-left:max(16px,calc((100% - 1240px)/2));padding-right:max(16px,calc((100% - 1240px)/2))}}
+/* 손글씨 메모 */
+.mmode{display:flex;gap:6px}
+.mmode button{flex:1;min-height:52px;border-radius:14px;border:2px solid #cbd5e1;background:#fff;color:#1E3A5F;font-size:17px;font-weight:800;font-family:inherit}
+.mmode button.on{background:#1E3A5F;border-color:#1E3A5F;color:#fff}
+.mta[hidden],.ink[hidden]{display:none}
+.ink{flex:1;min-height:46vh;display:flex;flex-direction:column;gap:6px}
+.itool{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.itool button{min-height:50px;padding:0 12px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:15px;font-weight:800;font-family:inherit}
+.itool button.on{background:#1E3A5F;color:#fff;border-color:#1E3A5F}
+.itool .ic{width:50px;padding:0;background:#fff;position:relative}
+.itool .ic::after{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--c)}
+.itool .ic.on{background:#fff;border:3px solid #1E3A5F}
+.ipad{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;border:2px solid #cbd5e1;border-radius:16px;background-color:#FFFEF7;background-attachment:local;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(2.6rem - 1px),#e7e0cc calc(2.6rem - 1px),#e7e0cc 2.6rem)}
+.ipad canvas{display:block;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ihelp{font-size:13px;color:#71717a;font-weight:700}
+.mink{display:block;max-width:100%;max-height:260px;object-fit:contain;object-position:left top;background:#FFFEF7;border:1px solid #e7e0cc;border-radius:12px;margin-top:6px}
+.mprev .mink{max-height:88px}
+@media (min-width:600px){.ink{min-height:0}}
+/* 성경봉독·찬송가 더 굵게 */
+.bible p{font-weight:800;color:#111}
+.bible sup{font-weight:900}
+.rdb .st .ln,.rdb .st.ref .ln,.mbp .st .ln{font-weight:800;color:#111}
+.rdb .st.dim .ln{font-weight:700}
+.item .what{font-weight:800}
 </style></head>
 <body><div class="wrap">
 <header>
@@ -322,12 +346,14 @@ main{padding-top:14px}
 </div>
 <div class="rd md" id="md" hidden>
  <div class="rdh"><button class="x" id="mdx">✕ 닫기</button><div class="rdt" id="mdt">✍ 은혜 메모</div><div class="fsz"><button id="mfm" aria-label="글자 작게">−</button><span>글자</span><button id="mfp" aria-label="글자 크게">+</button></div></div>
- <div class="rdb mdb" id="mdbx"><div class="mdi" id="mdi"></div><div class="msp"><div class="mbp" id="mbp"></div><div class="mgut" id="mgut" role="separator" aria-label="성경과 메모 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 가운데로"><span></span></div><div class="mwp"><textarea class="mta" id="mta" placeholder="말씀을 들으며 마음에 남은 구절, 받은 은혜, 결단을 적어 보세요."></textarea><div class="mst" id="mst"></div><div class="mhelp"><span class="h1">적는 대로 바로 저장돼요. 이 휴대폰에만 보관되고 다른 사람은 볼 수 없어요.</span><span class="sh"> 가운데 막대를 끌면 성경·메모 폭이 바뀌어요(두 번 누르면 가운데로).</span></div></div></div></div>
+ <div class="rdb mdb" id="mdbx"><div class="mdi" id="mdi"></div><div class="msp"><div class="mbp" id="mbp"></div><div class="mgut" id="mgut" role="separator" aria-label="성경과 메모 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 가운데로"><span></span></div><div class="mwp"><div class="mmode" role="group" aria-label="쓰는 방법"><button id="mmk">⌨ 글자로 쓰기</button><button id="mmh">✍ 손으로 쓰기</button></div>
+<div class="ink" id="ink" hidden><div class="itool"><button class="ic on" data-c="#1f1f1f" style="--c:#1f1f1f" aria-label="검정 펜"></button><button class="ic" data-c="#1d4ed8" style="--c:#1d4ed8" aria-label="파랑 펜"></button><button class="ic" data-c="#dc2626" style="--c:#dc2626" aria-label="빨강 펜"></button><button id="iwd">굵은 펜</button><button id="ier">지우개</button><button id="iun">↶ 되돌리기</button><button id="icl">모두 지우기</button></div><div class="ipad" id="ipad"><canvas id="icv"></canvas></div><div class="ihelp">손가락이나 펜으로 쓰세요. 두 손가락으로 밀면 위아래로 움직이고, 아래 끝까지 쓰면 칸이 저절로 늘어나요.</div></div>
+<textarea class="mta" id="mta" placeholder="말씀을 들으며 마음에 남은 구절, 받은 은혜, 결단을 적어 보세요."></textarea><div class="mst" id="mst"></div><div class="mhelp"><span class="h1">적는 대로 바로 저장돼요. 이 휴대폰에만 보관되고 다른 사람은 볼 수 없어요.</span><span class="sh"> 가운데 막대를 끌면 성경·메모 폭이 바뀌어요(두 번 누르면 가운데로).</span></div></div></div></div>
  <div class="rdf"><button id="msh">📤 보내기·복사</button><button class="nx" id="mok">다 썼어요 ✓</button></div>
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v019';
+const VER='v020';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -377,7 +403,7 @@ const p=D.passages&&D.passages[ref];if(!p||!p.verses||!p.verses.length)return `<
 // ===== 은혜 메모 (휴대폰에만 저장) =====
 const mKey=(d,s)=>'jb_memo_'+d+'_'+s;
 const mGet=(d,s)=>{try{return JSON.parse(localStorage.getItem(mKey(d,s))||'null');}catch(e){return null;}};
-function memoBtn(){const m=mGet(sel,cur);const has=m&&m.text&&m.text.trim();return (has?`<div class="mprev" onclick="openM()">${esc(m.text.trim())}</div>`:'')+`<div class="btns"><button class="memo" onclick="openM()">✍ ${has?'은혜 메모 이어 쓰기':'은혜 메모 쓰기'}</button></div>`;}
+function memoBtn(){const m=mGet(sel,cur);const hasT=m&&m.text&&m.text.trim(),has=hasT||(m&&m.ink&&m.ink.length);return (has?`<div class="mprev" onclick="openM()">${hasT?esc(m.text.trim()):''}${inkThumb(m)}</div>`:'')+`<div class="btns"><button class="memo" onclick="openM()">✍ ${has?'은혜 메모 이어 쓰기':'은혜 메모 쓰기'}</button></div>`;}
 function itemHtml(it){
  if(it.section)return `<div class="sec">— ${esc(it.t)} —</div>`;
  let what='',extra='';
@@ -404,10 +430,10 @@ function render(){
   m.innerHTML=D.news.map(n=>`<div class="card news"><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></div>`).join('')+
    (D.times?`<div class="card"><h3 style="margin:0 0 6px;font-size:1.02rem;color:var(--navy)">예배 시간 및 장소</h3><table>${D.times.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table></div>`:'');
   return;}
- if(cur==='memo'){const all=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('jb_memo_')){try{const o=JSON.parse(localStorage.getItem(k));if(o&&o.text&&o.text.trim())all.push(o);}catch(e){}}}
+ if(cur==='memo'){const all=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('jb_memo_')){try{const o=JSON.parse(localStorage.getItem(k));if(o&&((o.text&&o.text.trim())||(o.ink&&o.ink.length)))all.push(o);}catch(e){}}}
   all.sort((a,b)=>(b.d+b.svc).localeCompare(a.d+a.svc));
   m.innerHTML=`<div class="card"><h3 style="margin:0 0 4px;font-size:1.05rem;color:var(--navy)">✍ 내 은혜 메모</h3><div class="who" style="color:var(--sub);font-size:.88rem">말씀을 들으며 적은 메모가 날짜별로 모여요. 이 휴대폰에만 보관돼요.</div><div class="btns"><button class="memo" onclick="openM()">✍ ${md(sel)} 메모 쓰기</button></div></div>`+
-   (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}<div class="mt">${esc(o.text.trim())}</div><div class="btns"><button onclick="openM('${o.d}','${o.svc}')">✏ 고치기</button><button onclick="shareM('${o.d}','${o.svc}')">📤 보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「✍ 은혜 메모 쓰기」를 눌러 보세요.</div>');
+   (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}${o.text&&o.text.trim()?`<div class="mt">${esc(o.text.trim())}</div>`:''}${inkThumb(o)}<div class="btns"><button onclick="openM('${o.d}','${o.svc}')">✏ 고치기</button><button onclick="shareM('${o.d}','${o.svc}')">📤 보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「✍ 은혜 메모 쓰기」를 눌러 보세요.</div>');
   return;}
  const s=D.services.find(x=>x.id===cur);R=[];
  let h=`<div class="card svc"><div class="kick2">${esc(md(sel))} 예배 순서</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>🕚 ${esc(s.time)}</span>`:''}${s.place?`<span>📍 ${esc(s.place)}</span>`:''}${s.leader?`<span>🙏 인도 ${esc(s.leader)}</span>`:''}</div></div>`;
@@ -472,21 +498,73 @@ function openM(d,s){mD=d||sel;mS=s||(cur==='memo'||cur==='news'?(D.services.find
  {let pr=ref,p=D.passages&&D.passages[pr];if(!(p&&p.verses&&p.verses.length)&&sv){const bi=sv.items.find(i=>i.bible);if(bi){pr=String(bi.bible).split(/\s*,\s*/)[0];p=D.passages&&D.passages[pr];}}
   if(p&&p.verses&&p.verses.length){mbp.innerHTML=`<div class="bh">📖 ${esc(p.label||pr)}</div>`+p.verses.map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+'<div class="copy">성경전서 개역개정판 © 대한성서공회</div>';mbp.scrollTop=0;mdbEl.classList.add('split');}
   else{mbp.innerHTML='';mdbEl.classList.remove('split');}}
- mta.value=o.text||'';mst.textContent=o.at?'저장됨 · '+o.at.slice(5,16).replace('T',' ').replace('-','/'):'';mst.className='mst';
+ mta.value=o.text||'';INK=Array.isArray(o.ink)?o.ink.map(s=>({c:s.c,w:s.w,e:s.e,p:s.p})):[];inkH=o.inkH||0;inkLW=0;inkCur=null;ipad.scrollTop=0;mst.textContent=o.at?'저장됨 · '+o.at.slice(5,16).replace('T',' ').replace('-','/'):'';mst.className='mst';
  if(!mOpen){mOpen=true;mdv.hidden=false;document.body.style.overflow='hidden';history.pushState({md:1},'');}
- setTimeout(()=>{mta.focus();mta.setSelectionRange(mta.value.length,mta.value.length);},60);}
+ setTimeout(()=>{setMode(mMode);if(mMode!=='h')mta.setSelectionRange(mta.value.length,mta.value.length);},60);}
 function saveM(){const t=mta.value;const at=new Date(Date.now()+9*36e5).toISOString().slice(0,16);
- if(!t.trim()){localStorage.removeItem(mKey(mD,mS));mst.textContent='';return;}
- try{localStorage.setItem(mKey(mD,mS),JSON.stringify({d:mD,svc:mS,svcName:mdv.dataset.svc,title:mdv.dataset.title,ref:mdv.dataset.ref,text:t,at}));mst.textContent='저장됨 ✓';mst.className='mst';}catch(e){mst.textContent='저장하지 못했어요. 휴대폰 저장 공간을 확인해 주세요.';mst.className='mst w';}}
-mta.addEventListener('input',()=>{mst.textContent='적는 중…';mst.className='mst w';clearTimeout(mT);mT=setTimeout(saveM,400);});
+ if(!t.trim()&&!INK.length){localStorage.removeItem(mKey(mD,mS));mst.textContent='';return;}
+ try{localStorage.setItem(mKey(mD,mS),JSON.stringify({d:mD,svc:mS,svcName:mdv.dataset.svc,title:mdv.dataset.title,ref:mdv.dataset.ref,text:t,ink:INK.length?INK:undefined,inkH:INK.length?inkH:undefined,at}));mst.textContent='저장됨 ✓';mst.className='mst';}catch(e){mst.textContent='저장하지 못했어요. 휴대폰 저장 공간을 확인해 주세요.';mst.className='mst w';}}
+// ===== 손글씨 메모 =====
+const inkEl=document.getElementById('ink'),ipad=document.getElementById('ipad'),icv=document.getElementById('icv'),ictx=icv.getContext('2d'),mmk=document.getElementById('mmk'),mmh=document.getElementById('mmh');
+let INK=[],inkH=0,inkC='#1f1f1f',inkThick=false,inkEr=false,inkCur=null,penSeen=false,inkLW=0,mMode=localStorage.getItem('jb_mmode')||'h';
+const IWD=[0.0042,0.0075],IER=0.05;
+function inkStroke(x,s){const p=s.p;x.globalCompositeOperation=s.e?'destination-out':'source-over';x.strokeStyle=s.c;x.fillStyle=s.c;x.lineWidth=s.w;x.lineCap='round';x.lineJoin='round';
+ if(p.length<=2){x.beginPath();x.arc(p[0],p[1],s.w/2,0,7);x.fill();return;}
+ x.beginPath();x.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)x.lineTo(p[i],p[i+1]);x.stroke();}
+function inkDraw(){ictx.save();ictx.setTransform(1,0,0,1,0,0);ictx.clearRect(0,0,icv.width,icv.height);ictx.restore();INK.forEach(s=>inkStroke(ictx,s));ictx.globalCompositeOperation='source-over';}
+function inkMaxY(a){let m=0;(a||[]).forEach(s=>{for(let i=1;i<s.p.length;i+=2)if(s.p[i]>m)m=s.p[i];});return m;}
+function inkSize(force){const w=ipad.clientWidth;if(!w)return;if(!force&&Math.abs(w-inkLW)<2&&icv.width)return;inkLW=w;
+ const base=Math.max(ipad.clientHeight/w,0.6);if(!inkH||inkH<base)inkH=Math.max(base,inkMaxY(INK)+0.3);
+ const h=Math.round(w*inkH),dpr=Math.min(2,devicePixelRatio||1);icv.style.width=w+'px';icv.style.height=h+'px';icv.width=Math.round(w*dpr);icv.height=Math.round(h*dpr);ictx.setTransform(dpr*w,0,0,dpr*w,0,0);inkDraw();}
+new ResizeObserver(()=>{if(!inkEl.hidden)inkSize();}).observe(ipad);
+function mDirty(){mst.textContent='적는 중…';mst.className='mst w';clearTimeout(mT);mT=setTimeout(saveM,400);}
+const inkPt=e=>{const r=icv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*1e4)/1e4,Math.round((e.clientY-r.top)/r.width*1e4)/1e4];};
+const iTch=new Map();let iPan=null;const iAvg=()=>{let t=0;iTch.forEach(v=>t+=v);return t/iTch.size;};
+icv.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='pen'&&!penSeen){penSeen=true;icv.style.touchAction='pan-y';}
+ if(e.pointerType==='touch'){if(penSeen)return;iTch.set(e.pointerId,e.clientY);
+  if(iTch.size>=2){if(inkCur){INK.pop();inkCur=null;inkDraw();}iPan={y:iAvg()};e.preventDefault();return;}}
+ e.preventDefault();try{icv.setPointerCapture(e.pointerId);}catch(_){}
+ inkCur={c:inkC,w:inkEr?IER:IWD[inkThick?1:0],p:inkPt(e)};if(inkEr)inkCur.e=1;inkCur._id=e.pointerId;INK.push(inkCur);inkStroke(ictx,inkCur);ictx.globalCompositeOperation='source-over';});
+icv.addEventListener('pointermove',e=>{
+ if(iTch.has(e.pointerId)){iTch.set(e.pointerId,e.clientY);if(iPan){const a=iAvg();ipad.scrollTop-=a-iPan.y;iPan.y=a;e.preventDefault();return;}}
+ if(!inkCur||e.pointerId!==inkCur._id)return;e.preventDefault();
+ const evs=(e.getCoalescedEvents&&e.getCoalescedEvents())||[];const s=inkCur;
+ ictx.globalCompositeOperation=s.e?'destination-out':'source-over';ictx.strokeStyle=s.c;ictx.lineWidth=s.w;ictx.lineCap='round';ictx.lineJoin='round';
+ for(const ev of (evs.length?evs:[e])){const q=inkPt(ev),p=s.p,n=p.length;if(Math.abs(q[0]-p[n-2])+Math.abs(q[1]-p[n-1])<0.0012)continue;ictx.beginPath();ictx.moveTo(p[n-2],p[n-1]);ictx.lineTo(q[0],q[1]);ictx.stroke();p.push(q[0],q[1]);}
+ ictx.globalCompositeOperation='source-over';});
+const inkEnd=e=>{iTch.delete(e.pointerId);if(iTch.size<2)iPan=null;
+ if(!inkCur||e.pointerId!==inkCur._id)return;delete inkCur._id;inkCur=null;
+ if(inkMaxY(INK)>inkH-0.25){inkH+=0.6;inkSize(true);}mDirty();};
+icv.addEventListener('pointerup',inkEnd);icv.addEventListener('pointercancel',inkEnd);
+const icBtns=[...document.querySelectorAll('.itool .ic')];
+const iTool=()=>{icBtns.forEach(b=>b.classList.toggle('on',!inkEr&&b.dataset.c===inkC));document.getElementById('ier').classList.toggle('on',inkEr);document.getElementById('iwd').classList.toggle('on',inkThick);};
+icBtns.forEach(b=>b.onclick=()=>{inkC=b.dataset.c;inkEr=false;iTool();});
+document.getElementById('iwd').onclick=()=>{inkThick=!inkThick;inkEr=false;iTool();toast(inkThick?'굵은 펜':'가는 펜');};
+document.getElementById('ier').onclick=()=>{inkEr=!inkEr;iTool();if(inkEr)toast('지우개: 지울 곳을 문질러 주세요');};
+document.getElementById('iun').onclick=()=>{if(!INK.length){toast('되돌릴 글씨가 없어요');return;}INK.pop();inkDraw();mDirty();};
+document.getElementById('icl').onclick=()=>{if(!INK.length)return;if(!confirm('손글씨를 모두 지울까요?'))return;INK=[];inkH=0;inkSize(true);ipad.scrollTop=0;mDirty();};
+function setMode(m){mMode=m;localStorage.setItem('jb_mmode',m);const h=m==='h';inkEl.hidden=!h;mta.hidden=h;mmk.classList.toggle('on',!h);mmh.classList.toggle('on',h);if(h){mta.blur();requestAnimationFrame(()=>inkSize(true));}else{mta.focus();}}
+mmk.onclick=()=>setMode('k');mmh.onclick=()=>setMode('h');
+function inkCanvas(o,W){const my=Math.max(inkMaxY(o.ink)+0.04,0.15);const c=document.createElement('canvas');c.width=W;c.height=Math.ceil(W*my);const x=c.getContext('2d');x.setTransform(W,0,0,W,0,0);(o.ink||[]).forEach(s=>inkStroke(x,s));x.globalCompositeOperation='source-over';return c;}
+const inkThumb=o=>o&&o.ink&&o.ink.length?`<img class="mink" alt="손글씨 메모" src="${inkCanvas(o,700).toDataURL('image/png')}">`:'';
+function shareInk(o){const c=inkCanvas(o,1200);const top=o.title?130:80;const b=document.createElement('canvas');b.width=c.width;b.height=c.height+top+20;const x=b.getContext('2d');x.fillStyle='#FFFEF7';x.fillRect(0,0,b.width,b.height);
+ x.fillStyle='#1E3A5F';x.font='bold 40px "NSR","Pretendard",sans-serif';x.fillText(`${md(o.d)} ${o.svcName||''} 은혜 메모`,40,60);
+ if(o.title){x.fillStyle='#3f3f46';x.font='bold 30px "NSR","Pretendard",sans-serif';x.fillText(`「${o.title}」 ${o.ref||''}`,40,108);}x.drawImage(c,0,top);
+ const u=b.toDataURL('image/png'),bin=atob(u.split(',')[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+ const name=`은혜메모_${o.d}.png`,f=new File([arr],name,{type:'image/png'});const dat={files:[f]};if(o.text&&o.text.trim())dat.text=memoText(o);
+ if(navigator.canShare&&navigator.canShare(dat)){navigator.share(dat).catch(e=>{if(!(e&&e.name==='AbortError'))toast('보내지 못했어요');});return;}
+ const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();toast('그림으로 저장했어요');}
+function shareAny(o){if(!o)return false;if(o.ink&&o.ink.length){shareInk(o);return true;}if(o.text&&o.text.trim()){shareTxt(memoText(o));return true;}return false;}
+mta.addEventListener('input',mDirty);
 function closeM(){if(!mOpen)return;clearTimeout(mT);saveM();mOpen=false;mdv.hidden=true;if(!rOpen)document.body.style.overflow='';if(D)render();}
 const mClose=()=>{if(history.state&&history.state.md)history.back();else closeM();};
 document.getElementById('mdx').onclick=mClose;document.getElementById('mok').onclick=mClose;
-function memoText(o){return `[${md(o.d)} ${o.svcName||''} 은혜 메모]\n${o.title?'「'+o.title+'」'+(o.ref?' '+o.ref:'')+'\n':''}\n${o.text.trim()}`;}
+function memoText(o){return `[${md(o.d)} ${o.svcName||''} 은혜 메모]\n${o.title?'「'+o.title+'」'+(o.ref?' '+o.ref:'')+'\n':''}\n${(o.text||'').trim()}`;}
 async function shareTxt(t){try{if(navigator.share){await navigator.share({text:t});return;}}catch(e){if(e&&e.name==='AbortError')return;}
  try{await navigator.clipboard.writeText(t);toast('복사했어요');}catch(e){toast('복사하지 못했어요');}}
-function shareM(d,s){const o=mGet(d,s);if(o&&o.text)shareTxt(memoText(o));}
-document.getElementById('msh').onclick=()=>{saveM();const o=mGet(mD,mS);if(o&&o.text)shareTxt(memoText(o));else toast('먼저 메모를 적어 주세요');};
+function shareM(d,s){shareAny(mGet(d,s));}
+document.getElementById('msh').onclick=()=>{saveM();if(!shareAny(mGet(mD,mS)))toast('먼저 메모를 적어 주세요');};
 document.getElementById('rprev').onclick=()=>{if(ri0>0){ri0--;renderR();}};
 document.getElementById('rnext').onclick=()=>{if(ri0<R.length-1){ri0++;renderR();}};
 // ===== 날짜(주일) 고르기 =====
