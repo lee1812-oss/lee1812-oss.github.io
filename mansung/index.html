@@ -287,7 +287,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v029';
+const VER='v030';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -576,28 +576,29 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
 .yv.drag{user-select:none;-webkit-user-select:none}
 .yvb.vh:not(.off) .yvv{height:var(--yvh)}
 .yvb.vh .yvr{aspect-ratio:auto;height:100%}
-.ychips{position:relative;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid #EFEAE0;scrollbar-width:none;flex:none}
+.ychips{position:relative;display:flex;gap:5px;overflow-x:auto;padding:5px 8px;background:#fff;border-bottom:1px solid #EFEAE0;scrollbar-width:none;flex:none}
 .ychips::-webkit-scrollbar{display:none}
-.ychips button{flex:none;min-height:44px;border-radius:999px;border:1.5px solid #E7E1D6;background:#fff;color:#44403c;font-size:15px;font-weight:800;padding:0 13px;font-family:inherit}
+.ychips button{flex:none;min-height:40px;border-radius:999px;border:1.5px solid #E7E1D6;background:#fff;color:#44403c;font-size:15px;font-weight:800;padding:0 12px;font-family:inherit}
 .ychips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .ychips button .tm{font-size:12px;font-weight:700;color:#a8a29e;margin-left:5px}
 .ychips button.on .tm{color:#cbd5e1}
-.ynow{padding:10px 14px 4px;flex:none}
-.ynow .nn{display:inline-block;font-size:14px;font-weight:900;color:#fff;background:#B45309;border-radius:999px;padding:3px 12px}
-.ynow .nt{font-size:calc(var(--yfs) * .95);font-weight:900;color:var(--navy2);line-height:1.35;margin-top:6px;word-break:keep-all}
-.ynow .ns{font-size:14px;font-weight:700;color:#57534e;margin-top:2px}
-.ynote{font-size:13px;font-weight:700;color:#57534e;padding:0 14px 6px;flex:none;word-break:keep-all}
-.yvc{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 14px 14px;font-size:var(--yfs);line-height:1.65;font-weight:700;color:#1f1f1f}
-.yvc .st{padding:10px 14px;margin-bottom:10px}
+.ynow{display:flex;align-items:center;gap:8px;padding:6px 12px;flex:none;min-width:0;border-bottom:1px solid #EFEAE0}
+.ynow .nn{flex:none;font-size:14px;font-weight:900;color:#fff;background:#B45309;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.ynow .nt{flex:1;min-width:0;font-size:17px;font-weight:900;color:var(--navy2);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ynow .ns{flex:none;font-size:14px;font-weight:700;color:#57534e;white-space:nowrap}
+.ynote{display:none}
+.yvc{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:8px 10px 10px;font-size:var(--yfs);line-height:1.55;font-weight:700;color:#1f1f1f}
+.yvc .st{padding:7px 12px;margin-bottom:6px;display:flow-root}
+.yvc .st .lb{float:left;margin:calc(var(--yfs) * .2) 8px 0 0}
 .yvc .st .ln{font-weight:800;color:#111}
 .yvc .st.dim .ln{font-weight:700}
 .yvc .copy{font-size:12px}
 .yvc .btns{display:none}
-.ybig{font-size:calc(var(--yfs) * 1.25);font-weight:900;color:var(--navy2);text-align:center;padding:26px 8px;line-height:1.5;word-break:keep-all}
+.ybig{font-size:calc(var(--yfs) * 1.25);font-weight:900;color:var(--navy2);text-align:center;padding:14px 8px;line-height:1.5;word-break:keep-all}
 .ybig small{display:block;font-size:.6em;color:#57534e;font-weight:800;margin-top:8px}
 .ymemo{min-height:56px;font-size:17px;font-weight:900;border-radius:16px;padding:0 20px;border:0;background:var(--gold);color:#fff;font-family:inherit}
-.yvn{display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -2px 10px rgba(28,25,23,.06);flex:none}
-.yvn button{flex:1;min-height:56px;border-radius:16px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:900;font-family:inherit}
+.yvn{display:flex;gap:6px;padding:5px 8px calc(5px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -2px 10px rgba(28,25,23,.06);flex:none}
+.yvn button{flex:1;min-height:48px;border-radius:16px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:900;font-family:inherit}
 .yvn button:disabled{opacity:.35}
 .yvn button[hidden]{display:none}
 .yvn .nx{background:var(--navy);color:#fff;border:0}
@@ -658,7 +659,7 @@ function drawChips(){const mk=marks();$('ychips').innerHTML=yList.map(([it,i],k)
  $('ychips').querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.k,1));
  const on=$('ychips').querySelector('.on');if(on){const c=$('ychips');c.scrollTo({left:on.offsetLeft-c.clientWidth/2+on.offsetWidth/2,behavior:'smooth'});}}
 function drawNow(){const [it]=yList[yIdx]||[];if(!it)return;const nm=itemName(it);
- $('ynow').innerHTML=`<span class="nn">${yIdx+1}/${yList.length} · ${esc(it.t)}${it.stand?' · 일어서서':''}</span>${nm?`<div class="nt">${esc(nm)}</div>`:''}${it.who?`<div class="ns">${esc(it.who)}</div>`:''}`;
+ $('ynow').innerHTML=`<span class="nn">${yIdx+1}/${yList.length} · ${esc(it.t)}${it.stand?' · 일어서서':''}</span>${nm?`<span class="nt" title="${esc(nm)}">${esc(nm)}</span>`:'<span class="nt"></span>'}${it.who?`<span class="ns">${esc(it.who)}</span>`:''}`;
  $('yvc').innerHTML=itemCont(it);$('yvc').scrollTop=0;const f=$('yvc').querySelector('.st.sing');if(f)setTimeout(()=>$('yvc').scrollTop=f.offsetTop-$('yvc').offsetTop-6,30);
  $('ypv').disabled=yIdx<=0;$('ynx').disabled=yIdx>=yList.length-1;drawChips();}
 function go(k,seek){yIdx=Math.max(0,Math.min(yList.length-1,k));drawNow();
@@ -674,7 +675,8 @@ async function openY(){
  yList=ysv.items.map((it,i)=>[it,i]);
  const id=ysv.yt&&ysv.yt.id;const nw=new Date(),dw=nw.getDay(),hm=nw.getHours()*60+nw.getMinutes();const onAir=!id&&sel===ymd(nw.getDay()===3?new Date(nw-3*864e5):nw)&&((dw===0&&((hm>=650&&hm<=760)||(hm>=830&&hm<=930)))||(dw===3&&hm>=1130&&hm<=1240));yLive=!id;yIdx=0;yAuto=-1;yPend=-1;yReady=false;yWant=null;
  $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?(onAir?'생중계 · 이전·다음 버튼으로 순서를 넘겨요':'최신 영상 · 이전·다음 버튼으로 순서를 넘겨요'):(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
- $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 이전·다음 버튼으로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 이전·다음 버튼으로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 를 눌러 맞춰 주세요.';
+ $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 이전·다음 버튼으로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 이전·다음 버튼으로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 「지금 이 순서」를 눌러 맞춰 주세요.';
+ if(yLive)setTimeout(()=>toast($('ynote').textContent),600);else if(!localStorage.getItem('jb_ynt')){localStorage.setItem('jb_ynt','1');setTimeout(()=>toast($('ynote').textContent),2600);}
  $('yfx').hidden=yLive;
  $('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=false;document.body.style.overflow='hidden';window.yOpen=true;history.pushState({yv:1},'');drawNow();
  try{await api();}catch(e){err('영상을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.');return;}
