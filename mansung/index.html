@@ -267,14 +267,51 @@ td:first-child{color:var(--navy)}
  .mdb.split .mhelp .h1{display:none}
  .mdb.split .mhelp .sh{font-size:12px}
 }
+
+/* ===== v019 날짜 카드 + 예배 고르기 ===== */
+.dnow{display:flex;flex-direction:row;align-items:center;gap:14px;text-align:left;padding:10px 14px;justify-content:flex-start}
+.cal{flex:0 0 auto;min-width:56px;padding:0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 10px rgba(30,58,95,.18);text-align:center;display:flex;flex-direction:column}
+.cal .cm{display:block;background:var(--navy);color:#fff;font-size:.78rem;font-weight:900;padding:3px 0}
+.cal .cd{display:block;white-space:nowrap;padding-left:6px!important;padding-right:6px!important;font-size:1.9rem;font-weight:900;color:var(--navy2);line-height:1.15;padding-top:2px}
+.cal .cw{display:block;font-size:.68rem;font-weight:900;color:#C2410C;padding-bottom:4px}
+.dinfo{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.dinfo .dd{font-size:.82rem;font-weight:800;color:var(--sub)}
+.dinfo .rel{align-self:flex-start;margin:0}
+.dinfo .dti{order:1;font-size:1.25rem;font-weight:900;color:var(--navy2);line-height:1.3}
+.dinfo .rel{order:2}
+.chips{margin-top:10px}
+.chip{min-height:50px}
+.svl{display:flex;align-items:center;gap:8px;margin:14px 2px 8px;font-size:.85rem;font-weight:900;color:var(--gold);letter-spacing:.04em}
+.svl::after{content:"";flex:1;height:1px;background:#EADFC8}
+.svg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.dnow,.dinfo{min-width:0}
+.svg .sv{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;min-height:96px;padding:10px 12px 10px 12px;border-radius:18px;border:1.5px solid #E7DFD0;background:#FCFBF8;color:var(--ink);font-family:inherit;cursor:pointer}
+.svg .sv .si{font-size:1.25rem;line-height:1;margin-bottom:4px}
+.svg .sv b{font-size:1.08rem;font-weight:900;color:var(--navy2)}
+.svg .sv .sd{font-size:.78rem;font-weight:800;color:var(--sub)}
+.svg .sv .sh{font-size:.82rem;font-weight:900;color:var(--gold)}
+.svg .sv.on{background:linear-gradient(150deg,#27507F,var(--navy) 55%,var(--navy2));border-color:var(--navy);box-shadow:0 6px 16px rgba(30,58,95,.3)}
+.svg .sv.on b{color:#fff}.svg .sv.on .sd{color:#D6E0EE}.svg .sv.on .sh{color:#E9D3A6}
+.svg .sv.on::after{content:"✓";position:absolute;right:10px;top:8px;width:24px;height:24px;border-radius:50%;background:#E9D3A6;color:var(--navy2);font-size:.8rem;font-weight:900;display:flex;align-items:center;justify-content:center}
+.svx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.svx button{min-height:54px;border-radius:16px;border:1.5px solid #E2D6BE;background:#fff;color:#57534e;font-weight:800;font-size:.95rem;font-family:inherit}
+.svx button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+main{padding-top:14px}
+.mini{position:fixed;left:0;right:0;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:rgba(246,243,237,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(28,25,23,.1)}
+.mini .mi{flex:1;min-width:0;font-size:.95rem;font-weight:800;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .mi b{color:var(--navy2);font-weight:900}
+.mini button{flex:0 0 auto;min-height:48px;padding:0 16px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-weight:900;font-size:.9rem;font-family:inherit;box-shadow:0 4px 12px rgba(30,58,95,.28)}
+@media (max-width:699px){.dmain{gap:6px}.dmain button.ar{flex:0 0 44px;min-height:54px}.dnow{gap:10px;padding:8px 10px}.dinfo .dti{font-size:1.08rem}}
+@media (min-width:700px){.svg{grid-template-columns:repeat(4,1fr)}.svx{max-width:50%}.mini{padding-left:max(16px,calc((100% - 1240px)/2));padding-right:max(16px,calc((100% - 1240px)/2))}}
 </style></head>
 <body><div class="wrap">
 <header>
  <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><div class="kick">대한예수교장로회 · 주보</div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
  <div class="tools"><a class="yt" href="#" id="yt"><span class="yi">▶</span>유튜브 예배 보기</a><div class="fsz"><button id="fsm" aria-label="글자 작게">−</button><span>글자</span><button id="fsp" aria-label="글자 크게">+</button></div></div>
 </header>
-<div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div></div>
-<nav id="tabs"></nav>
+<div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="cal"><span class="cm" id="dcm"> </span><b class="cd" id="dcd"> </b><span class="cw">주일</span></div><div class="dinfo"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div><div class="dti" id="dti"></div></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div><div class="svl">예배 고르기</div><div class="svg" id="tabs"></div><div class="svx" id="tabs2"></div></div>
+<div class="mini" id="mini" hidden><div class="mi" id="mitxt"></div><button id="miup">예배 바꾸기 ▲</button></div>
+
 <main id="main"><div class="empty">주보를 불러오는 중이에요…</div></main>
 <div class="foot" id="foot"></div>
 </div>
@@ -290,7 +327,7 @@ td:first-child{color:var(--navy)}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v018';
+const VER='v019';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -357,8 +394,11 @@ function itemHtml(it){
 function render(){
  const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식'],['memo','✍ 은혜 메모']];
  if(!tabs.some(t=>t[0]===cur)){const dow=new Date().getDay();cur=(dow>=1&&dow<=3&&D.services.some(s=>s.id==='wed'))?'wed':D.services[0].id;}
- document.getElementById('tabs').innerHTML=tabs.map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}">${esc(n)}</button>`).join('');
- document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();scrollTo(0,0);});
+ const ICO={w1:'🌅',w2:'☀️',pm:'🌤️',wed:'🌙'};
+  document.getElementById('tabs').innerHTML=D.services.map(s=>{const tm=String(s.time||'');const mm=tm.match(/^(.*?\))\s*(.*)$/);const day=mm?mm[1]:`${md(sel)}(주일)`;const hr=mm?mm[2]:tm;return `<button class="sv${s.id===cur?' on':''}" data-id="${s.id}"><span class="si">${ICO[s.id]||'⛪'}</span><b>${esc(s.tab)}</b><span class="sd">${esc(day)}</span><span class="sh">${esc(hr)}</span></button>`;}).join('');
+  document.getElementById('tabs2').innerHTML=[['news','📢 교회 소식'],['memo','✍ 은혜 메모']].map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}">${n}</button>`).join('');
+  const csv=D.services.find(x=>x.id===cur);document.getElementById('mitxt').innerHTML=`📅 ${esc(mdShort(sel))} · <b>${esc(csv?csv.tab:(cur==='news'?'교회 소식':'은혜 메모'))}</b>`;
+  document.querySelectorAll('#tabs button,#tabs2 button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();const mt=document.getElementById('main').getBoundingClientRect().top;if(mt>innerHeight*0.6||mt<0)window.scrollTo({top:scrollY+mt-74,behavior:'smooth'});});
  const m=document.getElementById('main');
  if(cur==='news'){
   m.innerHTML=D.news.map(n=>`<div class="card news"><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></div>`).join('')+
@@ -463,13 +503,15 @@ function dateBar(){
  const have=W.map(w=>w.date);const last=have.length?have[have.length-1]:sel;
  // 칩: 있는 주들 + 아직 안 올라온 이번 주(준비 중)
  const list=[...have];if(thisSun>last)list.push(thisSun);
- document.getElementById('dd').textContent=`${md(sel)} 주일`;
+ const sd=toD(sel);document.getElementById('dcm').textContent=`${sd.getMonth()+1}월`;document.getElementById('dcd').textContent=sd.getDate();document.getElementById('dd').textContent=`${sd.getFullYear()}년`;document.getElementById('dti').textContent=`${md(sel)} 주일`;
  const r=document.getElementById('drel');r.textContent=rel(sel);r.hidden=false;r.className='rel'+(sel<thisSun?' past':'');
  const i=have.indexOf(sel);document.getElementById('dprev').disabled=i<=0;document.getElementById('dnext').disabled=i<0||i>=have.length-1;
  document.getElementById('chips').innerHTML=list.map(s=>{const ok=have.includes(s);return `<button class="chip${s===sel?' on':''}${ok?'':' wait'}" data-d="${s}"><b>${mdShort(s)}</b><span>${ok?rel(s):'토요일에 올라와요'}</span></button>`;}).join('');
  document.querySelectorAll('#chips .chip').forEach(b=>b.onclick=()=>{if(have.includes(b.dataset.d))pick(b.dataset.d);else{const m=document.getElementById('dmsg');m.textContent=`${md(b.dataset.d)} 주보는 보통 토요일에 방송실에 올라오면 자동으로 들어와요.`;m.hidden=false;}});
  const on=document.querySelector('#chips .chip.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
  const m=document.getElementById('dmsg');if(sel<thisSun&&!have.includes(thisSun)&&sel===last){m.textContent=`${md(thisSun)} 주보는 아직 안 올라왔어요. 지난 주보를 보여 드려요.`;m.hidden=false;}else m.hidden=true;}
+(function(){const mi=document.getElementById('mini'),tb=document.getElementById('tabs');document.getElementById('miup').onclick=()=>window.scrollTo({top:Math.max(0,scrollY+document.querySelector('.datebar').getBoundingClientRect().top-10),behavior:'smooth'});
+ if('IntersectionObserver' in window)new IntersectionObserver(es=>{mi.hidden=es[0].isIntersecting||es[0].boundingClientRect.top>0;},{threshold:0}).observe(document.getElementById('tabs2'));})();
 function loadWeek(s){return fetch(`w-${s}.json?t=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();});}
 function pick(s){sel=s;const c=localStorage.getItem('jb_w_'+s);if(c){try{show(JSON.parse(c));}catch(e){}}
  loadWeek(s).then(d=>{localStorage.setItem('jb_w_'+s,JSON.stringify(d));if(sel===s)show(d);}).catch(()=>{if(!c)document.getElementById('main').innerHTML='<div class="empty">인터넷 연결을 확인해 주세요.</div>';});scrollTo(0,0);}
