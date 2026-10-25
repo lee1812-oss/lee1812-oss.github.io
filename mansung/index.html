@@ -353,7 +353,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v020';
+const VER='v021';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -373,10 +373,11 @@ setFs(fs);document.getElementById('fsm').onclick=e=>keepView(null,e.currentTarge
 // 유튜브 앱으로 열기 (누를 때 열리므로 휴대폰이 막지 않음)
 const CH='UCOp1NMZk2VqnvuLZCHTay0Q',P='/channel/'+CH,WEB='https://www.youtube.com'+P;
 const ua=navigator.userAgent,isAnd=/Android/i.test(ua),isIOS=/iPhone|iPad|iPod/i.test(ua);
-document.getElementById('yt').onclick=e=>{e.preventDefault();
+function ytApp(){
  if(isAnd)location.href='intent://www.youtube.com'+P+'#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url='+encodeURIComponent(WEB)+';end';
  else if(isIOS){const t=Date.now();location.href='youtube://www.youtube.com'+P;setTimeout(()=>{if(!document.hidden&&Date.now()-t<2500)location.href=WEB;},1500);}
- else window.open(WEB,'_blank');};
+ else window.open(WEB,'_blank');}
+document.getElementById('yt').onclick=e=>{e.preventDefault();if(window.ytChoose)ytChoose();else ytApp();};
 let D=null,cur=localStorage.getItem('jb_tab')||'';
 // ===== 줄바꿈: 뜻이 끊기지 않는 마디로 묶기 =====
 const syl=w=>w.replace(/[^가-힣A-Za-z0-9]/g,'').length;
@@ -450,7 +451,7 @@ let tt=null;function toast(m){let e=document.querySelector('.toast');if(!e){e=do
 const setRfs=(v,show)=>{rfs=Math.max(16,Math.min(40,v));rd.style.setProperty('--rfs',rfs+'px');localStorage.setItem('jb_rfs',rfs);if(show)toast('글자 크기 '+(rfs-14));};setRfs(rfs);
 document.getElementById('rfm').onclick=()=>keepView(rdb,null,()=>setRfs(rfs-2,1));document.getElementById('rfp').onclick=()=>keepView(rdb,null,()=>setRfs(rfs+2,1));
 const nums=s=>String(s||'').match(/\d+/g)?.map(Number)||[];
-function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
+function rCont(r){let title='',sub='',h='';
  if(r.k==='h'){const hi=hInfo(r.n);title=`찬송 ${r.n}장 · ${hi.title}`;const sing=nums(r.verses);sub=`${r.t}${r.verses?` · ${r.verses}만 부릅니다`:''}`;
   const ref=hi.stanzas.find(x=>x.type==='refrain');const verses=hi.stanzas.filter(x=>x.type==='verse');
   const lines=st=>st.lines.map(l=>`<span class="ln">${phHtml(hymnPh(l))}</span>`).join('');
@@ -465,6 +466,8 @@ function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
   h=CREED_PARTS.map(([lb,ls])=>`<div class="st"><span class="lb">${esc(lb)}</span>${ls.map(l=>`<span class="ln">${esc(l)}</span>`).join('')}</div>`).join('')+'<div class="amen">아멘</div>';}
  else{const p=D.passages[r.ref]||{};title=`📖 ${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
   h=(p.verses||[]).map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`+(D.services.find(x=>x.id===cur)?.items.some(i=>i.sermon)?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="memo" style="min-height:56px;font-size:17px" onclick="openM()">✍ 은혜 메모 쓰기</button></div>`:'');}
+ return {title,sub,h};}
+function renderR(){const r=R[ri0];if(!r)return;const {title,sub,h}=rCont(r);
  document.getElementById('rdt').innerHTML=`${esc(title)}<small>${esc(sub)}</small>`;rdb.innerHTML=h;rdb.scrollTop=0;
  const first=rdb.querySelector('.st.sing');if(first)setTimeout(()=>rdb.scrollTop=first.offsetTop-rdb.offsetTop-8,30);
  document.getElementById('rprev').disabled=ri0<=0;const nx=document.getElementById('rnext');nx.disabled=ri0>=R.length-1;
@@ -472,7 +475,7 @@ function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
 function openR(i){ri0=i;renderR();if(!rOpen){rOpen=true;rd.hidden=false;document.body.style.overflow='hidden';history.pushState({rd:1},'');}}
 function closeR(){if(!rOpen)return;rOpen=false;rd.hidden=true;document.body.style.overflow='';}
 document.getElementById('rdx').onclick=()=>{if(history.state&&history.state.rd)history.back();else closeR();};
-window.addEventListener('popstate',()=>{if(mOpen){closeM();return;}closeR();});
+window.addEventListener('popstate',()=>{if(mOpen){closeM();return;}if(rOpen){closeR();return;}if(window.yOpen)closeY(1);});
 let mOpen=false,mD='',mS='',mT=null;let mfs=+(localStorage.getItem('jb_mfs')||20);
 const mdv=document.getElementById('md'),mta=document.getElementById('mta'),mst=document.getElementById('mst');
 const setMfs=(v,show)=>{mfs=Math.max(16,Math.min(34,v));mdv.style.setProperty('--rfs',mfs+'px');localStorage.setItem('jb_mfs',mfs);if(show)toast('글자 크기 '+(mfs-12));};setMfs(mfs);
@@ -605,4 +608,142 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(r
 // 새 버전이 올라와 있으면 한 번 새로 열기 (휴대폰이 옛 화면을 붙잡고 있을 때)
 fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER='(v\d+)'/);if(m&&m[1]!==VER&&sessionStorage.getItem('jb_rl')!==m[1]){sessionStorage.setItem('jb_rl',m[1]);location.reload();}}).catch(()=>{});
 </script><script>(function(){function fit(){var w=innerWidth,h=innerHeight,s=Math.min(w,h);var k=w<600?1:Math.max(1,Math.min(1.3,1+0.3*(s-500)/524));document.documentElement.style.setProperty('--k',k.toFixed(3));}fit();addEventListener('resize',fit);addEventListener('orientationchange',function(){setTimeout(fit,300)});})();</script>
+
+<!-- ===== 유튜브 예배 보기 + 순서지 자막 (v021) ===== -->
+<style>
+.ysh{position:fixed;inset:0;z-index:70;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;justify-content:center}
+.ysh[hidden],.yv[hidden]{display:none}
+.yshc{width:100%;max-width:560px;background:#fff;border-radius:24px 24px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.yshc h3{margin:2px 4px 12px;font-size:19px;font-weight:900;color:var(--navy2)}
+.yshc button{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;margin-bottom:10px;border-radius:18px;border:1.5px solid #E7E1D6;background:#fff;font-family:inherit;font-size:18px;font-weight:900;color:var(--ink);text-align:left;padding:10px 16px}
+.yshc button small{display:block;font-size:14px;font-weight:700;color:#57534e;margin-top:3px}
+.yshc button.rec{border:2px solid var(--gold);background:#FFFBEF}
+.yshc button .bi{font-size:28px;flex:none}
+.yshc button.cx{min-height:56px;justify-content:center;background:#f5f5f4;border:0;color:#44403c}
+.rtag{display:inline-block;font-size:12px;font-weight:900;color:#fff;background:#15803D;border-radius:999px;padding:1px 9px;margin-left:6px;vertical-align:2px}
+.yv{position:fixed;inset:0;z-index:48;background:var(--cream);display:flex;flex-direction:column;--yfs:22px}
+.yvh{display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top));background:#fff;box-shadow:0 2px 10px rgba(28,25,23,.06)}
+.yvh .x{min-width:76px;min-height:54px;border-radius:16px;border:0;background:var(--navy);color:#fff;font-size:17px;font-weight:800;font-family:inherit}
+.yvt{flex:1;min-width:0;font-weight:900;font-size:17px;line-height:1.3;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.yvt small{display:block;font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ytog{min-height:54px;border-radius:16px;border:1.5px solid #cbd5e1;background:#fff;color:#1E3A5F;font-size:16px;font-weight:900;font-family:inherit;padding:0 12px;white-space:nowrap}
+.ytog.on{background:#15803D;border-color:#15803D;color:#fff}
+.yvh .fsz button{min-width:46px;min-height:54px}
+.yvb{flex:1;min-height:0;display:flex;flex-direction:column}
+.yvv{background:#000;flex:none;display:flex;align-items:center;justify-content:center;position:relative}
+.yvr{width:100%;aspect-ratio:16/9;position:relative}
+.yvr iframe,.yvr>div{position:absolute;inset:0;width:100%;height:100%;border:0}
+.yerr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;text-align:center;padding:16px;font-size:17px;font-weight:800;background:#111}
+.yerr button{min-height:54px;border-radius:14px;border:0;background:#E00000;color:#fff;font-weight:900;font-size:17px;padding:0 18px;font-family:inherit}
+.yvs{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--cream)}
+.yvb.off .yvs{display:none}
+.yvb.off .yvv{flex:1}
+.ychips{position:relative;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid #EFEAE0;scrollbar-width:none;flex:none}
+.ychips::-webkit-scrollbar{display:none}
+.ychips button{flex:none;min-height:44px;border-radius:999px;border:1.5px solid #E7E1D6;background:#fff;color:#44403c;font-size:15px;font-weight:800;padding:0 13px;font-family:inherit}
+.ychips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.ychips button .tm{font-size:12px;font-weight:700;color:#a8a29e;margin-left:5px}
+.ychips button.on .tm{color:#cbd5e1}
+.ynow{padding:10px 14px 4px;flex:none}
+.ynow .nn{display:inline-block;font-size:14px;font-weight:900;color:#fff;background:#B45309;border-radius:999px;padding:3px 12px}
+.ynow .nt{font-size:calc(var(--yfs) * .95);font-weight:900;color:var(--navy2);line-height:1.35;margin-top:6px;word-break:keep-all}
+.ynow .ns{font-size:14px;font-weight:700;color:#57534e;margin-top:2px}
+.ynote{font-size:13px;font-weight:700;color:#57534e;padding:0 14px 6px;flex:none;word-break:keep-all}
+.yvc{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 14px 14px;font-size:var(--yfs);line-height:1.65;font-weight:700;color:#1f1f1f}
+.yvc .st{padding:10px 14px;margin-bottom:10px}
+.yvc .st .ln{font-weight:800;color:#111}
+.yvc .st.dim .ln{font-weight:700}
+.yvc .copy{font-size:12px}
+.yvc .btns{display:none}
+.ybig{font-size:calc(var(--yfs) * 1.25);font-weight:900;color:var(--navy2);text-align:center;padding:26px 8px;line-height:1.5;word-break:keep-all}
+.ybig small{display:block;font-size:.6em;color:#57534e;font-weight:800;margin-top:8px}
+.ymemo{min-height:56px;font-size:17px;font-weight:900;border-radius:16px;padding:0 20px;border:0;background:var(--gold);color:#fff;font-family:inherit}
+.yvn{display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -2px 10px rgba(28,25,23,.06);flex:none}
+.yvn button{flex:1;min-height:56px;border-radius:16px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:900;font-family:inherit}
+.yvn button:disabled{opacity:.35}
+.yvn button[hidden]{display:none}
+.yvn .nx{background:var(--navy);color:#fff;border:0}
+.yvn .fx{flex:.8;font-size:14px}
+@media (orientation:landscape) and (min-width:640px),(min-width:900px){
+ .yvb{flex-direction:row}
+ .yvv{flex:1;min-width:0;align-self:stretch}
+ .yvr{max-height:100%}
+ .yvs{flex:none;width:var(--ysw,38%);min-width:300px;border-left:1px solid #E7E1D6}
+}
+@media (max-width:480px){.yvh{gap:6px;padding-left:8px;padding-right:8px}.yvh .x{min-width:64px;font-size:16px}.ytog{font-size:14px;padding:0 9px}.yvh .fsz button{min-width:40px}.yvt{font-size:15px}}
+@media (orientation:landscape) and (max-height:500px){.yvh{padding-top:4px;padding-bottom:4px}.yvh .x,.ytog,.yvh .fsz button{min-height:44px}.yvn button{min-height:46px}.ychips button{min-height:38px}.ynote{display:none}}
+</style>
+<div class="ysh" id="ysh" hidden><div class="yshc">
+ <h3>▶ 유튜브 예배, 어떻게 볼까요?</h3>
+ <button class="rec" id="ysA"><span class="bi">📺</span><span>앱 안에서 보기 + 순서 자막<span class="rtag">추천</span><small>영상 옆(휴대폰은 아래)에 지금 순서·찬송 가사·성경 말씀이 나와요</small></span></button>
+ <button id="ysB"><span class="bi">▶</span><span>유튜브 앱으로 보기<small>지금처럼 만성교회 유튜브 채널을 열어요</small></span></button>
+ <button class="cx" id="ysX">닫기</button>
+</div></div>
+<div class="yv" id="yv" hidden>
+ <div class="yvh"><button class="x" id="yvx">✕ 닫기</button><div class="yvt" id="yvt"></div><button class="ytog on" id="ytog">자막 켜짐</button><div class="fsz"><button id="yfm" aria-label="자막 글자 작게">−</button><button id="yfp" aria-label="자막 글자 크게">+</button></div></div>
+ <div class="yvb" id="yvb">
+  <div class="yvv"><div class="yvr" id="yvr"><div id="yvp"></div></div></div>
+  <div class="yvs"><div class="ychips" id="ychips"></div><div class="ynow" id="ynow"></div><div class="ynote" id="ynote"></div><div class="yvc" id="yvc"></div>
+   <div class="yvn"><button id="ypv">◀ 이전</button><button class="fx" id="yfx">⏱ 지금 이 순서</button><button class="nx" id="ynx">다음 ▶</button></div></div>
+ </div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+let yp=null,ysv=null,yIdx=0,yAuto=-1,yTimer=null,yList=[],yLive=false;window.yOpen=false;
+let yfs=+(localStorage.getItem('jb_yfs')||22);const setYfs=v=>{yfs=Math.max(16,Math.min(36,v));$('yv').style.setProperty('--yfs',yfs+'px');localStorage.setItem('jb_yfs',yfs);};setYfs(yfs);
+$('yfm').onclick=()=>{setYfs(yfs-2);toast('자막 글자 '+(yfs-14));};$('yfp').onclick=()=>{setYfs(yfs+2);toast('자막 글자 '+(yfs-14));};
+const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
+const lKey=()=>'jb_ytm_'+sel+'_'+ysv.id;
+function marks(){const o={};((ysv.yt&&ysv.yt.marks)||[]).forEach(([t,i])=>o[i]=t);let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}if(!yLive)Object.assign(o,l);return o;}
+window.ytChoose=()=>{$('ysh').hidden=false;};
+$('ysX').onclick=()=>{$('ysh').hidden=true;};$('ysh').onclick=e=>{if(e.target.id==='ysh')$('ysh').hidden=true;};
+$('ysB').onclick=()=>{$('ysh').hidden=true;ytApp();};
+$('ysA').onclick=()=>{$('ysh').hidden=true;openY();};
+function api(){return new Promise((res,rej)=>{if(window.YT&&YT.Player)return res();const p=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{p&&p();res();};if(!$('ytapi')){const s=document.createElement('script');s.id='ytapi';s.src='https://www.youtube.com/iframe_api';s.onerror=rej;document.head.appendChild(s);}});}
+const pLabel=r=>(D.passages&&D.passages[r]&&D.passages[r].label)||r;
+function itemName(it){return it.hymn?`찬송 ${it.hymn}장 · ${hInfo(it.hymn).title}`:it.song?it.song:it.bible?String(it.bible).split(/\s*,\s*/).map(pLabel).join(', '):it.creed?'사도신경':(it.sermon&&D.sermon)?'「'+D.sermon.title+'」':(it.msg||it.info||'');}
+function itemCont(it){
+ if(it.hymn&&hInfo(it.hymn).stanzas.length)return rCont({k:'h',n:it.hymn,verses:it.verses,t:it.t}).h;
+ if(it.song&&sInfo(it.song))return rCont({k:'s',name:it.song,t:it.t}).h;
+ if(it.bible)return String(it.bible).split(/\s*,\s*/).filter(Boolean).map((r,i)=>rCont({k:'b',ref:r,page:i===0?it.page:'',t:it.t}).h).join('');
+ if(it.creed)return rCont({k:'c',t:it.t,stand:it.stand}).h;
+ if(it.sermon&&D.sermon){const s=D.sermon;return `<div class="ybig" style="padding-top:8px">「${esc(s.title)}」<small>${esc([s.series,s.preacher].filter(Boolean).join(' · '))}</small></div><div style="text-align:center;margin:0 0 14px"><button class="ymemo" onclick="openM()">✍ 은혜 메모 쓰기</button></div>`+(s.ref&&D.passages&&D.passages[s.ref]?rCont({k:'b',ref:s.ref,t:it.t}).h:'');}
+ const nm=itemName(it)||it.t;
+ return `<div class="ybig">${esc(nm)}${it.who?`<small>${esc(it.who)}</small>`:''}${it.stand?'<small>🙋 일어서서</small>':''}</div>`;}
+function drawChips(){const mk=marks();$('ychips').innerHTML=yList.map(([it,i],k)=>`<button data-k="${k}" class="${k===yIdx?'on':''}">${esc(it.t)}${mk[i]!=null&&!yLive?`<span class="tm">${fmt(mk[i])}</span>`:''}</button>`).join('');
+ $('ychips').querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.k,1));
+ const on=$('ychips').querySelector('.on');if(on){const c=$('ychips');c.scrollTo({left:on.offsetLeft-c.clientWidth/2+on.offsetWidth/2,behavior:'smooth'});}}
+function drawNow(){const [it]=yList[yIdx]||[];if(!it)return;const nm=itemName(it);
+ $('ynow').innerHTML=`<span class="nn">${yIdx+1}/${yList.length} · ${esc(it.t)}${it.stand?' · 일어서서':''}</span>${nm?`<div class="nt">${esc(nm)}</div>`:''}${it.who?`<div class="ns">${esc(it.who)}</div>`:''}`;
+ $('yvc').innerHTML=itemCont(it);$('yvc').scrollTop=0;const f=$('yvc').querySelector('.st.sing');if(f)setTimeout(()=>$('yvc').scrollTop=f.offsetTop-$('yvc').offsetTop-6,30);
+ $('ypv').disabled=yIdx<=0;$('ynx').disabled=yIdx>=yList.length-1;drawChips();}
+function go(k,seek){yIdx=Math.max(0,Math.min(yList.length-1,k));drawNow();
+ if(seek&&yp&&yp.seekTo&&!yLive){const t=marks()[yList[yIdx][1]];if(t!=null){yp.seekTo(t,true);yAuto=yIdx;}}}
+$('ypv').onclick=()=>go(yIdx-1,1);$('ynx').onclick=()=>go(yIdx+1,1);
+$('yfx').onclick=()=>{if(!yp||!yp.getCurrentTime){toast('영상이 나온 뒤에 눌러 주세요');return;}const t=Math.round(yp.getCurrentTime());let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}l[yList[yIdx][1]]=t;localStorage.setItem(lKey(),JSON.stringify(l));yAuto=yIdx;drawChips();toast(`「${yList[yIdx][0].t}」 → ${fmt(t)}로 맞췄어요`);};
+function tick(){if(!yp||!yp.getCurrentTime||yLive)return;let t=0;try{t=yp.getCurrentTime()||0;}catch(e){return;}const mk=marks();let best=-1,bt=-1;yList.forEach(([it,i],k)=>{const m=mk[i];if(m!=null&&m<=t+1.5&&m>=bt){bt=m;best=k;}});
+ if(best>=0&&best!==yAuto){yAuto=best;if(best!==yIdx){yIdx=best;drawNow();}}}
+function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${msg}<button onclick="ytApp()">▶ 유튜브 앱으로 보기</button></div>`);}
+async function openY(){
+ ysv=D.services.find(x=>x.id===cur)||D.services.find(x=>x.id==='w2')||D.services[0];
+ yList=ysv.items.map((it,i)=>[it,i]);
+ const id=ysv.yt&&ysv.yt.id;yLive=!id;yIdx=0;yAuto=-1;
+ $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?'🔴 생중계 · ◀ ▶로 순서를 넘겨요':(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
+ $('ynote').textContent=yLive?'이 예배 영상이 아직 등록되지 않아 생중계 화면을 열었어요. 순서는 ◀ ▶로 넘겨 주세요.':'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 ⏱를 눌러 맞춰 주세요.';
+ $('yfx').hidden=yLive;
+ $('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=false;document.body.style.overflow='hidden';window.yOpen=true;history.pushState({yv:1},'');drawNow();
+ try{await api();}catch(e){err('영상을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.');return;}
+ if(!window.yOpen)return;
+ const ev={onError:()=>err(yLive?'지금은 생중계 시간이 아니에요.<br><span style="font-size:15px;font-weight:700">주일 오전 11시 · 오후 2시 · 수요일 오후 7시</span>':'이 영상은 앱 안에서 틀 수 없어요.'),onReady:()=>tick()};
+ if(yLive){$('yvp').outerHTML=`<iframe id="yvp" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen src="https://www.youtube.com/embed/live_stream?channel=${CH}&enablejsapi=1&playsinline=1&rel=0&origin=${encodeURIComponent(location.origin)}"></iframe>`;yp=new YT.Player('yvp',{events:ev});}
+ else{const mk=marks();const k0=yList.findIndex(([it,i])=>mk[i]!=null);yp=new YT.Player('yvp',{videoId:id,playerVars:{playsinline:1,rel:0,start:k0>=0?mk[yList[k0][1]]:0},events:ev});}
+ clearInterval(yTimer);yTimer=setInterval(tick,1000);}
+window.closeY=fromPop=>{if(!window.yOpen)return;window.yOpen=false;clearInterval(yTimer);try{yp&&yp.destroy&&yp.destroy();}catch(e){}yp=null;$('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=true;document.body.style.overflow='';if(!fromPop)history.back();};
+$('yvx').onclick=()=>closeY();
+const subOff=off=>{$('yvb').classList.toggle('off',off);$('ytog').classList.toggle('on',!off);$('ytog').textContent=off?'자막 꺼짐':'자막 켜짐';};
+$('ytog').onclick=()=>{const off=!$('yvb').classList.contains('off');subOff(off);localStorage.setItem('jb_ysub',off?'0':'1');};
+subOff(localStorage.getItem('jb_ysub')==='0');
+})();
+</script>
 </body></html>
