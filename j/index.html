@@ -1,0 +1,8 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>조조 알림 전광판</title>
+<script>
+// 조조 알림 전광판 짧은 주소 (2026-10-25). 열쇠는 주소의 # 뒤에만 있고 이 파일에는 없다(# 뒤는 서버로 안 감).
+var k=location.hash.slice(1).replace(/[^a-z0-9]/gi,'');
+try{if(k)localStorage.setItem('jbk',k);else k=localStorage.getItem('jbk')||'';}catch(e){}
+if(k)location.replace('https://script.google.com/macros/s/AKfycbzHH0cAFytvYowJoHLHfSZ2NtixRRBFUkYw76lyLwv3iAooKnegWLYCS5ecSuojob9Fkw/exec?k='+k);
+</script></head>
+<body style="font:20px sans-serif;padding:40px;color:#333;word-break:keep-all">열쇠가 없어요.<br>조조가 준 QR을 다시 찍어서 열어 주세요.</body></html>
