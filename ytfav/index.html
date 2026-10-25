@@ -148,10 +148,11 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const now=()=>Date.now();
 
 // ---------- 저장 (이 기기 + 모든 기기 저장소) ----------
+const MS='https://www.youtube.com/channel/UCOp1NMZk2VqnvuLZCHTay0Q', MSTH='https://yt3.ggpht.com/ytc/AIdro_lX_fMZLdOYltCt3iZB78mDcSMkhCcJfqXIb5CBtKrZ1w=s240-c-k-c0xffffffff-no-rj-mo';
 function seed(){
  return {cats:[{id:'c1',name:'교회',color:COLORS[0],o:1,u:1},{id:'c2',name:'음악',color:COLORS[5],o:2,u:1},{id:'c3',name:'요리·베이킹',color:COLORS[1],o:3,u:1},{id:'c4',name:'공부·정보',color:COLORS[4],o:4,u:1}],
-  items:[{id:'s1',title:'만성교회',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C',type:'channel',cat:'c1',o:1,u:1},
-   {id:'s2',title:'만성교회 생방송',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C/live',type:'live',cat:'c1',o:2,u:1}]};
+  items:[{id:'s1',title:'만성교회',url:MS,type:'channel',cat:'c1',o:1,u:2,th:MSTH},
+   {id:'s2',title:'만성교회 생방송',url:MS+'/live',type:'live',cat:'c1',o:2,u:2}]};
 }
 let D; try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!D||!Array.isArray(D.items))D=seed();
@@ -160,6 +161,8 @@ PF.cur=PF.cur||D.cur||'all';PF.open=PF.open||D.open||'app';delete D.cur;delete D
 // v001 자료 바꾸기 (순서 o, 고친 시각 u)
 D.cats.forEach((c,i)=>{if(c.o==null)c.o=i+1;if(c.u==null)c.u=1});
 D.items.forEach((x,i)=>{if(x.o==null)x.o=i+1;if(x.u==null)x.u=now()});
+// 만성교회 기본 항목을 채널 번호 주소로 (손대지 않은 것만)
+D.items.forEach(x=>{if(x.id==='s1'&&(x.u||0)<2){x.url=MS;x.th=MSTH;x.u=2}if(x.id==='s2'&&(x.u||0)<2){x.url=MS+'/live';x.u=2}});
 let TOK=localStorage.getItem(TKEY)||'';
 function save(){localStorage.setItem(KEY,JSON.stringify({cats:D.cats,items:D.items}));localStorage.setItem(PKEY,JSON.stringify(PF))}
 const CT=()=>D.cats.filter(c=>!c.del).sort((a,b)=>a.o-b.o);
