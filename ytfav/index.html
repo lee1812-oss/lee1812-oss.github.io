@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>유튜브 즐겨찾기</title>
+<meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png?v=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="유튜브 즐겨찾기">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--red:#E3002B;--red2:#B80024;--ink:#111418;--sub:#4A5059;--line:#E3E6EA;--bg:#F4F5F7;--card:#FFFFFF;--soft:#F0F1F3}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:18px;line-height:1.45;word-break:keep-all;overflow-wrap:break-word}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px 120px}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+.hd{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:11px;flex:none}
+.ttl{flex:1;min-width:0}
+.ttl h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttl small{display:block;color:var(--sub);font-size:14px;white-space:nowrap}
+.btn{min-height:54px;padding:0 20px;border-radius:14px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:18px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.red:active{background:var(--red2)}
+.btn.dark{background:#22262B;border-color:#22262B;color:#fff}
+.btn.ghost{background:var(--soft);border-color:var(--soft)}
+.btn.warn{background:#fff;border-color:#F2B8C0;color:#C4001F}
+.btn.wide{width:100%}
+.icon-btn{width:54px;height:54px;padding:0;border-radius:14px;border:1px solid var(--line);background:#fff;font-size:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cats{display:flex;flex-wrap:wrap;gap:10px;padding:16px 0 6px}
+.chip{min-height:50px;padding:0 18px;border-radius:999px;border:2px solid var(--line);background:#fff;font-weight:700;font-size:18px;display:inline-flex;align-items:center;gap:8px}
+.chip .dot{width:12px;height:12px;border-radius:50%}
+.chip .n{color:var(--sub);font-weight:600;font-size:16px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on .n{color:#D6D9DE}
+.chip.add{border-style:dashed;color:var(--sub)}
+.tools{display:flex;gap:10px;align-items:center;padding:8px 0 4px}
+.find{flex:1;min-height:54px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:0 16px;font-size:18px}
+.sec{margin:22px 0 10px;display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
+.sec .bar{width:6px;height:22px;border-radius:3px}
+.sec .cnt{color:var(--sub);font-weight:600;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 10px 10px 10px;min-height:96px}
+.item .go{flex:1;min-width:0;display:flex;align-items:center;gap:14px;background:none;border:0;padding:0;text-align:left}
+.thumb{width:128px;height:72px;border-radius:12px;flex:none;object-fit:cover;background:var(--soft);position:relative;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.av{width:128px;height:72px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px;font-weight:800}
+.meta{min-width:0;flex:1}
+.meta b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:19px;font-weight:700;line-height:1.35}
+.tag{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:15px;color:var(--sub);font-weight:600}
+.tag i{font-style:normal;padding:2px 9px;border-radius:999px;background:var(--soft);color:#333}
+.tag i.live{background:#FDE7EA;color:#C4001F}
+.empty{background:#fff;border:2px dashed var(--line);border-radius:18px;padding:34px 20px;text-align:center;color:var(--sub);font-size:18px}
+.empty b{display:block;color:var(--ink);font-size:20px;margin-bottom:6px}
+/* 아래에서 올라오는 창 */
+.dim{position:fixed;inset:0;background:rgba(15,18,22,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.dim.show{display:flex}
+.sheet{background:#fff;width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.dim{align-items:center}.sheet{border-radius:24px}}
+.sheet h2{margin:0 0 4px;font-size:23px;font-weight:800}
+.sheet .lead{margin:0 0 16px;color:var(--sub);font-size:17px}
+.step{display:inline-block;font-size:15px;font-weight:700;color:var(--red);margin-bottom:6px}
+label.f{display:block;font-weight:700;margin:14px 0 8px}
+.inp{width:100%;min-height:56px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:18px;background:#fff}
+.inp:focus,.find:focus{outline:none;border-color:#22262B}
+textarea.inp{min-height:110px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>.btn{flex:1}
+.pick{display:flex;flex-wrap:wrap;gap:10px}
+.pick button{min-height:54px;padding:0 18px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.pick button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.pick .dot{width:14px;height:14px;border-radius:50%}
+.colors{display:flex;flex-wrap:wrap;gap:10px}
+.colors button{width:48px;height:48px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line)}
+.colors button.on{box-shadow:0 0 0 3px var(--ink)}
+.prev{display:flex;gap:14px;align-items:center;background:var(--soft);border-radius:16px;padding:12px;margin:4px 0 6px}
+.note{background:#EEF4FF;color:#1F3B73;border-radius:14px;padding:12px 14px;font-size:16px;margin-top:14px}
+.note.ok{background:#E9F7EE;color:#1E5B33}
+.note.warn{background:#FFF3E5;color:#8A4B00}
+.catrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.catrow .nm{flex:1;font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}
+.catrow .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catrow .nm .dot{width:16px;height:16px;border-radius:50%;flex:none}
+.catrow .icon-btn{width:50px;height:50px;font-size:20px}
+.hr{height:1px;background:var(--line);margin:18px 0}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140%);background:#22262B;color:#fff;border-radius:16px;padding:14px 16px 14px 20px;font-size:17px;font-weight:600;display:flex;align-items:center;gap:14px;z-index:80;transition:transform .25s;max-width:92vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#fff;color:#111;font-weight:800}
+.fab{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:30;box-shadow:0 8px 24px rgba(227,0,43,.35);border-radius:999px;min-height:62px;padding:0 26px;font-size:20px}
+.moving .item{border-style:dashed}
+</style>
+</head>
+<body>
+<header>
+ <div class="hd">
+  <img class="logo" src="icon-192.png?v=1" alt="">
+  <div class="ttl"><h1>유튜브 즐겨찾기</h1><small id="sub">자주 가는 채널·영상을 한 번에</small></div>
+  <button class="icon-btn" id="bSet" aria-label="설정">⚙</button>
+ </div>
+</header>
+<div class="wrap">
+ <div class="cats" id="cats"></div>
+ <div class="tools" id="tools" style="display:none"><input class="find" id="find" placeholder="🔍 이름으로 찾기" autocomplete="off"></div>
+ <div id="list"></div>
+</div>
+<button class="btn red fab" id="bAdd">＋ 즐겨찾기 추가</button>
+
+<div class="dim" id="dim"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"><span id="tmsg"></span><button id="tbtn" style="display:none">되돌리기</button></div>
+
+<script>
+const VER='v001', UPD='2026.10.25';
+const KEY='ytfav-data-v1';
+const COLORS=['#E3002B','#F28C00','#E0B000','#1F9D55','#1A73E8','#6A3FC8','#D63384','#5F6B7A'];
+const TYPE={channel:'채널',video:'영상',playlist:'재생목록',search:'검색',live:'생방송',shorts:'쇼츠',other:'유튜브'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+// ---------- 저장 ----------
+function seed(){
+ const c=[{id:'c1',name:'교회',color:COLORS[0]},{id:'c2',name:'음악',color:COLORS[5]},{id:'c3',name:'요리·베이킹',color:COLORS[1]},{id:'c4',name:'공부·정보',color:COLORS[4]}];
+ const it=[
+  {id:uid(),title:'만성교회',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C',type:'channel',cat:'c1'},
+  {id:uid()+'b',title:'만성교회 생방송 (지금 예배)',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C/live',type:'live',cat:'c1'}];
+ return {v:1,cats:c,items:it,cur:'all',open:'app'};
+}
+let D;
+try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!D||!Array.isArray(D.items))D=seed();
+D.cur=D.cur||'all';D.open=D.open||'app';
+function save(){localStorage.setItem(KEY,JSON.stringify(D))}
+save();
+
+// ---------- 유튜브 주소 해석 ----------
+function findUrl(t){const m=String(t||'').match(/https?:\/\/[^\s"'<>]+/i);return m?m[0]:null}
+function parse(raw){
+ raw=String(raw||'').trim(); if(!raw)return null;
+ let u=findUrl(raw);
+ if(!u&&/^(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(raw))u='https://'+raw;
+ if(!u&&/^@\S+$/.test(raw))u='https://www.youtube.com/'+raw;
+ if(!u){return {type:'search',url:'https://www.youtube.com/results?search_query='+encodeURIComponent(raw),title:raw+' (검색)',q:raw}}
+ let x; try{x=new URL(u)}catch(e){return null}
+ const h=x.hostname.replace(/^(www\.|m\.|music\.)/,''); const p=x.pathname.split('/').filter(Boolean);
+ if(h==='youtu.be'&&p[0])return vid(p[0]);
+ if(!/youtube\.com$/.test(h))return {type:'other',url:x.href,title:x.hostname,ext:true};
+ const v=x.searchParams.get('v'), list=x.searchParams.get('list');
+ if(p[0]==='watch'&&v)return vid(v);
+ if(p[0]==='shorts'&&p[1])return vid(p[1],'shorts');
+ if(p[0]==='live'&&p[1])return vid(p[1],'live');
+ if(p[0]==='playlist'&&list)return {type:'playlist',url:'https://www.youtube.com/playlist?list='+encodeURIComponent(list),title:'재생목록'};
+ if(p[0]==='results'){const q=x.searchParams.get('search_query')||'';return {type:'search',url:x.href,title:q+' (검색)',q}}
+ if(p[0]&&(p[0].startsWith('@')||p[0].startsWith('%40')||['channel','c','user'].includes(p[0]))){
+  const isAt=!['channel','c','user'].includes(p[0]);
+  const base=isAt?p[0]:p[0]+'/'+(p[1]||'');
+  let name=isAt?p[0]:(p[1]||'채널'); try{name=decodeURIComponent(name)}catch(e){}
+  name=name.replace(/^@/,'');
+  const rest=p.slice(isAt?1:2); const live=rest[0]==='live';
+  return {type:live?'live':'channel',url:'https://www.youtube.com/'+base+(live?'/live':''),title:name+(live?' 생방송':''),nameGuess:true};
+ }
+ return {type:'other',url:x.href,title:'유튜브'};
+}
+function vid(id,t){id=id.replace(/[^\w-]/g,'');return {type:t||'video',vid:id,url:t==='shorts'?'https://www.youtube.com/shorts/'+id:'https://www.youtube.com/watch?v='+id,title:'',needTitle:true}}
+async function fetchTitle(url){
+ try{const r=await fetch('https://noembed.com/embed?url='+encodeURIComponent(url));const j=await r.json();return j&&j.title?{title:j.title,author:j.author_name||''}:null}catch(e){return null}
+}
+
+// ---------- 열기 (유튜브 앱으로) ----------
+const isAndroid=/Android/i.test(navigator.userAgent), isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function openIt(it){
+ const u=new URL(it.url).href;
+ if(D.open==='app'&&isAndroid&&!it.ext){
+  location.href='intent://'+u.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url='+encodeURIComponent(u)+';end';
+  return;
+ }
+ if(D.open==='app'&&isIOS&&!it.ext){
+  let left=false;const off=()=>{left=true};
+  document.addEventListener('visibilitychange',off,{once:true});
+  location.href=u.replace(/^https?:\/\//,'youtube://');
+  setTimeout(()=>{if(!left&&document.visibilityState==='visible')window.open(u,'_blank')},1600);
+  return;
+ }
+ window.open(u,'_blank','noopener');
+}
+
+// ---------- 화면 그리기 ----------
+const catOf=id=>D.cats.find(c=>c.id===id);
+function cnt(id){return D.items.filter(i=>id==='all'?true:id==='none'?!catOf(i.cat):i.cat===id).length}
+function drawCats(){
+ const none=cnt('none');
+ if(D.cur!=='all'&&D.cur!=='none'&&!catOf(D.cur))D.cur='all';
+ if(D.cur==='none'&&!none)D.cur='all';
+ let h=`<button class="chip ${D.cur==='all'?'on':''}" data-c="all">전체 <span class="n">${D.items.length}</span></button>`;
+ for(const c of D.cats)h+=`<button class="chip ${D.cur===c.id?'on':''}" data-c="${c.id}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)} <span class="n">${cnt(c.id)}</span></button>`;
+ if(none)h+=`<button class="chip ${D.cur==='none'?'on':''}" data-c="none"><span class="dot" style="background:#B8BEC6"></span>분류 없음 <span class="n">${none}</span></button>`;
+ h+=`<button class="chip add" id="bCats">＋ 카테고리 만들기·정리</button>`;
+ $('#cats').innerHTML=h;
+}
+function thumb(it){
+ const c=catOf(it.cat);const col=c?c.color:'#8A929C';
+ if(it.vid)return `<div class="thumb"><img loading="lazy" src="https://i.ytimg.com/vi/${it.vid}/mqdefault.jpg" alt=""></div>`;
+ const ic={channel:'',live:'🔴',search:'🔍',playlist:'▶',other:'▶'}[it.type]||'';
+ const letter=ic||esc((it.title||'?').trim().charAt(0));
+ return `<div class="av" style="background:linear-gradient(135deg,${col},${shade(col)})">${letter}</div>`;
+}
+function shade(hex){const n=parseInt(hex.slice(1),16);const f=v=>Math.max(0,Math.round(v*0.72));return '#'+[(n>>16)&255,(n>>8)&255,n&255].map(f).map(v=>v.toString(16).padStart(2,'0')).join('')}
+function card(it){
+ const c=catOf(it.cat);
+ return `<div class="item"><button class="go" data-open="${it.id}">${thumb(it)}<div class="meta"><b>${esc(it.title||'이름 없음')}</b><div class="tag"><i class="${it.type==='live'?'live':''}">${TYPE[it.type]||'유튜브'}</i>${D.cur==='all'&&c?'':''}</div></div></button><button class="icon-btn" data-edit="${it.id}" aria-label="고치기">⋯</button></div>`;
+}
+function drawList(){
+ const q=($('#find').value||'').trim().toLowerCase();
+ $('#tools').style.display=D.items.length>8?'flex':'none';
+ const match=i=>!q||(i.title||'').toLowerCase().includes(q);
+ let h='';
+ if(!D.items.length){h=`<div class="empty"><b>아직 즐겨찾기가 없어요</b>아래 빨간 「＋ 즐겨찾기 추가」를 눌러<br>유튜브 주소나 검색어를 넣어 주세요.</div>`}
+ else if(D.cur==='all'){
+  const groups=[...D.cats.map(c=>({c,list:D.items.filter(i=>i.cat===c.id&&match(i))})),{c:null,list:D.items.filter(i=>!catOf(i.cat)&&match(i))}];
+  for(const g of groups){ if(!g.list.length)continue;
+   h+=`<div class="sec"><span class="bar" style="background:${g.c?g.c.color:'#B8BEC6'}"></span>${g.c?esc(g.c.name):'분류 없음'} <span class="cnt">${g.list.length}개</span></div><div class="grid">${g.list.map(card).join('')}</div>`;}
+  if(!h)h=`<div class="empty"><b>「${esc(q)}」 찾는 결과가 없어요</b></div>`;
+ } else {
+  const c=catOf(D.cur); const list=D.items.filter(i=>(D.cur==='none'?!catOf(i.cat):i.cat===D.cur)&&match(i));
+  h=`<div class="sec"><span class="bar" style="background:${c?c.color:'#B8BEC6'}"></span>${c?esc(c.name):'분류 없음'} <span class="cnt">${list.length}개</span></div>`;
+  h+=list.length?`<div class="grid">${list.map(card).join('')}</div>`:`<div class="empty"><b>이 카테고리는 비어 있어요</b>「＋ 즐겨찾기 추가」로 넣거나,<br>다른 즐겨찾기의 ⋯ 버튼에서 옮길 수 있어요.</div>`;
+ }
+ $('#list').innerHTML=h;
+ $('#sub').textContent=`${VER} · ${UPD} · 즐겨찾기 ${D.items.length}개`;
+}
+function draw(){drawCats();drawList();save()}
+
+// ---------- 아래 창 ----------
+function sheet(html){$('#sheet').innerHTML=html;$('#dim').classList.add('show');$('#sheet').scrollTop=0}
+function close(){$('#dim').classList.remove('show');$('#sheet').innerHTML=''}
+$('#dim').addEventListener('click',e=>{if(e.target.id==='dim')close()});
+let tT;function toast(m,undo){$('#tmsg').textContent=m;const b=$('#tbtn');b.style.display=undo?'':'none';b.onclick=()=>{undo();hideT()};$('#toast').classList.add('show');clearTimeout(tT);tT=setTimeout(hideT,undo?7000:2600)}
+function hideT(){$('#toast').classList.remove('show')}
+
+function catPick(sel,allowNew=true){
+ return `<div class="pick" id="pick">${D.cats.map(c=>`<button data-pc="${c.id}" class="${sel===c.id?'on':''}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</button>`).join('')}<button data-pc="" class="${!sel?'on':''}">분류 없음</button>${allowNew?'<button data-newcat="1" style="border-style:dashed">＋ 새 카테고리</button>':''}</div>`;
+}
+function bindPick(get,set){
+ $('#sheet').querySelectorAll('[data-pc]').forEach(b=>b.onclick=()=>{set(b.dataset.pc);$('#sheet').querySelectorAll('[data-pc]').forEach(x=>x.classList.toggle('on',x===b))});
+ const nb=$('#sheet').querySelector('[data-newcat]');
+ if(nb)nb.onclick=()=>{const n=prompt('새 카테고리 이름을 적어 주세요 (예: 운동, 여행)');if(!n||!n.trim())return;const c={id:'c'+uid(),name:n.trim().slice(0,20),color:COLORS[D.cats.length%COLORS.length]};D.cats.push(c);save();set(c.id);
+  const wrap=$('#pick');wrap.outerHTML=catPick(c.id);bindPick(get,set)};
+}
+
+// 추가 1단계
+function addStep1(pre){
+ sheet(`<span class="step">1 / 2 단계</span><h2>무엇을 즐겨찾기 할까요?</h2>
+ <p class="lead">유튜브 주소를 붙여 넣거나, 검색어(예: 만성교회, 빵 만들기)를 적어 주세요.</p>
+ <textarea class="inp" id="aIn" placeholder="예) https://youtu.be/...  또는  @채널이름  또는  검색어">${esc(pre||'')}</textarea>
+ <div class="row" style="margin-top:12px"><button class="btn ghost" id="aPaste">📋 복사한 주소 붙여넣기</button></div>
+ <div class="note">💡 유튜브 앱에서 보고 있는 영상·채널의 <b>「공유」</b>를 누르고 <b>「유튜브 즐겨찾기」</b>를 고르면 여기로 바로 들어와요. (앱을 홈 화면에 설치했을 때)</div>
+ <div class="row" style="margin-top:18px"><button class="btn" id="aX">취소</button><button class="btn red" id="aNext">다음 ›</button></div>`);
+ $('#aX').onclick=close;
+ $('#aPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('#aIn').value=t;}else toast('복사한 내용이 없어요')}catch(e){toast('붙여넣기 허용이 필요해요. 칸을 길게 눌러 붙여넣어 주세요')}};
+ $('#aNext').onclick=()=>{const v=$('#aIn').value;const r=parse(v);if(!r){toast('주소를 알아볼 수 없어요. 다시 확인해 주세요');return}
+  const sharedTitle=(pre&&findUrl(pre))?pre.replace(findUrl(pre),'').trim():'';
+  addStep2(r,sharedTitle)};
+ if(!pre)setTimeout(()=>$('#aIn').focus(),120);
+}
+// 추가 2단계
+function addStep2(r,shared){
+ let cat=(D.cur!=='all'&&D.cur!=='none'&&catOf(D.cur))?D.cur:(D.cats[0]?.id||'');
+ const dup=D.items.find(i=>i.url===r.url);
+ const tmp={...r,cat,id:'tmp'};
+ sheet(`<span class="step">2 / 2 단계</span><h2>이름과 카테고리를 정해 주세요</h2>
+ <div class="prev">${thumb(tmp)}<div class="meta"><div class="tag" style="margin:0"><i class="${r.type==='live'?'live':''}">${TYPE[r.type]}</i></div><div style="font-size:15px;color:var(--sub);margin-top:4px;word-break:break-all">${esc(decodeURIComponent(r.url).replace('https://www.',''))}</div></div></div>
+ ${dup?`<div class="note warn">⚠ 이미 「${esc(dup.title)}」로 저장된 주소예요. 그래도 저장하면 하나 더 생겨요.</div>`:''}
+ ${r.ext?`<div class="note warn">⚠ 유튜브 주소가 아니에요. 인터넷 창으로 열려요.</div>`:''}
+ <label class="f" for="aName">보일 이름</label>
+ <input class="inp" id="aName" value="${esc(shared||r.title||'')}" placeholder="${r.needTitle?'영상 제목을 불러오는 중…':'이름을 적어 주세요'}" maxlength="60">
+ <label class="f">카테고리</label>${catPick(cat)}
+ <div class="row" style="margin-top:22px"><button class="btn" id="aBack">‹ 이전</button><button class="btn red" id="aSave">저장하기</button></div>`);
+ bindPick(()=>cat,v=>cat=v);
+ if(r.needTitle&&!shared){fetchTitle(r.url).then(t=>{const el=$('#aName');if(el&&t&&!el.value){el.value=t.title}if(el)el.placeholder='이름을 적어 주세요'})}
+ $('#aBack').onclick=()=>addStep1(r.q||r.url);
+ $('#aSave').onclick=()=>{const name=$('#aName').value.trim()||r.title||TYPE[r.type];
+  const it={id:uid(),title:name,url:r.url,type:r.type,cat};if(r.vid)it.vid=r.vid;if(r.ext)it.ext=true;
+  D.items.push(it);close();draw();toast(`「${name}」 저장했어요`)};
+}
+
+// 즐겨찾기 고치기
+function editItem(id){
+ const it=D.items.find(i=>i.id===id);if(!it)return;let cat=it.cat||'';
+ sheet(`<h2>즐겨찾기 고치기</h2><p class="lead">${esc(TYPE[it.type])} · 바꾼 뒤 「저장하기」를 눌러 주세요.</p>
+ <label class="f" for="eName">보일 이름</label><input class="inp" id="eName" value="${esc(it.title)}" maxlength="60">
+ <label class="f">카테고리 옮기기</label>${catPick(cat)}
+ <label class="f">순서</label><div class="row"><button class="btn ghost" id="eUp">▲ 앞으로</button><button class="btn ghost" id="eDn">▼ 뒤로</button></div>
+ <div class="row" style="margin-top:22px"><button class="btn" id="eX">닫기</button><button class="btn red" id="eSave">저장하기</button></div>
+ <div class="hr"></div>
+ <div class="row"><button class="btn ghost" id="eCopy">🔗 주소 복사</button><button class="btn warn" id="eDel">🗑 지우기</button></div>`);
+ bindPick(()=>cat,v=>cat=v);
+ $('#eX').onclick=close;
+ $('#eSave').onclick=()=>{it.title=$('#eName').value.trim()||it.title;it.cat=cat;close();draw();toast('저장했어요')};
+ const mv=d=>{const same=D.items.filter(i=>(i.cat||'')===(it.cat||'')||(!catOf(i.cat)&&!catOf(it.cat)));const k=same.indexOf(it);const o=same[k+d];if(!o){toast(d<0?'이미 맨 앞이에요':'이미 맨 뒤예요');return}
+  const a=D.items.indexOf(it),b=D.items.indexOf(o);[D.items[a],D.items[b]]=[D.items[b],D.items[a]];draw();toast(d<0?'앞으로 옮겼어요':'뒤로 옮겼어요')};
+ $('#eUp').onclick=()=>mv(-1);$('#eDn').onclick=()=>mv(1);
+ $('#eCopy').onclick=async()=>{try{await navigator.clipboard.writeText(new URL(it.url).href);toast('주소를 복사했어요')}catch(e){prompt('주소를 길게 눌러 복사하세요',new URL(it.url).href)}};
+ $('#eDel').onclick=()=>{const k=D.items.indexOf(it);D.items.splice(k,1);close();draw();toast(`「${it.title}」 지웠어요`,()=>{D.items.splice(k,0,it);draw();toast('되살렸어요')})};
+}
+
+// 카테고리 만들기·정리
+function catSheet(){
+ let color=COLORS[D.cats.length%COLORS.length];
+ const rows=D.cats.map((c,k)=>`<div class="catrow"><div class="nm"><span class="dot" style="background:${c.color}"></span><span>${esc(c.name)}</span><small style="color:var(--sub);font-weight:600">${cnt(c.id)}개</small></div>
+  <button class="icon-btn" data-cu="${k}" aria-label="위로">▲</button><button class="icon-btn" data-cd="${k}" aria-label="아래로">▼</button><button class="icon-btn" data-ce="${c.id}" aria-label="이름·색 바꾸기">✏️</button><button class="icon-btn" data-cx="${c.id}" aria-label="지우기">🗑</button></div>`).join('');
+ sheet(`<h2>카테고리 만들기·정리</h2><p class="lead">카테고리는 즐겨찾기를 나눠 담는 상자예요.</p>
+ <label class="f" for="cName">새 카테고리 이름</label>
+ <input class="inp" id="cName" placeholder="예) 운동, 여행, 손주 영상" maxlength="20">
+ <label class="f">색</label><div class="colors" id="cCol">${COLORS.map(x=>`<button data-col="${x}" class="${x===color?'on':''}" style="background:${x}" aria-label="색"></button>`).join('')}</div>
+ <div class="row" style="margin-top:16px"><button class="btn red wide" id="cAdd">＋ 카테고리 만들기</button></div>
+ <div class="hr"></div>
+ <label class="f" style="margin-top:0">지금 있는 카테고리 (${D.cats.length}개)</label>
+ ${rows||'<div class="empty" style="padding:20px">아직 카테고리가 없어요</div>'}
+ <div class="row" style="margin-top:20px"><button class="btn wide" id="cX">닫기</button></div>`);
+ $('#cX').onclick=close;
+ $('#cCol').querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{color=b.dataset.col;$('#cCol').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+ $('#cAdd').onclick=()=>{const n=$('#cName').value.trim();if(!n){toast('이름을 먼저 적어 주세요');$('#cName').focus();return}
+  if(D.cats.some(c=>c.name===n)){toast('같은 이름이 이미 있어요');return}
+  D.cats.push({id:'c'+uid(),name:n.slice(0,20),color});draw();catSheet();toast(`「${n}」 카테고리를 만들었어요`)};
+ $('#sheet').querySelectorAll('[data-cu]').forEach(b=>b.onclick=()=>{const k=+b.dataset.cu;if(k<1)return;[D.cats[k-1],D.cats[k]]=[D.cats[k],D.cats[k-1]];draw();catSheet()});
+ $('#sheet').querySelectorAll('[data-cd]').forEach(b=>b.onclick=()=>{const k=+b.dataset.cd;if(k>=D.cats.length-1)return;[D.cats[k+1],D.cats[k]]=[D.cats[k],D.cats[k+1]];draw();catSheet()});
+ $('#sheet').querySelectorAll('[data-ce]').forEach(b=>b.onclick=()=>catEdit(b.dataset.ce));
+ $('#sheet').querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>{const c=catOf(b.dataset.cx);const k=D.cats.indexOf(c);const n=cnt(c.id);
+  if(!confirm(`「${c.name}」 카테고리를 지울까요?`+(n?`\n안에 있던 즐겨찾기 ${n}개는 지워지지 않고 「분류 없음」으로 옮겨져요.`:'')))return;
+  D.cats.splice(k,1);draw();catSheet();toast(`「${c.name}」 카테고리를 지웠어요`,()=>{D.cats.splice(k,0,c);draw();catSheet()})});
+}
+function catEdit(id){
+ const c=catOf(id);let color=c.color;
+ sheet(`<h2>카테고리 바꾸기</h2>
+ <label class="f" for="ceName">이름</label><input class="inp" id="ceName" value="${esc(c.name)}" maxlength="20">
+ <label class="f">색</label><div class="colors" id="ceCol">${COLORS.map(x=>`<button data-col="${x}" class="${x===color?'on':''}" style="background:${x}" aria-label="색"></button>`).join('')}</div>
+ <div class="row" style="margin-top:22px"><button class="btn" id="ceB">‹ 이전</button><button class="btn red" id="ceS">저장하기</button></div>`);
+ $('#ceCol').querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{color=b.dataset.col;$('#ceCol').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+ $('#ceB').onclick=catSheet;
+ $('#ceS').onclick=()=>{const n=$('#ceName').value.trim();if(!n){toast('이름을 적어 주세요');return}c.name=n;c.color=color;draw();catSheet();toast('바꿨어요')};
+}
+
+// 설정·옮기기
+function b64e(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function b64d(s){s=s.replace(/-/g,'+').replace(/_/g,'/');return decodeURIComponent(escape(atob(s)))}
+function pack(){return {v:1,cats:D.cats,items:D.items.map(({id,title,url,type,cat,vid,ext})=>({id,title,url,type,cat,vid,ext}))}}
+function setSheet(){
+ sheet(`<h2>설정</h2><p class="lead">${VER} · 업데이트 ${UPD}</p>
+ <label class="f" style="margin-top:0">누르면 어디로 열까요?</label>
+ <div class="pick" id="oPick"><button data-o="app" class="${D.open==='app'?'on':''}">▶ 유튜브 앱으로 (추천)</button><button data-o="web" class="${D.open==='web'?'on':''}">🌐 인터넷 창으로</button></div>
+ <div class="hr"></div>
+ <label class="f" style="margin-top:0">다른 휴대폰·태블릿으로 옮기기</label>
+ <p class="lead" style="margin:0 0 10px">즐겨찾기는 이 기기에만 저장돼요. 아래 링크를 카톡 「나에게」로 보내고 다른 기기에서 열면 그대로 들어가요.</p>
+ <div class="row"><button class="btn dark" id="sLink">🔗 옮기기 링크 복사</button></div>
+ <div class="row" style="margin-top:10px"><button class="btn ghost" id="sExp">💾 백업 파일 저장</button><button class="btn ghost" id="sImp">📂 백업 파일 불러오기</button></div>
+ <input type="file" id="sFile" accept=".json,application/json" style="display:none">
+ <div class="row" style="margin-top:22px"><button class="btn wide" id="sX">닫기</button></div>`);
+ $('#sX').onclick=close;
+ $('#oPick').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{D.open=b.dataset.o;save();$('#oPick').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));toast(D.open==='app'?'유튜브 앱으로 열게요':'인터넷 창으로 열게요')});
+ $('#sLink').onclick=async()=>{const link=location.origin+location.pathname+'#data='+b64e(JSON.stringify(pack()));
+  try{await navigator.clipboard.writeText(link);toast('링크를 복사했어요. 카톡 「나에게」에 붙여 넣으세요')}catch(e){prompt('링크를 길게 눌러 복사하세요',link)}};
+ $('#sExp').onclick=()=>{const b=new Blob([JSON.stringify(pack(),null,1)],{type:'application/json'});const a=document.createElement('a');const d=new Date();
+  a.href=URL.createObjectURL(b);a.download=`유튜브즐겨찾기_백업_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;a.click();toast('백업 파일을 저장했어요')};
+ $('#sImp').onclick=()=>$('#sFile').click();
+ $('#sFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{importData(JSON.parse(await f.text()))}catch(x){toast('백업 파일을 읽지 못했어요')}};
+}
+function importData(o){
+ if(!o||!Array.isArray(o.items)){toast('가져올 내용이 없어요');return}
+ const add=confirm(`즐겨찾기 ${o.items.length}개, 카테고리 ${(o.cats||[]).length}개를 가져올게요.\n\n[확인] 지금 것에 합치기 (추천)\n[취소] 가져오지 않기`);
+ if(!add)return;
+ for(const c of (o.cats||[])){const same=D.cats.find(x=>x.name===c.name);if(same){o.items.forEach(i=>{if(i.cat===c.id)i.cat=same.id})}else{const nid=D.cats.some(x=>x.id===c.id)?'c'+uid():c.id;o.items.forEach(i=>{if(i.cat===c.id)i.cat=nid});D.cats.push({...c,id:nid})}}
+ let n=0;for(const i of o.items){if(D.items.some(x=>x.url===i.url))continue;D.items.push({...i,id:uid()});n++}
+ close();draw();toast(`${n}개를 새로 가져왔어요 (같은 주소는 건너뜀)`);
+}
+
+// ---------- 누르기 ----------
+document.addEventListener('click',e=>{
+ const c=e.target.closest('[data-c]');if(c){D.cur=c.dataset.c;draw();window.scrollTo({top:0});return}
+ if(e.target.closest('#bCats')){catSheet();return}
+ const o=e.target.closest('[data-open]');if(o){const it=D.items.find(i=>i.id===o.dataset.open);if(it)openIt(it);return}
+ const ed=e.target.closest('[data-edit]');if(ed){editItem(ed.dataset.edit);return}
+});
+$('#bAdd').onclick=()=>addStep1('');
+$('#bSet').onclick=setSheet;
+$('#find').addEventListener('input',drawList);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+draw();
+// 다른 앱에서 「공유」로 들어온 경우, 옮기기 링크로 들어온 경우
+(function(){
+ const sp=new URLSearchParams(location.search);const sh=[sp.get('title'),sp.get('text'),sp.get('url')].filter(Boolean).join(' ').trim();
+ if(location.hash.startsWith('#data=')){try{const o=JSON.parse(b64d(location.hash.slice(6)));history.replaceState(null,'',location.pathname);setTimeout(()=>importData(o),300)}catch(e){toast('옮기기 링크가 잘렸어요. 다시 복사해 주세요')}}
+ else if(sh&&findUrl(sh)){history.replaceState(null,'',location.pathname);const u=findUrl(sh);const t=sh.replace(u,'').trim();addStep1(t?t+' '+u:u);
+  const r=parse(u);if(r)addStep2(r,t)}
+})();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
