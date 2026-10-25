@@ -1,0 +1,29 @@
+{
+ "name": "만성교회 유튜브",
+ "short_name": "만성교회",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#f4f4f5",
+ "theme_color": "#B3261E",
+ "icons": [
+  {
+   "src": "icon-192.png?v=1",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png?v=1",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png?v=1",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
