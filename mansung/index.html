@@ -5,11 +5,16 @@
 <title>만성교회</title><meta name="theme-color" content="#FFFFFF">
 <link rel="manifest" href="manifest.webmanifest?v=5"><link rel="icon" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="만성교회">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <style>
+@font-face{font-family:'NSR';font-weight:400;font-display:swap;src:url(https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/NanumSquareRoundR.woff2) format('woff2')}
+@font-face{font-family:'NSR';font-weight:700;font-display:swap;src:url(https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/NanumSquareRoundB.woff2) format('woff2')}
+@font-face{font-family:'NSR';font-weight:800;font-display:swap;src:url(https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/NanumSquareRoundEB.woff2) format('woff2')}
+@font-face{font-family:'NSR';font-weight:900;font-display:swap;src:url(https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/NanumSquareRoundEB.woff2) format('woff2')}
 :root{--fs:18px;--navy:#1E3A5F;--line:#e4e4e7;--sub:#52525b}
 *{box-sizing:border-box}
 html{font-size:var(--fs)}
-body{margin:0;background:#f4f4f5;color:#18181b;font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#f4f4f5;color:#18181b;font-family:"NSR","Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:640px;margin:0 auto;padding:0 0 calc(30px + env(safe-area-inset-bottom))}
 header{background:#fff;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
 .hrow{display:flex;align-items:center;gap:12px}
@@ -104,6 +109,12 @@ td:first-child{font-weight:700}
 .toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(30,58,95,.92);color:#fff;font-weight:900;font-size:20px;padding:14px 22px;border-radius:16px;z-index:80;pointer-events:none}
 .st .ln.b .ph{display:block}
 .bitem{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:8px 12px;margin-top:6px;font-size:.88rem;color:#92400e;font-weight:700}
+/* 크게 보기 본문: 부드럽고 굵게 */
+.rdb{font-weight:700;color:#1f1f1f;line-height:1.7}
+.rdb .st .lb,.rdt,.amen{font-weight:800}
+.st.ref .ln,.st .ln{font-weight:700}
+.st.dim .ln{font-weight:400}
+button,a{font-family:inherit}
 .foot{color:#71717a;font-size:.75rem;text-align:center;margin:14px 10px}
 .empty{padding:40px 20px;text-align:center;color:var(--sub)}
 [hidden]{display:none!important}
@@ -125,7 +136,7 @@ td:first-child{font-weight:700}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v011';
+const VER='v012';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
