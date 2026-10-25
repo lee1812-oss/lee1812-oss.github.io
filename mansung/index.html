@@ -143,12 +143,12 @@ html{font-size:calc(var(--fs) * var(--k))}
 .rdb,.mta{font-size:calc(var(--rfs) * var(--k))}
 @media (min-width:700px){
  :root{--k:1.15}
- .wrap{max-width:none;padding-left:max(20px,calc((100% - 1240px)/2));padding-right:max(20px,calc((100% - 1240px)/2))}
+ .wrap{max-width:none;padding-left:max(20px,calc((100% - 1400px)/2));padding-right:max(20px,calc((100% - 1400px)/2))}
  header{padding:20px 4px 12px}
  .hrow img{width:64px;height:64px}
- .rdb{padding-left:max(28px,calc((100% - 1200px)/2));padding-right:max(28px,calc((100% - 1200px)/2))}
+ .rdb{padding-left:max(28px,calc((100% - 1360px)/2));padding-right:max(28px,calc((100% - 1360px)/2))}
  .rdt{font-size:21px}.rdt small{font-size:15px}
- .rdh,.rdf{padding-left:max(16px,calc((100% - 1240px)/2));padding-right:max(16px,calc((100% - 1240px)/2))}
+ .rdh,.rdf{padding-left:max(16px,calc((100% - 1400px)/2));padding-right:max(16px,calc((100% - 1400px)/2))}
  .rdf button{font-size:18px;min-height:62px}
 }
 @media (min-width:1100px){:root{--k:1.22}}
@@ -242,6 +242,31 @@ td:first-child{color:var(--navy)}
  nav{padding:10px 4px}
  main{padding:6px 4px 14px}
 }
+/* v018 은혜 메모: 성경 왼쪽 · 메모 오른쪽, 가운데 막대로 폭 조절 (좁은 휴대폰은 위·아래) */
+.msp{display:flex;flex-direction:column;gap:10px}
+.mbp,.mgut,.mhelp .sh{display:none}
+.mdb.split{overflow:hidden;padding-bottom:10px}
+.mdb.split .msp{flex:1;min-height:0;flex-direction:row;gap:0}
+.mdb.split .mbp{display:block;flex:0 0 var(--msw,50%);min-width:0;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 10px 16px 2px}
+.mbp .bh{font-size:.78em;font-weight:900;color:#1E3A5F;margin:2px 0 10px}
+.mbp .st{padding:10px 12px;margin-bottom:8px}
+.mbp .copy{font-size:12px;color:#71717a;margin-top:6px}
+.mdb.split .mgut{display:flex;flex:0 0 30px;align-items:center;justify-content:center;cursor:col-resize;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
+.mdb.split .mgut span{width:8px;height:72px;border-radius:999px;background:#C9D7EA;box-shadow:0 0 0 4px rgba(201,215,234,.35);transition:background .15s}
+.mdb.split .mgut.on span,.mdb.split .mgut:hover span,.mdb.split .mgut:focus-visible span{background:#1E3A5F}
+.mwp{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+.mdb.split .mwp{flex:1;padding-left:10px}
+.mdb.split .mta{flex:1;min-height:0;resize:none}
+.mdb.split .mhelp .sh{display:inline}
+@media (max-width:599px){
+ .mdb.split .msp{flex-direction:column}
+ .mdb.split .mbp{flex:0 0 var(--msh,42%);padding:2px 2px 8px}
+ .mdb.split .mgut{flex:0 0 30px;cursor:row-resize}
+ .mdb.split .mgut span{width:72px;height:8px}
+ .mdb.split .mwp{padding-left:0}
+ .mdb.split .mhelp .h1{display:none}
+ .mdb.split .mhelp .sh{font-size:12px}
+}
 </style></head>
 <body><div class="wrap">
 <header>
@@ -260,12 +285,12 @@ td:first-child{color:var(--navy)}
 </div>
 <div class="rd md" id="md" hidden>
  <div class="rdh"><button class="x" id="mdx">✕ 닫기</button><div class="rdt" id="mdt">✍ 은혜 메모</div><div class="fsz"><button id="mfm" aria-label="글자 작게">−</button><span>글자</span><button id="mfp" aria-label="글자 크게">+</button></div></div>
- <div class="rdb mdb"><div class="mdi" id="mdi"></div><textarea class="mta" id="mta" placeholder="말씀을 들으며 마음에 남은 구절, 받은 은혜, 결단을 적어 보세요."></textarea><div class="mst" id="mst"></div><div class="mhelp">적는 대로 바로 저장돼요. 이 휴대폰에만 보관되고 다른 사람은 볼 수 없어요.</div></div>
+ <div class="rdb mdb" id="mdbx"><div class="mdi" id="mdi"></div><div class="msp"><div class="mbp" id="mbp"></div><div class="mgut" id="mgut" role="separator" aria-label="성경과 메모 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 가운데로"><span></span></div><div class="mwp"><textarea class="mta" id="mta" placeholder="말씀을 들으며 마음에 남은 구절, 받은 은혜, 결단을 적어 보세요."></textarea><div class="mst" id="mst"></div><div class="mhelp"><span class="h1">적는 대로 바로 저장돼요. 이 휴대폰에만 보관되고 다른 사람은 볼 수 없어요.</span><span class="sh"> 가운데 막대를 끌면 성경·메모 폭이 바뀌어요(두 번 누르면 가운데로).</span></div></div></div></div>
  <div class="rdf"><button id="msh">📤 보내기·복사</button><button class="nx" id="mok">다 썼어요 ✓</button></div>
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v017';
+const VER='v018';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -385,13 +410,28 @@ window.addEventListener('popstate',()=>{if(mOpen){closeM();return;}closeR();});
 let mOpen=false,mD='',mS='',mT=null;let mfs=+(localStorage.getItem('jb_mfs')||20);
 const mdv=document.getElementById('md'),mta=document.getElementById('mta'),mst=document.getElementById('mst');
 const setMfs=(v,show)=>{mfs=Math.max(16,Math.min(34,v));mdv.style.setProperty('--rfs',mfs+'px');localStorage.setItem('jb_mfs',mfs);if(show)toast('글자 크기 '+(mfs-12));};setMfs(mfs);
-document.getElementById('mfm').onclick=()=>keepView(mdv.querySelector('.mdb'),null,()=>setMfs(mfs-2,1));document.getElementById('mfp').onclick=()=>keepView(mdv.querySelector('.mdb'),null,()=>setMfs(mfs+2,1));
+const mdbEl=document.getElementById('mdbx'),mbp=document.getElementById('mbp'),mgut=document.getElementById('mgut');const mSc=()=>mdbEl.classList.contains('split')?mbp:mdbEl;
+document.getElementById('mfm').onclick=()=>keepView(mSc(),null,()=>setMfs(mfs-2,1));document.getElementById('mfp').onclick=()=>keepView(mSc(),null,()=>setMfs(mfs+2,1));
+const mNar=()=>innerWidth<600;
+function mSplit(){mdbEl.style.setProperty('--msw',(+(localStorage.getItem('jb_msw')||50))+'%');mdbEl.style.setProperty('--msh',(+(localStorage.getItem('jb_msh')||42))+'%');}mSplit();
+function mSetSplit(p){p=Math.round(Math.max(20,Math.min(80,p)));localStorage.setItem(mNar()?'jb_msh':'jb_msw',p);mSplit();}
+let gDrag=false;
+mgut.tabIndex=0;
+mgut.addEventListener('pointerdown',e=>{gDrag=true;mgut.classList.add('on');try{mgut.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+mgut.addEventListener('pointermove',e=>{if(!gDrag)return;const r=mgut.parentElement.getBoundingClientRect();mSetSplit(mNar()?(e.clientY-r.top)/r.height*100:(e.clientX-r.left)/r.width*100);});
+const gEnd=()=>{if(!gDrag)return;gDrag=false;mgut.classList.remove('on');};
+mgut.addEventListener('pointerup',gEnd);mgut.addEventListener('pointercancel',gEnd);mgut.addEventListener('lostpointercapture',gEnd);
+mgut.addEventListener('dblclick',()=>{localStorage.removeItem(mNar()?'jb_msh':'jb_msw');mSplit();toast('가운데로 되돌렸어요');});
+mgut.addEventListener('keydown',e=>{const k=mNar()?['ArrowUp','ArrowDown']:['ArrowLeft','ArrowRight'];const i=k.indexOf(e.key);if(i<0)return;e.preventDefault();const cur0=+(localStorage.getItem(mNar()?'jb_msh':'jb_msw')||(mNar()?42:50));mSetSplit(cur0+(i?5:-5));});
 function openM(d,s){mD=d||sel;mS=s||(cur==='memo'||cur==='news'?(D.services.find(x=>x.items.some(i=>i.sermon))||D.services[0]).id:cur);
  const o=mGet(mD,mS)||{};const sv=(mD===sel&&D.services.find(x=>x.id===mS))||null;
  const title=o.title||(sv&&D.sermon&&sv.items.some(i=>i.sermon)?D.sermon.title:'')||'';const ref=o.ref||(sv&&D.sermon?D.sermon.ref:'')||'';
  mdv.dataset.title=title;mdv.dataset.ref=ref;mdv.dataset.svc=o.svcName||(sv?sv.name:'');
  document.getElementById('mdt').innerHTML=`✍ 은혜 메모<small>${esc(md(mD))} · ${esc(mdv.dataset.svc)}</small>`;
  document.getElementById('mdi').innerHTML=title?`<b>「${esc(title)}」</b>${esc(ref)}${D.sermon&&D.sermon.preacher&&mD===sel?' · '+esc(D.sermon.preacher):''}`:'오늘 받은 은혜를 적어 보세요';
+ {let pr=ref,p=D.passages&&D.passages[pr];if(!(p&&p.verses&&p.verses.length)&&sv){const bi=sv.items.find(i=>i.bible);if(bi){pr=String(bi.bible).split(/\s*,\s*/)[0];p=D.passages&&D.passages[pr];}}
+  if(p&&p.verses&&p.verses.length){mbp.innerHTML=`<div class="bh">📖 ${esc(p.label||pr)}</div>`+p.verses.map(([v,t])=>`<div class="st"><span class="lb">${esc(v)}절</span><span class="ln b">${phHtml(biblePh(t))}</span></div>`).join('')+'<div class="copy">성경전서 개역개정판 © 대한성서공회</div>';mbp.scrollTop=0;mdbEl.classList.add('split');}
+  else{mbp.innerHTML='';mdbEl.classList.remove('split');}}
  mta.value=o.text||'';mst.textContent=o.at?'저장됨 · '+o.at.slice(5,16).replace('T',' ').replace('-','/'):'';mst.className='mst';
  if(!mOpen){mOpen=true;mdv.hidden=false;document.body.style.overflow='hidden';history.pushState({md:1},'');}
  setTimeout(()=>{mta.focus();mta.setSelectionRange(mta.value.length,mta.value.length);},60);}
@@ -444,4 +484,5 @@ fetch('weeks.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(w=>{
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});
 // 새 버전이 올라와 있으면 한 번 새로 열기 (휴대폰이 옛 화면을 붙잡고 있을 때)
 fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER='(v\d+)'/);if(m&&m[1]!==VER&&sessionStorage.getItem('jb_rl')!==m[1]){sessionStorage.setItem('jb_rl',m[1]);location.reload();}}).catch(()=>{});
-</script></body></html>
+</script><script>(function(){function fit(){var w=innerWidth,h=innerHeight,s=Math.min(w,h);var k=w<600?1:Math.max(1,Math.min(1.3,1+0.3*(s-500)/524));document.documentElement.style.setProperty('--k',k.toFixed(3));}fit();addEventListener('resize',fit);addEventListener('orientationchange',function(){setTimeout(fit,300)});})();</script>
+</body></html>
