@@ -13,7 +13,10 @@
 @font-face{font-family:'NSR';font-weight:900;font-display:swap;src:url(https://cdn.jsdelivr.net/gh/innks/NanumSquareRound@master/NanumSquareRoundEB.woff2) format('woff2')}
 :root{--fs:18px;--navy:#1E3A5F;--line:#e4e4e7;--sub:#52525b}
 *{box-sizing:border-box}
-html{font-size:var(--fs)}
+html{font-size:var(--fs);-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
+html,body,.rdb{overflow-anchor:none}
+.rd,.rdb{overscroll-behavior:contain}
+.fsz button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 body{margin:0;background:#f4f4f5;color:#18181b;font-family:"NSR","Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:640px;margin:0 auto;padding:0 0 calc(30px + env(safe-area-inset-bottom))}
 header{background:#fff;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
@@ -172,7 +175,7 @@ html{font-size:calc(var(--fs) * var(--k))}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v015';
+const VER='v016';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -180,7 +183,15 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 // 글자 크기
 let fs=+(localStorage.getItem('jb_fs')||18);
 const setFs=(v,show)=>{fs=Math.max(14,Math.min(30,v));if(show&&window.toast)toast('글자 크기 '+(fs-12));document.documentElement.style.setProperty('--fs',fs+'px');localStorage.setItem('jb_fs',fs);};
-setFs(fs);document.getElementById('fsm').onclick=()=>setFs(fs-2,1);document.getElementById('fsp').onclick=()=>setFs(fs+2,1);
+// 글자 크기를 바꿔도 화면이 움직이지 않게: 보던 줄(또는 누른 버튼)을 같은 자리에 붙잡아 둠 (v016)
+function keepView(sc,btn,fn){let a=null,top=0;
+ if(sc){top=sc.getBoundingClientRect().top;for(const e of sc.querySelectorAll('.ln,.lb,.amen,.copy,.mdi,.mta,.mst,.mhelp,.btns,p,div')){const r=e.getBoundingClientRect();if(r.height&&r.bottom>top+2){a=e;break;}}}
+ else a=btn;
+ if(!a){fn();return;}
+ const r0=a.getBoundingClientRect();fn();const r1=a.getBoundingClientRect();
+ const want=(sc&&r0.top<top)?top-(top-r0.top)*(r1.height/(r0.height||1)):r0.top;const d=r1.top-want;
+ if(Math.abs(d)>0.5){if(sc)sc.scrollTop+=d;else window.scrollBy(0,d);}}
+setFs(fs);document.getElementById('fsm').onclick=e=>keepView(null,e.currentTarget,()=>setFs(fs-2,1));document.getElementById('fsp').onclick=e=>keepView(null,e.currentTarget,()=>setFs(fs+2,1));
 // 유튜브 앱으로 열기 (누를 때 열리므로 휴대폰이 막지 않음)
 const CH='UCOp1NMZk2VqnvuLZCHTay0Q',P='/channel/'+CH,WEB='https://www.youtube.com'+P;
 const ua=navigator.userAgent,isAnd=/Android/i.test(ua),isIOS=/iPhone|iPad|iPod/i.test(ua);
@@ -255,7 +266,7 @@ let rfs=+(localStorage.getItem('jb_rfs')||23);
 const rd=document.getElementById('rd'),rdb=document.getElementById('rdb');
 let tt=null;function toast(m){let e=document.querySelector('.toast');if(!e){e=document.createElement('div');e.className='toast';document.body.appendChild(e);}e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,900);}
 const setRfs=(v,show)=>{rfs=Math.max(16,Math.min(40,v));rd.style.setProperty('--rfs',rfs+'px');localStorage.setItem('jb_rfs',rfs);if(show)toast('글자 크기 '+(rfs-14));};setRfs(rfs);
-document.getElementById('rfm').onclick=()=>setRfs(rfs-2,1);document.getElementById('rfp').onclick=()=>setRfs(rfs+2,1);
+document.getElementById('rfm').onclick=()=>keepView(rdb,null,()=>setRfs(rfs-2,1));document.getElementById('rfp').onclick=()=>keepView(rdb,null,()=>setRfs(rfs+2,1));
 const nums=s=>String(s||'').match(/\d+/g)?.map(Number)||[];
 function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
  if(r.k==='h'){const hi=hInfo(r.n);title=`찬송 ${r.n}장 · ${hi.title}`;const sing=nums(r.verses);sub=`${r.t}${r.verses?` · ${r.verses}만 부릅니다`:''}`;
@@ -283,7 +294,7 @@ window.addEventListener('popstate',()=>{if(mOpen){closeM();return;}closeR();});
 let mOpen=false,mD='',mS='',mT=null;let mfs=+(localStorage.getItem('jb_mfs')||20);
 const mdv=document.getElementById('md'),mta=document.getElementById('mta'),mst=document.getElementById('mst');
 const setMfs=(v,show)=>{mfs=Math.max(16,Math.min(34,v));mdv.style.setProperty('--rfs',mfs+'px');localStorage.setItem('jb_mfs',mfs);if(show)toast('글자 크기 '+(mfs-12));};setMfs(mfs);
-document.getElementById('mfm').onclick=()=>setMfs(mfs-2,1);document.getElementById('mfp').onclick=()=>setMfs(mfs+2,1);
+document.getElementById('mfm').onclick=()=>keepView(mdv.querySelector('.mdb'),null,()=>setMfs(mfs-2,1));document.getElementById('mfp').onclick=()=>keepView(mdv.querySelector('.mdb'),null,()=>setMfs(mfs+2,1));
 function openM(d,s){mD=d||sel;mS=s||(cur==='memo'||cur==='news'?(D.services.find(x=>x.items.some(i=>i.sermon))||D.services[0]).id:cur);
  const o=mGet(mD,mS)||{};const sv=(mD===sel&&D.services.find(x=>x.id===mS))||null;
  const title=o.title||(sv&&D.sermon&&sv.items.some(i=>i.sermon)?D.sermon.title:'')||'';const ref=o.ref||(sv&&D.sermon?D.sermon.ref:'')||'';
