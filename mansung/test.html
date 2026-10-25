@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>만성교회</title><meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="manifest.webmanifest?v=5"><link rel="icon" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="만성교회">
+<style>
+:root{--fs:18px;--navy:#1E3A5F;--line:#e4e4e7;--sub:#52525b}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:#f4f4f5;color:#18181b;font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:640px;margin:0 auto;padding:0 0 calc(30px + env(safe-area-inset-bottom))}
+header{background:#fff;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:12px}
+.hrow img{width:52px;height:52px;border-radius:50%;object-fit:cover}
+h1{font-size:1.35rem;margin:0}
+.when{color:var(--sub);font-size:.9rem;margin-top:2px}
+.tools{display:flex;gap:8px;margin-top:12px}
+.yt{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:60px;border-radius:14px;background:#E00000;border:0;color:#fff;font-weight:800;font-size:1.05rem;text-decoration:none}
+.fsb{min-width:54px;min-height:54px;border-radius:14px;border:1px solid #a1a1aa;background:#fff;font-size:1rem;font-weight:700;color:#18181b}
+.datebar{background:#fff;padding:12px 12px 12px;border-bottom:1px solid var(--line)}
+.dmain{display:flex;align-items:center;gap:8px}
+.dmain button.ar{flex:0 0 58px;min-height:58px;border-radius:14px;border:1px solid #cbd5e1;background:#f8fafc;font-size:1.4rem;font-weight:800;color:var(--navy)}
+.dmain button.ar:disabled{opacity:.3}
+.dnow{flex:1;text-align:center;border-radius:14px;background:#EEF3F9;padding:8px 6px;min-height:58px;display:flex;flex-direction:column;justify-content:center}
+.dnow .dd{font-size:1.3rem;font-weight:900;color:var(--navy)}
+.dnow .rel{font-size:.8rem;font-weight:800;color:#fff;background:var(--navy);border-radius:999px;padding:2px 10px;align-self:center;margin-top:3px}
+.dnow .rel.past{background:#71717a}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-width:76px;min-height:58px;border-radius:14px;border:1px solid #d4d4d8;background:#fff;font-family:inherit;color:#18181b;padding:4px 10px;line-height:1.25}
+.chip b{display:block;font-size:1.05rem}
+.chip span{font-size:.72rem;color:#71717a;font-weight:700}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.on span{color:#dbeafe}
+.chip.wait{border-style:dashed;color:#a1a1aa}
+.dmsg{margin-top:8px;font-size:.85rem;color:#b45309;font-weight:700;text-align:center}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 auto;min-height:54px;padding:0 14px;border:0;background:none;font-size:.95rem;font-weight:700;color:#71717a;border-bottom:4px solid transparent;font-family:inherit}
+nav button.on{color:var(--navy);border-bottom-color:var(--navy)}
+main{padding:14px 12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.svc h2{font-size:1.2rem;margin:0 0 4px}
+.svc .meta{color:var(--sub);font-size:.88rem}
+.word{border-left:6px solid var(--navy)}
+.word .lbl{font-size:.8rem;font-weight:800;color:var(--navy);letter-spacing:.02em}
+.word .st{font-size:1.15rem;font-weight:800;margin:6px 0 4px;line-height:1.45}
+.word .ser{color:var(--sub);font-size:.88rem}
+.item{display:flex;gap:10px;padding:13px 2px;border-top:1px solid #f0f0f2;align-items:flex-start}
+.item:first-child{border-top:0}
+.item .n{flex:0 0 6.2em;font-weight:700;color:#3f3f46;font-size:.95rem;padding-top:1px}
+.item .n .stand{display:block;font-size:.7rem;font-weight:700;color:#b45309;margin-top:2px}
+.item .c{flex:1;min-width:0}
+.item .what{font-size:1rem;font-weight:700;line-height:1.45}
+.item .who{color:var(--sub);font-size:.85rem;margin-top:2px}
+.item .note{color:#1d4ed8;font-size:.82rem;margin-top:3px}
+.sec{text-align:center;color:var(--navy);font-weight:800;padding:10px 0 4px;font-size:.95rem}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.btns a,.btns button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:var(--navy);font-weight:700;font-size:.9rem;text-decoration:none;font-family:inherit}
+.bible{background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:12px 14px;margin-top:8px}
+.bible .bt{font-weight:800;color:#92400e;font-size:.92rem;margin-bottom:6px}
+.bible p{margin:0 0 8px;font-size:1.08rem;line-height:1.8}
+.bible sup{font-size:.75rem;font-weight:800;color:#b45309;margin-right:4px;vertical-align:baseline}
+.copy{font-size:.72rem;color:#71717a;margin-top:4px}
+.creed{background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:12px 14px;margin-top:8px;font-size:1.05rem;line-height:1.8}
+.news h3{font-size:1.02rem;margin:0 0 6px;color:var(--navy)}
+.news p{margin:0;white-space:pre-line;line-height:1.7;font-size:.98rem}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+td{padding:9px 4px;border-top:1px solid #f0f0f2;vertical-align:top}
+td:first-child{font-weight:700}
+/* 크게 보기(찬송 가사·성경) */
+.ph{display:inline-block;max-width:100%;margin-right:.32em}
+.bible{cursor:pointer}
+.bible .more{display:block;text-align:center;margin-top:8px;font-weight:800;color:#92400e;font-size:.9rem}
+.rd{position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column;--rfs:23px}
+.rdh{display:flex;align-items:center;gap:8px;padding:10px 12px calc(10px);padding-top:calc(10px + env(safe-area-inset-top));border-bottom:1px solid var(--line);background:#fff}
+.rdh .x{min-width:84px;min-height:54px;border-radius:14px;border:0;background:#1E3A5F;color:#fff;font-size:17px;font-weight:800;font-family:inherit}
+.rdt{flex:1;min-width:0;font-weight:900;font-size:18px;line-height:1.3;color:#18181b}
+.rdt small{display:block;font-size:13px;font-weight:700;color:#b45309;margin-top:2px}
+.rdh .fsb{min-width:50px;min-height:54px}
+.rdb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 24px;font-size:var(--rfs);line-height:1.75}
+.st{border-radius:16px;padding:14px 16px;margin-bottom:12px;background:#fafafa;border:1px solid #ececef}
+.st .lb{display:inline-block;font-size:.62em;font-weight:900;color:#fff;background:#1E3A5F;border-radius:999px;padding:2px 12px;margin-bottom:6px}
+.st.sing{background:#FFFBEB;border:2px solid #F59E0B}
+.st.sing .lb{background:#B45309}
+.st.dim{opacity:.5}
+.st .ln{display:block;margin:2px 0 6px}
+.st.ref{background:#EEF3F9;border-color:#C9D7EA}
+.st.ref .lb{background:#4B6A91}
+.amen{text-align:center;font-weight:900;color:#1E3A5F;margin:6px 0 10px}
+.vs{display:flex;gap:10px;padding:10px 2px;border-bottom:1px solid #f1f1f3}
+.vs .vn{flex:0 0 auto;min-width:1.7em;font-size:.7em;font-weight:900;color:#B45309;padding-top:.35em;text-align:right}
+.vs .vt{flex:1;min-width:0}
+.rdf{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.rdf button{flex:1;min-height:58px;border-radius:14px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:800;font-family:inherit}
+.rdf button:disabled{opacity:.35}
+.rdf .nx{background:#1E3A5F;color:#fff;border:0}
+.foot{color:#71717a;font-size:.75rem;text-align:center;margin:14px 10px}
+.empty{padding:40px 20px;text-align:center;color:var(--sub)}
+[hidden]{display:none!important}
+</style></head>
+<body><div class="wrap">
+<header>
+ <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
+ <div class="tools"><a class="yt" href="#" id="yt">▶ 유튜브 예배 보기</a><button class="fsb" id="fsm" aria-label="글자 작게">가−</button><button class="fsb" id="fsp" aria-label="글자 크게">가+</button></div>
+</header>
+<div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div></div>
+<nav id="tabs"></nav>
+<main id="main"><div class="empty">주보를 불러오는 중이에요…</div></main>
+<div class="foot" id="foot"></div>
+</div>
+<div class="rd" id="rd" hidden>
+ <div class="rdh"><button class="x" id="rdx">✕ 닫기</button><div class="rdt" id="rdt"></div><button class="fsb" id="rfm" aria-label="글자 작게">가−</button><button class="fsb" id="rfp" aria-label="글자 크게">가+</button></div>
+ <div class="rdb" id="rdb"></div>
+ <div class="rdf"><button id="rprev">◀ 이전 순서</button><button class="nx" id="rnext">다음 순서 ▶</button></div>
+</div>
+<script>
+const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
+const VER='v008';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// 글자 크기
+let fs=+(localStorage.getItem('jb_fs')||18);
+const setFs=v=>{fs=Math.max(15,Math.min(28,v));document.documentElement.style.setProperty('--fs',fs+'px');localStorage.setItem('jb_fs',fs);};
+setFs(fs);document.getElementById('fsm').onclick=()=>setFs(fs-2);document.getElementById('fsp').onclick=()=>setFs(fs+2);
+// 유튜브 앱으로 열기 (누를 때 열리므로 휴대폰이 막지 않음)
+const CH='UCOp1NMZk2VqnvuLZCHTay0Q',P='/channel/'+CH,WEB='https://www.youtube.com'+P;
+const ua=navigator.userAgent,isAnd=/Android/i.test(ua),isIOS=/iPhone|iPad|iPod/i.test(ua);
+document.getElementById('yt').onclick=e=>{e.preventDefault();
+ if(isAnd)location.href='intent://www.youtube.com'+P+'#Intent;scheme=https;package=com.google.android.youtube;S.browser_fallback_url='+encodeURIComponent(WEB)+';end';
+ else if(isIOS){const t=Date.now();location.href='youtube://www.youtube.com'+P;setTimeout(()=>{if(!document.hidden&&Date.now()-t<2500)location.href=WEB;},1500);}
+ else window.open(WEB,'_blank');};
+let D=null,cur=localStorage.getItem('jb_tab')||'';
+// ===== 줄바꿈: 뜻이 끊기지 않는 마디로 묶기 =====
+const syl=w=>w.replace(/[^가-힣A-Za-z0-9]/g,'').length;
+// 찬송: 한 줄을 같은 길이(7~8글자)의 악구 단위로 나눔
+function hymnPh(line){const w=line.split(/\s+/).filter(Boolean);const cum=[];let s=0;w.forEach(x=>{s+=syl(x);cum.push(s);});
+ const n=Math.max(1,Math.round(s/7.5));const cuts=[];let last=-1;for(let k=1;k<n;k++){const tg=s*k/n;let bi=-1,bd=1e9;for(let i=last+1;i<w.length-1;i++){const d=Math.abs(cum[i]-tg);if(d<bd){bd=d;bi=i;}}if(bi>=0){cuts.push(bi);last=bi;}}
+ const out=[];let cur=[];w.forEach((x,i)=>{cur.push(x);if(cuts.includes(i)){out.push(cur.join(' '));cur=[];}});if(cur.length)out.push(cur.join(' '));return out;}
+// 성경: 말이 이어지는 고비(…되, …니, …매, …며 등)에서 나눔
+function biblePh(t){const w=t.split(/\s+/).filter(Boolean);const out=[];let cur=[],a=0;
+ w.forEach((x,i)=>{cur.push(x);a+=syl(x);const rest=w.slice(i+1).reduce((p,y)=>p+syl(y),0);
+  if(rest>=4&&((a>=8&&/(되|니|매|며|고|여|서|나|데|면|라|다|요|거늘|도다|[,.:;?!”'」])$/.test(x))||a>=15)){out.push(cur.join(' '));cur=[];a=0;}});
+ if(cur.length)out.push(cur.join(' '));return out;}
+const phHtml=arr=>arr.map(p=>`<span class="ph">${esc(p)}</span>`).join(' ');
+const hInfo=n=>{const h=(D.hymns||{})[n];return typeof h==='string'?{title:h,stanzas:[]}:(h||{title:'',stanzas:[]});};
+// 지금 화면(예배)에서 크게 볼 수 있는 순서 목록
+let R=[];
+function hymnBtns(n,ri){const has=hInfo(n).stanzas.length;return `<div class="btns">${has?`<button onclick="openR(${ri})">🎵 가사 크게 보기</button>`:`<a href="https://www.hbible.co.kr/hb/hymn/view/${n}" target="_blank" rel="noopener">🎵 가사 보기</a>`}<a href="https://www.youtube.com/results?search_query=${encodeURIComponent('새찬송가 '+n+'장')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
+function songBtns(t){const q=t.replace(/\(.*?\)/g,'').trim();return `<div class="btns"><a href="https://www.google.com/search?q=${encodeURIComponent(q+' 가사')}" target="_blank" rel="noopener">🎵 가사 찾기</a><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' 찬양')}" target="_blank" rel="noopener">▶ 듣기</a></div>`;}
+function bibleBox(ref,page,ri){const p=D.passages&&D.passages[ref];if(!p||!p.verses||!p.verses.length)return `<div class="bible"><div class="bt">${esc(ref)}</div><p>본문을 불러오지 못했어요.</p></div>`;
+ return `<div class="bible" onclick="if(!event.target.closest('a'))openR(${ri})"><div class="bt">📖 ${esc(p.label)}${page?` · ${esc(page)}`:''}</div>${p.verses.map(([v,t])=>`<p><sup>${esc(v)}</sup>${phHtml(biblePh(t))}</p>`).join('')}<span class="more">눌러서 크게 보기 ›</span><div class="copy">성경전서 개역개정판 © 대한성서공회 · <a href="${esc(p.link)}" target="_blank" rel="noopener">성서공회에서 앞뒤 보기</a></div></div>`;}
+function itemHtml(it){
+ if(it.section)return `<div class="sec">— ${esc(it.t)} —</div>`;
+ let what='',extra='';
+ if(it.hymn){const ri=R.push({k:'h',n:it.hymn,verses:it.verses,t:it.t})-1;what=`찬송 ${esc(it.hymn)}장 · ${esc(hInfo(it.hymn).title)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=hymnBtns(it.hymn,ri);}
+ else if(it.song){what=`${esc(it.song)}${it.verses?` <span style="font-weight:600;color:#52525b">(${esc(it.verses)})</span>`:''}`;extra=songBtns(it.song);}
+ else if(it.bible){const rs=String(it.bible).split(/\s*,\s*/).filter(Boolean);what=esc(rs.map(r=>r.replace(/(\D)(\d)/,'$1 $2')).join(', '));extra=rs.map((r,i)=>{const ri=R.push({k:'b',ref:r,page:i===0?it.page:'',t:it.t})-1;return bibleBox(r,i===0?it.page:'',ri);}).join('');}
+ else if(it.creed){what='사도신경';extra=`<div class="btns"><button onclick="this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden">✝ 사도신경 펼치기</button></div><div class="creed" hidden>${CREED}</div>`;}
+ else if(it.sermon&&D.sermon){what=`「${esc(D.sermon.title)}」`;extra=`<div class="who">${esc(D.sermon.series||'')}</div>`;}
+ else if(it.msg){what=esc(it.msg);}
+ else if(it.info){what=`<span style="font-weight:500;font-size:.92rem">${esc(it.info)}</span>`;}
+ return `<div class="item"><div class="n">${esc(it.t)}${it.stand?'<span class="stand">일어서서</span>':''}</div><div class="c">${what?`<div class="what">${what}</div>`:''}${it.who?`<div class="who">${esc(it.who)}</div>`:''}${it.note?`<div class="note">${esc(it.note)}</div>`:''}${extra}</div></div>`;}
+function render(){
+ const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식']];
+ if(!tabs.some(t=>t[0]===cur)){const dow=new Date().getDay();cur=(dow>=1&&dow<=3&&D.services.some(s=>s.id==='wed'))?'wed':D.services[0].id;}
+ document.getElementById('tabs').innerHTML=tabs.map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}">${esc(n)}</button>`).join('');
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();scrollTo(0,0);});
+ const m=document.getElementById('main');
+ if(cur==='news'){
+  m.innerHTML=D.news.map(n=>`<div class="card news"><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></div>`).join('')+
+   (D.times?`<div class="card"><h3 style="margin:0 0 6px;font-size:1.02rem;color:var(--navy)">예배 시간 및 장소</h3><table>${D.times.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table></div>`:'');
+  return;}
+ const s=D.services.find(x=>x.id===cur);R=[];
+ let h=`<div class="card svc"><h2>${esc(s.name)}</h2><div class="meta">${esc(s.time)}${s.place?' · '+esc(s.place):''}${s.leader?' · 인도 '+esc(s.leader):''}</div></div>`;
+ if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">${ymd(new Date())===sel?'오늘의 말씀':md(sel)+' 말씀'}</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
+ h+=`<div class="card">${s.items.map(itemHtml).join('')}</div>`;
+ m.innerHTML=h;}
+function show(d){D=d;document.getElementById('when').textContent=d.title;dateBar();
+ document.getElementById('foot').innerHTML=`${esc(d.issue||'')} · ${esc(d.source||'')}<br>${VER} · 갱신 ${esc((d.builtAt||'').slice(0,16).replace('T',' '))}`;render();}
+// ===== 크게 보기 화면 =====
+let ri0=-1,rOpen=false;
+let rfs=+(localStorage.getItem('jb_rfs')||23);
+const rd=document.getElementById('rd'),rdb=document.getElementById('rdb');
+const setRfs=v=>{rfs=Math.max(17,Math.min(36,v));rd.style.setProperty('--rfs',rfs+'px');localStorage.setItem('jb_rfs',rfs);};setRfs(rfs);
+document.getElementById('rfm').onclick=()=>setRfs(rfs-2);document.getElementById('rfp').onclick=()=>setRfs(rfs+2);
+const nums=s=>String(s||'').match(/\d+/g)?.map(Number)||[];
+function renderR(){const r=R[ri0];if(!r)return;let title='',sub='',h='';
+ if(r.k==='h'){const hi=hInfo(r.n);title=`찬송 ${r.n}장 · ${hi.title}`;const sing=nums(r.verses);sub=`${r.t}${r.verses?` · ${r.verses}만 부릅니다`:''}`;
+  const ref=hi.stanzas.find(x=>x.type==='refrain');const verses=hi.stanzas.filter(x=>x.type==='verse');
+  const lines=st=>st.lines.map(l=>`<span class="ln">${phHtml(hymnPh(l))}</span>`).join('');
+  verses.forEach((v,i)=>{const no=nums(v.label)[0]||i+1;const on=sing.includes(no);const cls=sing.length?(on?' sing':' dim'):'';
+   h+=`<div class="st${cls}" data-no="${no}">${v.label?`<span class="lb">${esc(v.label)}${on?' · 오늘 부르는 절':''}</span>`:''}${lines(v)}</div>`;
+   if(ref&&(!sing.length||on))h+=`<div class="st ref"><span class="lb">후렴</span>${lines(ref)}</div>`;});
+  if(hi.stanzas.some(x=>x.type==='amen'))h+='<div class="amen">아멘</div>';
+  h+=`<div class="copy">가사 출처: 새찬송가 (하나성경) · <a href="https://www.hbible.co.kr/hb/hymn/view/${r.n}" target="_blank" rel="noopener">원문 보기</a></div>`;}
+ else{const p=D.passages[r.ref]||{};title=`📖 ${p.label||r.ref}`;sub=`${r.t}${r.page?' · '+r.page:''}`;
+  h=(p.verses||[]).map(([v,t])=>`<div class="vs"><div class="vn">${esc(v)}</div><div class="vt">${phHtml(biblePh(t))}</div></div>`).join('')+`<div class="copy" style="margin-top:10px">성경전서 개역개정판 © 대한성서공회</div>`;}
+ document.getElementById('rdt').innerHTML=`${esc(title)}<small>${esc(sub)}</small>`;rdb.innerHTML=h;rdb.scrollTop=0;
+ const first=rdb.querySelector('.st.sing');if(first)setTimeout(()=>rdb.scrollTop=first.offsetTop-rdb.offsetTop-8,30);
+ document.getElementById('rprev').disabled=ri0<=0;const nx=document.getElementById('rnext');nx.disabled=ri0>=R.length-1;
+ nx.textContent=ri0>=R.length-1?'마지막 순서':`다음: ${R[ri0+1].t} ▶`;}
+function openR(i){ri0=i;renderR();if(!rOpen){rOpen=true;rd.hidden=false;document.body.style.overflow='hidden';history.pushState({rd:1},'');}}
+function closeR(){if(!rOpen)return;rOpen=false;rd.hidden=true;document.body.style.overflow='';}
+document.getElementById('rdx').onclick=()=>{if(history.state&&history.state.rd)history.back();else closeR();};
+window.addEventListener('popstate',()=>closeR());
+document.getElementById('rprev').onclick=()=>{if(ri0>0){ri0--;renderR();}};
+document.getElementById('rnext').onclick=()=>{if(ri0<R.length-1){ri0++;renderR();}};
+// ===== 날짜(주일) 고르기 =====
+let W=[],sel='';
+const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const toD=s=>{const [y,m,dd]=s.split('-').map(Number);return new Date(y,m-1,dd);};
+const addDays=(s,n)=>{const d=toD(s);d.setDate(d.getDate()+n);return ymd(d);};
+const thisSun=(()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+((7-d.getDay())%7));return ymd(d);})();
+function rel(s){const w=Math.round((toD(s)-toD(thisSun))/864e5/7);const today=ymd(new Date())===s;
+ if(w===0)return today?'오늘':'이번 주';if(w===-1)return '지난주';if(w===1)return '다음 주';return w<0?`${-w}주 전`:`${w}주 뒤`;}
+const md=s=>{const d=toD(s);return `${d.getMonth()+1}월 ${d.getDate()}일`;};
+const mdShort=s=>{const d=toD(s);return `${d.getMonth()+1}/${d.getDate()}`;};
+function dateBar(){
+ const have=W.map(w=>w.date);const last=have.length?have[have.length-1]:sel;
+ // 칩: 있는 주들 + 아직 안 올라온 이번 주(준비 중)
+ const list=[...have];if(thisSun>last)list.push(thisSun);
+ document.getElementById('dd').textContent=`${md(sel)} 주일`;
+ const r=document.getElementById('drel');r.textContent=rel(sel);r.hidden=false;r.className='rel'+(sel<thisSun?' past':'');
+ const i=have.indexOf(sel);document.getElementById('dprev').disabled=i<=0;document.getElementById('dnext').disabled=i<0||i>=have.length-1;
+ document.getElementById('chips').innerHTML=list.map(s=>{const ok=have.includes(s);return `<button class="chip${s===sel?' on':''}${ok?'':' wait'}" data-d="${s}"><b>${mdShort(s)}</b><span>${ok?rel(s):'토요일에 올라와요'}</span></button>`;}).join('');
+ document.querySelectorAll('#chips .chip').forEach(b=>b.onclick=()=>{if(have.includes(b.dataset.d))pick(b.dataset.d);else{const m=document.getElementById('dmsg');m.textContent=`${md(b.dataset.d)} 주보는 보통 토요일에 방송실에 올라오면 자동으로 들어와요.`;m.hidden=false;}});
+ const on=document.querySelector('#chips .chip.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
+ const m=document.getElementById('dmsg');if(sel<thisSun&&!have.includes(thisSun)&&sel===last){m.textContent=`${md(thisSun)} 주보는 아직 안 올라왔어요. 지난 주보를 보여 드려요.`;m.hidden=false;}else m.hidden=true;}
+function loadWeek(s){return fetch(`w-${s}.json?t=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();});}
+function pick(s){sel=s;const c=localStorage.getItem('jb_w_'+s);if(c){try{show(JSON.parse(c));}catch(e){}}
+ loadWeek(s).then(d=>{localStorage.setItem('jb_w_'+s,JSON.stringify(d));if(sel===s)show(d);}).catch(()=>{if(!c)document.getElementById('main').innerHTML='<div class="empty">인터넷 연결을 확인해 주세요.</div>';});scrollTo(0,0);}
+document.getElementById('dprev').onclick=()=>{const i=W.findIndex(w=>w.date===sel);if(i>0)pick(W[i-1].date);};
+document.getElementById('dnext').onclick=()=>{const i=W.findIndex(w=>w.date===sel);if(i>=0&&i<W.length-1)pick(W[i+1].date);};
+function start(weeks){W=weeks||[];const have=W.map(w=>w.date);
+ // 기본: 이번 주일이 있으면 그것, 없으면 가장 최근 주
+ const def=have.includes(thisSun)?thisSun:(have.filter(s=>s<=thisSun).pop()||have[have.length-1]);if(def)pick(def);}
+const cw=localStorage.getItem('jb_weeks');if(cw){try{start(JSON.parse(cw));}catch(e){}}
+fetch('weeks.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(w=>{localStorage.setItem('jb_weeks',JSON.stringify(w));const same=cw===JSON.stringify(w);if(!same||!D)start(w);})
+ .catch(()=>{if(!D)fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{W=[{date:d.date}];sel=d.date;show(d);}).catch(()=>{document.getElementById('main').innerHTML='<div class="empty">인터넷 연결을 확인해 주세요.</div>';});});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
