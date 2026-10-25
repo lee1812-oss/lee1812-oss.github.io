@@ -353,7 +353,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v022';
+const VER='v023';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -690,7 +690,7 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-let yPend=-1,yp=null,ysv=null,yIdx=0,yAuto=-1,yTimer=null,yList=[],yLive=false;window.yOpen=false;
+let yHold=0,yPend=-1,yp=null,ysv=null,yIdx=0,yAuto=-1,yTimer=null,yList=[],yLive=false;window.yOpen=false;
 let yfs=+(localStorage.getItem('jb_yfs')||22);const setYfs=v=>{yfs=Math.max(16,Math.min(36,v));$('yv').style.setProperty('--yfs',yfs+'px');localStorage.setItem('jb_yfs',yfs);};setYfs(yfs);
 $('yfm').onclick=()=>{setYfs(yfs-2);toast('자막 글자 '+(yfs-14));};$('yfp').onclick=()=>{setYfs(yfs+2);toast('자막 글자 '+(yfs-14));};
 const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
@@ -720,10 +720,10 @@ function drawNow(){const [it]=yList[yIdx]||[];if(!it)return;const nm=itemName(it
  $('ypv').disabled=yIdx<=0;$('ynx').disabled=yIdx>=yList.length-1;drawChips();}
 function go(k,seek){yIdx=Math.max(0,Math.min(yList.length-1,k));drawNow();
  if(seek&&!yLive&&!(yp&&yp.seekTo)){yPend=yIdx;return;}
- if(seek&&yp&&yp.seekTo&&!yLive){const t=marks()[yList[yIdx][1]];if(t!=null){yp.seekTo(t,true);yAuto=yIdx;}}}
+ if(seek&&yp&&yp.seekTo&&!yLive){const t=marks()[yList[yIdx][1]];if(t!=null){yp.seekTo(t,true);yAuto=yIdx;yHold=Date.now()+3500;}}}
 $('ypv').onclick=()=>go(yIdx-1,1);$('ynx').onclick=()=>go(yIdx+1,1);
 $('yfx').onclick=()=>{if(!yp||!yp.getCurrentTime){toast('영상이 나온 뒤에 눌러 주세요');return;}const t=Math.round(yp.getCurrentTime());let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}l[yList[yIdx][1]]=t;localStorage.setItem(lKey(),JSON.stringify(l));yAuto=yIdx;drawChips();toast(`「${yList[yIdx][0].t}」 → ${fmt(t)}로 맞췄어요`);};
-function tick(){if(!yp||!yp.getCurrentTime||yLive)return;let t=0;try{t=yp.getCurrentTime()||0;}catch(e){return;}const mk=marks();let best=-1,bt=-1;yList.forEach(([it,i],k)=>{const m=mk[i];if(m!=null&&m<=t+1.5&&m>=bt){bt=m;best=k;}});
+function tick(){if(!yp||!yp.getCurrentTime||yLive||Date.now()<yHold)return;let t=0;try{t=yp.getCurrentTime()||0;}catch(e){return;}const mk=marks();let best=-1,bt=-1;yList.forEach(([it,i],k)=>{const m=mk[i];if(m!=null&&m<=t+1.5&&m>=bt){bt=m;best=k;}});
  if(best>=0&&best!==yAuto){yAuto=best;if(best!==yIdx){yIdx=best;drawNow();}}}
 function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${msg}<button onclick="ytApp()">▶ 유튜브 앱으로 보기</button></div>`);}
 async function openY(){
