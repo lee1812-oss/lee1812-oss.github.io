@@ -125,7 +125,7 @@ td:first-child{font-weight:700}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v010';
+const VER='v011';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -253,5 +253,7 @@ function start(weeks){W=weeks||[];const have=W.map(w=>w.date);
 const cw=localStorage.getItem('jb_weeks');if(cw){try{start(JSON.parse(cw));}catch(e){}}
 fetch('weeks.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(w=>{localStorage.setItem('jb_weeks',JSON.stringify(w));const same=cw===JSON.stringify(w);if(!same||!D)start(w);})
  .catch(()=>{if(!D)fetch('data.json?t='+Date.now()).then(r=>r.json()).then(d=>{W=[{date:d.date}];sel=d.date;show(d);}).catch(()=>{document.getElementById('main').innerHTML='<div class="empty">인터넷 연결을 확인해 주세요.</div>';});});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});
+// 새 버전이 올라와 있으면 한 번 새로 열기 (휴대폰이 옛 화면을 붙잡고 있을 때)
+fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER='(v\d+)'/);if(m&&m[1]!==VER&&sessionStorage.getItem('jb_rl')!==m[1]){sessionStorage.setItem('jb_rl',m[1]);location.reload();}}).catch(()=>{});
 </script></body></html>
