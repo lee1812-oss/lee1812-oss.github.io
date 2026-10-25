@@ -295,7 +295,7 @@ body.ss-on #foot{display:none}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v033';
+const VER='v034';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -605,6 +605,11 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
 .ybig{font-size:calc(var(--yfs) * 1.25);font-weight:900;color:var(--navy2);text-align:center;padding:14px 8px;line-height:1.5;word-break:keep-all}
 .ybig small{display:block;font-size:.6em;color:#57534e;font-weight:800;margin-top:8px}
 .ymemo{min-height:56px;font-size:17px;font-weight:900;border-radius:16px;padding:0 20px;border:0;background:var(--gold);color:#fff;font-family:inherit}
+.yvo{display:flex;gap:6px;padding:6px 10px 0;background:#fff;flex:none}
+.yvo[hidden]{display:none}
+.yvo button{flex:1;min-height:48px;border-radius:14px;border:1px solid #d6d3d1;background:#fafaf9;color:#44403c;font-size:15px;font-weight:800;font-family:inherit;line-height:1.15;padding:4px 6px}
+.yvo button small{display:block;font-size:12px;font-weight:700;color:#78716c;margin-top:2px}
+.yvo .oz{flex:.8}
 .yvn{display:flex;gap:6px;padding:5px 8px calc(5px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -2px 10px rgba(28,25,23,.06);flex:none}
 .yvn button{flex:1;min-height:48px;border-radius:16px;border:1px solid #cbd5e1;background:#f8fafc;color:#1E3A5F;font-size:16px;font-weight:900;font-family:inherit}
 .yvn button:disabled{opacity:.35}
@@ -636,7 +641,7 @@ fetch('./?vchk='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const
   <div class="yvv"><div class="yvr" id="yvr"><div id="yvp"></div></div></div>
   <div class="ygut" id="ygut" role="separator" tabindex="0" aria-label="영상과 자막 크기 조절" title="끌어서 영상·자막 크기 조절 · 두 번 누르면 처음 크기로"><span></span></div>
   <div class="yvs"><div class="ychips" id="ychips"></div><div class="ynow" id="ynow"></div><div class="ynote" id="ynote"></div><div class="yvc" id="yvc"></div>
-   <div class="yvn"><button id="ypv">이전</button><button class="fx" id="yfx">지금 이 순서</button><button class="nx" id="ynx">다음</button></div></div>
+   <div class="yvo" id="yvo"><button id="yom">자막 더 일찍<small>10초 앞당기기</small></button><button class="oz" id="yoz">자막 시각<small id="yov">그대로</small></button><button id="yop">자막 더 늦게<small>10초 미루기</small></button></div><div class="yvn"><button id="ypv">이전</button><button class="fx" id="yfx">지금 이 순서</button><button class="nx" id="ynx">다음</button></div></div>
  </div>
 </div>
 <script>
@@ -647,7 +652,9 @@ let yfs=+(localStorage.getItem('jb_yfs')||22);const setYfs=v=>{yfs=Math.max(16,M
 $('yfm').onclick=()=>{setYfs(yfs-2);toast('자막 글자 '+(yfs-14));};$('yfp').onclick=()=>{setYfs(yfs+2);toast('자막 글자 '+(yfs-14));};
 const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x;};
 const lKey=()=>'jb_ytm_'+sel+'_'+ysv.id;
-function marks(){const o={};((ysv.yt&&ysv.yt.marks)||[]).forEach(([t,i])=>o[i]=t);let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}if(!yLive)Object.assign(o,l);return o;}
+const oKey=()=>'jb_yto_'+((ysv.yt&&ysv.yt.id)||'');const yOff=()=>+localStorage.getItem(oKey())||0;
+function offShow(){const o=yOff();$('yov').textContent=o?(o>0?o+'초 늦춤':(-o)+'초 앞당김'):'그대로';}
+function marks(){const o={},of=yOff();((ysv.yt&&ysv.yt.marks)||[]).forEach(([t,i])=>o[i]=Math.max(0,t+of));let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}if(!yLive)Object.assign(o,l);return o;}
 window.ytChoose=()=>{$('ysh').hidden=false;};
 $('ysX').onclick=()=>{$('ysh').hidden=true;};$('ysh').onclick=e=>{if(e.target.id==='ysh')$('ysh').hidden=true;};
 $('ysB').onclick=()=>{$('ysh').hidden=true;ytApp();};
@@ -661,6 +668,7 @@ function itemCont(it){
  if(it.bible)return String(it.bible).split(/\s*,\s*/).filter(Boolean).map((r,i)=>rCont({k:'b',ref:r,page:i===0?it.page:'',t:it.t}).h).join('');
  if(it.creed)return rCont({k:'c',t:it.t,stand:it.stand}).h;
  if(it.sermon&&D.sermon){const s=D.sermon;return `<div class="ybig" style="padding-top:8px">「${esc(s.title)}」<small>${esc([s.series,s.preacher].filter(Boolean).join(' · '))}</small></div><div style="text-align:center;margin:0 0 14px"><button class="ymemo" onclick="openM()">은혜 메모 쓰기</button></div>`+(s.ref&&D.passages&&D.passages[s.ref]?rCont({k:'b',ref:s.ref,t:it.t}).h:'');}
+ if(it.pre&&!it.hymn&&!it.song)return `<div class="ybig">${esc(it.t)}<small>${esc(it.note||'예배 전에 함께 부르는 찬양이에요. 곡 이름은 아직 확인하지 못했어요.')}</small></div>`;
  const nm=itemName(it)||it.t;
  return `<div class="ybig">${esc(nm)}${it.who?`<small>${esc(it.who)}</small>`:''}${it.stand?'<small>일어서서</small>':''}</div>`;}
 window.yItemCont=itemCont;window.yItemName=itemName;
@@ -674,6 +682,8 @@ function drawNow(){const [it]=yList[yIdx]||[];if(!it)return;const nm=itemName(it
 function go(k,seek){yIdx=Math.max(0,Math.min(yList.length-1,k));drawNow();
  if(seek&&!yLive&&!yReady){yPend=yIdx;return;}
  if(seek&&yReady&&!yLive){const t=marks()[yList[yIdx][1]];if(t!=null){yWant=t;yp.seekTo(t,true);try{yp.playVideo();}catch(e){}yAuto=yIdx;yHold=Date.now()+3500;}}}
+function setOff(v){v=Math.max(-300,Math.min(300,v));if(v)localStorage.setItem(oKey(),v);else localStorage.removeItem(oKey());offShow();yAuto=-1;drawChips();tick();toast(v?`자막을 ${Math.abs(v)}초 ${v>0?'늦게':'일찍'} 바꿔요`:'자막 시각을 처음대로 돌렸어요');}
+$('yom').onclick=()=>setOff(yOff()-10);$('yop').onclick=()=>setOff(yOff()+10);$('yoz').onclick=()=>setOff(0);
 $('ypv').onclick=()=>go(yIdx-1,1);$('ynx').onclick=()=>go(yIdx+1,1);
 $('yfx').onclick=()=>{if(!yp||!yp.getCurrentTime){toast('영상이 나온 뒤에 눌러 주세요');return;}const t=Math.round(yp.getCurrentTime());let l={};try{l=JSON.parse(localStorage.getItem(lKey())||'{}');}catch(e){}l[yList[yIdx][1]]=t;localStorage.setItem(lKey(),JSON.stringify(l));yAuto=yIdx;drawChips();toast(`「${yList[yIdx][0].t}」 → ${fmt(t)}로 맞췄어요`);};
 function tick(){if(!yReady||!yp||!yp.getCurrentTime||yLive||Date.now()<yHold)return;let t=0,st=-1;try{t=yp.getCurrentTime()||0;st=yp.getPlayerState();}catch(e){return;}if(st!==1)return;if(yWant!=null){const w=yWant;yWant=null;if(Math.abs(t-w)>4){yp.seekTo(w,true);yHold=Date.now()+2500;return;}}const mk=marks();let best=-1,bt=-1;yList.forEach(([it,i],k)=>{const m=mk[i];if(m!=null&&m<=t+1.5&&m>=bt){bt=m;best=k;}});
@@ -681,12 +691,12 @@ function tick(){if(!yReady||!yp||!yp.getCurrentTime||yLive||Date.now()<yHold)ret
 function err(msg){$('yvr').insertAdjacentHTML('beforeend',`<div class="yerr">${msg}<button onclick="ytApp()">유튜브 앱으로 보기</button></div>`);}
 async function openY(){
  ysv=D.services.find(x=>x.id===cur)||D.services.find(x=>x.id==='w2')||D.services[0];
- yList=ysv.items.map((it,i)=>[it,i]);
+ yList=[...(((ysv.yt&&ysv.yt.pre)||[]).map((it,k)=>[it,-1-k])),...ysv.items.map((it,i)=>[it,i])];
  const id=ysv.yt&&ysv.yt.id;const nw=new Date(),dw=nw.getDay(),hm=nw.getHours()*60+nw.getMinutes();const onAir=!id&&sel===ymd(nw.getDay()===3?new Date(nw-3*864e5):nw)&&((dw===0&&((hm>=650&&hm<=760)||(hm>=830&&hm<=930)))||(dw===3&&hm>=1130&&hm<=1240));yLive=!id;yIdx=0;yAuto=-1;yPend=-1;yReady=false;yWant=null;
  $('yvt').innerHTML=`${esc(md(sel))} · ${esc(ysv.tab||ysv.name)}<small>${yLive?(onAir?'생중계 · 이전·다음 버튼으로 순서를 넘겨요':'최신 영상 · 이전·다음 버튼으로 순서를 넘겨요'):(ysv.yt.approx?'영상을 따라 순서가 바뀌어요 (시간은 대략)':'영상을 따라 순서가 바뀌어요')}</small>`;
  $('ynote').textContent=yLive?(onAir?'생중계 화면이에요. 순서는 이전·다음 버튼으로 넘겨 주세요.':'이 예배 영상이 아직 등록되지 않아 만성교회 최신 영상을 열었어요. 순서는 이전·다음 버튼으로 넘겨 주세요.'):'순서를 누르면 영상이 그 부분으로 가요. 어긋나면 그 순서에서 「지금 이 순서」를 눌러 맞춰 주세요.';
  if(yLive)setTimeout(()=>toast($('ynote').textContent),600);else if(!localStorage.getItem('jb_ynt')){localStorage.setItem('jb_ynt','1');setTimeout(()=>toast($('ynote').textContent),2600);}
- $('yfx').hidden=yLive;
+ $('yfx').hidden=yLive;$('yvo').hidden=yLive;if(!yLive)offShow();
  $('yvr').innerHTML='<div id="yvp"></div>';$('yv').hidden=false;document.body.style.overflow='hidden';window.yOpen=true;history.pushState({yv:1},'');drawNow();
  try{await api();}catch(e){err('영상을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.');return;}
  if(!window.yOpen)return;
