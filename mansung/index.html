@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>만성교회</title><meta name="theme-color" content="#FFFFFF">
+<title>만성교회</title><meta name="theme-color" content="#1E3A5F">
 <link rel="manifest" href="manifest.webmanifest?v=5"><link rel="icon" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="만성교회">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -152,11 +152,101 @@ html{font-size:calc(var(--fs) * var(--k))}
  .rdf button{font-size:18px;min-height:62px}
 }
 @media (min-width:1100px){:root{--k:1.22}}
+
+/* ===== v017 디자인: 남색·금색 주보 스타일 ===== */
+:root{--navy:#1E3A5F;--navy2:#0E2340;--gold:#B8893B;--gold2:#F4EAD3;--cream:#F6F3ED;--ink:#1c1917;--sub:#57534e;--line:#ebe5da}
+body{background:var(--cream);color:var(--ink)}
+header{position:relative;background:linear-gradient(160deg,#27507F 0%,var(--navy) 45%,var(--navy2) 100%);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 18px 46px;border:0;overflow:hidden}
+header::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(244,234,211,.18),rgba(244,234,211,0) 70%);pointer-events:none}
+header .hrow{position:relative;z-index:1}
+.hrow img{width:56px;height:56px;border:3px solid rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.25);background:#fff}
+.kick{font-size:.72rem;font-weight:800;color:#E9D3A6;letter-spacing:.04em}
+h1{font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1.25}
+header .when{color:#D6E0EE;font-weight:700}
+header .tools{position:relative;z-index:1;margin-top:16px}
+.yt{background:#fff;color:var(--ink);border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.22);font-weight:900}
+.yt .yi{display:inline-flex;align-items:center;justify-content:center;width:34px;height:24px;border-radius:7px;background:#E00000;color:#fff;font-size:.8rem}
+header .fsz{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:16px}
+header .fsz button{background:transparent;color:#fff}
+header .fsz button:active{background:rgba(255,255,255,.2)}
+header .fsz span{color:#E9D3A6}
+.datebar{position:relative;z-index:2;margin:-30px 12px 0;border:0;border-radius:22px;background:#fff;box-shadow:0 10px 28px rgba(30,58,95,.14);padding:12px}
+.dmain button.ar{background:#fff;border:1.5px solid #E2D6BE;color:var(--navy);border-radius:16px}
+.dnow{background:linear-gradient(180deg,#F8F3E8,#F1E7D2);border-radius:16px}
+.dnow .dd{color:var(--navy2)}
+.dnow .rel{background:var(--gold)}
+.chip{border:1.5px solid #E7E1D6;border-radius:16px;background:#FCFBF8}
+.chip.on{background:var(--navy);border-color:var(--navy);box-shadow:0 4px 12px rgba(30,58,95,.3)}
+.chip.on span{color:#E9D3A6}
+nav{top:0;margin-top:12px;background:rgba(246,243,237,.92);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border:0;gap:8px;padding:8px 12px}
+nav button{flex:0 0 auto;min-height:50px;padding:0 18px;border-radius:999px;border:1.5px solid #E2D6BE;background:#fff;color:#57534e;font-weight:800}
+nav button.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(30,58,95,.28)}
+main{padding:6px 12px 14px}
+.card{border:0;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(28,25,23,.05),0 8px 24px rgba(28,25,23,.06)}
+.svc{padding:18px 18px 16px}
+.svc .kick2{font-size:.78rem;font-weight:900;color:var(--gold);letter-spacing:.04em;margin-bottom:2px}
+.svc h2{font-size:1.4rem;font-weight:900;color:var(--navy2);margin:0 0 10px}
+.svc .meta{display:flex;flex-wrap:wrap;gap:6px}
+.svc .meta span{display:inline-flex;align-items:center;gap:4px;background:#F4F1EA;border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:800;color:#44403c}
+.word{position:relative;overflow:hidden;border:0;background:linear-gradient(150deg,#27507F,var(--navy) 50%,var(--navy2));color:#fff;padding:20px 20px 18px}
+.word::before{content:"\201C";position:absolute;right:14px;top:-18px;font-size:7rem;font-family:Georgia,serif;color:rgba(233,211,166,.22);line-height:1}
+.word .lbl{display:inline-block;color:var(--navy2);background:#E9D3A6;border-radius:999px;padding:3px 12px;font-size:.78rem}
+.word .st{font-size:1.35rem;font-weight:900;margin:12px 0 8px;line-height:1.45;color:#fff;border:0;background:none;padding:0}
+.word .ser{color:#D6E0EE;font-weight:700}
+.order{padding:8px 16px 8px 14px}
+.item{position:relative;display:block;padding:16px 4px 16px 34px;border-top:1px dashed #EDE7DC}
+.item:first-child{border-top:0}
+.item::after{content:"";position:absolute;left:12px;top:0;bottom:0;width:2px;background:#EDE3CF}
+.item:first-child::after{top:24px}
+.item:last-child::after{bottom:auto;height:24px}
+.item::before{content:"";position:absolute;z-index:1;left:6px;top:22px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid #C9B98F;box-sizing:border-box}
+.item.k-h::before{border-color:var(--gold);background:var(--gold2)}
+.item.k-b::before,.item.k-c::before{border-color:var(--navy);background:#DCE6F2}
+.item.k-w::before{width:18px;height:18px;left:4px;top:20px;border-color:var(--navy);background:var(--navy)}
+.item .n{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:.85rem;font-weight:900;color:var(--gold);letter-spacing:.02em;padding:0;margin-bottom:3px}
+.item.k-b .n,.item.k-c .n,.item.k-w .n{color:var(--navy)}
+.item .n .stand{display:inline-block;margin:0;font-size:.7rem;font-weight:900;color:#fff;background:#C2410C;border-radius:999px;padding:1px 8px}
+.item .what{font-size:1.08rem;font-weight:800;color:var(--ink)}
+.item.k-w{background:linear-gradient(90deg,#F8F3E8,rgba(248,243,232,0));border-radius:16px;border-top-color:transparent}
+.item.k-w+.item{border-top-color:transparent}
+.item .who{color:var(--sub);font-weight:700}
+.sec{display:flex;align-items:center;gap:10px;color:var(--gold);font-weight:900;font-size:.88rem;letter-spacing:.06em;padding:16px 4px 6px}
+.sec::before,.sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(184,137,59,0),rgba(184,137,59,.6),rgba(184,137,59,0))}
+.btns{gap:8px;margin-top:10px}
+.btns a,.btns button{min-height:54px;padding:0 18px;border-radius:16px;font-weight:800;font-size:.92rem;background:#fff;border:1.5px solid #D9CFBD;color:var(--navy)}
+.btns button{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(30,58,95,.22)}
+.btns button:active,.btns a:active{transform:translateY(1px)}
+.btns .memo{background:#FFF7E6;border-color:var(--gold);color:#7C5A1E;box-shadow:none}
+.bitem{background:#FBF7EE;border:0;border-left:4px solid var(--gold);border-radius:12px;color:#7C5A1E}
+.mprev{background:#FBF7EE;border:0;border-left:4px solid var(--gold)}
+.ptag{background:var(--gold)}
+.news h3,.mcard h3{display:flex;align-items:center;gap:8px;font-size:1.08rem;font-weight:900;color:var(--navy2)}
+.news h3::before{content:"";flex:0 0 5px;align-self:stretch;min-height:1.1em;border-radius:3px;background:var(--gold)}
+.news p{color:#292524}
+td{border-top:1px solid #F0EBE1}
+td:first-child{color:var(--navy)}
+.foot{color:#a8a29e}
+/* 크게 보기 화면 다듬기 */
+.rd{background:var(--cream)}
+.rdh{box-shadow:0 2px 10px rgba(28,25,23,.06);border-bottom:0}
+.rdh .x{border-radius:16px}
+.rdt small{color:var(--gold)}
+.st{background:#fff;border:0;border-radius:20px;box-shadow:0 1px 2px rgba(28,25,23,.05),0 6px 18px rgba(28,25,23,.05)}
+.st.sing{background:#FFFBEF;border:2px solid #E0B45C}
+.st.ref{background:#EEF3F9;border:0}
+.rdf{box-shadow:0 -2px 10px rgba(28,25,23,.06);border-top:0}
+.rdf button{border-radius:16px}
+@media (min-width:700px){
+ header{margin-top:16px;border-radius:28px;padding:26px 28px 56px}
+ .datebar{margin:-34px 24px 0}
+ nav{padding:10px 4px}
+ main{padding:6px 4px 14px}
+}
 </style></head>
 <body><div class="wrap">
 <header>
- <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
- <div class="tools"><a class="yt" href="#" id="yt">▶ 유튜브 예배 보기</a><div class="fsz"><button id="fsm" aria-label="글자 작게">−</button><span>글자</span><button id="fsp" aria-label="글자 크게">+</button></div></div>
+ <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><div class="kick">대한예수교장로회 · 주보</div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
+ <div class="tools"><a class="yt" href="#" id="yt"><span class="yi">▶</span>유튜브 예배 보기</a><div class="fsz"><button id="fsm" aria-label="글자 작게">−</button><span>글자</span><button id="fsp" aria-label="글자 크게">+</button></div></div>
 </header>
 <div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div></div>
 <nav id="tabs"></nav>
@@ -175,7 +265,7 @@ html{font-size:calc(var(--fs) * var(--k))}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v016';
+const VER='v017';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -237,7 +327,8 @@ function itemHtml(it){
  else if(it.sermon){extra=memoBtn();}
  else if(it.msg){what=esc(it.msg);}
  else if(it.info){what=`<span style="font-weight:500;font-size:.92rem">${esc(it.info)}</span>`;}
- return `<div class="item"><div class="n">${esc(it.t)}${it.stand?'<span class="stand">일어서서</span>':''}</div><div class="c">${what?`<div class="what">${what}</div>`:''}${it.who?`<div class="who">${esc(it.who)}</div>`:''}${it.note?`<div class="note">${esc(it.note)}</div>`:''}${extra}</div></div>`;}
+ const kc=it.hymn||it.song?' k-h':it.bible?' k-b':it.creed?' k-c':it.sermon?' k-w':'';
+  return `<div class="item${kc}"><div class="n">${esc(it.t)}${it.stand?'<span class="stand">일어서서</span>':''}</div><div class="c">${what?`<div class="what">${what}</div>`:''}${it.who?`<div class="who">${esc(it.who)}</div>`:''}${it.note?`<div class="note">${esc(it.note)}</div>`:''}${extra}</div></div>`;}
 function render(){
  const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식'],['memo','✍ 은혜 메모']];
  if(!tabs.some(t=>t[0]===cur)){const dow=new Date().getDay();cur=(dow>=1&&dow<=3&&D.services.some(s=>s.id==='wed'))?'wed':D.services[0].id;}
@@ -254,9 +345,9 @@ function render(){
    (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}<div class="mt">${esc(o.text.trim())}</div><div class="btns"><button onclick="openM('${o.d}','${o.svc}')">✏ 고치기</button><button onclick="shareM('${o.d}','${o.svc}')">📤 보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「✍ 은혜 메모 쓰기」를 눌러 보세요.</div>');
   return;}
  const s=D.services.find(x=>x.id===cur);R=[];
- let h=`<div class="card svc"><h2>${esc(s.name)}</h2><div class="meta">${esc(s.time)}${s.place?' · '+esc(s.place):''}${s.leader?' · 인도 '+esc(s.leader):''}</div></div>`;
+ let h=`<div class="card svc"><div class="kick2">${esc(md(sel))} 예배 순서</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>🕚 ${esc(s.time)}</span>`:''}${s.place?`<span>📍 ${esc(s.place)}</span>`:''}${s.leader?`<span>🙏 인도 ${esc(s.leader)}</span>`:''}</div></div>`;
  if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">${ymd(new Date())===sel?'오늘의 말씀':md(sel)+' 말씀'}</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
- h+=`<div class="card">${s.items.map(itemHtml).join('')}</div>`;
+ h+=`<div class="card order">${s.items.map(itemHtml).join('')}</div>`;
  m.innerHTML=h;}
 function show(d){D=d;document.getElementById('when').textContent=d.title;dateBar();
  document.getElementById('foot').innerHTML=`${esc(d.issue||'')} · ${esc(d.source||'')}<br>${VER} · 갱신 ${esc((d.builtAt||'').slice(0,16).replace('T',' '))}`;render();}
