@@ -134,6 +134,21 @@ button,a{font-family:inherit}
 .mcard .md0{font-size:.82rem;font-weight:800;color:#b45309}
 .mcard h3{font-size:1.02rem;margin:2px 0 0;color:var(--navy)}
 .ptag{display:inline-block;font-size:.72rem;font-weight:800;color:#fff;background:#4B6A91;border-radius:999px;padding:1px 9px;margin-left:6px;vertical-align:middle}
+/* 아이패드·태블릿 화면 맞춤 (v014) */
+:root{--k:1}
+html{font-size:calc(var(--fs) * var(--k))}
+.rdb,.mta{font-size:calc(var(--rfs) * var(--k))}
+@media (min-width:700px){
+ :root{--k:1.15}
+ .wrap{max-width:none;padding-left:max(20px,calc((100% - 1000px)/2));padding-right:max(20px,calc((100% - 1000px)/2))}
+ header{padding:20px 4px 12px}
+ .hrow img{width:64px;height:64px}
+ .rdb{padding-left:max(28px,calc((100% - 960px)/2));padding-right:max(28px,calc((100% - 960px)/2))}
+ .rdt{font-size:21px}.rdt small{font-size:15px}
+ .rdh,.rdf{padding-left:max(16px,calc((100% - 1000px)/2));padding-right:max(16px,calc((100% - 1000px)/2))}
+ .rdf button{font-size:18px;min-height:62px}
+}
+@media (min-width:1100px){:root{--k:1.22}}
 </style></head>
 <body><div class="wrap">
 <header>
@@ -157,7 +172,7 @@ button,a{font-family:inherit}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v013';
+const VER='v014';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
