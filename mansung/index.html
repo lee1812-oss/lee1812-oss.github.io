@@ -287,7 +287,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v031';
+const VER='v032';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -360,7 +360,7 @@ function render(){
   const tb=document.getElementById('tabs');const sn=n=>({news:'소식',memo:'메모'})[n]||n;tb.innerHTML=tabs.map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}" title="${esc(n)}"><span class="f">${esc(n)}</span><span class="s">${esc(sn(id)===id?String(n).replace(/\s*(예배|기도회)$/,'').replace(/^(주일|청년)\s+/,'$1'):sn(id))}</span></button>`).join('');
   tb.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();const mt=document.getElementById('main').getBoundingClientRect().top-document.getElementById('top').offsetHeight;if(mt<0)window.scrollTo({top:scrollY+mt-8});});
   const on=tb.querySelector('.on');if(on)tb.scrollLeft=Math.max(0,on.offsetLeft-(tb.clientWidth-on.offsetWidth)/2);
- const m=document.getElementById('main');
+ const m=document.getElementById('main');m.dataset.svc=cur;
  if(cur==='news'){
   m.innerHTML=D.news.map(n=>`<div class="card news"><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></div>`).join('')+
    (D.times?`<div class="card"><h3 style="margin:0 0 6px;font-size:1.02rem;color:var(--navy)">예배 시간 및 장소</h3><table>${D.times.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table></div>`:'');
@@ -709,6 +709,31 @@ $('ysA').addEventListener('click',()=>{setTimeout(ySz,50);if(!localStorage.getIt
 </script>
 <!-- ===== 예배 화면: 왼쪽 순서지 + 오른쪽 자막 (v031) ===== -->
 <style>
+/* 예배별 색 구분 (v032): 주일2부 파랑 · 청년1부 초록 · 오후 주황 · 수요 보라 */
+#main{--sv:#1E3A5F;--svl:#FFF3D6}
+#main[data-svc=w2]{--sv:#1D4ED8;--svl:#EAF1FF}
+#main[data-svc=w1]{--sv:#15803D;--svl:#E8F6EC}
+#main[data-svc=pm]{--sv:#C2410C;--svl:#FFF0E6}
+#main[data-svc=wed]{--sv:#7C3AED;--svl:#F2ECFF}
+.tabs button[data-id=w2]{--tc:#93C5FD;--tb:#1D4ED8}
+.tabs button[data-id=w1]{--tc:#86EFAC;--tb:#15803D}
+.tabs button[data-id=pm]{--tc:#FDBA74;--tb:#C2410C}
+.tabs button[data-id=wed]{--tc:#C4B5FD;--tb:#7C3AED}
+.tabs button[data-id=w2],.tabs button[data-id=w1],.tabs button[data-id=pm],.tabs button[data-id=wed]{color:var(--tc)}
+.tabs button[data-id=w2]::before,.tabs button[data-id=w1]::before,.tabs button[data-id=pm]::before,.tabs button[data-id=wed]::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;background:var(--tc);margin-right:.35em;vertical-align:.1em}
+.tabs button.on[data-id]{border-radius:12px 12px 0 0}
+.tabs button.on[data-id=w2],.tabs button.on[data-id=w1],.tabs button.on[data-id=pm],.tabs button.on[data-id=wed]{background:var(--tb);color:#fff;border-bottom-color:var(--tc)}
+.tabs button.on[data-id]::before{background:#fff}
+#main .svc{border-top:7px solid var(--sv);background:linear-gradient(180deg,var(--svl),#fff 75%)}
+#main .svc h2{color:var(--sv)}
+#main .svc .meta span{background:#fff;border:1.5px solid var(--svl)}
+.ssp{border:2px solid var(--sv)!important}
+.ssv0{display:flex;align-items:baseline;gap:8px;padding:7px 12px;background:var(--sv);color:#fff;flex:none;min-width:0;white-space:nowrap;overflow:hidden}
+.ssv0 b{font-size:17px;font-weight:900;flex:none}
+.ssv0 span{font-size:14px;font-weight:700;opacity:.9;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ssl .item.sel{background:var(--svl)!important;box-shadow:inset 5px 0 0 var(--sv)!important}
+.ssn .nx{background:var(--sv)!important}
+@media (max-width:699px){.ssk button.sel{background:var(--sv)!important;border-color:var(--sv)!important}.ssv0{padding:6px 8px}.ssv0 b{font-size:15px}.ssv0 span{font-size:12px}}
 .ssv{display:flex;align-items:flex-start;--ssw:50%}
 .ssl{flex:1;min-width:0}
 .ssl .item[data-i]{cursor:pointer;border-radius:12px;transition:background .15s}
@@ -767,7 +792,7 @@ function short(it){const nm=window.yItemName?yItemName(it):'';return it.hymn?`${
 window.ssWrap=(s,head,ord)=>{
  if(!on())return head+`<div class="sson"><button onclick="ssToggle(1)">옆에 자막 함께 보기</button></div>`+ord;
  let k='<div class="ssk" id="ssk">';s.items.forEach((it,i)=>{k+=it.section?`<div class="sx">${esc(it.t)}</div>`:`<button data-i="${i}">${esc(it.t)}${short(it)||it.stand?`<small>${esc([short(it),it.stand?'일어서서':''].filter(Boolean).join(' · '))}</small>`:''}</button>`;});k+='</div>';
- return head+`<div class="ssv" id="ssv"><div class="ssl">${ord}${k}</div><div class="ssr"><div class="ssg" id="ssg" role="separator" tabindex="0" aria-label="순서지와 자막 폭 조절" title="끌어서 순서지·자막 폭 조절 · 두 번 누르면 처음 폭으로"><span></span></div><div class="ssp"><div class="ssh"><span class="nn" id="ssnn"></span><span class="nt" id="ssnt"></span><span class="sp"></span><div class="fz"><button id="ssfm" aria-label="자막 글자 작게">가−</button><button id="ssfp" aria-label="자막 글자 크게">가+</button></div></div><div class="ssb yvc" id="ssb"></div><div class="ssn"><button id="sspv">이전</button><button class="nx" id="ssnx">다음</button><button class="of" id="ssof" title="자막 칸 닫기">자막 끄기</button></div></div></div></div>`;};
+ return head+`<div class="ssv" id="ssv"><div class="ssl">${ord}${k}</div><div class="ssr"><div class="ssg" id="ssg" role="separator" tabindex="0" aria-label="순서지와 자막 폭 조절" title="끌어서 순서지·자막 폭 조절 · 두 번 누르면 처음 폭으로"><span></span></div><div class="ssp"><div class="ssv0"><b>${esc(s.tab||s.name)}</b><span>${esc([s.name!==s.tab?s.name:'',s.time].filter(Boolean).join(' · '))}</span></div><div class="ssh"><span class="nn" id="ssnn"></span><span class="nt" id="ssnt"></span><span class="sp"></span><div class="fz"><button id="ssfm" aria-label="자막 글자 작게">가−</button><button id="ssfp" aria-label="자막 글자 크게">가+</button></div></div><div class="ssb yvc" id="ssb"></div><div class="ssn"><button id="sspv">이전</button><button class="nx" id="ssnx">다음</button><button class="of" id="ssof" title="자막 칸 닫기">자막 끄기</button></div></div></div></div>`;};
 window.ssToggle=v=>{localStorage.setItem('jb_split',v?'1':'0');render();if(v)toast('오른쪽에 자막이 나와요');};
 function setTop(){const t=$('top');if(t)document.documentElement.style.setProperty('--toph',t.offsetHeight+'px');}
 function setFs(v,show){sfs=Math.max(14,Math.min(44,v));localStorage.setItem('jb_sfs',sfs);const v2=$('ssv');if(v2)v2.style.setProperty('--sfs',sfs+'px');if(show)toast('자막 글자 '+(sfs-12));}
