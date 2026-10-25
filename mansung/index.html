@@ -19,35 +19,6 @@ html,body,.rdb{overflow-anchor:none}
 .fsz button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 body{margin:0;background:#f4f4f5;color:#18181b;font-family:"NSR","Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:640px;margin:0 auto;padding:0 0 calc(30px + env(safe-area-inset-bottom))}
-header{background:#fff;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
-.hrow{display:flex;align-items:center;gap:12px}
-.hrow img{width:52px;height:52px;border-radius:50%;object-fit:cover}
-h1{font-size:1.35rem;margin:0}
-.when{color:var(--sub);font-size:.9rem;margin-top:2px}
-.tools{display:flex;gap:8px;margin-top:12px}
-.yt{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:60px;border-radius:14px;background:#E00000;border:0;color:#fff;font-weight:800;font-size:1.05rem;text-decoration:none}
-.fsb{min-width:54px;min-height:54px;border-radius:14px;border:1px solid #a1a1aa;background:#fff;font-size:1rem;font-weight:700;color:#18181b}
-.datebar{background:#fff;padding:12px 12px 12px;border-bottom:1px solid var(--line)}
-.dmain{display:flex;align-items:center;gap:8px}
-.dmain button.ar{flex:0 0 58px;min-height:58px;border-radius:14px;border:1px solid #cbd5e1;background:#f8fafc;font-size:1.4rem;font-weight:800;color:var(--navy)}
-.dmain button.ar:disabled{opacity:.3}
-.dnow{flex:1;text-align:center;border-radius:14px;background:#EEF3F9;padding:8px 6px;min-height:58px;display:flex;flex-direction:column;justify-content:center}
-.dnow .dd{font-size:1.3rem;font-weight:900;color:var(--navy)}
-.dnow .rel{font-size:.8rem;font-weight:800;color:#fff;background:var(--navy);border-radius:999px;padding:2px 10px;align-self:center;margin-top:3px}
-.dnow .rel.past{background:#71717a}
-.chips{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;min-width:76px;min-height:58px;border-radius:14px;border:1px solid #d4d4d8;background:#fff;font-family:inherit;color:#18181b;padding:4px 10px;line-height:1.25}
-.chip b{display:block;font-size:1.05rem}
-.chip span{font-size:.72rem;color:#71717a;font-weight:700}
-.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
-.chip.on span{color:#dbeafe}
-.chip.wait{border-style:dashed;color:#a1a1aa}
-.dmsg{margin-top:8px;font-size:.85rem;color:#b45309;font-weight:700;text-align:center}
-nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
-nav button{flex:1 0 auto;min-height:54px;padding:0 14px;border:0;background:none;font-size:.95rem;font-weight:700;color:#71717a;border-bottom:4px solid transparent;font-family:inherit}
-nav button.on{color:var(--navy);border-bottom-color:var(--navy)}
 main{padding:14px 12px}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
 .svc h2{font-size:1.2rem;margin:0 0 4px}
@@ -144,8 +115,6 @@ html{font-size:calc(var(--fs) * var(--k))}
 @media (min-width:700px){
  :root{--k:1.15}
  .wrap{max-width:none;padding-left:max(20px,calc((100% - 1400px)/2));padding-right:max(20px,calc((100% - 1400px)/2))}
- header{padding:20px 4px 12px}
- .hrow img{width:64px;height:64px}
  .rdb{padding-left:max(28px,calc((100% - 1360px)/2));padding-right:max(28px,calc((100% - 1360px)/2))}
  .rdt{font-size:21px}.rdt small{font-size:15px}
  .rdh,.rdf{padding-left:max(16px,calc((100% - 1400px)/2));padding-right:max(16px,calc((100% - 1400px)/2))}
@@ -156,31 +125,6 @@ html{font-size:calc(var(--fs) * var(--k))}
 /* ===== v017 디자인: 남색·금색 주보 스타일 ===== */
 :root{--navy:#1E3A5F;--navy2:#0E2340;--gold:#B8893B;--gold2:#F4EAD3;--cream:#F6F3ED;--ink:#1c1917;--sub:#57534e;--line:#ebe5da}
 body{background:var(--cream);color:var(--ink)}
-header{position:relative;background:linear-gradient(160deg,#27507F 0%,var(--navy) 45%,var(--navy2) 100%);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 18px 46px;border:0;overflow:hidden}
-header::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(244,234,211,.18),rgba(244,234,211,0) 70%);pointer-events:none}
-header .hrow{position:relative;z-index:1}
-.hrow img{width:56px;height:56px;border:3px solid rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.25);background:#fff}
-.kick{font-size:.72rem;font-weight:800;color:#E9D3A6;letter-spacing:.04em}
-h1{font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1.25}
-header .when{color:#D6E0EE;font-weight:700}
-header .tools{position:relative;z-index:1;margin-top:16px}
-.yt{background:#fff;color:var(--ink);border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.22);font-weight:900}
-.yt .yi{display:inline-flex;align-items:center;justify-content:center;width:34px;height:24px;border-radius:7px;background:#E00000;color:#fff;font-size:.8rem}
-header .fsz{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:16px}
-header .fsz button{background:transparent;color:#fff}
-header .fsz button:active{background:rgba(255,255,255,.2)}
-header .fsz span{color:#E9D3A6}
-.datebar{position:relative;z-index:2;margin:-30px 12px 0;border:0;border-radius:22px;background:#fff;box-shadow:0 10px 28px rgba(30,58,95,.14);padding:12px}
-.dmain button.ar{background:#fff;border:1.5px solid #E2D6BE;color:var(--navy);border-radius:16px}
-.dnow{background:linear-gradient(180deg,#F8F3E8,#F1E7D2);border-radius:16px}
-.dnow .dd{color:var(--navy2)}
-.dnow .rel{background:var(--gold)}
-.chip{border:1.5px solid #E7E1D6;border-radius:16px;background:#FCFBF8}
-.chip.on{background:var(--navy);border-color:var(--navy);box-shadow:0 4px 12px rgba(30,58,95,.3)}
-.chip.on span{color:#E9D3A6}
-nav{top:0;margin-top:12px;background:rgba(246,243,237,.92);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border:0;gap:8px;padding:8px 12px}
-nav button{flex:0 0 auto;min-height:50px;padding:0 18px;border-radius:999px;border:1.5px solid #E2D6BE;background:#fff;color:#57534e;font-weight:800}
-nav button.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(30,58,95,.28)}
 main{padding:6px 12px 14px}
 .card{border:0;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(28,25,23,.05),0 8px 24px rgba(28,25,23,.06)}
 .svc{padding:18px 18px 16px}
@@ -237,9 +181,6 @@ td:first-child{color:var(--navy)}
 .rdf{box-shadow:0 -2px 10px rgba(28,25,23,.06);border-top:0}
 .rdf button{border-radius:16px}
 @media (min-width:700px){
- header{margin-top:16px;border-radius:28px;padding:26px 28px 56px}
- .datebar{margin:-34px 24px 0}
- nav{padding:10px 4px}
  main{padding:6px 4px 14px}
 }
 /* v018 은혜 메모: 성경 왼쪽 · 메모 오른쪽, 가운데 막대로 폭 조절 (좁은 휴대폰은 위·아래) */
@@ -269,40 +210,7 @@ td:first-child{color:var(--navy)}
 }
 
 /* ===== v019 날짜 카드 + 예배 고르기 ===== */
-.dnow{display:flex;flex-direction:row;align-items:center;gap:14px;text-align:left;padding:10px 14px;justify-content:flex-start}
-.cal{flex:0 0 auto;min-width:56px;padding:0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 3px 10px rgba(30,58,95,.18);text-align:center;display:flex;flex-direction:column}
-.cal .cm{display:block;background:var(--navy);color:#fff;font-size:.78rem;font-weight:900;padding:3px 0}
-.cal .cd{display:block;white-space:nowrap;padding-left:6px!important;padding-right:6px!important;font-size:1.9rem;font-weight:900;color:var(--navy2);line-height:1.15;padding-top:2px}
-.cal .cw{display:block;font-size:.68rem;font-weight:900;color:#C2410C;padding-bottom:4px}
-.dinfo{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
-.dinfo .dd{font-size:.82rem;font-weight:800;color:var(--sub)}
-.dinfo .rel{align-self:flex-start;margin:0}
-.dinfo .dti{order:1;font-size:1.25rem;font-weight:900;color:var(--navy2);line-height:1.3}
-.dinfo .rel{order:2}
-.chips{margin-top:10px}
-.chip{min-height:50px}
-.svl{display:flex;align-items:center;gap:8px;margin:14px 2px 8px;font-size:.85rem;font-weight:900;color:var(--gold);letter-spacing:.04em}
-.svl::after{content:"";flex:1;height:1px;background:#EADFC8}
-.svg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
-.dnow,.dinfo{min-width:0}
-.svg .sv{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;min-height:96px;padding:10px 12px 10px 12px;border-radius:18px;border:1.5px solid #E7DFD0;background:#FCFBF8;color:var(--ink);font-family:inherit;cursor:pointer}
-.svg .sv .si{font-size:1.25rem;line-height:1;margin-bottom:4px}
-.svg .sv b{font-size:1.08rem;font-weight:900;color:var(--navy2)}
-.svg .sv .sd{font-size:.78rem;font-weight:800;color:var(--sub)}
-.svg .sv .sh{font-size:.82rem;font-weight:900;color:var(--gold)}
-.svg .sv.on{background:linear-gradient(150deg,#27507F,var(--navy) 55%,var(--navy2));border-color:var(--navy);box-shadow:0 6px 16px rgba(30,58,95,.3)}
-.svg .sv.on b{color:#fff}.svg .sv.on .sd{color:#D6E0EE}.svg .sv.on .sh{color:#E9D3A6}
-.svg .sv.on::after{content:"✓";position:absolute;right:10px;top:8px;width:24px;height:24px;border-radius:50%;background:#E9D3A6;color:var(--navy2);font-size:.8rem;font-weight:900;display:flex;align-items:center;justify-content:center}
-.svx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.svx button{min-height:54px;border-radius:16px;border:1.5px solid #E2D6BE;background:#fff;color:#57534e;font-weight:800;font-size:.95rem;font-family:inherit}
-.svx button.on{background:var(--navy);border-color:var(--navy);color:#fff}
 main{padding-top:14px}
-.mini{position:fixed;left:0;right:0;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:rgba(246,243,237,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(28,25,23,.1)}
-.mini .mi{flex:1;min-width:0;font-size:.95rem;font-weight:800;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini .mi b{color:var(--navy2);font-weight:900}
-.mini button{flex:0 0 auto;min-height:48px;padding:0 16px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-weight:900;font-size:.9rem;font-family:inherit;box-shadow:0 4px 12px rgba(30,58,95,.28)}
-@media (max-width:699px){.dmain{gap:6px}.dmain button.ar{flex:0 0 44px;min-height:54px}.dnow{gap:10px;padding:8px 10px}.dinfo .dti{font-size:1.08rem}}
-@media (min-width:700px){.svg{grid-template-columns:repeat(4,1fr)}.svx{max-width:50%}.mini{padding-left:max(16px,calc((100% - 1240px)/2));padding-right:max(16px,calc((100% - 1240px)/2))}}
 /* 손글씨 메모 */
 .mmode{display:flex;gap:6px}
 .mmode button{flex:1;min-height:52px;border-radius:14px;border:2px solid #cbd5e1;background:#fff;color:#1E3A5F;font-size:17px;font-weight:800;font-family:inherit}
@@ -327,15 +235,40 @@ main{padding-top:14px}
 .rdb .st .ln,.rdb .st.ref .ln,.mbp .st .ln{font-weight:800;color:#111}
 .rdb .st.dim .ln{font-weight:700}
 .item .what{font-weight:800}
+/* ===== v027 상단 고정 메뉴: 한 덩어리, 중복 없이 ===== */
+.top{position:sticky;top:0;z-index:30;background:linear-gradient(160deg,#27507F,var(--navy) 50%,var(--navy2));color:#fff;padding:calc(6px + env(safe-area-inset-top)) max(10px,calc((100% - 1400px)/2)) 0;box-shadow:0 4px 14px rgba(14,35,64,.22)}
+.t1,.t2{display:flex;align-items:center;gap:8px}
+.t1 img{flex:0 0 auto;width:calc(34px*var(--k));height:calc(34px*var(--k));border-radius:50%;object-fit:cover;background:#fff;border:2px solid rgba(255,255,255,.9)}
+.tn{flex:1;min-width:0;font-size:calc(20px*var(--k));font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yt{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:calc(44px*var(--k));padding:0 12px;border-radius:12px;background:#fff;color:var(--ink);font-weight:900;font-size:calc(15px*var(--k));text-decoration:none;white-space:nowrap}
+.yt .yi{display:inline-flex;align-items:center;justify-content:center;width:26px;height:19px;border-radius:5px;background:#E00000;color:#fff;font-size:10px}
+.top .fsz{border:1px solid rgba(255,255,255,.35);border-radius:12px;background:rgba(255,255,255,.12)}
+.top .fsz button{width:calc(44px*var(--k));min-height:calc(44px*var(--k));background:transparent;color:#fff;font-size:calc(16px*var(--k))}
+.top .fsz button:active{background:rgba(255,255,255,.2)}
+.t2{margin-top:6px}
+.t2 .ar{flex:0 0 calc(46px*var(--k));height:calc(40px*var(--k));border:0;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:calc(17px*var(--k));font-family:inherit}
+.t2 .ar:disabled{opacity:.3}
+.dnow{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:calc(19px*var(--k));font-weight:900;white-space:nowrap}
+.dnow .rel{font-size:calc(13px*var(--k));font-weight:900;color:var(--navy2);background:#E9D3A6;border-radius:999px;padding:2px 10px}
+.dnow .rel.past{background:#CBD5E1}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;margin-top:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;min-height:calc(48px*var(--k));padding:0 12px;border:0;border-bottom:4px solid transparent;background:none;color:#C3D1E4;font-size:calc(16px*var(--k));font-weight:800;font-family:inherit;white-space:nowrap}
+.tabs button.on{color:#fff;font-weight:900;border-bottom-color:#E9D3A6}
+.tabs .s{display:none}
+@media (max-width:599px){.tabs button{flex:1 1 auto;padding:0 6px}.tabs .f{display:none}.tabs .s{display:inline}}
+.dmsg{margin:0;padding:4px 0 8px;font-size:calc(14px*var(--k));color:#FDE68A;font-weight:800;text-align:center}
+.svc .kick2{white-space:normal}
+@media (min-width:700px){.top{padding-left:max(20px,calc((100% - 1400px)/2));padding-right:max(20px,calc((100% - 1400px)/2))}}
+@media (max-width:360px){.yt .yt2{display:none}}
 </style></head>
-<body><div class="wrap">
-<header>
- <div class="hrow"><img src="icon-192.png?v=1" alt=""><div><div class="kick">대한예수교장로회 · 주보</div><h1>만성교회</h1><div class="when" id="when">불러오는 중…</div></div></div>
- <div class="tools"><a class="yt" href="#" id="yt"><span class="yi">▶</span>유튜브 예배 보기</a><div class="fsz"><button id="fsm" aria-label="글자 작게">−</button><span>글자</span><button id="fsp" aria-label="글자 크게">+</button></div></div>
+<body><header class="top" id="top">
+ <div class="t1"><img src="icon-192.png?v=1" alt=""><b class="tn">만성교회</b><a class="yt" href="#" id="yt"><span class="yi">▶</span>예배<span class="yt2"> 영상</span></a><div class="fsz"><button id="fsm" aria-label="글자 작게">가−</button><button id="fsp" aria-label="글자 크게">가+</button></div></div>
+ <div class="t2"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><span id="dti"></span><span class="rel" id="drel" hidden></span></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div>
+ <div class="tabs" id="tabs"></div>
+ <div class="dmsg" id="dmsg" hidden></div>
 </header>
-<div class="datebar"><div class="dmain"><button class="ar" id="dprev" aria-label="이전 주">◀</button><div class="dnow"><div class="cal"><span class="cm" id="dcm"> </span><b class="cd" id="dcd"> </b><span class="cw">주일</span></div><div class="dinfo"><div class="dd" id="dd"> </div><div class="rel" id="drel" hidden></div><div class="dti" id="dti"></div></div></div><button class="ar" id="dnext" aria-label="다음 주">▶</button></div><div class="chips" id="chips"></div><div class="dmsg" id="dmsg" hidden></div><div class="svl">예배 고르기</div><div class="svg" id="tabs"></div><div class="svx" id="tabs2"></div></div>
-<div class="mini" id="mini" hidden><div class="mi" id="mitxt"></div><button id="miup">예배 바꾸기 ▲</button></div>
-
+<div class="wrap">
 <main id="main"><div class="empty">주보를 불러오는 중이에요…</div></main>
 <div class="foot" id="foot"></div>
 </div>
@@ -353,7 +286,7 @@ main{padding-top:14px}
 </div>
 <script>
 const CREED='나는 전능하신 아버지 하나님, 천지의 창조주를 믿습니다. 나는 그의 유일하신 아들, 우리 주 예수 그리스도를 믿습니다. 그는 성령으로 잉태되어 동정녀 마리아에게서 나시고, 본디오 빌라도에게 고난을 받아 십자가에 못 박혀 죽으시고, 장사된 지 사흘 만에 죽은 자 가운데서 다시 살아나셨으며, 하늘에 오르시어 전능하신 아버지 하나님 우편에 앉아 계시다가, 거기로부터 살아 있는 자와 죽은 자를 심판하러 오십니다. 나는 성령을 믿으며, 거룩한 공교회와 성도의 교제와 죄를 용서받는 것과 몸의 부활과 영원한 삶을 믿습니다. 아멘.';
-const VER='v026';
+const VER='v027';
 const CREED_PARTS=[['성부 하나님',['나는 전능하신','아버지 하나님,','천지의 창조주를','믿습니다.']],
  ['성자 예수 그리스도',['나는 그의 유일하신 아들,','우리 주 예수 그리스도를','믿습니다.','그는 성령으로 잉태되어','동정녀 마리아에게서','나시고,','본디오 빌라도에게','고난을 받아','십자가에 못 박혀','죽으시고,','장사된 지 사흘 만에','죽은 자 가운데서','다시 살아나셨으며,','하늘에 오르시어','전능하신 아버지 하나님','우편에 앉아 계시다가,','거기로부터','살아 있는 자와 죽은 자를','심판하러 오십니다.']],
  ['성령',['나는 성령을 믿으며,','거룩한 공교회와','성도의 교제와','죄를 용서받는 것과','몸의 부활과','영원한 삶을 믿습니다.']]];
@@ -362,12 +295,13 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 let fs=+(localStorage.getItem('jb_fs')||18);
 const setFs=(v,show)=>{fs=Math.max(14,Math.min(30,v));if(show&&window.toast)toast('글자 크기 '+(fs-12));document.documentElement.style.setProperty('--fs',fs+'px');localStorage.setItem('jb_fs',fs);};
 // 글자 크기를 바꿔도 화면이 움직이지 않게: 보던 줄(또는 누른 버튼)을 같은 자리에 붙잡아 둠 (v016)
-function keepView(sc,btn,fn){let a=null,top=0;
- if(sc){top=sc.getBoundingClientRect().top;for(const e of sc.querySelectorAll('.ln,.lb,.amen,.copy,.mdi,.mta,.mst,.mhelp,.btns,p,div')){const r=e.getBoundingClientRect();if(r.height&&r.bottom>top+2){a=e;break;}}}
- else a=btn;
+function keepView(sc,btn,fn){let a=null;
+ const top=sc?sc.getBoundingClientRect().top:document.getElementById('top').getBoundingClientRect().bottom;
+ const q=sc?'.ln,.lb,.amen,.copy,.mdi,.mta,.mst,.mhelp,.btns,p,div':'#main .kick2,#main h2,#main h3,#main .meta,#main .lbl,#main .st,#main .item,#main p,#main tr,#main .btns';
+ for(const e of (sc||document).querySelectorAll(q)){const r=e.getBoundingClientRect();if(r.height&&r.bottom>top+2){a=e;break;}}
  if(!a){fn();return;}
  const r0=a.getBoundingClientRect();fn();const r1=a.getBoundingClientRect();
- const want=(sc&&r0.top<top)?top-(top-r0.top)*(r1.height/(r0.height||1)):r0.top;const d=r1.top-want;
+ const want=r0.top<top?top-(top-r0.top)*(r1.height/(r0.height||1)):r0.top;const d=r1.top-want;
  if(Math.abs(d)>0.5){if(sc)sc.scrollTop+=d;else window.scrollBy(0,d);}}
 setFs(fs);document.getElementById('fsm').onclick=e=>keepView(null,e.currentTarget,()=>setFs(fs-2,1));document.getElementById('fsp').onclick=e=>keepView(null,e.currentTarget,()=>setFs(fs+2,1));
 // 유튜브 앱으로 열기 (누를 때 열리므로 휴대폰이 막지 않음)
@@ -419,13 +353,12 @@ function itemHtml(it){
  const kc=it.hymn||it.song?' k-h':it.bible?' k-b':it.creed?' k-c':it.sermon?' k-w':'';
   return `<div class="item${kc}"><div class="n">${esc(it.t)}${it.stand?'<span class="stand">일어서서</span>':''}</div><div class="c">${what?`<div class="what">${what}</div>`:''}${it.who?`<div class="who">${esc(it.who)}</div>`:''}${it.note?`<div class="note">${esc(it.note)}</div>`:''}${extra}</div></div>`;}
 function render(){
- const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식'],['memo','✍ 은혜 메모']];
+ const tabs=[...D.services.map(s=>[s.id,s.tab]),['news','교회 소식'],['memo','은혜 메모']];
  if(!tabs.some(t=>t[0]===cur)){const dow=new Date().getDay();cur=(dow>=1&&dow<=3&&D.services.some(s=>s.id==='wed'))?'wed':D.services[0].id;}
  const ICO={w1:'🌅',w2:'☀️',pm:'🌤️',wed:'🌙'};
-  document.getElementById('tabs').innerHTML=D.services.map(s=>{const tm=String(s.time||'');const mm=tm.match(/^(.*?\))\s*(.*)$/);const day=mm?mm[1]:`${md(sel)}(주일)`;const hr=mm?mm[2]:tm;return `<button class="sv${s.id===cur?' on':''}" data-id="${s.id}"><span class="si">${ICO[s.id]||'⛪'}</span><b>${esc(s.tab)}</b><span class="sd">${esc(day)}</span><span class="sh">${esc(hr)}</span></button>`;}).join('');
-  document.getElementById('tabs2').innerHTML=[['news','📢 교회 소식'],['memo','✍ 은혜 메모']].map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}">${n}</button>`).join('');
-  const csv=D.services.find(x=>x.id===cur);document.getElementById('mitxt').innerHTML=`📅 ${esc(mdShort(sel))} · <b>${esc(csv?csv.tab:(cur==='news'?'교회 소식':'은혜 메모'))}</b>`;
-  document.querySelectorAll('#tabs button,#tabs2 button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();const mt=document.getElementById('main').getBoundingClientRect().top;if(mt>innerHeight*0.6||mt<0)window.scrollTo({top:scrollY+mt-74,behavior:'smooth'});});
+  const tb=document.getElementById('tabs');const sn=n=>({news:'소식',memo:'메모'})[n]||n;tb.innerHTML=tabs.map(([id,n])=>`<button class="${id===cur?'on':''}" data-id="${id}" title="${esc(n)}"><span class="f">${esc(n)}</span><span class="s">${esc(sn(id)===id?String(n).replace(/\s*(예배|기도회)$/,'').replace(/^(주일|청년)\s+/,'$1'):sn(id))}</span></button>`).join('');
+  tb.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.id;localStorage.setItem('jb_tab',cur);render();const mt=document.getElementById('main').getBoundingClientRect().top-document.getElementById('top').offsetHeight;if(mt<0)window.scrollTo({top:scrollY+mt-8});});
+  const on=tb.querySelector('.on');if(on)tb.scrollLeft=Math.max(0,on.offsetLeft-(tb.clientWidth-on.offsetWidth)/2);
  const m=document.getElementById('main');
  if(cur==='news'){
   m.innerHTML=D.news.map(n=>`<div class="card news"><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></div>`).join('')+
@@ -437,11 +370,11 @@ function render(){
    (all.length?all.map(o=>`<div class="card mcard"><div class="md0">${esc(md(o.d))} · ${esc(o.svcName||'')}</div><h3>「${esc(o.title||'말씀')}」</h3>${o.ref?`<div class="who" style="color:var(--sub);font-size:.85rem">${esc(o.ref)}</div>`:''}${o.text&&o.text.trim()?`<div class="mt">${esc(o.text.trim())}</div>`:''}${inkThumb(o)}<div class="btns"><button onclick="openM('${o.d}','${o.svc}')">✏ 고치기</button><button onclick="shareM('${o.d}','${o.svc}')">📤 보내기</button></div></div>`).join(''):'<div class="empty">아직 적은 메모가 없어요.<br>예배 탭의 「말씀 선포」에서 「✍ 은혜 메모 쓰기」를 눌러 보세요.</div>');
   return;}
  const s=D.services.find(x=>x.id===cur);R=[];
- let h=`<div class="card svc"><div class="kick2">${esc(md(sel))} 예배 순서</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>🕚 ${esc(s.time)}</span>`:''}${s.place?`<span>📍 ${esc(s.place)}</span>`:''}${s.leader?`<span>🙏 인도 ${esc(s.leader)}</span>`:''}</div></div>`;
+ let h=`<div class="card svc"><div class="kick2">${esc(D.title||md(sel)+' 예배 순서')}</div><h2>${esc(s.name)}</h2><div class="meta">${s.time?`<span>🕚 ${esc(s.time)}</span>`:''}${s.place?`<span>📍 ${esc(s.place)}</span>`:''}${s.leader?`<span>🙏 인도 ${esc(s.leader)}</span>`:''}</div></div>`;
  if(s.items.some(i=>i.sermon)&&D.sermon){h+=`<div class="card word"><div class="lbl">${ymd(new Date())===sel?'오늘의 말씀':md(sel)+' 말씀'}</div><div class="st">「${esc(D.sermon.title)}」</div><div class="ser">${esc(D.sermon.series||'')} · ${esc(D.sermon.preacher||'')}</div></div>`;}
  h+=`<div class="card order">${s.items.map(itemHtml).join('')}</div>`;
  m.innerHTML=h;}
-function show(d){D=d;document.getElementById('when').textContent=d.title;dateBar();
+function show(d){D=d;dateBar();
  document.getElementById('foot').innerHTML=`${esc(d.issue||'')} · ${esc(d.source||'')}<br>${VER} · 갱신 ${esc((d.builtAt||'').slice(0,16).replace('T',' '))}`;render();}
 // ===== 크게 보기 화면 =====
 let ri0=-1,rOpen=false;
@@ -584,20 +517,16 @@ function dateBar(){
  const have=W.map(w=>w.date);const last=have.length?have[have.length-1]:sel;
  // 칩: 있는 주들 + 아직 안 올라온 이번 주(준비 중)
  const list=[...have];if(thisSun>last)list.push(thisSun);
- const sd=toD(sel);document.getElementById('dcm').textContent=`${sd.getMonth()+1}월`;document.getElementById('dcd').textContent=sd.getDate();document.getElementById('dd').textContent=`${sd.getFullYear()}년`;document.getElementById('dti').textContent=`${md(sel)} 주일`;
+ document.getElementById('dti').textContent=`${md(sel)} 주일`;
  const r=document.getElementById('drel');r.textContent=rel(sel);r.hidden=false;r.className='rel'+(sel<thisSun?' past':'');
- const i=have.indexOf(sel);document.getElementById('dprev').disabled=i<=0;document.getElementById('dnext').disabled=i<0||i>=have.length-1;
- document.getElementById('chips').innerHTML=list.map(s=>{const ok=have.includes(s);return `<button class="chip${s===sel?' on':''}${ok?'':' wait'}" data-d="${s}"><b>${mdShort(s)}</b><span>${ok?rel(s):'토요일에 올라와요'}</span></button>`;}).join('');
- document.querySelectorAll('#chips .chip').forEach(b=>b.onclick=()=>{if(have.includes(b.dataset.d))pick(b.dataset.d);else{const m=document.getElementById('dmsg');m.textContent=`${md(b.dataset.d)} 주보는 보통 토요일에 방송실에 올라오면 자동으로 들어와요.`;m.hidden=false;}});
+ const i=have.indexOf(sel);document.getElementById('dprev').disabled=i<=0;document.getElementById('dnext').disabled=i<0||(i>=have.length-1&&!(thisSun>last));
  const on=document.querySelector('#chips .chip.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
  const m=document.getElementById('dmsg');if(sel<thisSun&&!have.includes(thisSun)&&sel===last){m.textContent=`${md(thisSun)} 주보는 아직 안 올라왔어요. 지난 주보를 보여 드려요.`;m.hidden=false;}else m.hidden=true;}
-(function(){const mi=document.getElementById('mini'),tb=document.getElementById('tabs');document.getElementById('miup').onclick=()=>window.scrollTo({top:Math.max(0,scrollY+document.querySelector('.datebar').getBoundingClientRect().top-10),behavior:'smooth'});
- if('IntersectionObserver' in window)new IntersectionObserver(es=>{mi.hidden=es[0].isIntersecting||es[0].boundingClientRect.top>0;},{threshold:0}).observe(document.getElementById('tabs2'));})();
 function loadWeek(s){return fetch(`w-${s}.json?t=${Date.now()}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();});}
 function pick(s){sel=s;const c=localStorage.getItem('jb_w_'+s);if(c){try{show(JSON.parse(c));}catch(e){}}
  loadWeek(s).then(d=>{localStorage.setItem('jb_w_'+s,JSON.stringify(d));if(sel===s)show(d);}).catch(()=>{if(!c)document.getElementById('main').innerHTML='<div class="empty">인터넷 연결을 확인해 주세요.</div>';});scrollTo(0,0);}
 document.getElementById('dprev').onclick=()=>{const i=W.findIndex(w=>w.date===sel);if(i>0)pick(W[i-1].date);};
-document.getElementById('dnext').onclick=()=>{const i=W.findIndex(w=>w.date===sel);if(i>=0&&i<W.length-1)pick(W[i+1].date);};
+document.getElementById('dnext').onclick=()=>{const i=W.findIndex(w=>w.date===sel);if(i>=0&&i<W.length-1)pick(W[i+1].date);else{const m=document.getElementById('dmsg');m.textContent=`${md(thisSun)} 주보는 보통 토요일에 올라오면 자동으로 들어와요.`;m.hidden=false;}};
 function start(weeks){W=weeks||[];const have=W.map(w=>w.date);
  // 기본: 이번 주일이 있으면 그것, 없으면 가장 최근 주
  const def=have.includes(thisSun)?thisSun:(have.filter(s=>s<=thisSun).pop()||have[have.length-1]);if(def)pick(def);}
