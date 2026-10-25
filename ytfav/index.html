@@ -92,7 +92,7 @@ textarea.inp{min-height:110px;resize:vertical}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#fff;color:#111;font-weight:800}
 .fab{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:30;box-shadow:0 8px 24px rgba(227,0,43,.35);border-radius:999px;min-height:62px;padding:0 26px;font-size:20px}
-.moving .item{border-style:dashed}
+@media(max-width:480px){.thumb,.av{width:104px;height:60px}.av{font-size:26px}.item{gap:10px}.item .go{gap:10px}.meta b{font-size:18px}.wrap{padding:0 12px 120px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -127,7 +127,7 @@ function seed(){
  const c=[{id:'c1',name:'교회',color:COLORS[0]},{id:'c2',name:'음악',color:COLORS[5]},{id:'c3',name:'요리·베이킹',color:COLORS[1]},{id:'c4',name:'공부·정보',color:COLORS[4]}];
  const it=[
   {id:uid(),title:'만성교회',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C',type:'channel',cat:'c1'},
-  {id:uid()+'b',title:'만성교회 생방송 (지금 예배)',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C/live',type:'live',cat:'c1'}];
+  {id:uid()+'b',title:'만성교회 생방송',url:'https://www.youtube.com/@%EB%A7%8C%EC%84%B1%EA%B5%90%ED%9A%8C/live',type:'live',cat:'c1'}];
  return {v:1,cats:c,items:it,cur:'all',open:'app'};
 }
 let D;
@@ -144,7 +144,7 @@ function parse(raw){
  let u=findUrl(raw);
  if(!u&&/^(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(raw))u='https://'+raw;
  if(!u&&/^@\S+$/.test(raw))u='https://www.youtube.com/'+raw;
- if(!u){return {type:'search',url:'https://www.youtube.com/results?search_query='+encodeURIComponent(raw),title:raw+' (검색)',q:raw}}
+ if(!u){return {type:'search',url:'https://www.youtube.com/results?search_query='+encodeURIComponent(raw),title:raw,q:raw}}
  let x; try{x=new URL(u)}catch(e){return null}
  const h=x.hostname.replace(/^(www\.|m\.|music\.)/,''); const p=x.pathname.split('/').filter(Boolean);
  if(h==='youtu.be'&&p[0])return vid(p[0]);
@@ -154,7 +154,7 @@ function parse(raw){
  if(p[0]==='shorts'&&p[1])return vid(p[1],'shorts');
  if(p[0]==='live'&&p[1])return vid(p[1],'live');
  if(p[0]==='playlist'&&list)return {type:'playlist',url:'https://www.youtube.com/playlist?list='+encodeURIComponent(list),title:'재생목록'};
- if(p[0]==='results'){const q=x.searchParams.get('search_query')||'';return {type:'search',url:x.href,title:q+' (검색)',q}}
+ if(p[0]==='results'){const q=x.searchParams.get('search_query')||'';return {type:'search',url:x.href,title:q,q}}
  if(p[0]&&(p[0].startsWith('@')||p[0].startsWith('%40')||['channel','c','user'].includes(p[0]))){
   const isAt=!['channel','c','user'].includes(p[0]);
   const base=isAt?p[0]:p[0]+'/'+(p[1]||'');
@@ -189,6 +189,7 @@ function openIt(it){
 }
 
 // ---------- 화면 그리기 ----------
+const nextColor=()=>COLORS.find(x=>!D.cats.some(c=>c.color===x))||COLORS[D.cats.length%COLORS.length];
 const catOf=id=>D.cats.find(c=>c.id===id);
 function cnt(id){return D.items.filter(i=>id==='all'?true:id==='none'?!catOf(i.cat):i.cat===id).length}
 function drawCats(){
@@ -247,7 +248,7 @@ function catPick(sel,allowNew=true){
 function bindPick(get,set){
  $('#sheet').querySelectorAll('[data-pc]').forEach(b=>b.onclick=()=>{set(b.dataset.pc);$('#sheet').querySelectorAll('[data-pc]').forEach(x=>x.classList.toggle('on',x===b))});
  const nb=$('#sheet').querySelector('[data-newcat]');
- if(nb)nb.onclick=()=>{const n=prompt('새 카테고리 이름을 적어 주세요 (예: 운동, 여행)');if(!n||!n.trim())return;const c={id:'c'+uid(),name:n.trim().slice(0,20),color:COLORS[D.cats.length%COLORS.length]};D.cats.push(c);save();set(c.id);
+ if(nb)nb.onclick=()=>{const n=prompt('새 카테고리 이름을 적어 주세요 (예: 운동, 여행)');if(!n||!n.trim())return;const c={id:'c'+uid(),name:n.trim().slice(0,20),color:nextColor()};D.cats.push(c);save();set(c.id);
   const wrap=$('#pick');wrap.outerHTML=catPick(c.id);bindPick(get,set)};
 }
 
@@ -309,7 +310,7 @@ function editItem(id){
 
 // 카테고리 만들기·정리
 function catSheet(){
- let color=COLORS[D.cats.length%COLORS.length];
+ let color=nextColor();
  const rows=D.cats.map((c,k)=>`<div class="catrow"><div class="nm"><span class="dot" style="background:${c.color}"></span><span>${esc(c.name)}</span><small style="color:var(--sub);font-weight:600">${cnt(c.id)}개</small></div>
   <button class="icon-btn" data-cu="${k}" aria-label="위로">▲</button><button class="icon-btn" data-cd="${k}" aria-label="아래로">▼</button><button class="icon-btn" data-ce="${c.id}" aria-label="이름·색 바꾸기">✏️</button><button class="icon-btn" data-cx="${c.id}" aria-label="지우기">🗑</button></div>`).join('');
  sheet(`<h2>카테고리 만들기·정리</h2><p class="lead">카테고리는 즐겨찾기를 나눠 담는 상자예요.</p>
