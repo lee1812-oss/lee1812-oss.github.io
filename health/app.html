@@ -720,6 +720,11 @@ html.ph #phoneApp .done .dph{align-self:stretch;flex:0 1 auto;margin:0 0 -30px}
 .wxtip.t-ok{background:#E2F3E6;color:#1C5E3C;border:1.5px solid #B4DCBF}
 .wxtip.t-dust,.wxtip.t-hot{background:#FFEBC7;color:#7A3F00;border:1.5px solid #F2C77A}
 .wxtip.t-cold,.wxtip.t-gap{background:#E8E6FA;color:#33307E;border:1.5px solid #C6C1EE}
+
+/* ===== v037 지난 날짜 보기: 큰 주황 띠 + 오늘로 가기 버튼 ===== */
+#roBar.robig{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FFE3BF!important;border:3px solid #E08A1E!important;color:#5A2E00;border-radius:16px!important;padding:10px 14px!important;font-size:20px;font-weight:800}
+#roBar.robig .rot{flex:1 1 260px}
+#roBar.robig .rogo{margin-left:auto;min-height:56px;padding:0 22px;border-radius:14px;background:#C25E00;color:#fff;font-size:20px;font-weight:900;box-shadow:0 2px 8px rgba(160,80,0,.25)}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -815,7 +820,7 @@ html.ph #phoneApp .done .dph{align-self:stretch;flex:0 1 auto;margin:0 0 -30px}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v034", PNAME="건강상태확인일지";
+var VER="v037", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1118,7 +1123,7 @@ function render0(){
   var d=S.days[curDate], n=S.roster.length, dc=doneCount();
   $("mProxy").textContent=(nameOf(S.writer)||"작성자")+" 대리 입력";
   Array.prototype.forEach.call($("mode").children,function(b){b.classList.toggle("on",b.dataset.m===mode)});
-  $("roBar").classList.toggle("hide",editable());
+  $("roBar").classList.toggle("hide",editable());roSync();
   if(view==="in"){
     var ed0=editable()&&!locked(), left=n-dc;
     $("pTxt").innerHTML='<span class="kk k1">✓ 체크 완료 <b>'+dc+'</b>명</span><span class="kk k0">체크 전 <b>'+left+'</b>명</span>'+(n&&!left?'<span class="kmsg ok">🎉 오늘 모두 체크 완료!</span>':(ed0&&left?'<span class="kmsg">👆 노란 카드를 눌러 체크해 주세요</span>':''));
@@ -1887,6 +1892,39 @@ window.addEventListener("pageshow",function(){pollNow()});
 window.addEventListener("focus",function(){pollNow()});
 setInterval(function(){lastPoll=Date.now();poll()},12000);
 setInterval(function(){if(pendRender&&!busyUI()&&!(UI==="phone"&&PH.step!==0)){pendRender=false;render()}},1000);
+
+/* ---------- v037 켜 둔 기기(포스기) 자동 맞춤: 날짜 넘김·새 버전·오늘로 돌아가기 ---------- */
+var RO_HTML=null;
+function roSync(){
+  var b=$("roBar");if(!b)return;if(RO_HTML===null)RO_HTML=b.innerHTML;
+  if(curDate&&TODAY&&curDate!==TODAY){
+    b.classList.remove("hide");b.classList.add("robig");
+    b.innerHTML='<span class="rot">📅 지금 <b class="nw">'+bigDate(curDate)+' ('+wd(curDate)+')</b> 지난 일지를 보고 있어요</span><button class="rogo" type="button" onclick="gotoDate(TODAY)">오늘 <span class="nw">'+bigDate(TODAY)+' ('+wd(TODAY)+')</span>로 가기 →</button>';
+  }else{b.classList.remove("robig");b.innerHTML=RO_HTML}
+}
+var lastTouch=Date.now(),NEWV=null,VCHK=0;
+["pointerdown","touchstart","keydown","input","wheel"].forEach(function(ev){document.addEventListener(ev,function(){lastTouch=Date.now()},{passive:true,capture:true})});
+function idleFor(ms){try{return Date.now()-lastTouch>=ms&&pend===0&&!noteT&&!busyUI()&&!(UI==="phone"&&PH.step!==0)}catch(e){return false}}
+function devToday(){return ymd(new Date())}
+function hardReload(tag){
+  try{var key="hl_hr_"+tag,n=+(sessionStorage.getItem(key)||0);if(n>=2)return false;sessionStorage.setItem(key,String(n+1))}catch(e){}
+  try{if(STATIC){var w=(window.top&&window.top!==window)?window.top:window,u=new URL(w.location.href);u.searchParams.set("v",tag);w.location.replace(u.toString());return true}}catch(e){}
+  return false;
+}
+function verPeek(){
+  try{fetch("https://lee1812-oss.github.io/health/version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.app&&j.app!==VER)NEWV=j.app}).catch(function(){})}catch(e){}
+}
+setInterval(function(){
+  if(!TODAY||UI==="admin")return;
+  var dt=devToday();
+  if(dt>TODAY&&idleFor(30000)){                 /* 자정이 지났으면 오늘 날짜로 */
+    if(!hardReload("d"+dt)){TODAY=dt;gotoDate(dt)}
+    return;
+  }
+  if(NEWV&&idleFor(30000)){if(hardReload(NEWV))return}   /* 새 버전이 있으면 아무도 30초 이상 손대지 않을 때 새로고침 */
+  if(curDate&&curDate!==TODAY&&idleFor(180000))gotoDate(TODAY);   /* 지난 날짜를 3분 넘게 그대로 두면 오늘로 */
+  if(++VCHK%5===1)verPeek();                    /* 5분마다 새 버전 확인 */
+},60000);
 
 /* ---------- 시작 ---------- */
 if(MODE0==="phone"){
