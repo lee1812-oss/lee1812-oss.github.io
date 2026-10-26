@@ -24,9 +24,11 @@ html,body{margin:0;height:100%;background:#FAF4EA;font-family:"Malgun Gothic","A
 #pb{position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));z-index:21;border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.18);display:flex;gap:8px;align-items:flex-start}
 #pb.ok{background:#e9f7ee;color:#14532d;border:1px solid #86efac}#pb.in{background:#eaf1fe;color:#1e3a8a;border:1px solid #9db7f3}#pb.wn{background:#fff4e5;color:#7c2d12;border:1px solid #fdba74}
 #pb .t{flex:1}#pb button{font:inherit;font-weight:700;border-radius:10px;border:1px solid currentColor;background:#fff;color:inherit;min-height:44px;padding:0 14px;margin-top:6px;cursor:pointer}#pb .x{border:0;background:transparent;font-size:18px;min-width:36px;margin-top:0}
+#sv{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:9;height:48px;padding:0 16px;border:0;border-radius:24px;background:rgba(30,41,59,.8);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+#say{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;background:#fff4e5;color:#7c2d12;border:3px solid #f97316;border-radius:18px;padding:22px 28px;font-size:26px;font-weight:800;line-height:1.5;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3);max-width:90vw}
 </style></head><body>
 <div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 QR 또는 링크로 한 번 열어 주세요.<br><br><small style="color:#667">홈 화면 아이콘으로 열었는데 이 화면이 나오면:<br>① 홈 화면의 「건강일지」 앱을 지우고<br>② 팀장에게 받은 QR(링크)을 <b>크롬</b>으로 열어<br>③ ⋮ → 「앱 설치」로 다시 설치해 주세요.</small></div>
-<div id="ib" class="hide"></div><div id="pb" class="hide"></div><div id="isht" class="hide"></div>
+<div id="ib" class="hide"></div><div id="pb" class="hide"></div><button id="sv" class="hide">🔊 9시 안내 소리 시험</button><div id="say" class="hide"></div><div id="isht" class="hide"></div>
 <iframe id="fr" class="hide" allow="fullscreen" title="건강상태확인일지"></iframe>
 <button class="fb hide" id="bFs">⛶ 화면 채우기</button>
 <button class="fb hide" id="bEx" style="background:rgba(200,40,40,.85);opacity:1">✕ 채우기 취소</button>
@@ -56,10 +58,11 @@ var HL_EXEC="";
   sync();
   if(m==="phone")instHelp(isIOS);
   try{pushInit(k,m)}catch(e){}
+  if(m==="tablet")try{sayInit(k)}catch(e){}
   verCheck();
 })();
 /* ---------- 설치 상태 안내 (바로연락 v007과 같은 방식) ---------- */
-var WRAP_VER="w4";
+var WRAP_VER="w5";
 function instFix(){var s=document.getElementById("isht");s.innerHTML='<div class="in"><h3>앱이 안 보이거나 안 열릴 때 (완전히 지우고 다시 설치)</h3>'+
  '<div class="n b"><b>1. 먼저 찾아보기</b><br>홈 화면을 위로 쓸어 올려 <b>앱스 화면</b> 맨 위 검색 칸에 <b>「건강일지」</b>를 쳐 보세요. 보이면 꾹 눌러 홈 화면으로 끌어오면 돼요.</div>'+
  '<div class="n w"><b>2. 「앱을 열 수 없음」이나 「잘못된 링크」가 뜨면</b><br>① 설정 → 애플리케이션 → 「건강일지」 → <b>삭제</b><br>② 휴대폰을 껐다 켜기<br>③ 팀장에게 받은 <b>QR(링크)</b>을 <b>크롬</b>으로 열기<br>④ ⋮ → <b>「앱 설치」</b> → 1분쯤 기다리기</div>'+
@@ -110,6 +113,26 @@ function pushInit(k,m){
   if(dismissed())return;
   bar('<div class="t">🔔 <b>9시 체크 알림 받기</b><br>근무일 아침 9시에 아직 건강 체크를 안 한 분이 있으면 이 기기에 알림이 울려요.<br><button class="on">알림 켜기</button></div>',"in");
  }).catch(function(){});
+}
+/* ---------- w5: 포스기(태블릿 화면) 9시 말소리 안내. 09:00에 체크 전 인원이 있으면 이름을 불러 소리 내어 알린다 ---------- */
+function sayInit(k){
+ if(!("speechSynthesis" in window))return;
+ var sv=document.getElementById("sv"),box=document.getElementById("say");
+ function act(){try{return !navigator.userActivation||navigator.userActivation.hasBeenActive}catch(e){return true}}
+ function voice(){var vs=speechSynthesis.getVoices().filter(function(v){return /^ko/i.test(v.lang)});return vs.filter(function(v){return /Google/.test(v.name)})[0]||vs[0]||null}
+ function chime(){try{var C=window.AudioContext||window.webkitAudioContext,c=new C(),t=c.currentTime;[880,660,880,660].forEach(function(f,i){var o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(0.0001,t+i*0.35);g.gain.exponentialRampToValueAtTime(0.6,t+i*0.35+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.35+0.32);o.start(t+i*0.35);o.stop(t+i*0.35+0.34)})}catch(e){}}
+ function speak(txt,times){speechSynthesis.cancel();for(var i=0;i<times;i++){var u=new SpeechSynthesisUtterance(txt);u.lang="ko-KR";var v=voice();if(v)u.voice=v;u.rate=0.95;u.volume=1;speechSynthesis.speak(u)}}
+ function show(html,ms){box.innerHTML=html;box.classList.remove("hide");setTimeout(function(){box.classList.add("hide")},ms)}
+ function announce(miss){var txt="건강 체크 안내입니다. 아직 건강 체크를 안 한 분이 "+miss.length+"명 있어요. "+miss.join(" 님, ")+" 님, 지금 건강 체크해 주세요.";
+  show("⏰ 9시 건강 체크 안내<br>체크 전: "+miss.join(" · ")+"<br><small style='font-size:18px'>노란 카드를 눌러 체크해 주세요</small>",90000);
+  chime();setTimeout(function(){speak(txt,2)},1600)}
+ sv.onclick=function(){chime();setTimeout(function(){speak("9시 건강 체크 안내 소리가 잘 나옵니다. 아침 9시에 체크 안 한 분이 있으면 이렇게 이름을 불러 드려요.",1)},1600);sv.classList.add("hide")};
+ function syncBtn(){sv.classList.toggle("hide",act())}
+ syncBtn();setInterval(syncBtn,5000);
+ try{speechSynthesis.getVoices()}catch(e){}
+ setInterval(function(){var n=new Date(Date.now()+9*3600e3),d=n.toISOString().slice(0,10),hm=n.toISOString().slice(11,16);
+  if(hm<"09:00"||hm>"09:05")return;var key="hl_say_"+d;try{if(localStorage.getItem(key))return;localStorage.setItem(key,"1")}catch(e){}
+  hlApi("apiMissNow",[k]).then(function(j){if(j&&j.ok&&!j.rest&&j.miss&&j.miss.length)announce(j.miss)}).catch(function(){try{localStorage.removeItem(key)}catch(e){}})},20000);
 }
 /* ---------- 새 버전 확인: GitHub Pages가 화면을 최대 10분 저장본으로 줄 때 ---------- */
 function verCheck(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
