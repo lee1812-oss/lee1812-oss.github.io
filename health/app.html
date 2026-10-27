@@ -731,6 +731,26 @@ html.ph #phoneApp #bAllX,#phoneApp #bAllX{background:#1F7A45;border:2px solid #1
 #phoneApp #bAllX.pulse{animation:axPulse 1.4s ease-in-out infinite}
 @keyframes axPulse{0%,100%{box-shadow:0 0 0 0 rgba(31,122,69,.5);background-color:#1F7A45;transform:scale(1)}50%{box-shadow:0 0 0 7px rgba(31,122,69,0);background-color:#2A9457;transform:scale(1.02)}}
 @media (prefers-reduced-motion:reduce){#phoneApp #bAllX.pulse{animation:none}}
+
+/* ===== v040 휴대폰 질문 화면: 큰 글씨·카드 높이는 내용대로·O X 안 잘림·위아래로 넘겨 보기 + 다 답하면 서명 버튼 강조 ===== */
+html.ph #phoneApp main>section#v1:not(.hide){overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;gap:10px;padding-bottom:4px}
+html.ph #phoneApp #v1>*{flex-shrink:0}
+html.ph #phoneApp #v1 .legend{display:block!important;font-size:15px;line-height:1.3;color:var(--sub);margin:0}
+html.ph #phoneApp #qs{flex:none;min-height:auto;display:flex;flex-direction:column;gap:10px;overflow:visible}
+html.ph #phoneApp .q,html.ph #phoneApp .q.ok,html.ph #phoneApp .q.hit{flex:none;min-height:86px;height:auto;overflow:visible;padding:12px 12px;display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px}
+html.ph #phoneApp .q.ok{border-color:var(--ok)}
+html.ph #phoneApp .q.hit{border-color:var(--bad)}
+html.ph #phoneApp .q .t{flex:1 1 auto;min-width:0;margin:0;font-size:clamp(18px,5vw,20px)!important;line-height:1.45;color:var(--ink);font-weight:500;align-items:flex-start;gap:8px;word-break:keep-all;overflow-wrap:break-word}
+html.ph #phoneApp .q .t .ku,html.ph #phoneApp .q .t .kb{font-weight:800}
+html.ph #phoneApp .q .no{display:flex!important;flex:none;width:28px;height:28px;font-size:15px;margin-top:2px}
+html.ph #phoneApp .sg{flex:none;width:auto!important;display:flex;gap:8px;align-self:center}
+html.ph #phoneApp .sg button{flex:none;width:58px;height:58px;min-height:58px;max-height:none;padding:0;border-width:2px;border-radius:14px;font-size:26px;font-weight:900;line-height:1}
+html.ph #phoneApp .sg button small{display:none!important}
+@media (max-width:360px){html.ph #phoneApp .q .no{display:none!important}html.ph #phoneApp .sg{gap:6px}html.ph #phoneApp .sg button{width:54px;height:54px;min-height:54px}}
+html.ph #phoneApp #bNext{position:sticky;bottom:0;z-index:2;flex:none;min-height:58px;height:auto;margin-top:2px;font-size:clamp(17px,4.8vw,21px)}
+html.ph #phoneApp #bNext.pulse:not([disabled]){background:#165A37;animation:nxPulse 1.4s ease-in-out infinite}
+@keyframes nxPulse{0%,100%{box-shadow:0 0 0 0 rgba(22,90,55,.5);background-color:#165A37}50%{box-shadow:0 0 0 7px rgba(22,90,55,0);background-color:#1F7A45}}
+@media (prefers-reduced-motion:reduce){html.ph #phoneApp #bNext.pulse{animation:none}}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -826,7 +846,7 @@ html.ph #phoneApp #bAllX,#phoneApp #bAllX{background:#1F7A45;border:2px solid #1
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v039", PNAME="건강상태확인일지";
+var VER="v040", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1356,7 +1376,7 @@ function fitText(el,box,minPx){
 function fitPhone(){
   if(MODE0!=="phone")return;
   if(PH.step===1){
-    Array.prototype.forEach.call(document.querySelectorAll("#qs .q"),function(q){fitText(q.querySelector(".t"),q,12)});
+    /* v040: 질문 글자는 줄이지 않고 화면을 위아래로 넘겨 보게 함 */
     fitText($("bNext"),$("bNext"),12);fitText($("bAllX"),$("bAllX"),12);
   }
 }
@@ -1369,8 +1389,11 @@ function phQ(){
   }).join("");
   var hit=PH.a.some(function(v){return v===1}),all=PH.a.every(function(v){return v>=0});
   $("bNext").disabled=!all;
-  $("bNext").textContent=all?"서명하러 가기":"모든 질문에 답해 주세요 ("+PH.a.filter(function(v){return v>=0}).length+"/5)";
+  $("bNext").textContent=all?"서명하러 가기 →":"모든 질문에 답해 주세요 ("+PH.a.filter(function(v){return v>=0}).length+"/5)";
+  $("bNext").classList.toggle("pulse",all);   /* v040: 다 답하면 「서명하러 가기」가 부드럽게 반짝 */
   fitPhone();
+  if(all&&!PH._all){setTimeout(function(){try{$("bNext").scrollIntoView({behavior:"smooth",block:"end"})}catch(x){}},60)}
+  PH._all=all;
 }
 var pd={cv:null,ctx:null,drawing:false,len:0,ready:false,lx:0,ly:0,sx:1,sy:1,idPh:"ph",idSend:"bSend"};
 function fitPad(force){
@@ -1833,7 +1856,7 @@ document.addEventListener("click",function(e){
   if(sg&&t.dataset.i!==undefined){PH.a[+t.dataset.i]=+t.dataset.v;phQ();return}
   var nb=t.closest("#nm");
   if(nb&&t.dataset.id&&curDate===TODAY){
-    PH.pid=t.dataset.id;PH.a=[-1,-1,-1,-1,-1];$("memo").value="";
+    PH.pid=t.dataset.id;PH.a=[-1,-1,-1,-1,-1];PH._all=false;$("memo").value="";
     try{localStorage.setItem("hl_pid",PH.pid)}catch(x){}
     phQ();phShow(1);return}
 });
