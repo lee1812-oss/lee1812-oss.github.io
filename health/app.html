@@ -836,6 +836,20 @@ html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
 .cf .bx.rdw .rdq{font-size:20px;font-weight:800;margin:0 0 14px}
 .cf .bx.rdw .bt button{flex:1;min-height:58px;font-size:19px}
 .cf .bx.rdw #rdOk{background:#1F6B45;color:#fff}
+
+/* ===== v047 제출 완료 인사 카드 ===== */
+html.ph #phoneApp main>section#v3:not(.hide){overflow-y:auto}
+html.ph #phoneApp .done{justify-content:flex-start;overflow:visible;flex:1 0 auto}
+html.ph #phoneApp .done .dph{height:clamp(90px,15vh,150px);font-size:clamp(18px,5vw,21px);padding:0 12px 40px}
+html.ph #phoneApp .done .grt{width:100%;max-width:400px;background:linear-gradient(135deg,#FFF6E6,#FFEFD9);border:1.5px solid #EBCB9C;border-radius:16px;padding:10px 14px;margin:6px 0;text-align:center;box-shadow:0 2px 8px rgba(120,70,20,.08)}
+html.ph #phoneApp .done .grt p{margin:3px 0;font-size:clamp(17px,4.9vw,20px);line-height:1.45;color:#4A3420;font-weight:600;word-break:keep-all}
+html.ph #phoneApp .done .grt p:last-child{color:#1F6B45;font-weight:800}
+.grtT{position:fixed;inset:0;z-index:60;background:rgba(40,25,10,.35);display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer}
+.grtT .gbx{max-width:640px;width:100%;background:linear-gradient(135deg,#FFF8EC,#FFEBD2);border:3px solid #E9B97A;border-radius:24px;padding:24px 28px;text-align:center;box-shadow:0 10px 40px rgba(80,40,0,.25)}
+.grtT .g1{font-size:28px;font-weight:900;color:#5A2E00;margin-bottom:10px;word-break:keep-all}
+.grtT p{margin:6px 0;font-size:22px;line-height:1.5;color:#4A3420;font-weight:600;word-break:keep-all}
+.grtT p:last-of-type{color:#1F6B45;font-weight:800}
+.grtT .gx{margin-top:12px;font-size:15px;color:#8A7460}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -931,7 +945,7 @@ html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v046", PNAME="건강상태확인일지";
+var VER="v047", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1362,6 +1376,7 @@ function submitEntry(sig,off){
   var nm=nameOf(id),k=cnt(d.rec[id]);
   closeOv();render();
   toast(nm+(off?" 님 휴무 처리":" 님 제출 완료")+(k?" · 특이사항을 적어 주세요":""));
+  if(by==="self"&&!off&&curDate===TODAY)greetTablet(id,hm(now),!!rd,!!k);   /* v047 본인 제출 뒤 인사 카드 */
   if(k){setTimeout(function(){var n=$("note");if(n&&!n.classList.contains("hide"))n.scrollIntoView({behavior:"smooth",block:"center"})},120)}
   afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),!!off,rd?{why:rd}:null),curDate);
 }
@@ -1528,9 +1543,10 @@ function exportSig(){
 function phFinish(t,dup){
   var hit=PH.a.filter(function(v){return v===1}).length,p=person(PH.pid);
   $("dn").className="done"+(hit&&!dup?" hit":"");
-  $("dn").innerHTML='<div class="dph">'+(dup?'오늘 체크는 이미 끝났어요 🌿':'오늘도 건강하게, 좋은 하루 보내세요 🌿')+'</div><div class="ck">✓</div><h2>'+(dup?"이미 제출했어요":"제출 완료")+'</h2>'+
+  var G=greetOf(PH.pid,t||hm(new Date()),!!PH._wasRedo,!!hit&&!dup);PH._wasRedo=false;
+  $("dn").innerHTML='<div class="dph">'+esc(G.l1)+'</div><div class="ck">✓</div><h2>'+(dup?"이미 제출했어요":"제출 완료")+'</h2>'+
    '<div class="dsum"><b>'+esc(p?p.name:"")+' 님</b><span>'+esc(fmtDate(TODAY))+' · '+esc(t||"")+'</span></div>'+
-   (dup?'':(hit?'<div class="dwarn">해당 있음 '+hit+'건 — 작업 전에 팀장님께 꼭 알려 주세요</div>':'<p class="dok">모든 항목 해당 없음</p>'))+'<p class="dmore">이 화면은 닫아도 돼요.</p>';
+   (dup?'':(hit?'<div class="dwarn">해당 있음 '+hit+'건 — 작업 전에 팀장님께 꼭 알려 주세요</div>':'<p class="dok">모든 항목 해당 없음</p>'))+'<div class="grt">'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'</div><p class="dmore">이 화면은 닫아도 돼요.</p>';
   phShow(3);
 }
 function phSend(){
@@ -1540,7 +1556,7 @@ function phSend(){
   api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null).then(function(r){
     PH.busy=false;$("bSend").textContent="서명하고 제출 완료";
     if(r.day)setDay(TODAY,r.day);
-    if(r.ok){var wr=!!PH.redo;PH.redo=null;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
+    if(r.ok){var wr=!!PH.redo;PH.redo=null;PH._wasRedo=wr;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
     if(r.dup){PH.redo=null;phFinish(r.t,true);return}
     toast(r.msg||"제출하지 못했어요");$("bSend").disabled=pd.len<80;
     if(r.locked){PH.step=0;renderPhone()}
@@ -2093,6 +2109,41 @@ function phDoneView(pid){
       phQ();phShow(1);toast("다시 체크해요 · 질문부터 서명까지");
     })},function(){phDoneView(pid)});
   };
+}
+
+/* ---------- v047 제출 완료 인사: 이름+직함, 그날 날씨·제출 시각·요일에 맞춘 문장 (날짜+사람으로 골라 같은 날엔 같은 글) ---------- */
+var TITLE={"이혜영":"이사","박태일":"상무","황정기":"전무","김영복":"대표","이정현":"과장","서재우":"차장","김명우":"대리","오승태":"사원"};
+function callName(p){if(!p)return "";var t=TITLE[p.name];return t?p.name+" "+t+"님":p.name+" 님"}
+function seedOf(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
+function greetOf(pid,t,redo,hit){
+  var p=person(pid),nm=callName(p),sd=seedOf(TODAY+"|"+pid),pk=function(a,n){return a[(sd+(n||0))%a.length]};
+  var hh=+(String(t).split(":")[0]||0),mm=+(String(t).split(":")[1]||0),mi=hh*60+mm;
+  var op=mi<420?pk(["가장 먼저 하루를 여셨네요.","이른 아침부터 부지런히 시작하셨네요."]):mi<510?pk(["좋은 아침이에요!","상쾌한 아침이에요!"]):mi<540?pk(["근무 전에 꼼꼼히 챙겨 주셨네요.","오늘도 딱 맞춰 준비해 주셨네요."]):pk(["바쁜 아침에도 잊지 않고 챙겨 주셨네요.","바쁜 와중에도 챙겨 주셔서 고마워요."]);
+  var wk=(typeof wxKind==="function")?wxKind():"def",w=WX||{},lo=(w.lo!=null?+w.lo:null),now=(w.t!=null?+w.t:null),hi=(w.hi!=null?+w.hi:null),du=String(w.dust||"");
+  var emo={clear:"☀️",part:"⛅",cloud:"☁️",rain:"🌧️",snow:"❄️"}[wk]||"🌿";
+  var wl;
+  if(wk==="snow")wl="눈 소식이 있어요. 길이 미끄러우니 천천히 다니세요.";
+  else if(wk==="rain")wl=pk(["비 소식이 있어요. 오가는 길 미끄럼 조심하세요.","비 오는 날이에요. 젖은 바닥 조심하시고 따뜻하게 계세요."],1);
+  else if((now!=null&&now<=0)||(lo!=null&&lo<=0))wl="영하의 추운 날이에요. 따뜻하게 입고 손발 녹이며 시작해요.";
+  else if(lo!=null&&lo<=5)wl="아침 공기가 차가워요. 감기 조심하시고 따뜻하게 시작해요.";
+  else if(hi!=null&&hi>=30)wl="더운 날이에요. 물 자주 드시고 쉬엄쉬엄 하세요.";
+  else if(/나쁨/.test(du))wl="미세먼지가 나빠요. 작업장 들어가기 전 손 씻기 한 번 더 챙겨요.";
+  else if(wk==="clear")wl=pk(["햇살이 좋은 날이에요. 기분 좋게 시작해요.","맑은 하늘처럼 상쾌한 하루 되세요."],1);
+  else if(wk==="part")wl=pk(["구름이 몽글몽글한 날, 마음은 맑게 시작해요.","구름 사이 햇살처럼 따뜻한 하루 되세요."],1);
+  else if(wk==="cloud")wl=pk(["하늘은 흐려도 오늘 빵은 맑고 맛있게 만들어요.","흐린 날일수록 서로 웃으며 힘내요."],1);
+  else wl="오늘도 건강하게 시작해요.";
+  if(op==="상쾌한 아침이에요!"&&(wk==="rain"||wk==="snow"||wk==="cloud"||(lo!=null&&lo<=0)))op="좋은 아침이에요!";
+  var wd0=wd(TODAY),dl={"월":"한 주의 시작, 이번 주도 함께 힘내요!","화":"화요일도 차근차근 함께해요.","수":"한 주의 한가운데, 조금만 더 힘내요!","목":"주말이 가까워지고 있어요. 오늘도 힘내요!","금":"한 주를 마무리하는 금요일, 끝까지 함께해요!","토":"쉬는 날에도 나와 주셔서 정말 고마워요.","일":"쉬는 날에도 나와 주셔서 정말 고마워요."}[wd0]||"";
+  var th=redo?"다시 확인해 주셔서 감사합니다. 덕분에 기록이 더 정확해졌어요.":pk(["오늘도 건강일지 작성에 협조해 주셔서 감사합니다.","꼼꼼한 건강 체크 덕분에 안전한 빵을 만들어요. 감사합니다.","건강일지 챙겨 주셔서 고맙습니다. 오늘도 잘 부탁드려요."],2);
+  if(hit)return {l1:nm+", 알려 주셔서 고마워요.",rest:["몸이 불편하시면 무리하지 마시고 팀장님께 꼭 말씀해 주세요.",th]};
+  return {l1:emo+" "+nm+", "+op,rest:[wl,dl,th].filter(function(s){return s})};
+}
+function greetTablet(pid,t,redo,hit){
+  var G=greetOf(pid,t,redo,hit),old=$("grtT");if(old)old.remove();
+  var e=document.createElement("div");e.id="grtT";e.className="grtT";
+  e.innerHTML='<div class="gbx"><div class="g1">'+esc(G.l1)+'</div>'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'<div class="gx">눌러서 닫기</div></div>';
+  e.onclick=function(){e.remove()};document.body.appendChild(e);
+  setTimeout(function(){if(e.parentNode)e.remove()},8000);
 }
 
 /* ---------- 시작 ---------- */
