@@ -87,8 +87,11 @@ function kakao(ev){let h='<div class="kk">',room='',date='';
  return h+'<div class="src">카톡 원문 그대로 옮김 · 개인정보·금액은 가림</div></div>';}
 function b64d(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 async function load(){
- const h=location.hash.slice(1);const [id,k]=h.split('.');
- if(!id||!k){fail('주소가 잘렸어요. 카톡으로 받은 주소 전체를 눌러 열어 주세요.');return;}
+ const qs=new URLSearchParams(location.search).get('r')||'';
+ let h=qs||location.hash.slice(1)||sessionStorage.getItem('r4code')||'';
+ const m=h.match(/([A-Za-z0-9]{6})\.([A-Za-z0-9_-]{20,})/);
+ if(!m){askCode();return;}
+ const id=m[1],k=m[2];try{sessionStorage.setItem('r4code',id+'.'+k)}catch(e){}
  ID=id;
  try{const r=await fetch('./'+id+'.txt?v='+Date.now());if(!r.ok)throw 0;const raw=b64d((await r.text()).trim());
   const key=await crypto.subtle.importKey('raw',b64d(k),'AES-GCM',false,['decrypt']);
@@ -97,6 +100,7 @@ async function load(){
  catch(e){fail('내용을 열 수 없어요. 주소 전체가 맞는지 확인해 주세요.');return;}
  try{ANS=JSON.parse(localStorage.getItem('r4_'+ID)||'{}')}catch(e){ANS={}}
  render();}
+function askCode(){document.getElementById('who').textContent='주소 확인';document.getElementById('app').innerHTML=`<div class="err">받은 주소의 뒷부분이 빠져서 열리지 않았어요.<br>카톡으로 받은 <b>주소 전체를 길게 눌러 복사</b>한 뒤 아래 칸에 붙여 넣고 「열기」를 눌러 주세요.<textarea id="pc" placeholder="여기에 붙여 넣기"></textarea><button class="big" id="po" style="margin-top:10px">열기</button></div>`;document.getElementById('po').onclick=()=>{const v=document.getElementById('pc').value;const m=v.match(/([A-Za-z0-9]{6})\.([A-Za-z0-9_-]{20,})/);if(!m){alert('주소가 맞지 않아요. 받은 주소 전체를 붙여 넣어 주세요.');return;}sessionStorage.setItem('r4code',m[0]);location.reload();};}
 function fail(t){document.getElementById('who').textContent='열 수 없음';document.getElementById('app').innerHTML=`<div class="err">${t}</div>`;}
 function save(){try{localStorage.setItem('r4_'+ID,JSON.stringify(ANS))}catch(e){}prog();}
 function prog(){const n=D.items.filter(it=>ANS[it.no]&&ANS[it.no].c).length;document.getElementById('prog').textContent=`${D.items.length}개 중 ${n}개 답함`+(n<D.items.length?' · 다 못 채워도 보낼 수 있어요':' · 모두 답했어요');
