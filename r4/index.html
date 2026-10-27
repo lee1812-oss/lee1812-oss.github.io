@@ -135,15 +135,15 @@ async function makePdf(){
   const z=document.getElementById('pdfzone');z.innerHTML='';
   const head=`<div class="ph"><div class="k">UTCA 출력일보 4차 점검 · 확인 요청 회신</div><h1>${esc(D.who)} 회신</h1><div class="m">회신 ${nowStr()} · 요청 ${esc(D.date)} ${esc(D.from)}</div></div>`;
   const pages=[];let pg=null,used=0;const LIMIT=1123-40-70;
-  const newPage=()=>{pg=document.createElement('div');pg.className='pg';pg.innerHTML=pages.length?'':head;z.appendChild(pg);pages.push(pg);used=pg.scrollHeight;};
+  const newPage=()=>{pg=document.createElement('div');pg.className='pg';pg.style.height='auto';pg.innerHTML=pages.length?'':head;z.appendChild(pg);pages.push(pg);};
   newPage();
   for(const it of D.items){const a=ANS[it.no]||{};const T=TAG[it.tag];
    const d=document.createElement('div');d.className='it';
    d.innerHTML=`<span class="tag" style="color:${T[1]};background:${T[2]};border-color:${T[1]}">${T[0]}</span><div class="q">${it.no}. ${esc(it.q)}</div><div class="ans${a.c?'':' none'}">답: ${esc(a.c||'답 없음')}</div>${a.m?`<div class="memo">메모: ${esc(a.m)}</div>`:''}`;
    pg.appendChild(d);
-   if(pg.scrollHeight>LIMIT&&pg.children.length>(pages.length===1?2:1)){pg.removeChild(d);newPage();pg.appendChild(d);}
+   if(pg.offsetHeight>LIMIT&&pg.children.length>(pages.length===1?2:1)){pg.removeChild(d);newPage();pg.appendChild(d);}
   }
-  pages.forEach((p,i)=>{const f=document.createElement('div');f.className='ft';f.innerHTML=`<span>${esc(D.who)} 회신 · UTCA 출력일보 확인</span><span>${i+1} / ${pages.length}</span>`;p.appendChild(f);});
+  pages.forEach((p,i)=>{p.style.height='1123px';const f=document.createElement('div');f.className='ft';f.innerHTML=`<span>${esc(D.who)} 회신 · UTCA 출력일보 확인</span><span>${i+1} / ${pages.length}</span>`;p.appendChild(f);});
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
   for(let i=0;i<pages.length;i++){const cv=await html2canvas(pages[i],{scale:2,backgroundColor:'#fff'});if(i)doc.addPage();doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,210,297);}
   PDFBLOB=doc.output('blob');const d=new Date();PDFNAME=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_UTCA_확인회신_${D.short}.pdf`;
