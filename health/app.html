@@ -931,7 +931,7 @@ html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v045", PNAME="건강상태확인일지";
+var VER="v046", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1363,7 +1363,7 @@ function submitEntry(sig,off){
   closeOv();render();
   toast(nm+(off?" 님 휴무 처리":" 님 제출 완료")+(k?" · 특이사항을 적어 주세요":""));
   if(k){setTimeout(function(){var n=$("note");if(n&&!n.classList.contains("hide"))n.scrollIntoView({behavior:"smooth",block:"center"})},120)}
-  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",(navigator.userAgent||"").slice(0,120),!!off,rd?{why:rd}:null),curDate);
+  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),!!off,rd?{why:rd}:null),curDate);
 }
 function resyncDay(){
   return api("apiDay",K,curDate).then(function(r){if(r.ok){setDay(curDate,r.day);applyCfg(r.cfg);render()}}).catch(function(){});
@@ -1537,7 +1537,7 @@ function phSend(){
   if(PH.busy||pd.len<80)return;
   PH.busy=true;$("bSend").disabled=true;$("bSend").textContent="제출 중…";
   var memo=PH.a.some(function(v){return v===1})?$("memo").value.trim():"";
-  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),(navigator.userAgent||"").slice(0,120),false,PH.redo?{why:PH.redo}:null).then(function(r){
+  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null).then(function(r){
     PH.busy=false;$("bSend").textContent="서명하고 제출 완료";
     if(r.day)setDay(TODAY,r.day);
     if(r.ok){var wr=!!PH.redo;PH.redo=null;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
