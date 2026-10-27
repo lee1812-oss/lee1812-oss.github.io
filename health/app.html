@@ -850,6 +850,11 @@ html.ph #phoneApp .done .grt p:last-child{color:#1F6B45;font-weight:800}
 .grtT p{margin:6px 0;font-size:22px;line-height:1.5;color:#4A3420;font-weight:600;word-break:keep-all}
 .grtT p:last-of-type{color:#1F6B45;font-weight:800}
 .grtT .gx{margin-top:12px;font-size:15px;color:#8A7460}
+
+/* ===== v048 이름 2열: 작은 글씨가 칸을 넘지 않게 ===== */
+html.ph #phoneApp .nm.c2 .nb{padding:0 10px;min-width:0}
+html.ph #phoneApp .nm.c2 .nb span{max-width:100%}
+html.ph #phoneApp .nm.c2 .nb small{font-size:12.5px!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -945,7 +950,7 @@ html.ph #phoneApp .done .grt p:last-child{color:#1F6B45;font-weight:800}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v047", PNAME="건강상태확인일지";
+var VER="v048", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1429,7 +1434,7 @@ function renderPhone(){
   $("nm").innerHTML=list.map(function(p){
     var r=d.rec[p.id];
     if(r&&r.by==="proxy"&&!r.sg&&!lk)return '<button class="nb px" data-id="'+esc(p.id)+'"><span>'+esc(p.name)+'</span><small>'+(r.off?'휴무로 입력됨 · 출근했다면 눌러서 서명':'대리 입력됨 · 직접 서명하려면 누르세요')+'</small></button>';
-    if(r)return '<button class="nb dn'+(r.ed?' red':'')+'"'+(lk?' disabled':' data-done="'+esc(p.id)+'"')+'><span>'+esc(p.name)+'</span><small class="bdg">✓ 체크 완료 '+esc(r.t)+(r.ed?' · 수정 '+r.ed+'회':'')+'</small></button>';
+    if(r)return '<button class="nb dn'+(r.ed?' red':'')+'"'+(lk?' disabled':' data-done="'+esc(p.id)+'"')+'><span>'+esc(p.name)+'</span><small class="bdg">✓ 완료 '+esc(r.t)+(r.ed?' · 수정 '+r.ed+'회':'')+'</small></button>';
     if(lk)return '<button class="nb" disabled style="opacity:.5"><span>'+esc(p.name)+'</span><small>입력 마감</small></button>';
     return '<button class="nb todo'+(p.id===last?" me":"")+'" data-id="'+esc(p.id)+'"><span>'+esc(p.name)+'</span><small>'+(p.id===last?"내 이름 · 체크하기 ›":"체크 전 ›")+'</small></button>';
   }).join("");
@@ -1466,8 +1471,9 @@ function renderPhonePast(D){
 function fitNames(){
   var nm=$("nm");if(!nm||MODE0!=="phone"||PH.step!==0)return;
   var n=nm.children.length;if(!n)return;
-  var H=nm.clientHeight,g=6,cols=1;
-  if(H>0){for(cols=1;cols<4;cols++){var rows=Math.ceil(n/cols);if((H-(rows-1)*g)/rows>=46)break}}
+  /* v048: 이름 칸 높이는 고정(50~62px)이라, 8명이 한 화면에 들어가도록 열 수를 고른다(5명 이상이면 최소 2열) */
+  var H=nm.clientHeight,g=8,rh=Math.min(62,Math.max(50,(window.innerHeight||700)*0.074)),cols=n>4?2:1;
+  if(H>0){while(cols<4){var rows=Math.ceil(n/cols);if(rows*rh+(rows-1)*g<=H)break;cols++}}
   nm.style.gridTemplateColumns="repeat("+cols+",1fr)";
   nm.className="nm c"+cols;
 }
@@ -2138,6 +2144,9 @@ function greetOf(pid,t,redo,hit){
   if(hit)return {l1:nm+", 알려 주셔서 고마워요.",rest:["몸이 불편하시면 무리하지 마시고 팀장님께 꼭 말씀해 주세요.",th]};
   return {l1:emo+" "+nm+", "+op,rest:[wl,dl,th].filter(function(s){return s})};
 }
+/* 시험용: 서버 호출 없이 인사만 그려 보기 — __greetPreview("p4","07:40",false) */
+window.__greetPreview=function(pid,t,redo,hit){t=t||hm(new Date());if(MODE0==="phone"){PH.pid=pid;PH.a=hit?[1,0,0,0,0]:[0,0,0,0,0];PH._wasRedo=!!redo;phFinish(t,false)}else greetTablet(pid,t,!!redo,!!hit)};
+try{if(window.top&&window.top!==window)window.top.__greetPreview=window.__greetPreview}catch(x){}
 function greetTablet(pid,t,redo,hit){
   var G=greetOf(pid,t,redo,hit),old=$("grtT");if(old)old.remove();
   var e=document.createElement("div");e.id="grtT";e.className="grtT";
