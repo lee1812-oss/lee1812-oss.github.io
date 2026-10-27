@@ -855,6 +855,27 @@ html.ph #phoneApp .done .grt p:last-child{color:#1F6B45;font-weight:800}
 html.ph #phoneApp .nm.c2 .nb{padding:0 10px;min-width:0}
 html.ph #phoneApp .nm.c2 .nb span{max-width:100%}
 html.ph #phoneApp .nm.c2 .nb small{font-size:12.5px!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== v049 제출 완료 인사: 조조 컬러 3색(남색 #010736 · 크림 #FCF1D0/#FEF8E8 · 주황 #E8590C)만, 사진 없이 큰 카드 하나 ===== */
+html.ph[data-step="3"] #phoneApp{background:#FCF1D0}
+html.ph[data-step="3"] #phoneApp main{background:#FCF1D0}
+html.ph[data-step="3"] #phoneApp #steps,html.ph[data-step="3"] #phoneApp .ftr{display:none!important}
+html.ph[data-step="3"] #phoneApp #pBand{background:#010736!important;text-shadow:none}
+html.ph[data-step="3"] #phoneApp #pBand .pbl{color:#010736;background:#FEF8E8}
+html.ph #phoneApp main>section#v3:not(.hide){justify-content:center;gap:10px}
+html.ph #phoneApp .done.g2{flex:0 1 auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;padding:0;overflow:visible}
+html.ph #phoneApp .done.g2 .gcard{background:#010736;color:#FEF8E8;border-radius:24px;padding:22px 18px;text-align:center}
+html.ph #phoneApp .done.g2 .gbadge{display:inline-block;background:#E8590C;color:#FEF8E8;border-radius:999px;padding:6px 16px;font-size:17px;font-weight:800;margin-bottom:14px;line-height:1.3}
+html.ph #phoneApp .done.g2 .gname{font-size:clamp(24px,7.4vw,28px);font-weight:900;line-height:1.4;margin:0 0 10px;color:#FEF8E8;word-break:keep-all}
+html.ph #phoneApp .done.g2 .gcard p{font-size:clamp(20px,6.2vw,23px);line-height:1.5;margin:6px 0;font-weight:600;color:#FEF8E8;word-break:keep-all}
+html.ph #phoneApp .done.g2 .gmeta{text-align:center;color:#010736;font-size:14px;font-weight:600;margin-top:2px}
+html.ph[data-step="3"] #phoneApp #bAgain{background:transparent!important;color:#010736!important;border:1.5px solid #010736;height:46px;min-height:46px;font-size:16px;font-weight:700;border-radius:12px}
+.grtT{background:rgba(1,7,54,.45)}
+.grtT .gbx{background:#010736;border:0;box-shadow:0 10px 40px rgba(1,7,54,.4);padding:28px 32px}
+.grtT .gbadge{display:inline-block;background:#E8590C;color:#FEF8E8;border-radius:999px;padding:6px 18px;font-size:20px;font-weight:800;margin-bottom:14px}
+.grtT .g1{font-size:30px;font-weight:900;color:#FEF8E8;line-height:1.4;margin-bottom:12px}
+.grtT p,.grtT p:last-of-type{font-size:24px;line-height:1.5;color:#FEF8E8;font-weight:600}
+.grtT .gx{color:#FCF1D0;font-size:16px}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -950,7 +971,7 @@ html.ph #phoneApp .nm.c2 .nb small{font-size:12.5px!important;max-width:100%;ove
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v048", PNAME="건강상태확인일지";
+var VER="v049", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1548,11 +1569,12 @@ function exportSig(){
 }
 function phFinish(t,dup){
   var hit=PH.a.filter(function(v){return v===1}).length,p=person(PH.pid);
-  $("dn").className="done"+(hit&&!dup?" hit":"");
+  $("dn").className="done g2"+(hit&&!dup?" hit":"");
   var G=greetOf(PH.pid,t||hm(new Date()),!!PH._wasRedo,!!hit&&!dup);PH._wasRedo=false;
-  $("dn").innerHTML='<div class="dph">'+esc(G.l1)+'</div><div class="ck">✓</div><h2>'+(dup?"이미 제출했어요":"제출 완료")+'</h2>'+
-   '<div class="dsum"><b>'+esc(p?p.name:"")+' 님</b><span>'+esc(fmtDate(TODAY))+' · '+esc(t||"")+'</span></div>'+
-   (dup?'':(hit?'<div class="dwarn">해당 있음 '+hit+'건 — 작업 전에 팀장님께 꼭 알려 주세요</div>':'<p class="dok">모든 항목 해당 없음</p>'))+'<div class="grt">'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'</div><p class="dmore">이 화면은 닫아도 돼요.</p>';
+  /* v049 조조 컬러(남색 #010736·크림 #FEF8E8·주황 #E8590C) 인사 카드 하나로 */
+  var bd=dup?"✓ 이미 제출했어요":(hit?"해당 있음 "+hit+"건 · 팀장님께 꼭 알려 주세요":"✓ 제출 완료");
+  $("dn").innerHTML='<div class="gcard"><div class="gbadge">'+esc(bd)+'</div><div class="gname">'+esc(G.l1n)+'</div>'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'</div>'+
+   '<div class="gmeta">'+esc(fmtDate(TODAY))+' · '+esc(t||"")+' · '+VER+'</div>';
   phShow(3);
 }
 function phSend(){
@@ -2141,16 +2163,17 @@ function greetOf(pid,t,redo,hit){
   if(op==="상쾌한 아침이에요!"&&(wk==="rain"||wk==="snow"||wk==="cloud"||(lo!=null&&lo<=0)))op="좋은 아침이에요!";
   var wd0=wd(TODAY),dl={"월":"한 주의 시작, 이번 주도 함께 힘내요!","화":"화요일도 차근차근 함께해요.","수":"한 주의 한가운데, 조금만 더 힘내요!","목":"주말이 가까워지고 있어요. 오늘도 힘내요!","금":"한 주를 마무리하는 금요일, 끝까지 함께해요!","토":"쉬는 날에도 나와 주셔서 정말 고마워요.","일":"쉬는 날에도 나와 주셔서 정말 고마워요."}[wd0]||"";
   var th=redo?"다시 확인해 주셔서 감사합니다. 덕분에 기록이 더 정확해졌어요.":pk(["오늘도 건강일지 작성에 협조해 주셔서 감사합니다.","꼼꼼한 건강 체크 덕분에 안전한 빵을 만들어요. 감사합니다.","건강일지 챙겨 주셔서 고맙습니다. 오늘도 잘 부탁드려요."],2);
-  if(hit)return {l1:nm+", 알려 주셔서 고마워요.",rest:["몸이 불편하시면 무리하지 마시고 팀장님께 꼭 말씀해 주세요.",th]};
-  return {l1:emo+" "+nm+", "+op,rest:[wl,dl,th].filter(function(s){return s})};
+  if(hit)return {l1:nm+", 알려 주셔서 고마워요.",l1n:nm+", 알려 주셔서 고마워요.",rest:["몸이 불편하시면 무리하지 마시고 팀장님께 꼭 말씀해 주세요.",th]};
+  return {l1:emo+" "+nm+", "+op,l1n:nm+", "+op,rest:[wl,dl,th].filter(function(s){return s})};
 }
 /* 시험용: 서버 호출 없이 인사만 그려 보기 — __greetPreview("p4","07:40",false) */
-window.__greetPreview=function(pid,t,redo,hit){t=t||hm(new Date());if(MODE0==="phone"){PH.pid=pid;PH.a=hit?[1,0,0,0,0]:[0,0,0,0,0];PH._wasRedo=!!redo;phFinish(t,false)}else greetTablet(pid,t,!!redo,!!hit)};
+function __greetPreview(pid,t,redo,hit){t=t||hm(new Date());if(MODE0==="phone"){PH.pid=pid;PH.a=hit?[1,0,0,0,0]:[0,0,0,0,0];PH._wasRedo=!!redo;phFinish(t,false)}else greetTablet(pid,t,!!redo,!!hit)}
+window.__greetPreview=__greetPreview;
 try{if(window.top&&window.top!==window)window.top.__greetPreview=window.__greetPreview}catch(x){}
 function greetTablet(pid,t,redo,hit){
   var G=greetOf(pid,t,redo,hit),old=$("grtT");if(old)old.remove();
   var e=document.createElement("div");e.id="grtT";e.className="grtT";
-  e.innerHTML='<div class="gbx"><div class="g1">'+esc(G.l1)+'</div>'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'<div class="gx">눌러서 닫기</div></div>';
+  e.innerHTML='<div class="gbx"><div class="gbadge">'+(hit?"해당 있음 · 팀장님께 꼭 알려 주세요":"✓ 제출 완료")+'</div><div class="g1">'+esc(G.l1n)+'</div>'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'<div class="gx">눌러서 닫기</div></div>';
   e.onclick=function(){e.remove()};document.body.appendChild(e);
   setTimeout(function(){if(e.parentNode)e.remove()},8000);
 }
