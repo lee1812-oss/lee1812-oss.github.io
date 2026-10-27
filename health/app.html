@@ -828,6 +828,14 @@ html.ph #phoneApp #bSend.pulse:not([disabled]){animation:olBlink 1.4s step-end i
 .cf .bx.rdo .bt button{min-height:54px;padding:0 18px;border-radius:12px;font-size:18px;font-weight:800}
 html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
 .cf .bx.rdo #rdGo{background:#1F6B45;color:#fff}
+
+/* ===== v045 다시 체크 확인 창: 큰 글씨 + 주황 경고 테두리 ===== */
+.cf .bx.rdo.rdw{border:4px solid #FF8A00;box-shadow:0 8px 30px rgba(120,60,0,.25)}
+.cf .bx.rdw h3{font-size:22px;color:#7A3F00;margin:0 0 10px}
+.cf .bx.rdw .rdb{font-size:20px;line-height:1.55;color:var(--ink);background:#FFF4E2;border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.cf .bx.rdw .rdq{font-size:20px;font-weight:800;margin:0 0 14px}
+.cf .bx.rdw .bt button{flex:1;min-height:58px;font-size:19px}
+.cf .bx.rdw #rdOk{background:#1F6B45;color:#fff}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -923,7 +931,7 @@ html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v044", PNAME="건강상태확인일지";
+var VER="v045", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1313,7 +1321,7 @@ function openEntry(id){
   var r=recOf(id);
   if(r&&r.sg&&mode==="proxy"){toast("본인이 서명한 기록이에요. 「본인 입력」으로 바꿔서 다시 체크해 주세요");return}
   if(r&&r.sg){   /* v044 다시 체크: 이유를 고르고 질문·서명을 다시. 앞 기록은 수정 이력으로 남음 */
-    askWhy(p.name+" 님은 오늘 이미 체크했어요 ("+r.t+").\n다시 체크하면 앞 기록은 「수정 이력」으로 남아요.\n다시 체크하는 이유를 골라 주세요.",function(w){draft={id:id,a:r.a.slice(),had:true,redo:w};drawEntry()});
+    askRedo(p.name,r.t,function(){askWhy(p.name+" 님 · 다시 체크하는 이유를 골라 주세요.",function(w){draft={id:id,a:r.a.slice(),had:true,redo:w};drawEntry()})});
     return;
   }
   draft={id:id,a:r?r.a.slice():[0,0,0,0,0],had:!!r};
@@ -2063,6 +2071,13 @@ function askWhy(msg,fn){
   Array.prototype.forEach.call(h.querySelectorAll(".wy"),function(b){b.onclick=function(ev){ev.stopPropagation();h.innerHTML="";fn(b.dataset.w)}});
 }
 var REDO_W=["잘못 누름","증상 변화","기타"];
+/* v045 다시 체크 전 확인: 수정 기록이 남는다는 것을 크게 알리고 「확인」을 받아야 다음으로 */
+function askRedo(name,t,onOk,onCancel){
+  var h=$("cfHost");
+  h.innerHTML='<div class="cf"><div class="bx rdo rdw"><h3>⚠️ 다시 체크 전에 확인해 주세요</h3><p class="rdb">다시 체크하면 지금 기록<b class="nw">('+esc(t)+' 체크)</b>은 지워지지 않고 <b>「수정 기록」으로 남아요.</b><br>수정 횟수도 표시돼요.</p><p class="rdq">'+esc(name)+' 님, 다시 체크할까요?</p><div class="bt"><button type="button" id="cfNo">취소</button><button type="button" id="rdOk">확인하고 다시 체크</button></div></div></div>';
+  $("cfNo").onclick=function(ev){ev.stopPropagation();h.innerHTML="";if(onCancel)onCancel()};
+  $("rdOk").onclick=function(ev){ev.stopPropagation();h.innerHTML="";onOk()};
+}
 function phDoneView(pid){
   var d=S.days[TODAY],r=d&&d.rec[pid],p=person(pid);if(!r||!p)return;
   var lk=locked()||curDate!==TODAY,h=$("cfHost");
@@ -2072,11 +2087,11 @@ function phDoneView(pid){
    '<div class="bt"><button type="button" id="cfNo">닫기</button>'+(lk?'':'<button type="button" class="go" id="rdGo">다시 체크하기</button>')+'</div></div></div>';
   $("cfNo").onclick=function(){h.innerHTML=""};
   var g=$("rdGo");if(g)g.onclick=function(ev){ev.stopPropagation();h.innerHTML="";
-    askWhy("다시 체크하면 앞 기록은 「수정 이력」으로 남아요.\n질문부터 서명까지 다시 해요.\n다시 체크하는 이유를 골라 주세요.",function(w){
+    askRedo(p.name,r.t,function(){askWhy(p.name+" 님 · 다시 체크하는 이유를 골라 주세요.\n질문부터 서명까지 다시 해요.",function(w){
       PH.redo=w;PH.pid=pid;PH.a=[-1,-1,-1,-1,-1];PH._all=false;$("memo").value="";
       try{localStorage.setItem("hl_pid",pid)}catch(x){}
       phQ();phShow(1);toast("다시 체크해요 · 질문부터 서명까지");
-    });
+    })},function(){phDoneView(pid)});
   };
 }
 
