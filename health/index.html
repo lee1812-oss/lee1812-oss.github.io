@@ -34,6 +34,7 @@ html,body{margin:0;height:100%;background:#FAF4EA;font-family:"Malgun Gothic","A
 <button class="fb hide" id="bEx" style="background:rgba(200,40,40,.85);opacity:1">✕ 채우기 취소</button>
 <script>
 var HL_EXEC="";
+var APP_V="v039";   /* 이 껍데기가 여는 화면 버전. version.json의 app과 다르면 새 주소로 다시 열어 저장본을 건너뜀 */
 (function(){
   var EXEC=HL_EXEC="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec";
   var q=new URLSearchParams(location.search),k=q.get("k")||"",m=q.get("m")||"tablet";
@@ -47,7 +48,7 @@ var HL_EXEC="";
   if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){})}catch(e){}}
   if(["admin","tablet","phone"].indexOf(m)<0)m="tablet";
   var fr=document.getElementById("fr");/* w3: 화면은 같은 곳의 app.html(빠름)로 열고, 자료만 구글에서 받는다. app.html이 실패하면 스스로 예전 주소(EXEC)로 넘어간다 */
-  fr.src="app.html?v=a038&m="+m+"&k="+encodeURIComponent(k);fr.classList.remove("hide");
+  fr.src="app.html?v="+APP_V+"&m="+m+"&k="+encodeURIComponent(k);fr.classList.remove("hide");
   var bFs=document.getElementById("bFs"),bEx=document.getElementById("bEx"),de=document.documentElement;
   var can=!!(de.requestFullscreen||de.webkitRequestFullscreen)&&m!=="phone";   /* 휴대폰은 한 화면 배치라 가림 방지를 위해 채우기 버튼을 두지 않음 */
   function isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
@@ -62,7 +63,7 @@ var HL_EXEC="";
   verCheck();
 })();
 /* ---------- 설치 상태 안내 (바로연락 v007과 같은 방식) ---------- */
-var WRAP_VER="w6";
+var WRAP_VER="w7";
 function instFix(){var s=document.getElementById("isht");s.innerHTML='<div class="in"><h3>앱이 안 보이거나 안 열릴 때 (완전히 지우고 다시 설치)</h3>'+
  '<div class="n b"><b>1. 먼저 찾아보기</b><br>홈 화면을 위로 쓸어 올려 <b>앱스 화면</b> 맨 위 검색 칸에 <b>「건강일지」</b>를 쳐 보세요. 보이면 꾹 눌러 홈 화면으로 끌어오면 돼요.</div>'+
  '<div class="n w"><b>2. 「앱을 열 수 없음」이나 「잘못된 링크」가 뜨면</b><br>① 설정 → 애플리케이션 → 「건강일지」 → <b>삭제</b><br>② 휴대폰을 껐다 켜기<br>③ 팀장에게 받은 <b>QR(링크)</b>을 <b>크롬</b>으로 열기<br>④ ⋮ → <b>「앱 설치」</b> → 1분쯤 기다리기</div>'+
@@ -136,7 +137,8 @@ function sayInit(k){
 }
 /* ---------- 새 버전 확인: GitHub Pages가 화면을 최대 10분 저장본으로 줄 때 ---------- */
 function verCheck(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
- if(!j||!j.v||j.v===WRAP_VER)return;var key="hl_reload_"+j.v;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");
- var u=new URL(location.href);u.searchParams.set("v",j.v);location.replace(u.toString())}).catch(function(){})}catch(e){}}
+ if(!j)return;var want=(j.v&&j.v!==WRAP_VER)?j.v:((j.app&&j.app!==APP_V)?j.app:"");if(!want)return;
+ var key="hl_reload_"+want;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");
+ var u=new URL(location.href);u.searchParams.set("v",want);location.replace(u.toString())   /* m·k 등 기존 값은 그대로, v만 바꿔 HTTP 저장본을 건너뜀 */}).catch(function(){})}catch(e){}}
 </script><script>/* end */
 </script></body></html>

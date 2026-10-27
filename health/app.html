@@ -826,7 +826,7 @@ html.ph #phoneApp #bAllX,#phoneApp #bAllX{background:#1F7A45;border:2px solid #1
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v038", PNAME="건강상태확인일지";
+var VER="v039", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1932,6 +1932,12 @@ setInterval(function(){
   if(curDate&&curDate!==TODAY&&idleFor(180000))gotoDate(TODAY);   /* 지난 날짜를 3분 넘게 그대로 두면 오늘로 */
   if(++VCHK%5===1)verPeek();                    /* 5분마다 새 버전 확인 */
 },60000);
+/* v039: 열자마자 한 번 새 버전 확인 → 아직 아무도 손대지 않았으면 바로 새 버전으로(옛 저장본이 열렸을 때) */
+var LT0=lastTouch;
+setTimeout(function(){try{fetch("https://lee1812-oss.github.io/health/version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
+  if(!j||!j.app||j.app===VER)return;NEWV=j.app;
+  if(lastTouch===LT0&&pend===0&&!busyUI()&&!(UI==="phone"&&PH.step!==0))hardReload(NEWV);
+}).catch(function(){})}catch(e){}},800);
 
 /* ---------- 시작 ---------- */
 if(MODE0==="phone"){
