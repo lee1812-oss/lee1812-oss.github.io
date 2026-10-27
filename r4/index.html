@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>확인 요청 회신</title>
+<style>
+:root{--navy:#0D1C42;--navy2:#22396F;--line:#D5DBE5;--ink:#1B2433;--sub:#3E4A5C;--red:#C62828;--org:#D9730D;--blue:#1565C0;--grn:#2E7D32}
+*{box-sizing:border-box}
+body{margin:0;background:#EEF1F6;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;color:var(--ink);font-size:17px;word-break:keep-all;overflow-wrap:break-word;line-break:strict}
+.top{background:var(--navy);color:#fff;padding:18px 16px 16px}
+.top .k{font-size:14px;opacity:.85;font-weight:700}
+.top h1{margin:4px 0 2px;font-size:25px}
+.top .m{font-size:15px;opacity:.9}
+.wrap{max-width:640px;margin:0 auto;padding:12px 12px 140px}
+.guide{background:#fff;border-left:5px solid var(--navy2);border-radius:10px;padding:12px 14px;line-height:1.55;font-size:16px;margin-bottom:12px}
+.card{background:#fff;border-radius:14px;padding:16px 14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card.done{outline:3px solid #9CCB9F}
+.hd{display:flex;gap:10px;align-items:flex-start}
+.no{flex:none;width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:17px}
+.tag{display:inline-block;font-size:13px;font-weight:800;border:1.5px solid;border-radius:5px;padding:1px 7px;margin-bottom:4px}
+.q{font-size:19px;font-weight:800;line-height:1.4;color:var(--navy)}
+.why{margin:8px 0 0;color:var(--sub);line-height:1.55;font-size:16px}
+details{margin-top:10px}
+summary{cursor:pointer;font-weight:800;color:var(--navy2);font-size:16px;padding:10px 0;list-style:none}
+summary::before{content:'▸ ';}
+details[open] summary::before{content:'▾ ';}
+.ch{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ch button{min-height:54px;border-radius:12px;border:2px solid var(--line);background:#fff;font-size:17px;font-weight:700;color:var(--ink);text-align:left;padding:10px 14px;font-family:inherit}
+.ch button.on{border-color:var(--navy2);background:#E7EEFB;color:var(--navy)}
+.ch button.on::before{content:'✔ ';color:var(--grn)}
+textarea{width:100%;min-height:64px;margin-top:10px;border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-size:17px;font-family:inherit;resize:vertical}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.bar .in{max-width:640px;margin:0 auto}
+.prog{font-size:15px;color:var(--sub);margin-bottom:6px;font-weight:700}
+.big{width:100%;min-height:56px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-size:19px;font-weight:800;font-family:inherit}
+.big:disabled{opacity:.6}
+.out{display:none;background:#fff;border-radius:14px;padding:16px 14px;margin-top:6px;border:3px solid #9CCB9F}
+.out h2{margin:0 0 6px;font-size:20px;color:var(--grn)}
+.out p{margin:4px 0 10px;line-height:1.55;color:var(--sub);font-size:16px}
+.out button{width:100%;min-height:54px;border-radius:12px;font-size:18px;font-weight:800;margin-top:8px;font-family:inherit;border:2px solid var(--navy2);background:#fff;color:var(--navy)}
+.out button.p{background:#FEE500;border-color:#E5CF00;color:#191600}
+.err{background:#fff;border-radius:14px;padding:22px 16px;line-height:1.6;margin-top:20px}
+/* 카톡 근거 */
+.kk{background:#B2C7DA;border-radius:12px;padding:8px 8px 10px;font-family:inherit}
+.kk .rm{font-size:13px;font-weight:800;color:#2B3A4D;background:rgba(255,255,255,.55);border-radius:8px;padding:3px 8px;display:inline-block;margin:2px 0 4px}
+.kk .dt{text-align:center;margin:6px 0}
+.kk .dt span{background:rgba(0,0,0,.18);color:#fff;font-size:12.5px;border-radius:10px;padding:2px 10px}
+.kk .msg{display:flex;flex-direction:column;align-items:flex-start;margin:6px 0}
+.kk .msg.me{align-items:flex-end}
+.kk .nm{font-size:13px;color:#2E3B4A;margin:0 0 2px 4px;font-weight:700}
+.kk .row{display:flex;align-items:flex-end;gap:5px;max-width:92%}
+.kk .msg.me .row{flex-direction:row-reverse}
+.kk .bb{background:#fff;border-radius:4px 14px 14px 14px;padding:7px 10px;font-size:15px;line-height:1.45;white-space:pre-wrap;color:#111}
+.kk .msg.me .bb{background:#FEE500;border-radius:14px 4px 14px 14px}
+.kk .tm{font-size:11.5px;color:#3D4B5B;white-space:nowrap}
+.kk .src{font-size:11.5px;color:#3D4B5B;text-align:right;margin-top:4px}
+/* PDF용 페이지 */
+#pdfzone{position:fixed;left:-10000px;top:0}
+.pg{width:794px;height:1123px;background:#fff;padding:40px 44px;font-size:16px;color:var(--ink);position:relative;overflow:hidden}
+.pg .ph{border-bottom:3px solid var(--navy);padding-bottom:10px;margin-bottom:12px}
+.pg .ph .k{font-size:13px;color:#5F6B7A;font-weight:700}
+.pg .ph h1{font-size:28px;margin:3px 0;color:var(--navy)}
+.pg .ph .m{font-size:14px;color:var(--sub)}
+.pg .it{border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.pg .it .q{font-size:18px}
+.pg .ans{margin-top:8px;background:#EEF6EE;border-left:5px solid var(--grn);padding:8px 10px;border-radius:6px;font-size:17px;font-weight:800;color:#1E4D22}
+.pg .ans.none{background:#FFF3E6;border-left-color:var(--org);color:#8A4A06}
+.pg .memo{margin-top:6px;font-size:16px;white-space:pre-wrap;line-height:1.5}
+.pg .ft{position:absolute;left:44px;right:44px;bottom:22px;font-size:12.5px;color:#5F6B7A;border-top:1px solid var(--line);padding-top:6px;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="top"><div class="k">UTCA 출력일보 확인 요청</div><h1 id="who">불러오는 중…</h1><div class="m" id="meta"></div></div>
+<div class="wrap" id="app"></div>
+<div class="bar" id="bar" style="display:none"><div class="in"><div class="prog" id="prog"></div><button class="big" id="mk">회신 PDF 만들기</button></div></div>
+<div id="pdfzone"></div>
+<script>
+const TAG={red:['급여 영향','#C62828','#FDECEA'],orange:['확인 필요','#D9730D','#FFF3E6'],blue:['청구 영향','#1565C0','#E8F1FC']};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D=null,ID='',ANS={},PDFBLOB=null,PDFNAME='';
+function kakao(ev){let h='<div class="kk">',room='',date='';
+ for(const e of ev){ if(e.room!==room){h+=`<div class="rm">${esc(e.room)}</div>`;room=e.room;date='';}
+  if(e.date!==date){const [mo,da]=e.date.split('/');h+=`<div class="dt"><span>2026년 ${mo}월 ${da}일</span></div>`;date=e.date;}
+  h+=`<div class="msg${e.me?' me':''}">${e.me?'':`<div class="nm">${esc(e.name)}</div>`}<div class="row"><div class="bb">${esc(e.text)}</div><div class="tm">${e.time}</div></div></div>`;}
+ return h+'<div class="src">카톡 원문 그대로 옮김 · 개인정보·금액은 가림</div></div>';}
+function b64d(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+async function load(){
+ const h=location.hash.slice(1);const [id,k]=h.split('.');
+ if(!id||!k){fail('주소가 잘렸어요. 카톡으로 받은 주소 전체를 눌러 열어 주세요.');return;}
+ ID=id;
+ try{const r=await fetch('./'+id+'.txt?v='+Date.now());if(!r.ok)throw 0;const raw=b64d((await r.text()).trim());
+  const key=await crypto.subtle.importKey('raw',b64d(k),'AES-GCM',false,['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+  D=JSON.parse(new TextDecoder().decode(pt));}
+ catch(e){fail('내용을 열 수 없어요. 주소 전체가 맞는지 확인해 주세요.');return;}
+ try{ANS=JSON.parse(localStorage.getItem('r4_'+ID)||'{}')}catch(e){ANS={}}
+ render();}
+function fail(t){document.getElementById('who').textContent='열 수 없음';document.getElementById('app').innerHTML=`<div class="err">${t}</div>`;}
+function save(){try{localStorage.setItem('r4_'+ID,JSON.stringify(ANS))}catch(e){}prog();}
+function prog(){const n=D.items.filter(it=>ANS[it.no]&&ANS[it.no].c).length;document.getElementById('prog').textContent=`${D.items.length}개 중 ${n}개 답함`+(n<D.items.length?' · 다 못 채워도 보낼 수 있어요':' · 모두 답했어요');
+ D.items.forEach(it=>{const c=document.getElementById('c'+it.no);if(c)c.classList.toggle('done',!!(ANS[it.no]&&ANS[it.no].c));});}
+function render(){
+ document.title=D.who+' 확인 요청';
+ document.getElementById('who').textContent=D.who+'님께';
+ document.getElementById('meta').textContent=`${D.role} · ${D.items.length}건 · 보낸 사람 ${D.from} · ${D.date}`;
+ let h=`<div class="guide">질문마다 <b>답을 하나 고르고</b>, 필요하면 메모를 적어 주세요. 다 하면 맨 아래 <b>「회신 PDF 만들기」</b>를 누르고 카톡으로 보내 주시면 됩니다. 적은 답은 이 휴대폰에만 저장돼요.</div>`;
+ for(const it of D.items){const T=TAG[it.tag];const a=ANS[it.no]||{};
+  h+=`<div class="card" id="c${it.no}"><div class="hd"><div class="no">${it.no}</div><div><span class="tag" style="color:${T[1]};background:${T[2]};border-color:${T[1]}">${T[0]}</span><div class="q">${esc(it.q)}</div></div></div>
+  <div class="why">${esc(it.why)}</div>
+  <details><summary>근거 카톡 보기 (${it.ev.length}개)</summary>${kakao(it.ev)}</details>
+  <div class="ch">${it.ch.map((c,i)=>`<button data-n="${it.no}" data-i="${i}" class="${a.c===c?'on':''}">${esc(c)}</button>`).join('')}</div>
+  <textarea data-n="${it.no}" placeholder="메모 (날짜·이름·시간 등, 없으면 비워 두세요)">${esc(a.m||'')}</textarea></div>`;}
+ h+=`<div class="out" id="out"><h2>회신 PDF가 준비됐어요</h2><p>아래 노란 버튼을 누르고 <b>카카오톡 → ${esc(D.from)}</b>을 고르면 바로 보내져요. 버튼이 안 되면 「PDF 저장」 후 카톡에 파일로 올리거나, 「답 글 복사」로 붙여 넣어 주세요.</p>
+ <button class="p" id="sh">카톡으로 PDF 보내기</button><button id="dl">PDF 저장</button><button id="cp">답 글 복사</button></div>`;
+ document.getElementById('app').innerHTML=h;
+ document.getElementById('bar').style.display='block';
+ document.querySelectorAll('.ch button').forEach(b=>b.onclick=()=>{const n=b.dataset.n,it=D.items.find(x=>x.no==n);ANS[n]=ANS[n]||{};ANS[n].c=it.ch[+b.dataset.i];b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));save();});
+ document.querySelectorAll('textarea').forEach(t=>t.oninput=()=>{const n=t.dataset.n;ANS[n]=ANS[n]||{};ANS[n].m=t.value;save();});
+ document.getElementById('mk').onclick=makePdf;
+ document.getElementById('sh').onclick=sharePdf;
+ document.getElementById('dl').onclick=dlPdf;
+ document.getElementById('cp').onclick=copyText;
+ prog();}
+function nowStr(){const d=new Date();const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function replyText(){let t=`[${D.who} 회신] UTCA 출력일보 확인 요청 (${nowStr()})\n`;
+ for(const it of D.items){const a=ANS[it.no]||{};t+=`\n${it.no}. ${it.q}\n→ ${a.c||'(답 없음)'}${a.m?`\n  메모: ${a.m}`:''}\n`;}return t;}
+function loadJs(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
+async function makePdf(){
+ const btn=document.getElementById('mk');btn.disabled=true;btn.textContent='PDF 만드는 중…';
+ try{
+  if(!window.html2canvas)await loadJs('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  if(!window.jspdf)await loadJs('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  const z=document.getElementById('pdfzone');z.innerHTML='';
+  const head=`<div class="ph"><div class="k">UTCA 출력일보 4차 점검 · 확인 요청 회신</div><h1>${esc(D.who)} 회신</h1><div class="m">회신 ${nowStr()} · 요청 ${esc(D.date)} ${esc(D.from)}</div></div>`;
+  const pages=[];let pg=null,used=0;const LIMIT=1123-40-70;
+  const newPage=()=>{pg=document.createElement('div');pg.className='pg';pg.innerHTML=pages.length?'':head;z.appendChild(pg);pages.push(pg);used=pg.scrollHeight;};
+  newPage();
+  for(const it of D.items){const a=ANS[it.no]||{};const T=TAG[it.tag];
+   const d=document.createElement('div');d.className='it';
+   d.innerHTML=`<span class="tag" style="color:${T[1]};background:${T[2]};border-color:${T[1]}">${T[0]}</span><div class="q">${it.no}. ${esc(it.q)}</div><div class="ans${a.c?'':' none'}">답: ${esc(a.c||'답 없음')}</div>${a.m?`<div class="memo">메모: ${esc(a.m)}</div>`:''}`;
+   pg.appendChild(d);
+   if(pg.scrollHeight>LIMIT&&pg.children.length>(pages.length===1?2:1)){pg.removeChild(d);newPage();pg.appendChild(d);}
+  }
+  pages.forEach((p,i)=>{const f=document.createElement('div');f.className='ft';f.innerHTML=`<span>${esc(D.who)} 회신 · UTCA 출력일보 확인</span><span>${i+1} / ${pages.length}</span>`;p.appendChild(f);});
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
+  for(let i=0;i<pages.length;i++){const cv=await html2canvas(pages[i],{scale:2,backgroundColor:'#fff'});if(i)doc.addPage();doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,210,297);}
+  PDFBLOB=doc.output('blob');const d=new Date();PDFNAME=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_UTCA_확인회신_${D.short}.pdf`;
+  z.innerHTML='';
+  const o=document.getElementById('out');o.style.display='block';o.scrollIntoView({behavior:'smooth'});
+ }catch(e){alert('PDF를 만들지 못했어요. 인터넷 연결을 확인하거나 「답 글 복사」를 써 주세요.');document.getElementById('out').style.display='block';}
+ btn.disabled=false;btn.textContent='회신 PDF 다시 만들기';}
+async function sharePdf(){
+ if(!PDFBLOB){await makePdf();if(!PDFBLOB)return;}
+ const f=new File([PDFBLOB],PDFNAME,{type:'application/pdf'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:PDFNAME,text:`${D.who} 회신입니다.`});return;}catch(e){if(e.name==='AbortError')return;}}
+ alert('이 화면에서는 바로 보내기가 안 돼요. 카톡 안에서 열었다면 오른쪽 위 ⋮ →「다른 브라우저로 열기」(아이폰은 Safari로 열기)를 누른 뒤 다시 해 주세요. 적은 답은 그대로 남아 있어요.');}
+function dlPdf(){if(!PDFBLOB){alert('먼저 「회신 PDF 만들기」를 눌러 주세요.');return;}const u=URL.createObjectURL(PDFBLOB);const a=document.createElement('a');a.href=u;a.download=PDFNAME;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},4000);}
+async function copyText(){const t=replyText();try{await navigator.clipboard.writeText(t);alert('답 글을 복사했어요. 카톡 대화창에 길게 눌러 붙여 넣어 주세요.');}
+ catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');alert('답 글을 복사했어요. 카톡 대화창에 붙여 넣어 주세요.');}catch(_){prompt('아래 글을 길게 눌러 복사해 주세요',t);}ta.remove();}}
+load();
+</script>
+</body></html>
