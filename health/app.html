@@ -751,6 +751,50 @@ html.ph #phoneApp #bNext{position:sticky;bottom:0;z-index:2;flex:none;min-height
 html.ph #phoneApp #bNext.pulse:not([disabled]){background:#165A37;animation:nxPulse 1.4s ease-in-out infinite}
 @keyframes nxPulse{0%,100%{box-shadow:0 0 0 0 rgba(22,90,55,.5);background-color:#165A37}50%{box-shadow:0 0 0 7px rgba(22,90,55,0);background-color:#1F7A45}}
 @media (prefers-reduced-motion:reduce){html.ph #phoneApp #bNext.pulse{animation:none}}
+
+/* ===== v041 휴대폰: 이름 버튼 작게·날씨 크게 / 질문·서명 단계엔 날씨 숨김 / 질문 화면 한 화면에 / 강조는 주황 굵은 테두리 켜짐·꺼짐 ===== */
+/* 1) 이름 선택: 이름 버튼은 작게, 위에서부터 차곡차곡 */
+html.ph #phoneApp .nm{grid-auto-rows:clamp(50px,7.4vh,62px)!important;align-content:start;gap:8px;overflow-y:auto}
+html.ph #phoneApp .nb,html.ph #phoneApp .nm.c2 .nb,html.ph #phoneApp .nm.c3 .nb,html.ph #phoneApp .nm.c4 .nb{font-size:clamp(16px,4.6vw,19px)!important;border-radius:12px}
+html.ph #phoneApp .nb small{font-size:13px!important}
+/* 2) 날씨 카드 크게 */
+html.ph #phoneApp #pBand #pWx{padding:10px 10px;gap:6px 8px;border-radius:16px}
+html.ph #phoneApp #pWx .wxi{font-size:34px}
+html.ph #phoneApp #pWx .wxt{font-size:36px}
+html.ph #phoneApp #pWx .wxnow{font-size:16px;padding:2px 8px}
+html.ph #phoneApp #pWx .wxh{padding:4px 9px;gap:4px}
+html.ph #phoneApp #pWx .wxh .hn{font-size:17px}
+html.ph #phoneApp #pWx .wxh .hi2{font-size:22px}
+html.ph #phoneApp #pWx .wxh em{font-size:14px}
+html.ph #phoneApp #pWx .wxh .hp{font-size:16px}
+html.ph #phoneApp #pWx .wxh .hp b{font-size:17px}
+html.ph #phoneApp #pWx .wxm span,html.ph #phoneApp #pWx .wxp,html.ph #phoneApp #pWx .wxd{font-size:16px;padding:3px 9px}
+html.ph #phoneApp #pWx .wxm b,html.ph #phoneApp #pWx .wxp b,html.ph #phoneApp #pWx .wxd b{font-size:18px}
+html.ph #phoneApp #pWx .wxtip{font-size:17px;padding:6px 10px;white-space:normal;line-height:1.35}
+html.ph #phoneApp #pWx .wxs{font-size:12px}
+/* 3) 질문·서명·완료 단계: 날씨 숨기고 날짜 띠는 얇게 */
+html.ph[data-step="1"] #phoneApp #pWx,html.ph[data-step="2"] #phoneApp #pWx,html.ph[data-step="3"] #phoneApp #pWx{display:none!important}
+html.ph[data-step="1"] #phoneApp #pBand,html.ph[data-step="2"] #phoneApp #pBand,html.ph[data-step="3"] #phoneApp #pBand{padding-top:5px;padding-bottom:5px}
+/* 4) 질문 화면: 한 화면에(아주 작은 폰만 스크롤) */
+html.ph #phoneApp main>section#v1:not(.hide){gap:6px;overflow-y:auto}
+html.ph #phoneApp #v1 .who{margin:0;gap:8px}
+html.ph #phoneApp #v1 .who b{font-size:20px}
+html.ph #phoneApp #v1 .who button{height:38px;padding:0 10px;font-size:15px}
+html.ph #phoneApp #bAllX{height:46px!important;min-height:46px;font-size:18px!important}
+html.ph #phoneApp #v1 .legend{font-size:14px;line-height:1.2}
+html.ph #phoneApp #qs{gap:5px}
+html.ph #phoneApp .q,html.ph #phoneApp .q.ok,html.ph #phoneApp .q.hit{flex-wrap:nowrap!important;min-height:0;padding:6px 6px 6px 10px;gap:8px;align-items:center}
+html.ph #phoneApp .q .t{font-size:17px!important;line-height:1.3;gap:0}
+html.ph #phoneApp .q .no{display:none!important}
+html.ph #phoneApp .sg{gap:5px}
+html.ph #phoneApp .sg button,html.ph #phoneApp .sg button.x,html.ph #phoneApp .sg button.o{width:46px;height:46px;min-height:46px;font-size:22px;border-radius:12px}
+@media (min-width:400px){html.ph #phoneApp .sg button{width:52px;height:52px;min-height:52px}}
+html.ph #phoneApp #bNext{min-height:52px;height:52px}
+/* 5) 강조: 빛 퍼짐 대신 주황 굵은 테두리가 켜졌다 꺼짐(1.4초, 안쪽에 그려서 잘리지 않음) */
+html.ph #phoneApp #bAllX.pulse,#phoneApp #bAllX.pulse{animation:olBlink 1.4s step-end infinite;background:#1F7A45;transform:none}
+html.ph #phoneApp #bNext.pulse:not([disabled]){animation:olBlink 1.4s step-end infinite;background:#165A37}
+@keyframes olBlink{0%{box-shadow:inset 0 0 0 5px #FF8A00}50%{box-shadow:inset 0 0 0 0 rgba(255,138,0,0)}}
+@media (prefers-reduced-motion:reduce){html.ph #phoneApp #bAllX.pulse,#phoneApp #bAllX.pulse,html.ph #phoneApp #bNext.pulse:not([disabled]){animation:none;box-shadow:inset 0 0 0 5px #FF8A00}}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -846,7 +890,7 @@ html.ph #phoneApp #bNext.pulse:not([disabled]){background:#165A37;animation:nxPu
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v040", PNAME="건강상태확인일지";
+var VER="v041", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1291,7 +1335,7 @@ function flushNote(){return noteT?sendNote():Promise.resolve()}
 /* ---------- 휴대폰 화면 ---------- */
 var PH={pid:"",a:[-1,-1,-1,-1,-1],step:0,busy:false};
 function phShow(n){
-  PH.step=n;
+  PH.step=n;try{document.documentElement.setAttribute("data-step",String(n))}catch(x){}   /* v041: 단계별 화면 배치(날씨는 이름 선택에서만) */
   var pbk=$("pBand");if(pbk)pbk.classList.toggle("lock",n!==0);
   ["v0","v1","v2","v3"].forEach(function(v,i){$(v).classList.toggle("hide",i!==n)});
   var sps=document.querySelectorAll("#steps .sp");
