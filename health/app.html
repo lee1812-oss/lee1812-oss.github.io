@@ -813,6 +813,21 @@ html.ph #phoneApp #v2 .pad.blink{animation:padBlink 1.4s step-end infinite}
 html.ph #phoneApp #bSend{min-height:52px}
 html.ph #phoneApp #bSend.pulse:not([disabled]){animation:olBlink 1.4s step-end infinite;background:#165A37}
 @media (prefers-reduced-motion:reduce){html.ph #phoneApp #v2 .pad.blink{animation:none;outline:5px solid #FF8A00;outline-offset:-5px}html.ph #phoneApp #bSend.pulse:not([disabled]){animation:none;box-shadow:inset 0 0 0 5px #FF8A00}}
+
+/* ===== v044 다시 체크: 오늘 기록 보기·이유 고르기 창 ===== */
+.cf .bx.rdo{max-width:440px;width:calc(100% - 24px);text-align:left}
+.cf .bx.rdo h3{margin:0 0 4px;font-size:21px}
+.cf .bx.rdo p{font-size:17px;line-height:1.5;margin:0 0 10px}
+.cf .bx.rdo .rdm{color:var(--sub);font-size:15px}
+.cf .bx.rdo .rdr{display:flex;justify-content:space-between;gap:8px;padding:6px 2px;border-bottom:1px solid var(--line);font-size:17px}
+.cf .bx.rdo .rdr b.x{color:#1F6B45}.cf .bx.rdo .rdr b.o{color:#C62828}
+.cf .bx.rdo .rdl{margin-top:10px;background:#FFF1D6;color:#7A3F00;border-radius:10px;padding:8px 10px;font-weight:700}
+.cf .bx.rdo .why{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
+.cf .bx.rdo .why .wy{min-height:54px;border-radius:12px;background:#FFF8EE;border:2px solid #E2B98A;color:#5A2E00;font-size:19px;font-weight:800}
+.cf .bx.rdo .bt{display:flex;gap:8px;justify-content:flex-end}
+.cf .bx.rdo .bt button{min-height:54px;padding:0 18px;border-radius:12px;font-size:18px;font-weight:800}
+html.ph #phoneApp .nb.dn:not([disabled]){cursor:pointer}
+.cf .bx.rdo #rdGo{background:#1F6B45;color:#fff}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -908,7 +923,7 @@ html.ph #phoneApp #bSend.pulse:not([disabled]){animation:olBlink 1.4s step-end i
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v043", PNAME="건강상태확인일지";
+var VER="v044", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1221,7 +1236,7 @@ function render0(){
       var r=d&&d.rec[p.id], c="pc", ed=editable()&&!locked(), s='<b class="tg t0">체크 전</b>'+(ed?'<i class="sx">눌러서 체크</i>':'<i class="sx">기록 없음</i>'), b="", ic='';
       if(!r&&ed)c+=" todo";
       if(r){var k=cnt(r);if(r.off){c+=" off";ic='–';s='<b class="tg t3">휴무</b><i class="sx">'+r.t+'</i>'}else if(k){c+=" hit";ic='!';s='<b class="tg t2">증상 '+k+'건</b><i class="sx">'+r.t+'</i>'}else{c+=" done";ic='✓';s='<b class="tg t1">체크 완료</b><i class="sx">'+r.t+'</i>'}
-        var by0=r.by==="proxy"?"대리":(r.by==="phone"?"휴대폰":"");if(by0)s=s.replace('</i>',' <span class="sb">· '+by0+'</span></i>')}
+        var by0=r.by==="proxy"?"대리":(r.by==="phone"?"휴대폰":"");if(by0)s=s.replace('</i>',' <span class="sb">· '+by0+'</span></i>');if(r.ed)s=s.replace('</i>',' <span class="sb">· 수정 '+r.ed+'회</span></i>')}
       var mm=(r&&r.memo)?'<span class="mm">증상 메모: '+esc(r.memo)+'</span>':'';
       h+='<button class="'+c+'" data-id="'+p.id+'">'+b+'<span class="ck" aria-hidden="true">'+ic+'</span><span class="n">'+esc(p.name)+'</span><span class="s">'+s+'</span>'+mm+'</button>';
     });
@@ -1296,7 +1311,11 @@ function openEntry(id){
   if(restDay(curDate)){toast("오늘은 쉬는 날이라 체크하지 않아요");return}
   if(locked()){toast("결재가 진행 중이라 고칠 수 없어요. 반려 후 수정하세요");return}
   var r=recOf(id);
-  if(r&&r.sg&&r.by==="phone"){toast("본인이 휴대폰에서 서명한 기록이라 여기서 고칠 수 없어요");return}
+  if(r&&r.sg&&mode==="proxy"){toast("본인이 서명한 기록이에요. 「본인 입력」으로 바꿔서 다시 체크해 주세요");return}
+  if(r&&r.sg){   /* v044 다시 체크: 이유를 고르고 질문·서명을 다시. 앞 기록은 수정 이력으로 남음 */
+    askWhy(p.name+" 님은 오늘 이미 체크했어요 ("+r.t+").\n다시 체크하면 앞 기록은 「수정 이력」으로 남아요.\n다시 체크하는 이유를 골라 주세요.",function(w){draft={id:id,a:r.a.slice(),had:true,redo:w};drawEntry()});
+    return;
+  }
   draft={id:id,a:r?r.a.slice():[0,0,0,0,0],had:!!r};
   drawEntry();
 }
@@ -1330,13 +1349,13 @@ function afterSave(p,date){
   }).catch(function(){pend--;toast("저장 상태를 확인하지 못했어요. 새로고침해 주세요");resyncDay()});
 }
 function submitEntry(sig,off){
-  var d=day(true),now=new Date(),by=mode==="proxy"?"proxy":"self",id=draft.id,a=off?[0,0,0,0,0]:draft.a.slice();
-  d.rec[id]={a:a,by:by,t:hm(now),sg:!!sig,off:!!off};
+  var d=day(true),now=new Date(),by=mode==="proxy"?"proxy":"self",id=draft.id,a=off?[0,0,0,0,0]:draft.a.slice(),rd=(by==="self"&&draft.redo)?draft.redo:null,old=d.rec[id];
+  d.rec[id]={a:a,by:by,t:hm(now),sg:!!sig,off:!!off,ed:((old&&old.ed)||0)+(rd&&old?1:0)};
   var nm=nameOf(id),k=cnt(d.rec[id]);
   closeOv();render();
   toast(nm+(off?" 님 휴무 처리":" 님 제출 완료")+(k?" · 특이사항을 적어 주세요":""));
   if(k){setTimeout(function(){var n=$("note");if(n&&!n.classList.contains("hide"))n.scrollIntoView({behavior:"smooth",block:"center"})},120)}
-  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",(navigator.userAgent||"").slice(0,120),!!off),curDate);
+  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",(navigator.userAgent||"").slice(0,120),!!off,rd?{why:rd}:null),curDate);
 }
 function resyncDay(){
   return api("apiDay",K,curDate).then(function(r){if(r.ok){setDay(curDate,r.day);applyCfg(r.cfg);render()}}).catch(function(){});
@@ -1387,7 +1406,7 @@ function renderPhone(){
   $("nm").innerHTML=list.map(function(p){
     var r=d.rec[p.id];
     if(r&&r.by==="proxy"&&!r.sg&&!lk)return '<button class="nb px" data-id="'+esc(p.id)+'"><span>'+esc(p.name)+'</span><small>'+(r.off?'휴무로 입력됨 · 출근했다면 눌러서 서명':'대리 입력됨 · 직접 서명하려면 누르세요')+'</small></button>';
-    if(r)return '<button class="nb dn" disabled><span>'+esc(p.name)+'</span><small class="bdg">✓ 체크 완료 '+esc(r.t)+'</small></button>';
+    if(r)return '<button class="nb dn'+(r.ed?' red':'')+'"'+(lk?' disabled':' data-done="'+esc(p.id)+'"')+'><span>'+esc(p.name)+'</span><small class="bdg">✓ 체크 완료 '+esc(r.t)+(r.ed?' · 수정 '+r.ed+'회':'')+'</small></button>';
     if(lk)return '<button class="nb" disabled style="opacity:.5"><span>'+esc(p.name)+'</span><small>입력 마감</small></button>';
     return '<button class="nb todo'+(p.id===last?" me":"")+'" data-id="'+esc(p.id)+'"><span>'+esc(p.name)+'</span><small>'+(p.id===last?"내 이름 · 체크하기 ›":"체크 전 ›")+'</small></button>';
   }).join("");
@@ -1445,7 +1464,7 @@ function fitPhone(){
 }
 function phQ(){
   try{$("bAllX").classList.toggle("pulse",PH.a.every(function(v){return v!==0&&v!==1}))}catch(x){}   /* v038: 아직 하나도 안 골랐으면 「전부 해당 없음」이 부드럽게 반짝 */
-  var p=person(PH.pid);$("w1").textContent=p.name+" 님";
+  var p=person(PH.pid);$("w1").textContent=p.name+" 님"+(PH.redo?" · 다시 체크":"");
   $("qs").innerHTML=QS.map(function(q,i){
     var v=PH.a[i];
     return '<div class="q'+(v===0?" ok":v===1?" hit":"")+'"><div class="t"><span class="no">'+(i+1)+'</span><div>'+q+'</div></div><div class="sg"><button class="x'+(v===0?" on":"")+'" data-i="'+i+'" data-v="0">X<small>해당 없음</small></button><button class="o'+(v===1?" on":"")+'" data-i="'+i+'" data-v="1">O<small>해당 있음</small></button></div></div>';
@@ -1510,11 +1529,11 @@ function phSend(){
   if(PH.busy||pd.len<80)return;
   PH.busy=true;$("bSend").disabled=true;$("bSend").textContent="제출 중…";
   var memo=PH.a.some(function(v){return v===1})?$("memo").value.trim():"";
-  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),(navigator.userAgent||"").slice(0,120)).then(function(r){
+  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),(navigator.userAgent||"").slice(0,120),false,PH.redo?{why:PH.redo}:null).then(function(r){
     PH.busy=false;$("bSend").textContent="서명하고 제출 완료";
     if(r.day)setDay(TODAY,r.day);
-    if(r.ok){phFinish(r.t,false);return}
-    if(r.dup){phFinish(r.t,true);return}
+    if(r.ok){var wr=!!PH.redo;PH.redo=null;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
+    if(r.dup){PH.redo=null;phFinish(r.t,true);return}
     toast(r.msg||"제출하지 못했어요");$("bSend").disabled=pd.len<80;
     if(r.locked){PH.step=0;renderPhone()}
   }).catch(function(){
@@ -1811,6 +1830,7 @@ function saveSet(){
 document.addEventListener("click",function(e){
   var t=e.target.closest("button");if(!t)return;
   var id=t.id;
+  if(t.dataset.done&&MODE0==="phone"){phDoneView(t.dataset.done);return}   /* v044 체크 완료 이름 → 오늘 기록 보기·다시 체크 */
   if(holClick(t,id))return;
   /* 화면 전환 */
   if(t.dataset.ui&&t.dataset.ui!=="sw"){switchUI(t.dataset.ui);return}
@@ -1919,7 +1939,7 @@ document.addEventListener("click",function(e){
   if(sg&&t.dataset.i!==undefined){PH.a[+t.dataset.i]=+t.dataset.v;phQ();return}
   var nb=t.closest("#nm");
   if(nb&&t.dataset.id&&curDate===TODAY){
-    PH.pid=t.dataset.id;PH.a=[-1,-1,-1,-1,-1];PH._all=false;$("memo").value="";
+    PH.pid=t.dataset.id;PH.a=[-1,-1,-1,-1,-1];PH._all=false;PH.redo=null;$("memo").value="";
     try{localStorage.setItem("hl_pid",PH.pid)}catch(x){}
     phQ();phShow(1);return}
 });
@@ -2033,6 +2053,32 @@ function sigSync(){try{
   b.classList.toggle("pulse",on&&!empty&&!b.disabled);
 }catch(x){}}
 (function(){try{var mo=new MutationObserver(sigSync);mo.observe($("ph"),{attributes:true,attributeFilter:["class"]});mo.observe($("bSend"),{attributes:true,attributeFilter:["disabled"]})}catch(x){}})();
+
+/* ---------- v044 다시 체크 (오늘 기록 보기 · 이유 고르기) ---------- */
+var QSHORT=["설사","기침·발열","복통·구토","진물·고름","피부감염"];
+function askWhy(msg,fn){
+  var h=$("cfHost");
+  h.innerHTML='<div class="cf"><div class="bx rdo"><p>'+esc(msg).replace(/\n/g,"<br>")+'</p><div class="why">'+REDO_W.map(function(w){return '<button type="button" class="wy" data-w="'+w+'">'+w+'</button>'}).join("")+'</div><div class="bt"><button type="button" id="cfNo">취소</button></div></div></div>';
+  $("cfNo").onclick=function(){h.innerHTML=""};
+  Array.prototype.forEach.call(h.querySelectorAll(".wy"),function(b){b.onclick=function(ev){ev.stopPropagation();h.innerHTML="";fn(b.dataset.w)}});
+}
+var REDO_W=["잘못 누름","증상 변화","기타"];
+function phDoneView(pid){
+  var d=S.days[TODAY],r=d&&d.rec[pid],p=person(pid);if(!r||!p)return;
+  var lk=locked()||curDate!==TODAY,h=$("cfHost");
+  var rows=r.off?'<div class="rdr"><b>휴무</b></div>':QSHORT.map(function(q,i){return '<div class="rdr"><span>'+(i+1)+'. '+q+'</span><b class="'+(r.a[i]?"o":"x")+'">'+(r.a[i]?"O 해당 있음":"X 해당 없음")+'</b></div>'}).join("");
+  h.innerHTML='<div class="cf"><div class="bx rdo"><h3>'+esc(p.name)+' 님 · 오늘 기록</h3><p class="rdm">'+esc(r.t)+' 체크'+(r.by==="proxy"?" · 대리 입력":r.by==="phone"?" · 휴대폰":"")+(r.sg?" · 서명 있음":"")+(r.ed?" · 수정 "+r.ed+"회":"")+'</p>'+rows+
+   (lk?'<p class="rdl">작성자 서명이 끝나 다시 체크할 수 없어요.<br>고칠 것이 있으면 작성자에게 말씀해 주세요.</p>':'')+
+   '<div class="bt"><button type="button" id="cfNo">닫기</button>'+(lk?'':'<button type="button" class="go" id="rdGo">다시 체크하기</button>')+'</div></div></div>';
+  $("cfNo").onclick=function(){h.innerHTML=""};
+  var g=$("rdGo");if(g)g.onclick=function(ev){ev.stopPropagation();h.innerHTML="";
+    askWhy("다시 체크하면 앞 기록은 「수정 이력」으로 남아요.\n질문부터 서명까지 다시 해요.\n다시 체크하는 이유를 골라 주세요.",function(w){
+      PH.redo=w;PH.pid=pid;PH.a=[-1,-1,-1,-1,-1];PH._all=false;$("memo").value="";
+      try{localStorage.setItem("hl_pid",pid)}catch(x){}
+      phQ();phShow(1);toast("다시 체크해요 · 질문부터 서명까지");
+    });
+  };
+}
 
 /* ---------- 시작 ---------- */
 if(MODE0==="phone"){
