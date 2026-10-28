@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="jojo-build" content="v001-20261029">
+<meta name="jojo-build" content="v002-20261029">
 <meta name="theme-color" content="#010736">
 <meta name="robots" content="noindex">
 <title>조조 비서</title>
@@ -17,53 +17,55 @@
 :root{--n:#010736;--c:#FCF1D0;--o:#E8590C;--fs:18px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:var(--fs);-webkit-text-size-adjust:100%}
+img,iframe{max-width:100%}
 body{font-family:-apple-system,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#fff;color:#111;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;padding-bottom:env(safe-area-inset-bottom)}
 button,a.btn{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:1100px;margin:0 auto;padding:0 14px 28px}
 header{background:var(--n);color:#fff;position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top)}
-header .in{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
+header .in{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;min-width:0}
 .badge{background:var(--o);color:#fff;font-weight:800;border-radius:10px;padding:6px 12px;font-size:1.1rem;white-space:nowrap}
-.hdate{font-weight:700;font-size:1.05rem;white-space:nowrap}
-.sp{flex:1}
-.hbtn{min-height:54px;min-width:54px;padding:0 14px;border:2px solid var(--c);background:transparent;color:var(--c);border-radius:12px;font-weight:700;white-space:nowrap}
+.hdate{font-weight:700;font-size:1.05rem;white-space:nowrap;min-width:0}
+.sp{flex:1 1 0;min-width:0}
+.hbtn{flex:none;min-height:54px;min-width:54px;padding:0 12px;border:2px solid var(--c);background:transparent;color:var(--c);border-radius:12px;font-weight:700;white-space:nowrap}
 h2{font-size:1.15rem;color:var(--n);margin:22px 2px 10px;display:flex;align-items:baseline;gap:8px}
 h2 small{font-size:.85rem;color:#444;font-weight:400}
 .notice{border:2px solid var(--o);border-radius:14px;padding:14px 16px;margin-top:14px;font-size:1rem}
 .notice b{color:var(--o)}
 .hide{display:none!important}
 /* 오늘 큰 숫자 4개 */
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-height:150px;padding:14px 14px 12px;background:var(--c);border:2px solid var(--c);border-radius:16px;text-decoration:none;color:#111}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{min-width:0;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-height:150px;padding:14px 14px 12px;background:var(--c);border:2px solid var(--c);border-radius:16px;text-decoration:none;color:#111}
 .tile:active{border-color:var(--n)}
-.tile .lb{font-weight:800;color:var(--n);font-size:1rem}
-.tile .num{font-size:2.9rem;font-weight:900;line-height:1.1;color:var(--n);margin:4px 0 2px;white-space:nowrap}
+.tile .lb{font-weight:800;color:var(--n);font-size:1rem;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .num{max-width:100%;font-size:2.9rem;font-weight:900;line-height:1.1;color:var(--n);margin:4px 0 2px;white-space:nowrap}
 .tile .num small{font-size:1.1rem;font-weight:800;margin-left:2px}
 .tile.warn .num{color:var(--o)}
-.tile .sub{font-size:.92rem;color:#222;line-height:1.4}
-.tile .go{margin-top:auto;padding-top:6px;font-size:.85rem;color:#444;white-space:nowrap}
-@media (max-width:400px){.tile .go{font-size:.8rem}}
+.tile .sub{font-size:.92rem;color:#222;line-height:1.4;max-width:100%;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.tile .go{margin-top:auto;padding-top:6px;font-size:.85rem;color:#444;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:400px){.tile .go{font-size:.8rem}.wrap{padding:0 10px 24px}header .in{padding:8px 10px}.tile{padding:12px 11px 10px}.tile .num{font-size:2.5rem}.badge{padding:6px 10px}.hbtn{padding:0 10px}}
 /* 할 일 */
 .box{border:2px solid #e5e5e5;border-radius:16px;overflow:hidden}
 .row{display:flex;gap:10px;align-items:flex-start;padding:13px 14px;border-top:1px solid #eee;min-height:54px}
 .row:first-child{border-top:0}
 .tag{flex:none;font-size:.82rem;font-weight:800;border:2px solid var(--n);color:var(--n);border-radius:8px;padding:1px 7px;margin-top:2px;white-space:nowrap}
 .tag.o{border-color:var(--o);color:var(--o)}
-.row .t{font-weight:700}
-.row .d{font-size:.9rem;color:#333}
+.row>div{min-width:0;flex:1 1 auto}
+.row .t{font-weight:700;overflow-wrap:anywhere}
+.row .d{font-size:.9rem;color:#333;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .row.empty{color:#555}
 .more{width:100%;min-height:54px;border:0;border-top:1px solid #eee;background:#fff;font-weight:700;color:var(--n)}
 a.rowlink{text-decoration:none;color:inherit;display:block}
 /* 바로가기 */
-.links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-a.btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:64px;padding:8px 10px;border:2px solid var(--n);border-radius:14px;text-decoration:none;font-weight:800;color:var(--n);background:#fff}
+.links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+a.btn{min-width:0;overflow-wrap:anywhere;display:flex;align-items:center;justify-content:center;text-align:center;min-height:64px;padding:8px 10px;border:2px solid var(--n);border-radius:14px;text-decoration:none;font-weight:800;color:var(--n);background:#fff}
 a.btn:active{background:var(--c)}
 a.btn span{display:block;font-size:.8rem;font-weight:400;color:#444}
 footer{margin-top:24px;font-size:.85rem;color:#444;line-height:1.6}
 footer b{color:var(--n)}
 @media (min-width:760px){
-  .tiles{grid-template-columns:repeat(4,1fr)}
-  .links{grid-template-columns:repeat(3,1fr)}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .links{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
 }
 @media (min-width:760px) and (max-height:700px){ /* 포스기·노트북 가로 화면 */
   .tile{min-height:132px}
@@ -117,13 +119,13 @@ footer b{color:var(--n)}
 
   <footer>
     <div id="srcs"></div>
-    <div><b>조조 비서 홈 v001</b> · 1단계 시험판(이혜영 이사 시험용 임시 주소). 회사 계정이 생기면 주소를 옮겨요.</div>
+    <div><b>조조 비서 홈 v002</b> · 1단계 시험판(이혜영 이사 시험용 임시 주소). 회사 계정이 생기면 주소를 옮겨요.</div>
   </footer>
 </div>
 
 <script>
 'use strict';
-const VER='v001';
+const VER='v002';
 const FACTORY_URL='https://lee1812-oss.github.io/drawbread/factory.enc.json'; // 업무 대시보드 직원용 공장 자료(암호화)
 const HEALTH_API='https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec';
 const NOTE_API='https://script.google.com/macros/s/AKfycbxY06btvioyILHCFRauZAjuY94PmsjEL6bxgew0DaqdWGja3KLxabQv3aqyO1xKDK1v/exec';
