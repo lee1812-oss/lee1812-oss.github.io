@@ -127,7 +127,8 @@ const VER='v001';
 const FACTORY_URL='https://lee1812-oss.github.io/drawbread/factory.enc.json'; // 업무 대시보드 직원용 공장 자료(암호화)
 const HEALTH_API='https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec';
 const NOTE_API='https://script.google.com/macros/s/AKfycbxY06btvioyILHCFRauZAjuY94PmsjEL6bxgew0DaqdWGja3KLxabQv3aqyO1xKDK1v/exec';
-const LS=localStorage, $=id=>document.getElementById(id);
+// 저장소가 막힌 화면(시크릿 창·다른 화면 안에 끼워 열기)에서도 멈추지 않게
+const LS=(()=>{try{const s=window.localStorage;s.getItem('jojo_k');return s;}catch(_){return {getItem:()=>null,setItem:()=>{},removeItem:()=>{}};}})(), $=id=>document.getElementById(id);
 const okK=s=>/^[A-Za-z0-9_-]{6,80}$/.test(s||'');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
