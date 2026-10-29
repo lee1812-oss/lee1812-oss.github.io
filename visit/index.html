@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>물류센터 1차 방문 확인 노트</title>
+<style>
+:root{--navy:#0D1C42;--navy2:#22396F;--teal:#0f766e;--teal-l:#e6f4f2;--bg:#f3f5f8;--line:#d9dee7;--ink:#111827;--ink2:#374151;--mute:#6b7280;
+--red:#c62828;--red-l:#fdecec;--ora:#c2410c;--ora-l:#fff3e6;--grn:#15803d;--grn-l:#e8f6ec;--blu:#1d4ed8;--blu-l:#eaf0fe}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:17px;line-height:1.55;word-break:keep-all;overflow-wrap:break-word}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px 120px}
+header{background:var(--navy);color:#fff;padding:16px 16px 14px;position:sticky;top:0;z-index:20}
+header .in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px}
+header h1{font-size:19px;margin:0;flex:1;line-height:1.3}
+header small{display:block;font-size:13px;color:#c9d3ea;font-weight:400}
+.hbtn{background:#fff2;border:1px solid #fff5;color:#fff;border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer;white-space:nowrap}
+.bar{height:6px;background:#ffffff33;border-radius:3px;margin-top:10px;overflow:hidden;max-width:860px;margin-left:auto;margin-right:auto}
+.bar i{display:block;height:100%;background:#5eead4;width:0;transition:width .3s}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer}
+.stat b{display:block;font-size:30px;line-height:1.1}
+.stat span{font-size:14px;color:var(--mute)}
+.stat.red b{color:var(--red)}.stat.ora b{color:var(--ora)}.stat.grn b{color:var(--grn)}.stat.blu b{color:var(--blu)}
+.tip{background:var(--blu-l);border-left:5px solid var(--blu);border-radius:10px;padding:12px 14px;margin:12px 0;color:#1e3a8a;font-size:16px}
+.tip.warn{background:var(--red-l);border-color:var(--red);color:#7f1d1d}
+.tip.ora{background:var(--ora-l);border-color:var(--ora);color:#7c2d12}
+h2{font-size:20px;margin:22px 0 10px}
+.secs{display:grid;gap:10px}
+.sec{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:64px;cursor:pointer;text-align:left;width:100%}
+.sec .no{width:38px;height:38px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.sec .t{flex:1}.sec .t b{display:block;font-size:18px}.sec .t span{font-size:14px;color:var(--mute)}
+.sec .p{font-size:15px;font-weight:700;white-space:nowrap;color:var(--teal)}
+.sec.done .no{background:var(--grn)}
+.pill{display:inline-block;font-size:13px;border-radius:999px;padding:1px 9px;margin-left:4px;white-space:nowrap;font-weight:700}
+.pill.red{background:var(--red-l);color:var(--red)}.pill.ora{background:var(--ora-l);color:var(--ora)}.pill.grn{background:var(--grn-l);color:var(--grn)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.card.must{border-left:6px solid var(--red)}
+.card.ok{border-left:6px solid var(--grn)}
+.card.need{border-left:6px solid var(--ora);background:#fffaf4}
+.q{font-weight:700;font-size:18px;text-wrap:pretty}
+.hint{font-size:15px;color:var(--mute);margin-top:3px;text-wrap:pretty}
+.look{font-size:15px;color:var(--teal);margin-top:4px}
+textarea,input[type=text]{width:100%;border:1.5px solid #b8c0cc;border-radius:10px;padding:10px 12px;margin-top:10px;background:#fff;min-height:52px;font-size:17px}
+textarea{resize:vertical;min-height:64px}
+textarea:focus,input:focus{outline:3px solid #99f6e4;border-color:var(--teal)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{border:1.5px solid #b8c0cc;background:#fff;border-radius:999px;padding:8px 14px;min-height:46px;cursor:pointer;font-size:16px}
+.chip.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.sbtn{border:1.5px solid var(--line);background:#f8fafc;border-radius:10px;padding:6px 12px;min-height:44px;cursor:pointer;font-size:15px;color:var(--ink2)}
+.sbtn.on-need{background:var(--ora);border-color:var(--ora);color:#fff;font-weight:700}
+.sbtn.on-ok{background:var(--grn);border-color:var(--grn);color:#fff;font-weight:700}
+.sbtn.del{color:var(--red)}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.check input{width:28px;height:28px;flex:none;margin-top:2px;accent-color:var(--grn)}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:20}
+.nav .in{max-width:860px;margin:0 auto;display:flex;gap:10px}
+.big{flex:1;min-height:56px;border-radius:12px;border:none;font-size:18px;font-weight:700;cursor:pointer}
+.big.pri{background:var(--navy);color:#fff}.big.sec2{background:#e5e9f0;color:var(--navy)}.big.tea{background:var(--teal);color:#fff}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px}
+.ph{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.ph img{width:100%;height:110px;object-fit:cover;display:block}
+.ph input{margin:0;border:none;border-top:1px solid var(--line);border-radius:0;min-height:40px;font-size:14px;padding:6px 8px}
+.ph button{position:absolute;top:4px;right:4px;background:#000a;color:#fff;border:none;border-radius:8px;min-width:34px;min-height:34px;cursor:pointer}
+.addq{display:flex;gap:8px;margin-top:8px}
+.addq input{margin-top:0}
+.addq button{flex:none}
+.hide{display:none!important}
+.rep h3{background:var(--navy);color:#fff;padding:8px 12px;border-radius:8px;font-size:17px;margin:18px 0 8px}
+.rep .it{border-bottom:1px solid var(--line);padding:8px 4px;display:grid;grid-template-columns:28px 1fr;gap:6px}
+.rep .it .m{font-weight:700}
+.rep .it .a{color:var(--ink2);white-space:pre-wrap}
+.rep .it .a.none{color:#9ca3af}
+.dot{width:14px;height:14px;border-radius:50%;margin-top:6px}
+.dot.ok{background:var(--grn)}.dot.need{background:var(--ora)}.dot.none{background:#cbd5e1}.dot.must{background:var(--red)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:15px;color:var(--ink2);margin:8px 0}
+.legend span{display:flex;align-items:center;gap:6px}.legend .dot{margin:0}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.tools button{min-height:54px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:16px;font-weight:700;cursor:pointer;color:var(--navy)}
+.tools button.danger{color:var(--red)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:999px;font-size:16px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+.nowrap{white-space:nowrap}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.tools{grid-template-columns:1fr}}
+@media print{header,.nav,.tools,.noprint{display:none!important}body{background:#fff;font-size:12pt}.wrap{max-width:none;padding:0}.rep h3{-webkit-print-color-adjust:exact;print-color-adjust:exact}.dot{-webkit-print-color-adjust:exact;print-color-adjust:exact}.rep .it{break-inside:avoid}@page{size:A4;margin:12mm}}
+</style>
+</head>
+<body>
+<header><div class="in">
+ <h1 id="hTitle">물류센터 1차 방문 확인 노트<small id="hSub">알프스 · 이카운트 · 업무 자동화 준비</small></h1>
+ <button class="hbtn" id="homeBtn" onclick="go('home')">처음</button>
+</div><div class="bar"><i id="pbar"></i></div></header>
+
+<div class="wrap" id="view"></div>
+
+<div class="nav" id="nav"><div class="in" id="navIn"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="photoIn" accept="image/*" capture="environment" class="hide" multiple>
+<input type="file" id="backupIn" accept=".json,application/json" class="hide">
+
+<script>
+/* ===== 질문 목록 (★ must = 오늘 꼭 확인) ===== */
+const SECTIONS=[
+{id:'base',t:'방문 기본 정보',d:'만난 분, 실무 담당자, 방문 목적',q:[
+ {id:'b1',q:'방문 날짜·시간',type:'text',ph:'예) 10/29(목) 14:00~16:00'},
+ {id:'b2',q:'회사 이름 · 센터 위치',type:'text',must:1},
+ {id:'b3',q:'만난 분 이름 · 직함',type:'text',must:1},
+ {id:'b4',q:'알프스·이카운트를 직접 쓰는 실무 담당자',hint:'이름, 맡은 일, 연락 방법. 나중에 자료를 받을 사람입니다.',type:'text',must:1},
+ {id:'b5',q:'오늘 방문 목적을 처음에 설명했나요?',hint:'「오늘은 현재 일하는 방식을 보고 듣는 날이고, 결정하거나 바꾸는 건 없습니다」',type:'check'},
+ {id:'b6',q:'함께 간 사람',type:'text'}
+]},
+{id:'scale',t:'회사·센터 규모',d:'고객, 주문량, 사람, 보관 구역',q:[
+ {id:'c1',q:'주요 고객 (급식사 이름)',hint:'급식사가 여러 곳이면 매출 큰 순서로',type:'text',must:1},
+ {id:'c2',q:'납품하는 사업장(학교·회사 식당 등) 수',type:'text',ph:'예) 약 120곳'},
+ {id:'c3',q:'하루 주문 건수 · 품목 수',hint:'평소 날과 많은 날을 따로 물어보기',type:'text',must:1,ph:'예) 평소 300건/품목 400개, 많은 날 500건'},
+ {id:'c4',q:'사람 수: 사무 / 현장 작업 / 배송 기사',type:'text',ph:'예) 사무 3, 현장 12, 기사 8'},
+ {id:'c5',q:'보관 구역',type:'multi',opts:['상온','냉장','냉동','농산물 작업장','소분 작업장','기타']},
+ {id:'c6',q:'일하는 시간대',hint:'새벽 출고인지, 전날 저녁 작업인지',type:'text',ph:'예) 전날 20시 작업 시작 → 새벽 5시 출발'}
+]},
+{id:'flow',t:'하루 업무 흐름',d:'주문 → 변경·취소 → 피킹 → 상차 → 마감',tip:'말로만 듣지 말고 실제 주문 1건을 처음부터 끝까지 따라가 보세요. 「이 다음엔 누가, 어디에 입력하나요?」를 반복해서 묻는 게 핵심입니다.',q:[
+ {id:'f1',q:'주문은 어떻게 들어오나요?',type:'multi',opts:['알프스가 자동 수집','이메일 엑셀','급식사 사이트에서 내려받기','전화·카톡','팩스·종이','기타'],must:1},
+ {id:'f2',q:'주문 마감 시각',type:'text',must:1,ph:'예) 납품 이틀 전 15시'},
+ {id:'f3',q:'변경·취소가 들어오는 마지막 시각과 방법',hint:'마감 뒤에 바뀌는 일이 얼마나 자주 있는지도',type:'text',must:1},
+ {id:'f4',q:'피킹(물건 꺼내기) 시작~끝 시각, 몇 명이',type:'text'},
+ {id:'f5',q:'라벨은 언제, 누가, 어떤 프린터로 뽑나요?',type:'text',look:'라벨 프린터 모델명과 라벨 실물 사진 찍기'},
+ {id:'f6',q:'상차 · 배송 출발 시각',type:'text'},
+ {id:'f7',q:'배송 완료는 어떻게 확인하나요?',type:'multi',opts:['기사 사인','사진','전화·카톡','앱','따로 확인 안 함']},
+ {id:'f8',q:'하루 마감(전표 입력·정산)은 언제, 누가',type:'text',must:1}
+]},
+{id:'alps',t:'알프스 사용 현황',d:'쓰는 메뉴, 자료 꺼내는 방법',tip:'실무 담당자 옆에서 알프스 화면을 직접 보면서 확인하세요. 화면 사진은 개인정보(사업장 담당자 연락처 등)가 안 보이게 찍습니다.',q:[
+ {id:'a1',q:'알프스에서 실제로 쓰는 메뉴',type:'multi',opts:['주문서 수집','신규·변경·취소 비교','급식 라벨','총량표','비교표','피킹','패킹','상차','재고(WMS)','배송(TMS)','정산','RPA(자동 수집)'],must:1},
+ {id:'a2',q:'쓴 기간 · 계약 방식 · 월 비용',type:'text'},
+ {id:'a3',q:'알프스 계정은 몇 개이고 누가 쓰나요?',type:'text'},
+ {id:'a4',q:'엑셀로 내려받을 수 있는 화면',hint:'총량표, 주문 목록, 출고 목록 등. 「내려받기」 버튼을 실제로 눌러 보기',type:'text',must:1},
+ {id:'a5',q:'다른 프로그램과 자동 연결(API)이 되나요?',hint:'모르면 메타데이터(알프스 회사)에 물어볼 수 있는지 확인',type:'chips',opts:['된다','안 된다','모름 · 문의 필요']},
+ {id:'a6',q:'메타데이터(알프스 회사) 담당자 연락처',type:'text'},
+ {id:'a7',q:'알프스에서 불편하거나 아쉬운 점',type:'area'}
+]},
+{id:'ecount',t:'이카운트 사용 현황',d:'전표 입력, 품목·거래처, 연결 열쇠',q:[
+ {id:'e1',q:'이카운트에서 쓰는 메뉴',type:'multi',opts:['판매','구매','재고','생산','회계','급여','세금계산서','모바일 앱'],must:1},
+ {id:'e2',q:'판매 전표는 누가, 언제, 어떻게 입력하나요?',hint:'손으로 한 건씩? 엑셀 올리기? 하루 몇 건?',type:'area',must:1},
+ {id:'e3',q:'품목 이름이 알프스와 이카운트에서 똑같나요?',hint:'예) 알프스 「대파(1kg)」 ↔ 이카운트 「대파 1KG」',type:'chips',opts:['똑같다','다르다','일부 다르다','모름'],must:1},
+ {id:'e4',q:'이카운트 거래처는 어떤 단위로 만들었나요?',type:'chips',opts:['급식사 단위','사업장 단위','섞여 있음','모름']},
+ {id:'e5',q:'창고는 몇 개, 어떤 이름으로 나눴나요?',type:'text'},
+ {id:'e6',q:'이카운트 연결 열쇠(오픈 API)를 발급할 수 있나요?',hint:'관리자 계정이 있는 분이 누구인지. 열쇠·비밀번호는 오늘 받지 않습니다.',type:'chips',opts:['가능','불가','모름 · 확인 필요'],must:1},
+ {id:'e7',q:'이카운트 사용자 수 · 요금제',type:'text'}
+]},
+{id:'pain',t:'두 번 입력·불편한 일',d:'자동화로 줄일 일 찾기 (가장 중요)',tip:'자동화할 일은 대부분 여기서 나옵니다. 「같은 걸 두 번 치는 곳」, 「실수가 났던 곳」을 꼭 구체적인 예로 받아 오세요.',q:[
+ {id:'p1',q:'같은 내용을 두 번 입력하는 곳',hint:'예) 알프스 출고 내역을 보고 이카운트에 판매 전표를 다시 입력',type:'area',must:1},
+ {id:'p2',q:'그 일에 하루 몇 시간, 누가 쓰나요?',type:'text',ph:'예) 사무 1명 하루 2시간'},
+ {id:'p3',q:'최근 실수·사고 사례',hint:'오배송, 누락, 변경·취소 늦게 반영, 수량 틀림 등. 언제, 얼마나 자주',type:'area',must:1},
+ {id:'p4',q:'따로 쓰는 엑셀 파일 (이름·용도)',type:'area',look:'파일 이름과 첫 화면 사진'},
+ {id:'p5',q:'종이로 하는 일',type:'text'},
+ {id:'p6',q:'카톡·전화로 주고받는 일',type:'text'},
+ {id:'p7',q:'직원들이 「이것만 없어지면 좋겠다」는 일',hint:'현장 직원 1~2명에게도 직접 물어보기',type:'area'}
+]},
+{id:'stock',t:'재고·입고',d:'입고, 실사, 결품, 기한',q:[
+ {id:'i1',q:'입고(물건 들어옴)는 어디에, 누가 입력하나요?',type:'text'},
+ {id:'i2',q:'재고 실사(직접 세기) 주기',type:'chips',opts:['매일','매주','매월','안 함']},
+ {id:'i3',q:'유통기한·소비기한 관리 방법',type:'text'},
+ {id:'i4',q:'결품(물건 부족)은 언제 알게 되고, 어떻게 대응하나요?',hint:'피킹하다가 아는지, 미리 아는지',type:'area',must:1},
+ {id:'i5',q:'바코드를 쓰나요?',type:'chips',opts:['쓴다','일부만','안 쓴다']}
+]},
+{id:'deliv',t:'배송·차량',d:'차량, 코스, 반품',q:[
+ {id:'d1',q:'차량 수 · 코스 수',type:'text'},
+ {id:'d2',q:'코스(어느 차가 어디로)는 어떻게 정하나요?',type:'text'},
+ {id:'d3',q:'반품·클레임은 어떻게 처리하나요?',type:'area'},
+ {id:'d4',q:'기사님이 쓰는 앱이나 종이',type:'text'}
+]},
+{id:'money',t:'단가·정산',d:'단가 위치, 월 마감, 세금계산서',q:[
+ {id:'m1',q:'단가는 어디에 있나요?',type:'multi',opts:['알프스','이카운트','엑셀','급식사 사이트','계약서만'],must:1},
+ {id:'m2',q:'월 마감 방법과 걸리는 시간',type:'text'},
+ {id:'m3',q:'세금계산서 발행 방법',type:'text'},
+ {id:'m4',q:'급식사와 금액 맞춰보기(대사)는 어떻게',type:'text'}
+]},
+{id:'env',t:'기기·환경',d:'PC, 프린터, 와이파이',q:[
+ {id:'t1',q:'사무실 PC 수 · 윈도우 버전',type:'text'},
+ {id:'t2',q:'현장에서 태블릿·휴대폰을 쓰나요?',type:'text'},
+ {id:'t3',q:'라벨 프린터 · 일반 프린터 모델',type:'text',look:'프린터 옆면 모델명 사진'},
+ {id:'t4',q:'와이파이가 현장(창고)까지 잘 되나요?',type:'chips',opts:['잘 된다','일부 약함','안 된다']},
+ {id:'t5',q:'구글 드라이브·구글 시트를 써도 되나요?',type:'chips',opts:['된다','안 된다','모름']}
+]},
+{id:'sec',t:'자료 사용 허락',d:'계약 제한, 승인자, 계정',q:[
+ {id:'s1',q:'급식사 주문 자료를 다른 프로그램으로 옮겨도 되나요?',hint:'급식사 계약에 외부 반출 제한이 있을 수 있습니다',type:'chips',opts:['된다','안 된다','계약서 확인 필요'],must:1},
+ {id:'s2',q:'자동화 진행은 누가 허락하나요?',type:'text'},
+ {id:'s3',q:'자동화용 계정을 따로 만들 수 있나요?',type:'chips',opts:['가능','불가','모름']},
+ {id:'s4',q:'비밀번호·열쇠는 오늘 받지 않기로 했나요?',hint:'카톡·문자로 받지 말고, 나중에 담당자가 직접 입력하도록 안내',type:'check'}
+]},
+{id:'files',t:'받아올 자료',d:'샘플 파일·사진 (개인정보 가리기)',tip:'파일은 「하루치 샘플」만 받으면 충분합니다. 사업장 담당자 이름·전화번호는 가린 것으로 받으세요.',q:[
+ {id:'r1',q:'총량표 엑셀 (하루치)',type:'check',must:1},
+ {id:'r2',q:'급식사에서 오는 주문서 원본',type:'check'},
+ {id:'r3',q:'이카운트 품목 목록 엑셀',type:'check',must:1},
+ {id:'r4',q:'이카운트 거래처 목록 엑셀',type:'check'},
+ {id:'r5',q:'라벨 실물 사진',type:'check'},
+ {id:'r6',q:'피킹·패킹 목록 사진',type:'check'},
+ {id:'r7',q:'작업장 구역 배치 사진',type:'check'},
+ {id:'r8',q:'이카운트 판매 전표 화면 사진',type:'check'},
+ {id:'r9',q:'자료를 어떻게 받기로 했나요?',type:'chips',opts:['오늘 USB','이메일','구글 드라이브 공유','다음 방문 때']}
+]},
+{id:'next',t:'바라는 것·다음 단계',d:'우선순위, 일정, 다음 방문',q:[
+ {id:'n1',q:'대표님이 가장 먼저 해결하고 싶은 것',hint:'최대 3개까지 고르고, 메모에 순서 적기',type:'multi',opts:['판매 전표 자동 입력','출고 대비 재고 현황판','변경·취소 알림','품목·거래처 이름 맞추기','결품 미리 알림','월 정산 자동화','배송 완료 확인','현장 전광판','기타'],must:1},
+ {id:'n2',q:'원하는 일정',type:'text'},
+ {id:'n3',q:'비용·예산에 대한 생각',type:'text'},
+ {id:'n4',q:'앞으로 연락할 창구 (누구와 이야기)',type:'text',must:1},
+ {id:'n5',q:'다음 방문 날짜',type:'text'},
+ {id:'n6',q:'오늘 느낀 점 · 자유 메모',type:'area'}
+]}
+];
+
+/* ===== 저장 ===== */
+const KEY='lc_visit1_v1';
+let S=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{a:{},custom:{},meta:{}}}catch(e){return{a:{},custom:{},meta:{}}}}
+let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(S));S.meta.saved=Date.now()},250)}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600)}
+
+/* 사진: IndexedDB */
+let DB;function db(){return new Promise((res,rej)=>{if(DB)return res(DB);const r=indexedDB.open('lc_visit1_photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p',{keyPath:'id'});r.onsuccess=()=>{DB=r.result;res(DB)};r.onerror=()=>rej(r.error)})}
+async function pAll(){const d=await db();return new Promise(r=>{const q=d.transaction('p').objectStore('p').getAll();q.onsuccess=()=>r(q.result||[])})}
+async function pPut(o){const d=await db();return new Promise(r=>{const tx=d.transaction('p','readwrite');tx.objectStore('p').put(o);tx.oncomplete=r})}
+async function pDel(id){const d=await db();return new Promise(r=>{const tx=d.transaction('p','readwrite');tx.objectStore('p').delete(id);tx.oncomplete=r})}
+async function pClear(){const d=await db();return new Promise(r=>{const tx=d.transaction('p','readwrite');tx.objectStore('p').clear();tx.oncomplete=r})}
+function shrink(file){return new Promise(res=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const M=1280;let w=img.width,h=img.height;if(w>M||h>M){const k=M/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.72))};img.onerror=()=>res(null);img.src=u})}
+let PH=[];
+
+/* ===== 계산 ===== */
+function qsOf(sec){return sec.q.concat((S.custom[sec.id]||[]).map(c=>({...c,type:'area',custom:1})))}
+function ans(id){return S.a[id]||{}}
+function hasVal(q){const a=ans(q.id);if(q.type==='check')return !!a.v;if(Array.isArray(a.v))return a.v.length>0;return !!(a.v&&String(a.v).trim())}
+function status(q){const a=ans(q.id);if(a.need)return'need';return hasVal(q)?'ok':'none'}
+function counts(){let all=0,done=0,must=0,mustDone=0,need=0;SECTIONS.forEach(s=>qsOf(s).forEach(q=>{all++;const st=status(q);if(st==='ok')done++;if(st==='need')need++;if(q.must){must++;if(st==='ok')mustDone++}}));return{all,done,must,mustDone,need}}
+function secCount(s){const qs=qsOf(s);return{all:qs.length,done:qs.filter(q=>status(q)==='ok').length,mustLeft:qs.filter(q=>q.must&&status(q)!=='ok').length,need:qs.filter(q=>status(q)==='need').length}}
+function updBar(){const c=counts();document.getElementById('pbar').style.width=(c.all?c.done/c.all*100:0)+'%'}
+
+/* ===== 화면 ===== */
+let cur='home',filter='';
+function go(v,f){cur=v;filter=f||'';render();window.scrollTo(0,0)}
+function nav(html){document.getElementById('navIn').innerHTML=html}
+
+function render(){updBar();const V=document.getElementById('view');
+ document.getElementById('homeBtn').classList.toggle('hide',cur==='home');
+ if(cur==='home')return home(V);
+ if(cur==='report')return report(V);
+ if(cur==='list')return list(V);
+ const i=SECTIONS.findIndex(s=>s.id===cur);if(i>=0)return section(V,i)}
+
+function home(V){const c=counts();
+ V.innerHTML=`
+ <div class="stats">
+  <div class="stat red" onclick="go('list','must')"><b>${c.must-c.mustDone}</b><span>꼭 확인 남음</span></div>
+  <div class="stat grn" onclick="go('report')"><b>${c.done}<small style="font-size:16px;color:#6b7280">/${c.all}</small></b><span>답 적음</span></div>
+  <div class="stat ora" onclick="go('list','need')"><b>${c.need}</b><span>다시 확인</span></div>
+  <div class="stat blu" onclick="go('report')"><b id="phCnt">${PH.length}</b><span>사진</span></div>
+ </div>
+ <div class="tip"><b>이렇게 쓰세요</b><br>① 아래 순서대로 들어가 답을 적습니다(자동 저장). ② <span class="pill red">꼭</span> 표시는 오늘 반드시 물어볼 것. ③ 바로 답을 못 들으면 「다시 확인」을 누릅니다. ④ 필요한 질문은 각 단계 아래에서 직접 추가할 수 있어요. ⑤ 끝나면 「정리본」으로 저장·인쇄합니다.</div>
+ <div class="tip warn"><b>주의</b> 비밀번호·연결 열쇠는 오늘 받거나 여기에 적지 마세요. 사진에는 사업장 담당자 이름·전화번호가 안 보이게 찍습니다.</div>
+ <h2>확인 순서 <span style="font-size:15px;color:#6b7280;font-weight:400">${SECTIONS.length}단계</span></h2>
+ <div class="secs">${SECTIONS.map((s,i)=>{const k=secCount(s);const done=k.done===k.all;return `<button class="sec ${done?'done':''}" onclick="go('${s.id}')"><span class="no">${done?'✓':i+1}</span><span class="t"><b>${esc(s.t)}${k.mustLeft?`<span class="pill red">꼭 ${k.mustLeft}</span>`:''}${k.need?`<span class="pill ora">다시 ${k.need}</span>`:''}</b><span>${esc(s.d)}</span></span><span class="p">${k.done}/${k.all}</span></button>`}).join('')}</div>`;
+ nav(`<button class="big sec2" onclick="go('list','must')">꼭 확인만 보기</button><button class="big pri" onclick="go('report')">정리본</button>`)}
+
+function qCard(q){const a=ans(q.id),st=status(q);let inp='';
+ if(q.type==='text')inp=`<input type="text" value="${esc(a.v)}" placeholder="${esc(q.ph||'')}" oninput="setV('${q.id}',this.value)">`;
+ else if(q.type==='area')inp=`<textarea placeholder="${esc(q.ph||'')}" oninput="setV('${q.id}',this.value)">${esc(a.v)}</textarea>`;
+ else if(q.type==='chips'||q.type==='multi'){const sel=q.type==='multi'?(a.v||[]):[a.v];inp=`<div class="chips">${q.opts.map(o=>`<button class="chip ${sel.includes(o)?'on':''}" onclick="pick('${q.id}','${q.type}',${JSON.stringify(o).replace(/"/g,'&quot;')},this)">${esc(o)}</button>`).join('')}</div><textarea style="min-height:52px" placeholder="덧붙일 내용 (선택)" oninput="setM('${q.id}',this.value)">${esc(a.m)}</textarea>`}
+ const head=q.type==='check'?`<label class="check"><input type="checkbox" ${a.v?'checked':''} onchange="setV('${q.id}',this.checked)"><span><span class="q">${esc(q.q)}</span>${q.must?'<span class="pill red">꼭</span>':''}${q.hint?`<div class="hint">${esc(q.hint)}</div>`:''}</span></label><input type="text" value="${esc(a.m)}" placeholder="메모 (선택)" oninput="setM('${q.id}',this.value)">`
+  :`<div class="q">${esc(q.q)}${q.must?'<span class="pill red">꼭</span>':''}${q.custom?'<span class="pill grn">추가</span>':''}</div>${q.hint?`<div class="hint">${esc(q.hint)}</div>`:''}${q.look?`<div class="look">눈으로 확인: ${esc(q.look)}</div>`:''}`;
+ return `<div class="card ${st==='need'?'need':st==='ok'?'ok':q.must?'must':''}" id="c_${q.id}">${head}${inp}
+ <div class="row"><button class="sbtn ${a.need?'on-need':''}" onclick="tNeed('${q.id}')">${a.need?'다시 확인 표시됨':'다시 확인'}</button>${q.custom?`<button class="sbtn del" onclick="delQ('${q.id}')">이 질문 지우기</button>`:''}</div></div>`}
+
+function section(V,i){const s=SECTIONS[i];
+ V.innerHTML=`<h2>${i+1}. ${esc(s.t)}</h2>${s.tip?`<div class="tip">${esc(s.tip)}</div>`:''}
+ ${qsOf(s).map(qCard).join('')}
+ <div class="card"><div class="q">질문 직접 추가</div><div class="hint">현장에서 새로 궁금해진 것을 적어 두세요.</div>
+ <div class="addq"><input type="text" id="newQ" placeholder="예) 냉동 창고 온도 기록은 누가?" onkeydown="if(event.key==='Enter')addQ('${s.id}')"><button class="sbtn on-ok" onclick="addQ('${s.id}')">추가</button></div></div>
+ <div class="card"><div class="q">이 단계 사진 <span id="pc_${s.id}" style="color:#6b7280;font-weight:400"></span></div><div class="hint">화면·라벨·작업장·서류를 찍어 두세요. 사진은 이 기기에만 저장됩니다.</div>
+ <div class="row"><button class="sbtn on-ok" style="min-height:54px;padding:6px 18px" onclick="addPhoto('${s.id}')">사진 찍기 · 고르기</button></div><div class="photos" id="ph_${s.id}"></div></div>`;
+ drawPhotos(s.id);
+ const prev=i>0?`<button class="big sec2" onclick="go('${SECTIONS[i-1].id}')">이전</button>`:`<button class="big sec2" onclick="go('home')">처음</button>`;
+ const next=i<SECTIONS.length-1?`<button class="big pri" onclick="go('${SECTIONS[i+1].id}')">다음: ${esc(SECTIONS[i+1].t)}</button>`:`<button class="big tea" onclick="go('report')">정리본 보기</button>`;
+ nav(prev+next)}
+
+function list(V){const isMust=filter==='must';let html=`<h2>${isMust?'오늘 꼭 확인할 것':'다시 확인할 것'}</h2><div class="tip ${isMust?'warn':'ora'}">${isMust?'빨간 줄이 아직 답을 못 적은 것, 초록 줄은 끝난 것입니다.':'현장을 떠나기 전에 한 번 더 물어보세요.'}</div>`;let n=0;
+ SECTIONS.forEach((s,i)=>{const qs=qsOf(s).filter(q=>isMust?q.must:status(q)==='need');if(!qs.length)return;n+=qs.length;html+=`<h2 style="font-size:17px;color:#22396F">${i+1}. ${esc(s.t)}</h2>`+qs.map(qCard).join('')});
+ if(!n)html+=`<div class="card ok"><div class="q">남은 항목이 없습니다.</div></div>`;
+ V.innerHTML=html;nav(`<button class="big sec2" onclick="go('home')">처음</button><button class="big pri" onclick="go('report')">정리본</button>`)}
+
+function ansText(q){const a=ans(q.id);let t='';if(q.type==='check')t=a.v?'확인함':'';else if(Array.isArray(a.v))t=a.v.join(', ');else t=a.v||'';if(a.m)t+=(t?' / ':'')+a.m;return String(t).trim()}
+function reportHTML(withPhotos){const c=counts(),d=new Date();let h=`<div class="rep"><h2 style="margin-top:6px">물류센터 1차 방문 정리본</h2>
+ <div style="color:#6b7280;font-size:15px">${esc(ansText({id:'b2',type:'text'})||'회사 이름 미기재')} · 정리 시각 <span class="nowrap">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>
+ <div class="legend"><span><i class="dot ok"></i>확인됨 ${c.done}</span><span><i class="dot need"></i>다시 확인 ${c.need}</span><span><i class="dot must"></i>꼭 확인 미기재 ${c.must-c.mustDone}</span><span><i class="dot none"></i>미기재</span></div>`;
+ SECTIONS.forEach((s,i)=>{h+=`<h3>${i+1}. ${esc(s.t)}</h3>`;qsOf(s).forEach(q=>{const st=status(q),t=ansText(q);const dot=st==='none'&&q.must?'must':st;h+=`<div class="it"><i class="dot ${dot}"></i><div><div class="m">${esc(q.q)}${q.must?' <span class="pill red">꼭</span>':''}${st==='need'?' <span class="pill ora">다시 확인</span>':''}</div><div class="a ${t?'':'none'}">${t?esc(t):'(미기재)'}</div></div></div>`});
+  if(withPhotos){const ps=PH.filter(p=>p.sec===s.id);if(ps.length)h+=`<div class="photos" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">${ps.map(p=>`<div class="ph"><img src="${p.data}" style="height:150px"><div style="font-size:13px;padding:4px 8px">${esc(p.note||'')}</div></div>`).join('')}</div>`}});
+ return h+'</div>'}
+function report(V){V.innerHTML=`<div class="tools noprint">
+ <button onclick="saveReport()">정리본 파일로 저장 (사진 포함)</button>
+ <button onclick="window.print()">인쇄 · PDF로 저장</button>
+ <button onclick="copyText()">글로 복사 (카톡·텔레그램 붙여넣기)</button>
+ <button onclick="backup()">백업 파일 저장</button>
+ <button onclick="document.getElementById('backupIn').click()">백업 불러오기</button>
+ <button class="danger" onclick="resetAll()">전부 지우고 새로 시작</button></div>`+reportHTML(true);
+ nav(`<button class="big sec2" onclick="go('home')">처음</button><button class="big pri" onclick="go('list','need')">다시 확인 목록</button>`)}
+
+/* ===== 입력 처리 ===== */
+function A(id){return S.a[id]||(S.a[id]={})}
+function refreshCard(id){const el=document.getElementById('c_'+id);if(!el)return;const q=findQ(id);const st=status(q);el.classList.toggle('ok',st==='ok');el.classList.toggle('need',st==='need');el.classList.toggle('must',st==='none'&&!!q.must);updBar()}
+function findQ(id){for(const s of SECTIONS)for(const q of qsOf(s))if(q.id===id)return q}
+function setV(id,v){A(id).v=v;save();refreshCard(id)}
+function setM(id,v){A(id).m=v;save();refreshCard(id)}
+function pick(id,type,o,btn){const a=A(id);if(type==='multi'){a.v=a.v||[];const k=a.v.indexOf(o);k>=0?a.v.splice(k,1):a.v.push(o);btn.classList.toggle('on',k<0)}else{a.v=a.v===o?'':o;btn.parentNode.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));if(a.v)btn.classList.add('on')}save();refreshCard(id)}
+function tNeed(id){const a=A(id);a.need=!a.need;save();const y=window.scrollY;render();window.scrollTo(0,y)}
+function addQ(sec){const el=document.getElementById('newQ');const t=el.value.trim();if(!t)return;(S.custom[sec]=S.custom[sec]||[]).push({id:'x'+Date.now(),q:t});save();const y=window.scrollY;render();window.scrollTo(0,y);toast('질문을 추가했어요')}
+function delQ(id){if(!confirm('이 질문을 지울까요?'))return;for(const k in S.custom)S.custom[k]=S.custom[k].filter(c=>c.id!==id);delete S.a[id];save();const y=window.scrollY;render();window.scrollTo(0,y)}
+
+/* 사진 */
+let photoSec='';
+function addPhoto(sec){photoSec=sec;document.getElementById('photoIn').click()}
+document.getElementById('photoIn').addEventListener('change',async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){const data=await shrink(f);if(!data)continue;const o={id:'p'+Date.now()+Math.random().toString(36).slice(2,6),sec:photoSec,data,note:'',t:Date.now()};await pPut(o);PH.push(o)}drawPhotos(photoSec);toast(fs.length+'장 저장했어요')});
+function drawPhotos(sec){const box=document.getElementById('ph_'+sec);if(!box)return;const ps=PH.filter(p=>p.sec===sec);const c=document.getElementById('pc_'+sec);if(c)c.textContent=ps.length?ps.length+'장':'';
+ box.innerHTML=ps.map(p=>`<div class="ph"><img src="${p.data}" onclick="window.open().document.write('<img src=&quot;'+this.src+'&quot; style=&quot;max-width:100%&quot;>')"><input type="text" value="${esc(p.note)}" placeholder="설명" oninput="noteP('${p.id}',this.value)"><button onclick="rmP('${p.id}','${sec}')" aria-label="지우기">✕</button></div>`).join('')}
+let noteT;function noteP(id,v){const p=PH.find(x=>x.id===id);if(!p)return;p.note=v;clearTimeout(noteT);noteT=setTimeout(()=>pPut(p),300)}
+async function rmP(id,sec){if(!confirm('사진을 지울까요?'))return;await pDel(id);PH=PH.filter(p=>p.id!==id);drawPhotos(sec)}
+
+/* 내보내기 */
+function stamp(){const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')}
+function dl(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+function saveReport(){const css=document.querySelector('style').textContent;dl(stamp()+'_물류센터_1차방문_정리본.html',`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>물류센터 1차 방문 정리본</title><style>${css}</style></head><body><div class="wrap" style="padding-top:14px">${reportHTML(true)}</div></body></html>`,'text/html');toast('정리본 파일을 저장했어요')}
+function copyText(){let t='[물류센터 1차 방문 정리]\n';SECTIONS.forEach((s,i)=>{t+=`\n■ ${i+1}. ${s.t}\n`;qsOf(s).forEach(q=>{const st=status(q),a=ansText(q);t+=`- ${q.q}: ${a||'(미기재)'}${st==='need'?' [다시 확인]':''}\n`})});
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('복사했어요. 붙여넣기 하세요')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('복사했어요')})}
+function backup(){dl(stamp()+'_물류센터_1차방문_백업.json',JSON.stringify({S,PH}),'application/json');toast('백업 파일을 저장했어요')}
+document.getElementById('backupIn').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const o=JSON.parse(await f.text());if(!o.S||!o.S.a)throw 0;if(!confirm('지금 적은 내용을 백업 내용으로 바꿀까요?'))return;S=o.S;S.custom=S.custom||{};S.meta=S.meta||{};localStorage.setItem(KEY,JSON.stringify(S));await pClear();PH=o.PH||[];for(const p of PH)await pPut(p);render();toast('불러왔어요')}catch(err){alert('백업 파일을 읽지 못했어요.')}});
+async function resetAll(){if(!confirm('적은 답과 사진을 모두 지울까요? 먼저 「백업 파일 저장」을 권합니다.'))return;if(!confirm('정말 모두 지울까요? 되돌릴 수 없습니다.'))return;S={a:{},custom:{},meta:{}};localStorage.setItem(KEY,JSON.stringify(S));await pClear();PH=[];go('home');toast('새로 시작합니다')}
+
+/* 시작 */
+if(!S.a.b1||!S.a.b1.v){const d=new Date();A('b1').v=`${d.getMonth()+1}/${d.getDate()}(${'일월화수목금토'[d.getDay()]}) `;}
+render();
+pAll().then(r=>{PH=r.sort((a,b)=>a.t-b.t);const c=document.getElementById('phCnt');if(c)c.textContent=PH.length;if(cur!=='home'&&cur!=='list')render()}).catch(()=>{});
+window.addEventListener('beforeunload',()=>localStorage.setItem(KEY,JSON.stringify(S)));
+</script>
+</body>
+</html>
