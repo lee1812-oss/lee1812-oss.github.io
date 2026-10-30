@@ -115,19 +115,28 @@ h2{font-size:19px;margin:18px 0 8px}
 #crop .edt button:not(.pri){background:#374151;color:#fff;border-color:#4b5563}
 #cropBox i{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:#facc15;border:3px solid #fff;pointer-events:auto;touch-action:none}
 #crop .cb{display:flex;gap:8px;width:min(612px,100%)}#crop .cb>*{flex:1}
+#bBar{position:fixed;left:0;right:0;top:0;z-index:55;background:#0D1C42;color:#fff;padding:10px 12px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#bBar .bt{max-width:640px;margin:0 auto 8px;font-size:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#bBar .bt b{color:#facc15;font-size:22px}#bBar .bt small{color:#cbd5e1;font-size:16px}
+#bBar .bb{max-width:640px;margin:0 auto;display:flex;gap:8px}
+#bBar .bb button{flex:1;min-height:54px;font-size:17px;background:#22396F;color:#fff;border-color:#3b5998;padding:0 8px}
+#bBar .bb .stop{background:#fff;color:#b91c1c;border-color:#fff}
+body.batch{padding-top:var(--bbh,124px)}body.batch header{top:var(--bbh,124px)}
+body.batch #crop{padding-top:calc(12px + var(--bbh,124px))}body.batch #toast{top:calc(16px + var(--bbh,124px))}
+body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 </style>
 </head>
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v022</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v023</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
 <main id="app"></main>
 <button class="pri fab" id="fab">＋ 명함 추가</button>
 <input type="file" id="camIn" accept="image/*" capture="environment" hidden>
-<input type="file" id="picIn" accept="image/*" hidden>
+<input type="file" id="picIn" accept="image/*" multiple hidden>
 <input type="file" id="vcfIn" accept=".vcf,text/vcard,text/x-vcard" hidden>
 <input type="file" id="meCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="mePic" accept="image/*" hidden>
@@ -140,7 +149,7 @@ h2{font-size:19px;margin:18px 0 8px}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v022';
+const VER='v023';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -561,15 +570,16 @@ function renderEdit(a){
 }
 async function saveDraft(){
   if(draft&&draft._me)return saveMeDraft();
-  const d=draft;xphRead();if(d.xph){d.xph=d.xph.map(x=>({l:x.l,n:fmtPhone(x.n)}));if(!d.xph.length)delete d.xph}const toPhone=$('#phChk')&&$('#phChk').checked;if(!d.id&&$('#phChk')){S.autoPhone=toPhone;saveS()}const newShop=d.kind==='shop'&&!d.id;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
+  const d=draft;const inB=!!(BATCH&&d._b&&d._b===BATCH.tok);xphRead();if(d.xph){d.xph=d.xph.map(x=>({l:x.l,n:fmtPhone(x.n)}));if(!d.xph.length)delete d.xph}const toPhone=$('#phChk')&&$('#phChk').checked;if(!d.id&&$('#phChk')){S.autoPhone=toPhone;saveS()}const newShop=d.kind==='shop'&&!d.id;FIELDS.forEach(([k])=>{d[k]=$('#f_'+k).value.trim()});
   ['mobile','tel','fax'].forEach(k=>{if(d[k])d[k]=fmtPhone(d[k])});
   if(!d.name&&!d.company&&!d.mobile&&!d.email){toast('이름·회사·번호·메일 중 하나는 넣어 주세요');return}
   if(!d.id){const dup=C.find(x=>(d.mobile&&digits(x.mobile)===digits(d.mobile))||(d.email&&x.email&&x.email.toLowerCase()===d.email.toLowerCase()));
     if(dup&&confirm((dup.name||'같은 사람')+'이(가) 이미 있어요. 기존 연락처에 합칠까요?\n(취소를 누르면 따로 저장해요)')){
-      for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';render();if(toPhone)saveVcf([dup],(dup.name||'연락처')+'.vcf');return}
+      for(const k of Object.keys(d)){if(d[k]&&!k.startsWith('_')&&k!=='id')dup[k]=d[k]}dup.updated=Date.now();await DB.put(dup);if(inB){toast('기존 연락처에 합쳤어요');return batchSaved(dup,toPhone)}draft=null;toast('기존 연락처에 합쳤어요');history.replaceState({v:'detail',id:dup.id},'');curId=dup.id;view='detail';render();if(toPhone)saveVcf([dup],(dup.name||'연락처')+'.vcf');return}
     d.id=newId();d.created=Date.now()}
-  d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;delete d._edited;delete d._phoneNote;
+  d.updated=Date.now();delete d._ocr;delete d._raw;delete d._alt;delete d._edited;delete d._phoneNote;delete d._b;
   await DB.put(d);const i=C.findIndex(x=>x.id===d.id);if(i>=0)C[i]=d;else C.push(d);
+  if(inB){toast('저장했어요');return batchSaved(d,toPhone)}
   draft=null;curId=d.id;toast('저장했어요');history.replaceState({v:'detail',id:d.id},'');view='detail';render();
   if(toPhone)saveVcf([d],(d.name||d.company||'연락처')+'.vcf');
   if(newShop)setTimeout(()=>shopPhoneSheet(d),350);
@@ -647,11 +657,12 @@ function mergeParse(a,b){const o={},alt={};for(const k of new Set([...Object.key
   if(x===y||!y){o[k]=x;continue}if(!x){o[k]=y;continue}
   const sx=fieldScore(k,x),sy=fieldScore(k,y);o[k]=sy>sx?y:x;alt[k]=sy>sx?x:y}return {o,alt}}
 async function onPhoto(file){
-  if(!file)return;let cv0;try{cv0=await imgToCanvas(file,2000)}catch(e){return toast('사진을 열지 못했어요')}
-  openEditor(cv0,readCardCv,{read:true})}
+  if(!file)return;const myB=BATCH?BATCH.tok:0;let cv0;try{cv0=await imgToCanvas(file,2000)}catch(e){if(myB&&BATCH&&BATCH.tok===myB){toast('이 사진은 열지 못해 건너뛰어요');return batchSkip(1)}return toast('사진을 열지 못했어요')}
+  if(myB&&(!BATCH||BATCH.tok!==myB))return;
+  openEditor(cv0,readCardCv,{read:true,onCancel:myB?batchAsk:null})}
 async function readCardCv(cv){
   sheet(`<h3>명함 글자 읽는 중…</h3><p class="muted" id="ocrMsg">구글 글자인식으로 읽고 있어요. 보통 5~10초 걸려요.</p><div class="prog"><i id="ocrBar" style="width:15%"></i></div><button class="opt" onclick="ocrCancel=true;sheet()">그만두고 직접 입력</button>`);
-  ocrCancel=false;
+  ocrCancel=false;const myB=BATCH?BATCH.tok:0;const gone=()=>myB&&(!BATCH||BATCH.tok!==myB);
   let thumb,full;
   try{
     const base=scaleCv(cv,1600);
@@ -667,16 +678,42 @@ async function readCardCv(cv){
       if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
       const w=await Tesseract.createWorker(['kor','eng']);const r=await w.recognize(big);await w.terminate();
       raw=r.data.text.replace(/[ \t]+/g,' ').split('\n').map(s=>s.trim()).filter(Boolean).join('\n');p=parseCard(raw)}
-    if(ocrCancel)return;
+    if(ocrCancel||gone())return;
     sheet();
-    draft=Object.assign(blank(),p,{_ocr:1,_raw:raw,_alt:alt,photo:thumb.toDataURL('image/jpeg',.7),photoFull:full.toDataURL('image/jpeg',.72)});
+    draft=Object.assign(blank(),p,{_ocr:1,_raw:raw,_alt:alt,photo:thumb.toDataURL('image/jpeg',.7),photoFull:full.toDataURL('image/jpeg',.72),_b:myB});
     go('edit',null);
-  }catch(e){
+  }catch(e){if(gone())return;
     sheet(`<h3>글자를 못 읽었어요</h3><p class="muted">인터넷이 연결돼 있는지 확인해 주세요. 사진은 그대로 붙여 두고 직접 입력할 수 있어요.</p>
-     <button class="opt pri" onclick="sheet();draft=Object.assign(blank(),{photo:window._lastThumb||''});go('edit',null)">직접 입력하기</button><button class="opt" onclick="sheet()">닫기</button>`);
+     <button class="opt pri" onclick="sheet();draft=Object.assign(blank(),{photo:window._lastThumb||'',_b:BATCH?BATCH.tok:0});go('edit',null)">직접 입력하기</button><button class="opt" onclick="sheet()">닫기</button>`);
   }
 }
 let ocrCancel=false;
+
+/* ---------- 앨범에서 명함 여러 장 한 번에 (v023) ---------- */
+let BATCH=null;
+function onPicFiles(fl){const A=[...(fl||[])],L=A.filter(f=>!f.type||f.type.startsWith('image/'));
+  if(L.length<=1)return onPhoto(L[0]||A[0]);
+  BATCH={files:L,n:L.length,i:0,saved:0,skip:0,tok:0,vcf:[]};batchShow()}
+function batchBar(){let b=$('#bBar');if(!BATCH){if(b)b.remove();document.body.classList.remove('batch');return}
+  if(!b){b=document.createElement('div');b.id='bBar';document.body.appendChild(b)}
+  const B=BATCH;b.innerHTML=`<div class="bt">🖼️ 명함 사진 <b>${B.i+1} / ${B.n}</b><small>저장 ${B.saved}명 · 건너뜀 ${B.skip}장</small></div><div class="bb"><button id="bSkip">⏭ 이 사진 건너뛰기</button><button class="stop" id="bStop">■ 나머지 그만하기</button></div>`;
+  $('#bSkip').onclick=()=>batchSkip();$('#bStop').onclick=batchStop;
+  document.body.classList.add('batch');document.body.style.setProperty('--bbh',b.offsetHeight+'px')}
+function batchShow(){const B=BATCH;if(!B)return;if(B.i>=B.n)return batchEnd(0,false);B.tok++;batchBar();onPhoto(B.files[B.i])}
+function batchQuiet(){ocrCancel=true;if(window._edClose)window._edClose();sheet();
+  if(view==='edit'&&draft&&draft._b){draft=null;history.replaceState({v:'list'},'');view='list';render()}}
+function batchSkip(silent){if(!BATCH)return;batchQuiet();BATCH.skip++;BATCH.i++;if(!silent&&BATCH.i<BATCH.n)toast('건너뛰었어요 · 다음 사진 '+(BATCH.i+1)+'/'+BATCH.n);batchShow()}
+function batchSaved(c,toPhone){const B=BATCH;if(toPhone&&!B.vcf.some(x=>x.id===c.id))B.vcf.push(c);B.saved++;B.i++;draft=null;curId=c.id;history.replaceState({v:'list'},'');view='list';render();
+  if(B.i<B.n)toast('저장했어요 · 다음 사진 '+(B.i+1)+'/'+B.n);setTimeout(batchShow,350)}
+function batchStop(){if(!BATCH)return;const onForm=!!(view==='edit'&&draft&&draft._b);
+  if(onForm)delete draft._b;else batchQuiet();
+  batchEnd(BATCH.n-BATCH.i-(onForm?1:0),onForm)}
+function batchAsk(){if(!BATCH)return;sheet(`<h3>이 사진은 어떻게 할까요?</h3><p class="muted">명함 사진 ${BATCH.i+1} / ${BATCH.n}</p><button class="opt pri" onclick="sheet();batchRedo()">✂️ 이 사진 다시 자르기</button><button class="opt" onclick="sheet();batchSkip()">⏭ 이 사진 건너뛰기</button><button class="opt" onclick="sheet();batchStop()">■ 나머지 그만하기</button>`)}
+function batchRedo(){if(BATCH){BATCH.tok++;onPhoto(BATCH.files[BATCH.i])}}
+function batchEnd(left,onForm){const B=BATCH;BATCH=null;batchBar();if(!B)return;const vc=B.vcf;
+  sheet(`<h3>${left?'■ 여기서 그만했어요':'✓ 명함 사진 '+B.n+'장 끝났어요'}</h3><div class="note">저장 <b>${B.saved}명</b> · 건너뜀 ${B.skip}장${left?' · 안 한 사진 '+left+'장':''}${onForm?'<br>지금 보던 명함은 아래 <b>「저장」</b>을 눌러야 저장돼요.':''}</div>
+  ${vc.length?`<button class="opt pri" id="bVcf">📱 저장한 ${vc.length}명 휴대폰 연락처에도 저장</button>`:''}<button class="opt" onclick="sheet()">${vc.length?'나중에 (상세 화면에서도 할 수 있어요)':'확인'}</button>`);
+  if(vc.length)$('#bVcf').onclick=()=>{sheet();saveVcf(vc,vc.length===1?(vc[0].name||vc[0].company||'연락처')+'.vcf':'바로연락_명함_'+vc.length+'명.vcf')}}
 
 /* ---------- 간판 찍어 거래처 등록 ---------- */
 let GEO={st:'none'},SG=null;
@@ -866,8 +903,8 @@ function openEditor(cv,done,opt){opt=opt||{};
   q('#edC').oninput=e=>{st.c=+e.target.value;q('#edCv').textContent=st.c;redraw()};
   q('#edAuto').onclick=()=>{st.auto=!st.auto;q('#edAuto').textContent=st.auto?'✨ 자동 보정 켬':'✨ 자동 보정 끔';q('#edAuto').classList.toggle('pri',st.auto);redraw()};
   q('#edReset').onclick=()=>{Object.assign(st,{rot:0,flip:false,tilt:0,b:0,c:0,auto:false});resetBox();['edTilt','edB','edC'].forEach(i=>q('#'+i).value=0);q('#edTv').textContent='0°';q('#edBv').textContent='0';q('#edCv').textContent='0';q('#edAuto').textContent='✨ 자동 보정 끔';q('#edAuto').classList.remove('pri');redraw()};
-  const close=()=>{o.remove();removeEventListener('resize',redraw)};addEventListener('resize',redraw);
-  q('#crNo').onclick=close;
+  const close=()=>{o.remove();removeEventListener('resize',redraw);if(window._edClose===close)window._edClose=null};addEventListener('resize',redraw);window._edClose=close;
+  q('#crNo').onclick=()=>{close();if(opt.onCancel)opt.onCancel()};
   q('#crOk').onclick=()=>{const src=xf(full),B=st.B;const x=Math.round(B.x0*src.width),y=Math.round(B.y0*src.height),w=Math.max(1,Math.round((B.x1-B.x0)*src.width)),h=Math.max(1,Math.round((B.y1-B.y0)*src.height));
     const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(src,x,y,w,h,0,0,w,h);adjustCv(c,st);close();done(c)};
   tab(1)}
@@ -898,7 +935,7 @@ async function meReadCv(cv){
 $('#meCam').onchange=e=>{onMePhoto(e.target.files[0]);e.target.value=''};
 $('#mePic').onchange=e=>{onMePhoto(e.target.files[0]);e.target.value=''};
 $('#camIn').onchange=e=>{onPhoto(e.target.files[0]);e.target.value=''};
-$('#picIn').onchange=e=>{onPhoto(e.target.files[0]);e.target.value=''};
+$('#picIn').onchange=e=>{const f=[...e.target.files];e.target.value='';onPicFiles(f)};
 $('#vcfIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const L=parseVcf(await f.text());if(!L.length)return toast('연락처를 찾지 못했어요');
   if(L.length===1){draft=Object.assign(blank(),L[0]);go('edit',null);return}
   if(!confirm(L.length+'명을 가져올까요?'))return;let n=0;for(const c of L){const o=Object.assign(blank(),c,{id:newId(),created:Date.now(),updated:Date.now(),metAt:''});await DB.put(o);C.push(o);n++}toast(n+'명을 가져왔어요');render()};
@@ -932,7 +969,7 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEvt=e;instChec
 addEventListener('appinstalled',()=>{instEvt=null;instCheck()});
 /* ---------- 새 버전 확인 (GitHub Pages가 화면을 최대 10분 저장본으로 줄 때 대비) ---------- */
 const verNum=v=>parseInt(String(v||'').replace(/\D/g,''),10)||0;
-async function verCheck(){try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();
+async function verCheck(){if(BATCH)return;try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();
   if(verNum(j.v)<=verNum(VER))return;
   const key='baro_reload_'+j.v;
   if(!sessionStorage.getItem(key)){sessionStorage.setItem(key,'1');const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString());return}
