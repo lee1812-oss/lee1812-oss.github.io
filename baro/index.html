@@ -121,14 +121,19 @@ h2{font-size:19px;margin:18px 0 8px}
 .mf{font-size:16px;color:var(--tx)}
 .mi{font-size:20px;min-height:58px;font-weight:600}
 .mi.miss{border:2px solid #ea580c;background:#fff7ed}
-.mloc{margin:14px 2px;font-size:16px;color:var(--sub)}
+.mloc{margin:8px 2px;font-size:16px;color:var(--sub)}
 details.more{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:0 14px;margin:10px 0 14px}
 details.more[open]{padding-bottom:12px}
 details.more summary{min-height:52px;display:flex;align-items:center;font-weight:700;color:var(--ac);cursor:pointer;font-size:17px}
-.mbig{min-height:68px;font-size:20px;margin-bottom:10px}
+.mbig{min-height:60px;font-size:20px;margin-bottom:8px}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:19px;margin:0 0 2px}
+.mthumb{height:64px;max-width:55%;object-fit:contain;background:#fff;border:1px solid var(--bd);border-radius:8px}
+.mthumb.big{position:fixed;z-index:60;left:2vw;top:8vh;height:auto;max-height:80vh;width:96vw;max-width:96vw;box-shadow:0 0 0 100vmax rgba(0,0,0,.6)}
+body:has(.mhead) main{padding:6px 14px 16px}body:has(.mhead) label.f{margin:6px 0 2px}body:has(.mhead) .mi{min-height:52px}body:has(.mhead) .more summary{min-height:44px;display:flex;align-items:center}
+body:has(.mhead) .mbig{margin-top:6px}
 .meetread{text-align:center}
-.meetread h3{font-size:25px;margin:6px 0}
-.meetread img{max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--bd);margin:8px 0}
+.meetread h3{font-size:22px;margin:2px 0}
+.meetread img{max-width:100%;max-height:110px;border-radius:10px;border:1px solid var(--bd);margin:4px 0}
 .ask .row button{min-height:60px;font-size:18px}
 .guide h3{font-size:23px!important;margin:4px 0 10px}
 .gsteps{margin:12px 0 14px;padding-left:30px;font-size:19px;line-height:1.5}
@@ -228,7 +233,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v034</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v035</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -249,7 +254,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v034';
+const VER='v035';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -810,7 +815,7 @@ async function readCardCv(cv){const meet=MEET_R;MEET_R=false;
 }
 let ocrCancel=false;
 
-/* ---------- 앨범에서 명함 여러 장 한 번에 (v034) ---------- */
+/* ---------- 앨범에서 명함 여러 장 한 번에 (v035) ---------- */
 let BATCH=null;
 function onPicFiles(fl){const A=[...(fl||[])],L=A.filter(f=>!f.type||f.type.startsWith('image/'));
   if(L.length<=1)return onPhoto(L[0]||A[0]);
@@ -939,8 +944,8 @@ function saveMeLS(){try{if(ME)localStorage.setItem('baro_me',JSON.stringify(ME))
 const ME_FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['memo','추가 정보 (예: 2공장 주소, 하는 일)']];
 function meSign(){const m=ME||{};return ['감사합니다.','',[m.company,m.dept,m.title].filter(Boolean).join(' ')+' '+(m.name||'')+' 드림',m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email].filter(x=>x!==undefined&&x!==false&&x!==null).join('\n').trim()}
 function meText(){const m=ME;const ad=firstAddr(m.address);return [m.name&&(m.name+(m.title?' '+m.title:'')),[m.company,m.dept].filter(Boolean).join(' '),m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email,ad&&'주소 '+ad,m.web&&'홈페이지 '+m.web].filter(Boolean).join('\n')}
-/* 내 명함 문자로 보내기 (v034) */
-/* 미팅 명함 교환 (v034): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
+/* 내 명함 문자로 보내기 (v035) */
+/* 미팅 명함 교환 (v035): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
 let MEET_R=false,MEETG={st:'none'};
 function getPend(){try{const p=JSON.parse(localStorage.getItem('baro_sendpend')||'null');if(!p||Date.now()-p.at>3*36e5)return null;return C.some(x=>x.id===p.id)?p:null}catch(e){return null}}
 function setPend(id){try{localStorage.setItem('baro_sendpend',JSON.stringify({id,at:Date.now()}))}catch(e){}}
@@ -957,16 +962,15 @@ function renderMeet(a){const d=draft;if(!d){view='list';return render()}d._meet=
   const al=k=>d._alt&&d._alt[k]?`<button class="alt" data-k="${k}">↺ 다른 읽기: ${esc(d._alt[k])}</button>`:'';
   const miss=!d.mobile;
   const inp=([k,l,t])=>`<label class="f" for="f_${k}">${l}</label>${k==='memo'?`<textarea id="f_${k}">${esc(d[k])}</textarea>`:`<input id="f_${k}" type="${t||'text'}" value="${esc(d[k])}" ${t==='tel'?'inputmode="tel"':''}>`}${al(k)}`;
-  a.innerHTML=`<h2 style="margin-top:4px;font-size:21px">🤝 받은 명함 확인</h2>
-  ${d.photoFull?`<img class="photo" style="max-height:170px;object-fit:contain;background:#fff" src="${d.photoFull}" alt="받은 명함">`:''}
+  a.innerHTML=`<div class="mhead"><b>🤝 받은 명함 확인</b>${d.photoFull?`<img class="mthumb" id="mThumb" src="${d.photoFull}" alt="받은 명함 (누르면 크게)">`:''}</div>
   <label class="f mf" for="f_name">이름</label><input class="mi" id="f_name" value="${esc(d.name)}">${al('name')}
   <label class="f mf" for="f_company">회사</label><input class="mi" id="f_company" value="${esc(d.company)}">${al('company')}
   <label class="f mf" for="f_mobile">휴대폰 ${miss?'<b style="color:#c2410c">· 못 읽었어요, 직접 넣어 주세요</b>':''}</label><input class="mi${miss?' miss':''}" id="f_mobile" type="tel" inputmode="tel" placeholder="010-0000-0000" value="${esc(d.mobile)}">${al('mobile')}
-  <div class="mloc">📍 만난 곳: <b id="mPlace"></b><br>📅 만난 날: ${esc(d.metAt)}</div>
+  <div class="mloc">📍 <b id="mPlace"></b> · 📅 ${esc(d.metAt)}</div>
   <details class="more"><summary>더 보기 (직함·메일·주소·메모)</summary>${FIELDS.filter(([k])=>!['name','company','mobile'].includes(k)).map(inp).join('')}</details>
   <button class="pri full mbig" id="mSend">📩 저장하고 내 명함 보내기</button>
   <div class="row"><button id="mSave">저장만</button><button id="mRe">📷 다시 찍기</button></div>`;
-  mPlaceUpd();
+  mPlaceUpd();const th=$('#mThumb');if(th)th.onclick=()=>th.classList.toggle('big');
   $('#mSend').onclick=()=>meetSave(true);$('#mSave').onclick=()=>meetSave(false);$('#mRe').onclick=()=>{draft=null;meetStart();history.back()};
   a.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,el=$('#f_'+k),v=el.value;el.value=d._alt[k];d._alt[k]=v;b.textContent='↺ 다른 읽기: '+v;if(k==='mobile')el.classList.toggle('miss',!el.value)});
   if(miss)setTimeout(()=>{const el=$('#f_mobile');if(el&&view==='meet'&&!el.value&&(d.name||d.company))el.focus()},400)}
@@ -1001,7 +1005,7 @@ function meSmsBody(c,lk){let t=S.meetHi||DEF_HI;const nm=c&&(c.name||'').trim();
   const lku=lk?meLinkReady():'';return t.trim()+'\n\n'+meSmsCard()+(lku?'\n\n📇 명함 사진 보기: '+lku:'')}
 function meNeed(){sheet(`<h3>🪪 내 명함이 아직 없어요</h3><div class="note">내 명함을 먼저 한 번 등록해 두면, 그다음부터는 버튼 하나로 바로 보낼 수 있어요.</div><button class="opt pri" onclick="sheet();go('me')">🪪 내 명함 등록하러 가기</button><button class="opt" onclick="sheet()">나중에</button>`)}
 function meSms(c,lk){if(!ME)return meNeed();sheet();const n=smsNum(c);if(c&&c.id)setPend(c.id);if(c&&!n)toast('휴대폰 번호가 없어서, 받는 분 번호는 문자 화면에서 넣어 주세요');location.href=smsHref(n,meSmsBody(c,lk))}
-/* v034: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
+/* v035: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
 let SENDC=null;
 const meSig=()=>ME&&ME.photoFull?ME.photoFull.length+':'+ME.photoFull.slice(-32):'';
 function meLinkReady(){return ME&&ME.photoFull&&ME.imgUrl&&ME.imgSig===meSig()?ME.imgUrl:''}
