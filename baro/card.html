@@ -1,0 +1,14 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>명함</title><style>
+body{margin:0;background:#111827;color:#fff;font:18px/1.4 system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+#w{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px;min-height:40vh}
+#w img{max-width:100%;max-height:62vh;border-radius:10px;background:#fff;transition:transform .2s}
+h1{font-size:22px;margin:8px 14px 0;text-align:center}p{margin:2px 14px;text-align:center;color:#cbd5e1}
+.b{display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px}
+a,button{display:flex;align-items:center;justify-content:center;min-height:58px;border-radius:12px;border:0;background:#1d4ed8;color:#fff;font-weight:700;font-size:19px;text-decoration:none;font-family:inherit}
+.g{background:#374151}</style></head><body><div id="w"></div><h1 id="nm"></h1><p id="co"></p><div class="b" id="b"></div>
+<script>const q=new URLSearchParams(location.search),g=k=>q.get(k)||'',$=id=>document.getElementById(id);
+$('nm').textContent=(g('n')+' '+g('t')).trim();$('co').textContent=g('c');document.title=g('n')?g('n')+' 명함':'명함';
+let rot=0;if(g('i')){const im=new Image();im.alt='명함';im.src='https://lh3.googleusercontent.com/d/'+encodeURIComponent(g('i'));im.onerror=()=>{$('w').innerHTML='<p>명함 사진을 불러오지 못했어요</p>'};im.onclick=()=>{rot=(rot+90)%360;im.style.transform='rotate('+rot+'deg)'};$('w').appendChild(im);
+const r=document.createElement('button');r.className='g';r.textContent='🔄 사진 돌리기';r.onclick=()=>im.onclick();$('b').appendChild(r)}else $('w').innerHTML='<p style="font-size:60px">🪪</p>';
+const m=g('m').replace(/[^0-9+]/g,'');if(m){const t=document.createElement('a');t.href='tel:'+m;t.textContent='📞 전화 걸기 '+g('m');$('b').appendChild(t);const s=document.createElement('a');s.href='sms:'+m;s.textContent='✉️ 문자 보내기';$('b').appendChild(s)}
+const v=document.createElement('button');v.textContent='📱 연락처에 저장';v.onclick=()=>{const L=['BEGIN:VCARD','VERSION:3.0','FN:'+g('n'),'N:'+g('n')+';;;;'];if(g('c'))L.push('ORG:'+g('c'));if(g('t'))L.push('TITLE:'+g('t'));if(g('m'))L.push('TEL;TYPE=CELL:'+g('m'));if(g('e'))L.push('EMAIL:'+g('e'));L.push('END:VCARD');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([L.join('\r\n')],{type:'text/vcard'}));a.download=(g('n')||'명함')+'.vcf';a.click()};$('b').appendChild(v);</script></body></html>

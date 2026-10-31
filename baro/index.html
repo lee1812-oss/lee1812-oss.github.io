@@ -233,7 +233,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v037</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v038</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -254,7 +254,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v037';
+const VER='v038';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -815,7 +815,7 @@ async function readCardCv(cv){const meet=MEET_R;MEET_R=false;
 }
 let ocrCancel=false;
 
-/* ---------- 앨범에서 명함 여러 장 한 번에 (v037) ---------- */
+/* ---------- 앨범에서 명함 여러 장 한 번에 (v038) ---------- */
 let BATCH=null;
 function onPicFiles(fl){const A=[...(fl||[])],L=A.filter(f=>!f.type||f.type.startsWith('image/'));
   if(L.length<=1)return onPhoto(L[0]||A[0]);
@@ -944,8 +944,8 @@ function saveMeLS(){try{if(ME)localStorage.setItem('baro_me',JSON.stringify(ME))
 const ME_FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['memo','추가 정보 (예: 2공장 주소, 하는 일)']];
 function meSign(){const m=ME||{};return ['감사합니다.','',[m.company,m.dept,m.title].filter(Boolean).join(' ')+' '+(m.name||'')+' 드림',m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email].filter(x=>x!==undefined&&x!==false&&x!==null).join('\n').trim()}
 function meText(){const m=ME;const ad=firstAddr(m.address);return [m.name&&(m.name+(m.title?' '+m.title:'')),[m.company,m.dept].filter(Boolean).join(' '),m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email,ad&&'주소 '+ad,m.web&&'홈페이지 '+m.web].filter(Boolean).join('\n')}
-/* 내 명함 문자로 보내기 (v037) */
-/* 미팅 명함 교환 (v037): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
+/* 내 명함 문자로 보내기 (v038) */
+/* 미팅 명함 교환 (v038): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
 let MEET_R=false,MEETG={st:'none'};
 function getPend(){try{const p=JSON.parse(localStorage.getItem('baro_sendpend')||'null');if(!p||Date.now()-p.at>3*36e5)return null;return C.some(x=>x.id===p.id)?p:null}catch(e){return null}}
 function setPend(id){try{localStorage.setItem('baro_sendpend',JSON.stringify({id,at:Date.now()}))}catch(e){}}
@@ -1003,7 +1003,7 @@ function meSmsCard(){const m=ME;const ad=firstAddr(m.address);return [m.name&&(m
 function meSmsBody(c,lk){let t=S.meetHi||DEF_HI;const nm=c&&(c.name||'').trim();const who=nm?nm+(c.title?' '+c.title:''):'';
   if(!who)t=t.replace(/\{상대\}\s*님?,?\s*/g,'');t=t.replace(/\{상대\}/g,who).replace(/\{내회사\}/g,ME.company||'').replace(/\{내이름\}/g,ME.name||'').replace(/[ \t]{2,}/g,' ').replace(/^[ \t]+/gm,'');
   const lku=lk?meLinkReady():'';return t.trim()+'\n\n'+meSmsCard()+(lku?'\n\n📇 명함 사진 보기: '+lku:'')}
-/* v037: 카카오톡 공유 카드 (사진+인사말+연락처가 한 메시지로) */
+/* v038: 카카오톡 공유 카드 (사진+인사말+연락처가 한 메시지로) */
 async function kakaoEnsure(){if(!KN.k){const r=await srv({act:'kjs'});if(r&&r.ok&&r.k)KN.k=r.k}
   if(!KN.k)throw new Error('nokey');if(!window.Kakao||!Kakao.Share)await loadScript('https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js');if(!Kakao.isInitialized())Kakao.init(KN.k);KN.sdk=true}
 function kakaoWarm(){if(!ME)return;kakaoEnsure().catch(()=>{});if(S.imgOk&&ME.photoFull&&!meLinkReady())meLinkMake()}
@@ -1012,7 +1012,7 @@ async function meKakaoCard(c,noimg){if(!ME)return meNeed();SENDC=c||null;
   if(ME.photoFull&&!S.imgOk&&!noimg)return sheet(`<h3>💬 카톡에 명함 사진 넣기</h3><div class="note">카톡 카드에 내 명함 사진을 넣으려면 사진을 <b>인터넷 주소로</b> 올려야 해요. 주소를 아는 사람은 누구나 볼 수 있고, 내 명함을 바꾸면 옛 사진은 지워져요.</div><button class="opt pri" onclick="S.imgOk=1;saveS();meKakaoCard(SENDC)">✓ 동의하고 카톡 카드 보내기</button><button class="opt" onclick="meKakaoCard(SENDC,1)">사진 없이 글만 카드로</button><button class="opt" onclick="sendMeTo(SENDC,'kakaoClip')">대신 사진만 보내고 글은 붙여넣기</button>`);
   sheet();if(c&&c.id)setPend(c.id);
   try{await kakaoEnsure();let u='';if(ME.photoFull&&!noimg){if(!meLinkReady())toast('명함 사진 준비 중…');await meLinkMake();if(ME.imgId&&meLinkReady())u='https://lh3.googleusercontent.com/d/'+ME.imgId}
-    const body=meSmsBody(c).split('\n\n')[0],home='https://lee1812-oss.github.io/baro/',lk=meLinkReady()||home,L={mobileWebUrl:lk,webUrl:lk};
+    const body=meSmsBody(c).split('\n\n')[0],home='https://lee1812-oss.github.io/baro/',cq=new URLSearchParams(Object.entries({i:ME.imgId&&meLinkReady()&&!noimg?ME.imgId:'',n:ME.name,t:ME.title,c:ME.company,m:ME.mobile,e:ME.email}).filter(x=>x[1])).toString(),lk=home+'card.html?'+cq,L={mobileWebUrl:lk,webUrl:lk};
     const title=([ME.company,ME.name,ME.title].filter(Boolean).join(' ')).slice(0,40)||'내 명함';
     const items=[[ '휴대폰',ME.mobile],['전화',ME.tel],['메일',ME.email],['주소',firstAddr(ME.address)]].filter(x=>x[1]).slice(0,5).map(x=>({item:x[0],itemOp:String(x[1]).slice(0,40)}));
     if(u)Kakao.Share.sendDefault({objectType:'feed',content:{title,description:body.slice(0,190),imageUrl:u,imageWidth:640,imageHeight:400,link:L},itemContent:items.length?{profileText:ME.name||'',items}:undefined,buttons:[{title:'명함 크게 보기',link:L}]});
@@ -1021,7 +1021,7 @@ async function meKakaoCard(c,noimg){if(!ME)return meNeed();SENDC=c||null;
 setTimeout(()=>{try{kakaoWarm()}catch(e){}},2500);
 function meNeed(){sheet(`<h3>🪪 내 명함이 아직 없어요</h3><div class="note">내 명함을 먼저 한 번 등록해 두면, 그다음부터는 버튼 하나로 바로 보낼 수 있어요.</div><button class="opt pri" onclick="sheet();go('me')">🪪 내 명함 등록하러 가기</button><button class="opt" onclick="sheet()">나중에</button>`)}
 function meSms(c,lk){if(!ME)return meNeed();sheet();const n=smsNum(c);if(c&&c.id)setPend(c.id);if(c&&!n)toast('휴대폰 번호가 없어서, 받는 분 번호는 문자 화면에서 넣어 주세요');location.href=smsHref(n,meSmsBody(c,lk))}
-/* v037: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
+/* v038: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
 let SENDC=null;
 const meSig=()=>ME&&ME.photoFull?ME.photoFull.length+':'+ME.photoFull.slice(-32):'';
 function meLinkReady(){return ME&&ME.photoFull&&ME.imgUrl&&ME.imgSig===meSig()?ME.imgUrl:''}
