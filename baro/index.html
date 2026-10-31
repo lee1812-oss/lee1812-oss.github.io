@@ -176,6 +176,12 @@ details.more summary{min-height:52px;display:flex;align-items:center;font-weight
 .ap{flex:1;text-align:center;font-size:13px;line-height:1.5;padding:6px 2px;border-radius:12px;background:#fff;border:1px solid var(--bd)}
 .ap.on{border:3px solid #16a34a;background:#e9f7ee;font-size:14px}
 .shhint{margin-top:8px;text-align:center;font-size:16px;color:#c2410c;font-weight:700}
+.mm{font-size:13px;color:#15803d;font-weight:800;text-align:center;line-height:1.4}
+.bar{display:flex;gap:6px;font-size:20px}.bar b{border:3px solid #ea580c;border-radius:8px;padding:0 3px;background:#fff7ed}.bar s{text-decoration:none;opacity:.5}
+.pm-gal{display:flex;gap:6px;margin-top:8px}.pm-gal span{flex:1;height:54px;border-radius:8px;background:#e5e7eb}
+.pm-gal .g1{position:relative;border:3px solid #ea580c;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center}.pm-gal .g1 img{width:100%;height:100%;object-fit:cover}
+.pm-gal i{position:absolute;left:0;right:0;bottom:0;background:#ea580c;color:#fff;font-size:11px;font-style:normal;text-align:center;font-weight:800}
+.pm-bar{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:20px}.pm-bar .on{border:3px solid #ea580c;border-radius:8px;padding:0 3px;background:#fff7ed}.pm-bar .inp{flex:1;font-size:13px;color:#9ca3af;border:1px solid var(--bd);border-radius:16px;padding:4px 8px;background:#fff}.pm-send2{color:var(--ac);font-weight:900}
 .pmock{border:3px solid #374151;border-radius:22px;padding:12px;background:#f9fafb;font-size:15px;max-width:330px;margin:0 auto}
 .pm-to{border-bottom:1px solid var(--bd);padding-bottom:6px;margin-bottom:8px}
 .pm-to span,.pm-auto{color:#15803d;font-weight:700;font-size:13px;margin-left:4px}
@@ -221,7 +227,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v032</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v033</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -242,7 +248,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v032';
+const VER='v033';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -725,7 +731,7 @@ function renderPaste(a){
 }
 function renderSet(a){
   const days=S.lastBak?Math.floor((Date.now()-S.lastBak)/864e5):null;
-  a.innerHTML=`<h2 style="margin-top:4px">🤝 미팅 명함 교환</h2><label class="f" for="mtHow">「저장하고 내 명함 보내기」를 누르면</label><select id="mtHow"><option value="clip" ${howNow()==='clip'?'selected':''}>문자 앱 바로 열기 + 명함 사진 붙여넣기 (추천)</option><option value="share" ${howNow()==='share'?'selected':''}>공유 창으로 (메시지·카톡 고르기)</option><option value="sms" ${howNow()==='sms'?'selected':''}>문자 글만</option><option value="link" ${howNow()==='link'?'selected':''}>사진 링크로 (예전 방식)</option></select>
+  a.innerHTML=`<h2 style="margin-top:4px">🤝 미팅 명함 교환</h2><label class="f" for="mtHow">「저장하고 내 명함 보내기」를 누르면</label><select id="mtHow"><option value="clip" ${howNow()==='clip'?'selected':''}>문자 앱 바로 열기 + 🖼에서 명함 사진 고르기 (추천)</option><option value="share" ${howNow()==='share'?'selected':''}>공유 창으로 (메시지·카톡 고르기)</option><option value="sms" ${howNow()==='sms'?'selected':''}>문자 글만</option><option value="link" ${howNow()==='link'?'selected':''}>사진 링크로 (예전 방식)</option></select>
   <label class="f" for="mtHi">인사말 (내 명함 글 앞에 붙어요)</label><textarea id="mtHi" rows="4">${esc(S.meetHi||DEF_HI)}</textarea><p class="muted" style="margin:4px 2px">{내회사}·{내이름} = 내 명함 정보로 바뀌어요. 인사말 아래에 이름·직함·전화·메일·대표 주소가 붙어요.</p><button class="full" onclick="$('#mtHi').value=DEF_HI">인사말 처음대로</button><label class="phc"><input type="checkbox" id="gOn" ${S.clipGuideOff?'':'checked'}><span>보내기 전에 3단계 안내 화면 보기</span></label>
   <h2>메일 끝 인사(서명)</h2><textarea id="sg" placeholder="예)&#10;감사합니다.&#10;이혜영 드림&#10;010-0000-0000">${esc(S.sign)}</textarea>
   <h2>주소를 누르면 (길안내 앱)</h2><select id="navSel"><option value="" ${!S.navApp?'selected':''}>매번 고르기 (티맵 · 카카오내비)</option><option value="tmap" ${S.navApp==='tmap'?'selected':''}>항상 티맵</option><option value="kakaonavi" ${S.navApp==='kakaonavi'?'selected':''}>항상 카카오내비</option></select>
@@ -803,7 +809,7 @@ async function readCardCv(cv){const meet=MEET_R;MEET_R=false;
 }
 let ocrCancel=false;
 
-/* ---------- 앨범에서 명함 여러 장 한 번에 (v032) ---------- */
+/* ---------- 앨범에서 명함 여러 장 한 번에 (v033) ---------- */
 let BATCH=null;
 function onPicFiles(fl){const A=[...(fl||[])],L=A.filter(f=>!f.type||f.type.startsWith('image/'));
   if(L.length<=1)return onPhoto(L[0]||A[0]);
@@ -932,8 +938,8 @@ function saveMeLS(){try{if(ME)localStorage.setItem('baro_me',JSON.stringify(ME))
 const ME_FIELDS=[['name','이름'],['title','직함'],['company','회사'],['dept','부서'],['mobile','휴대폰','tel'],['tel','회사 전화','tel'],['fax','팩스','tel'],['email','메일','email'],['address','주소'],['web','홈페이지','url'],['kakao','카톡 ID'],['memo','추가 정보 (예: 2공장 주소, 하는 일)']];
 function meSign(){const m=ME||{};return ['감사합니다.','',[m.company,m.dept,m.title].filter(Boolean).join(' ')+' '+(m.name||'')+' 드림',m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email].filter(x=>x!==undefined&&x!==false&&x!==null).join('\n').trim()}
 function meText(){const m=ME;const ad=firstAddr(m.address);return [m.name&&(m.name+(m.title?' '+m.title:'')),[m.company,m.dept].filter(Boolean).join(' '),m.mobile&&'휴대폰 '+m.mobile,m.tel&&'전화 '+m.tel,m.email&&'메일 '+m.email,ad&&'주소 '+ad,m.web&&'홈페이지 '+m.web].filter(Boolean).join('\n')}
-/* 내 명함 문자로 보내기 (v032) */
-/* 미팅 명함 교환 (v032): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
+/* 내 명함 문자로 보내기 (v033) */
+/* 미팅 명함 교환 (v033): 찍기 → 읽기 → 꼭 필요한 칸 확인 → 저장하고 문자 → 보냈어요? → 다음 명함 */
 let MEET_R=false,MEETG={st:'none'};
 function getPend(){try{const p=JSON.parse(localStorage.getItem('baro_sendpend')||'null');if(!p||Date.now()-p.at>3*36e5)return null;return C.some(x=>x.id===p.id)?p:null}catch(e){return null}}
 function setPend(id){try{localStorage.setItem('baro_sendpend',JSON.stringify({id,at:Date.now()}))}catch(e){}}
@@ -994,7 +1000,7 @@ function meSmsBody(c,lk){let t=S.meetHi||DEF_HI;const nm=c&&(c.name||'').trim();
   const lku=lk?meLinkReady():'';return t.trim()+'\n\n'+meSmsCard()+(lku?'\n\n📇 명함 사진 보기: '+lku:'')}
 function meNeed(){sheet(`<h3>🪪 내 명함이 아직 없어요</h3><div class="note">내 명함을 먼저 한 번 등록해 두면, 그다음부터는 버튼 하나로 바로 보낼 수 있어요.</div><button class="opt pri" onclick="sheet();go('me')">🪪 내 명함 등록하러 가기</button><button class="opt" onclick="sheet()">나중에</button>`)}
 function meSms(c,lk){if(!ME)return meNeed();sheet();const n=smsNum(c);if(c&&c.id)setPend(c.id);if(c&&!n)toast('휴대폰 번호가 없어서, 받는 분 번호는 문자 화면에서 넣어 주세요');location.href=smsHref(n,meSmsBody(c,lk))}
-/* v032: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
+/* v033: 문자에 내 명함 이미지 (문자 주소로는 사진을 못 붙여서, 사진 링크를 넣거나 사진을 복사해 붙여넣기) */
 let SENDC=null;
 const meSig=()=>ME&&ME.photoFull?ME.photoFull.length+':'+ME.photoFull.slice(-32):'';
 function meLinkReady(){return ME&&ME.photoFull&&ME.imgUrl&&ME.imgSig===meSig()?ME.imgUrl:''}
@@ -1019,23 +1025,20 @@ function sendMeTo(c,how){if(!ME)return meNeed();SENDC=c||null;how=how||howNow();
 function mePng(){return new Promise((ok,no)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);c.toBlob(b=>b?ok(b):no(),'image/png')};im.onerror=no;im.src=ME.photoFull})}
 let ME_PNG=null;
 let SHARE_T='';
-function handSteps(){return `<ol class="hsteps">
-  <li><div class="hpic"><span class="ring"><i></i></span><span class="fing">👆</span></div><div>글 맨 아래 <b>빈 곳</b>에 손가락을 대고<br><b class="hl">1초 누르고 있다가 손을 떼요</b></div></li>
-  <li><div class="hpic"><span class="mnu"><s>복사</s><b>붙여넣기</b></span></div><div>위에 작은 메뉴가 뜨면<br><b class="hl">「붙여넣기」 글자를 한 번 톡</b><br><small>다른 곳은 누르지 않아요</small></div></li>
-  <li><div class="hpic"><span class="snd">보내기 ▶</span></div><div>명함 사진이 붙으면<br><b class="hl">「보내기 ▶」</b></div></li></ol>
-  <p class="alt1">메뉴가 안 뜨면: 키보드 위 <b>📋(클립보드)</b> 버튼 → 명함 사진을 톡</p>`}
-function clipGuide(){sheet(`<div class="guide"><h3>📩 내 명함 문자로 보내기</h3><div class="cpst" id="cpSt">명함 사진 복사하는 중…</div>
-  <p class="gl">받는 분 번호와 글은 <b>자동</b>으로 채워져요. 명함 사진만 이렇게 붙여 주세요.</p>${handSteps()}
-  <div class="prw"><b>✋ 여기서 먼저 연습해 보세요</b><div class="practice" id="prBox" contenteditable="true" aria-label="연습 칸">여기를 1초 누르고 있다가 손을 떼고 → 「붙여넣기」</div><p id="prMsg" class="prm"></p></div>
+function handSteps(){const n=SENDC?smsNum(SENDC):'';return `<ol class="hsteps">
+  <li><div class="hpic"><span class="mm">받는 사람 ✓<br>글 ✓</span></div><div><b class="hl">문자 앱이 열려요</b><br><small>받는 분 번호${n?' ('+esc(fmtPhone(n))+')':''}와 글은 자동이에요</small></div></li>
+  <li><div class="hpic"><span class="bar"><b>🖼</b><s>📷</s><s>＋</s></span></div><div>왼쪽 아래 <b class="hl">🖼 사진 버튼</b> 톡<br>→ <b class="hl">맨 앞 명함 사진</b> 톡</div></li>
+  <li><div class="hpic"><span class="snd">보내기 ▶</span></div><div>명함 사진이 붙으면<br><b class="hl">「보내기 ▶」</b></div></li></ol>`}
+function msgMock(){return `<div class="pmock"><div class="pm-to">받는 사람: <b>${SENDC&&smsNum(SENDC)?esc(fmtPhone(smsNum(SENDC))):'(번호)'}</b> <span>← 자동</span></div><div class="pm-txt">안녕하세요.<br>${esc(ME.company||'')} ${esc(ME.name||'')}입니다.<br>만나 뵙게 되어 반갑습니다. …<span class="pm-auto">← 글도 자동</span></div>
+  <div class="pm-gal"><span class="g1">${ME.photoFull?`<img src="${ME.photoFull}" alt="">`:'🪪'}<i>맨 앞</i></span><span class="g0"></span><span class="g0"></span><span class="g0"></span></div>
+  <div class="pm-bar"><span class="on">🖼</span><span>📷</span><span>＋</span><span class="inp">메시지 입력</span><span class="pm-send2">▶</span></div></div>`}
+function clipGuide(){sheet(`<div class="guide"><h3>📩 내 명함 문자로 보내기</h3>
+  <p class="gl">누르면 <b>명함 사진이 사진첩에 저장</b>되고, 번호·글이 채워진 문자 앱이 열려요.</p>${msgMock()}${handSteps()}
+  <p class="alt1">처음 한 번은 저장 확인 창이 뜰 수 있어요 → 「다운로드」 누르기. 🖼에 명함 사진이 안 보이면 아래 「사진 확실히 같이 보내기」를 써 주세요.</p>
   <button class="opt pri gbig" onclick="clipGo()">📩 문자 앱 열기</button>
-  <button class="opt" onclick="shareGuide()">🖼️ 사진이 안 붙으면 → 사진 확실히 같이 보내기</button>
+  <button class="opt" onclick="shareGuide()">🖼️ 사진 확실히 같이 보내기 (메시지 앱 고르기)</button>
   <label class="gchk"><input type="checkbox" id="gOff"> 다음부터 이 안내 없이 바로 열기</label>
-  <button class="opt" onclick="sendMeTo(SENDC,'kakao')">💬 카카오톡으로 보내기</button><button class="opt" onclick="sheet()">닫기</button></div>`);
-  const bx=$('#prBox');let first=true;bx.addEventListener('focus',()=>{if(first){bx.textContent='';first=false}});
-  bx.addEventListener('paste',e=>{e.preventDefault();const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>i.type.startsWith('image/'));const m=$('#prMsg');
-    if(it){const f=it.getAsFile();const u=URL.createObjectURL(f);bx.innerHTML='<img src="'+u+'" alt="붙인 명함 사진">';bx.blur();m.className='prm ok';m.innerHTML='✓ 잘했어요! 문자 앱에서도 <b>똑같이</b> 하면 돼요';try{navigator.vibrate&&navigator.vibrate(60)}catch(_){}}
-    else{m.className='prm bad';m.innerHTML='글만 붙었어요. 아래 <b>「사진 확실히 같이 보내기」</b>를 써 주세요'}});
-  copyMe().then(ok=>{const s=$('#cpSt');if(!s)return;if(ok){s.className='cpst ok';s.innerHTML='✓ 명함 사진이 복사돼 있어요';try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(e){}}else{s.className='cpst bad';s.innerHTML='✕ 복사가 안 됐어요 → 아래 「카카오톡으로 보내기」를 써 주세요'}})}
+  <button class="opt" onclick="sendMeTo(SENDC,'kakao')">💬 카카오톡으로 보내기</button><button class="opt" onclick="sheet()">닫기</button></div>`)}
 function clipGo(){const o=$('#gOff');if(o&&o.checked){S.clipGuideOff=1;saveS()}meClipSend(SENDC)}
 function shareGuide(){const n=SENDC?smsNum(SENDC):'';sheet(`<div class="guide"><h3>🖼️ 명함 사진 확실히 같이 보내기</h3>
   <p class="gl">명함 사진과 글이 <b>한 번에</b> 문자에 들어가요. 받는 사람만 넣어 주세요.</p>
@@ -1048,17 +1051,20 @@ function mePngWarm(){meFileWarm();if(ME&&ME.photoFull&&!(ME_PNG&&ME_PNG.sig===me
 const tmo=ms=>new Promise((_,no)=>setTimeout(()=>no(new Error('t')),ms));
 async function copyMe(){try{if(navigator.clipboard&&window.ClipboardItem){const b=ME_PNG&&ME_PNG.sig===meSig()?ME_PNG.b:mePng();await Promise.race([navigator.clipboard.write([new ClipboardItem({'image/png':b})]),tmo(4000)]);return true}}catch(e){}return false}
 let CD_T=0;
-function failCard(){sheet(`<div class="cpcard bad"><div class="big">✕</div><h3>명함 사진 복사가 안 됐어요</h3><p>이 휴대폰에서는 사진 복사가 안 되는 것 같아요.<br>아래 카카오톡이나 공유 창으로 보내 주세요.</p></div><button class="opt pri gbig" onclick="sendMeTo(SENDC,'kakao')">💬 카카오톡으로 보내기</button><button class="opt" onclick="shareGuide()">🖼️ 공유 창으로 (메시지 앱 고르기)</button><button class="opt" onclick="meSms(SENDC)">글만 문자로 보내기</button>`)}
-async function meClipSend(c){SENDC=c||null;clearInterval(CD_T);const ok=await copyMe();
+function failCard(){sheet(`<div class="cpcard bad"><div class="big">✕</div><h3>명함 사진 저장이 안 됐어요</h3><p>아래 방법으로 보내 주세요.<br>사진과 글이 확실히 같이 가요.</p></div><button class="opt pri gbig" onclick="shareGuide()">🖼️ 사진 확실히 같이 보내기</button><button class="opt" onclick="sendMeTo(SENDC,'kakao')">💬 카카오톡으로 보내기</button><button class="opt" onclick="meSms(SENDC)">글만 문자로 보내기</button>`)}
+async function meDlSave(){if(!ME||!ME.photoFull)return false;const b=ME_FILE&&ME_FILE.sig===meSig()?ME_FILE.f:await (await fetch(ME.photoFull)).blob();
+  const d=new Date(),p=x=>String(x).padStart(2,'0');const nm=(ME.name||'내')+'_명함_'+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.jpg';
+  dl(new File([b],nm,{type:'image/jpeg'}));return true}
+async function meClipSend(c){SENDC=c||null;clearInterval(CD_T);let ok=false;try{ok=await meDlSave()}catch(e){}
   if(!ok)return failCard();
   try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(e){}
-  sheet(`<div class="cpcard"><div class="flyw">${ME.photoFull?`<img class="fly" src="${ME.photoFull}" alt="">`:''}<span class="clipi">📋</span></div><h3 class="okt">✓ 명함 사진 복사됐어요</h3><p class="cdt"><b id="cdN">2</b>초 뒤 문자 앱이 열려요</p></div><button class="opt pri gbig" onclick="smsNow()">📩 지금 바로 열기</button><button class="opt" onclick="clearInterval(CD_T);sheet()">취소</button>`);
+  sheet(`<div class="cpcard"><div class="flyw">${ME.photoFull?`<img class="fly" src="${ME.photoFull}" alt="">`:''}<span class="clipi">🖼️</span></div><h3 class="okt">✓ 명함 사진을 사진첩에 저장했어요</h3><p class="cdt"><b id="cdN">2</b>초 뒤 문자 앱이 열려요</p><p class="muted">저장 확인 창이 뜨면 「다운로드」를 눌러 주세요</p></div><button class="opt pri gbig" onclick="smsNow()">📩 지금 바로 열기</button><button class="opt" onclick="clearInterval(CD_T);sheet()">취소</button>`);
   let n=2;CD_T=setInterval(()=>{n--;const el=$('#cdN');if(el)el.textContent=n;if(n<=0)smsNow()},1000)}
-function smsNow(){clearInterval(CD_T);if(!$('#sheet').classList.contains('on'))return;meSms(SENDC);sheet(`<div class="guide"><h3>📩 문자 앱에서 이렇게 하세요</h3>${handSteps()}<button class="opt pri gbig" onclick="shareGuide()">🖼️ 사진이 안 붙었어요 → 사진 확실히 같이 보내기</button><button class="opt" onclick="meClipSend(SENDC)">📩 문자 앱 다시 열기 (다시 복사)</button><button class="opt" onclick="sheet()">닫기</button></div>`)}
+function smsNow(){clearInterval(CD_T);if(!$('#sheet').classList.contains('on'))return;meSms(SENDC);sheet(`<div class="guide"><h3>📩 문자 앱에서 이렇게 하세요</h3>${handSteps()}<button class="opt pri gbig" onclick="shareGuide()">🖼️ 사진이 안 보여요 → 사진 확실히 같이 보내기</button><button class="opt" onclick="meClipSend(SENDC)">📩 문자 앱 다시 열기</button><button class="opt" onclick="sheet()">닫기</button></div>`)}
 function meSendMenu(c){if(!ME)return meNeed();const n=smsNum(c);
   sheet(`<h3>📩 내 명함 보내기${c?' → '+esc(c.name||c.company||''):''}</h3>
   <button class="opt pri gbig" onclick="sendMeTo(${c?'cur()':'null'},'clip')">📩 문자로 보내기${n?' <span class="nw">('+esc(fmtPhone(n))+')</span>':''}</button>
-  <p class="muted" style="margin:2px 4px 8px">번호·글이 채워진 문자 앱이 바로 열려요. 글 아래를 꾹 눌러 「붙여넣기」하면 명함 사진이 붙어요.</p>
+  <p class="muted" style="margin:2px 4px 8px">명함 사진이 사진첩에 저장되고 번호·글이 채워진 문자 앱이 열려요. 왼쪽 아래 🖼 → 맨 앞 명함 사진 → 보내기.</p>
   <button class="opt" onclick="sendMeTo(${c?'cur()':'null'},'kakao')">💬 카카오톡으로 보내기</button>
   <button class="opt" onclick="sendMeTo(${c?'cur()':'null'},'share')">🖼️ 사진 확실히 같이 보내기 (메시지 앱 고르기)</button>
   <button class="opt" onclick="meSms(${c?'cur()':'null'})">✉️ 글만 문자로</button>
