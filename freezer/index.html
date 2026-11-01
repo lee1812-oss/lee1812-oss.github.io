@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0D1C42">
+<title>냉동고 온도 지킴이 (시험판)</title>
+<style>
+:root{--n:#0D1C42;--n2:#22396F;--cr:#FCF1D0;--gd:#BF913C;--ok:#15803d;--bad:#dc2626;--warn:#c2410c;--bg:#f3f4f6;--ink:#111827;--sub:#374151}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:18px;word-break:keep-all;line-height:1.5}
+header{background:var(--n);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header b{font-size:19px}header .v{margin-left:auto;font-size:13px;background:var(--gd);color:#fff;border-radius:8px;padding:2px 8px}
+.wrap{padding:12px;max-width:680px;margin:0 auto}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h3{margin:0 0 8px;font-size:19px;color:var(--n)}
+button,select,input{font:inherit}
+button{min-height:54px;border-radius:12px;border:0;padding:0 16px;font-weight:700;cursor:pointer}
+.b1{background:var(--n2);color:#fff;width:100%}
+.b2{background:#e5e7eb;color:var(--ink)}
+.b3{background:var(--gd);color:#fff;width:100%}
+.bad{background:var(--bad);color:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.seg button{background:#e5e7eb;color:var(--ink);min-width:60px}
+.seg button.on{background:var(--n2);color:#fff}
+input[type=number],input[type=text],select{min-height:54px;border:2px solid #cbd5e1;border-radius:12px;padding:0 12px;width:100%;background:#fff;color:var(--ink)}
+input[type=range]{width:100%;height:40px}
+.mode{display:block;width:100%;text-align:left;padding:18px;margin-bottom:12px;background:#fff;border:2px solid #cbd5e1;border-radius:16px;min-height:90px}
+.mode b{display:block;font-size:21px;color:var(--n)}.mode span{color:var(--sub);font-size:16px;font-weight:500}
+#vw{position:relative;background:#000;border-radius:12px;overflow:hidden;touch-action:none}
+#vw video,#vw img{display:block;width:100%;height:auto}
+#ov{position:absolute;left:0;top:0;width:100%;height:100%}
+.big{font-size:72px;font-weight:800;text-align:center;line-height:1.1;margin:6px 0;font-variant-numeric:tabular-nums}
+.st{text-align:center;font-size:18px;font-weight:700}
+.ok{color:var(--ok)}.er{color:var(--bad)}.wn{color:var(--warn)}.mu{color:var(--sub)}
+.res{font-size:28px;font-weight:800;text-align:center;padding:8px;border-radius:10px;background:#f1f5f9;margin:8px 0}
+#dbg{width:100%;image-rendering:pixelated;background:#111;border-radius:8px;display:block;margin-top:6px}
+.tip{font-size:16px;color:var(--sub);margin:6px 0 0}
+.step{display:inline-block;background:var(--n2);color:#fff;border-radius:50%;width:28px;height:28px;text-align:center;line-height:28px;font-size:16px;margin-right:6px}
+.hide{display:none!important}
+#dim{position:fixed;inset:0;background:#000;color:#555;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px}
+#dim b{font-size:56px;color:#777}
+.ev{padding:8px 0;border-bottom:1px solid #e5e7eb;font-size:16px}.ev:last-child{border:0}
+#qrbox{display:flex;justify-content:center;padding:10px;background:#fff}
+#qrbox img{width:240px;height:240px;image-rendering:pixelated}
+.warnbox{background:#fff7ed;border:2px solid #fdba74;border-radius:12px;padding:10px 12px;font-size:16px}
+.okbox{background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:10px 12px;font-size:16px}
+svg text{font-size:12px;fill:#374151}
+label.l{display:block;font-weight:700;margin:10px 0 4px}
+</style>
+</head>
+<body>
+<header><b id="htitle">❄ 냉동고 온도 지킴이</b><span class="v">시험판 v001</span></header>
+
+<!-- 처음 화면 -->
+<div class="wrap" id="sHome">
+  <div class="card"><h3>어느 휴대폰인가요?</h3>
+  <button class="mode" id="goCam"><b>📷 냉동고 앞에 둘 공폰</b><span>카메라로 판넬 숫자를 읽고, 온도가 높으면 알림을 보내요.</span></button>
+  <button class="mode" id="goView"><b>👀 내 휴대폰 (보기)</b><span>공폰 화면의 QR을 찍으면 어디서든 온도를 볼 수 있어요.</span></button>
+  <p class="tip">보기 화면은 공폰에서 만든 QR을 찍어야 열려요.</p></div>
+</div>
+
+<!-- 공폰: 맞추기 -->
+<div class="wrap hide" id="sCam">
+  <div id="vw"><video id="vid" playsinline muted autoplay></video><img id="timg" class="hide" alt=""><canvas id="ov"></canvas></div>
+  <div class="card" id="setupCard">
+    <h3><span class="step">1</span>온도 숫자에 네모 그리기</h3>
+    <p class="tip">위 화면에서 손가락으로 <b>온도 숫자만</b> 꼭 맞게 네모를 그려 주세요. (빼기 표시 「-」 칸도 포함)</p>
+    <div class="row" id="zoomRow" style="margin-top:6px"><span style="flex:0 0 auto">확대</span><input type="range" id="zoom" min="1" max="1" step="0.1" value="1"></div>
+    <h3 style="margin-top:14px"><span class="step">2</span>숫자 칸 수</h3>
+    <div class="row seg" id="nSeg"><button data-n="2">2칸</button><button data-n="3">3칸</button><button data-n="4">4칸</button></div>
+    <p class="tip">예: 「-18」이 보이는 판넬은 보통 3칸이에요.</p>
+    <h3 style="margin-top:14px"><span class="step">3</span>지금 판넬에 보이는 온도</h3>
+    <div class="row"><input type="text" id="expect" inputmode="text" placeholder="예: -18"><button class="b2" id="autoFit" style="flex:0 0 auto">자동 맞추기</button></div>
+    <div class="res" id="live">네모를 먼저 그려 주세요</div>
+    <canvas id="dbg"></canvas>
+    <p class="tip">아래 그림에서 숫자 모양이 흰색으로 또렷하면 잘 맞은 거예요. 초록 막대 = 켜진 획.</p>
+    <details style="margin-top:8px"><summary style="font-weight:700;min-height:44px;line-height:44px">세부 조정 (잘 안 읽힐 때)</summary>
+      <label class="l">기울기 <span id="slV"></span>°</label><input type="range" id="slant" min="0" max="20" step="1">
+      <label class="l">숫자 색</label>
+      <select id="pol"><option value="auto">자동</option><option value="bright">밝은 숫자 (빛나는 LED)</option><option value="dark">어두운 숫자 (액정 LCD)</option></select>
+      <label class="l">소수점 자리 (점은 못 읽으니 자리 수로 정해요)</label>
+      <select id="dec"><option value="0">없음 (예: -18)</option><option value="1">한 자리 (예: -18.5 → 3칸+1)</option></select>
+      <label class="l">사진으로 시험 (카메라 대신)</label><input type="file" id="tfile" accept="image/*">
+    </details>
+  </div>
+  <div class="card" id="alarmCard">
+    <h3><span class="step">4</span>알림 기준</h3>
+    <label class="l">이름</label><input type="text" id="cName">
+    <label class="l">경고 온도 (이 온도 이상이면)</label><input type="number" id="cHi" step="1">
+    <label class="l">얼마나 계속되면 알릴까요? (제상 때 잠깐 오르는 건 무시)</label>
+    <select id="cHold"><option>10</option><option>20</option><option>30</option><option>45</option><option>60</option></select>
+    <label class="l">평소 온도 소식 간격 (소리 없이 기록만)</label>
+    <select id="cBeat"><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="60">60분</option></select>
+    <p class="tip">숫자는 1분마다 읽어요. 경고는 소리 나는 알림, 평소 소식은 조용히 쌓여요.</p>
+  </div>
+  <button class="b3" id="startBtn">▶ 지키기 시작</button>
+  <p class="tip" style="text-align:center">시작하면 화면이 꺼지지 않게 잡아 둬요. 충전기를 꽂아 주세요.</p>
+</div>
+
+<!-- 공폰: 지키는 중 -->
+<div class="wrap hide" id="sRun">
+  <div class="card">
+    <div class="mu" style="text-align:center" id="rName">냉동고</div>
+    <div class="big" id="rTemp">--</div>
+    <div class="st" id="rSt">시작 중…</div>
+    <div class="mu" style="text-align:center;font-size:16px" id="rLast"></div>
+  </div>
+  <div class="row" style="margin-bottom:12px"><button class="b1" id="dimBtn">🌙 화면 어둡게</button><button class="b2" id="stopBtn">⏸ 멈추고 다시 맞추기</button></div>
+  <div class="card"><h3>내 휴대폰으로 보기</h3>
+    <p class="tip">내 휴대폰 카메라(또는 「QR 바로 찍기」)로 아래 QR을 찍으세요. 이 QR을 아는 사람은 온도를 볼 수 있으니 직원 단톡방에는 올리지 마세요.</p>
+    <div id="qrbox"></div>
+  </div>
+  <div class="card"><h3>기록</h3>
+    <div id="rLog" class="tip"></div>
+    <div class="row" style="margin-top:8px"><button class="b2" id="csvBtn">📄 기록 내려받기 (엑셀용)</button><button class="b2" id="testBtn">🔔 알림 시험 보내기</button></div>
+  </div>
+</div>
+
+<!-- 보기 -->
+<div class="wrap hide" id="sView">
+  <div class="card">
+    <div class="mu" style="text-align:center" id="vName">냉동고</div>
+    <div class="big" id="vTemp">--</div>
+    <div class="st" id="vSt">불러오는 중…</div>
+    <div class="mu" style="text-align:center;font-size:16px" id="vLast"></div>
+  </div>
+  <button class="b1" id="snapBtn" style="margin-bottom:12px">📷 지금 판넬 사진 받기</button>
+  <div class="card hide" id="vPhotoCard"><h3>판넬 사진</h3><img id="vPhoto" style="width:100%;border-radius:10px" alt="판넬 사진"><div class="tip" id="vPhotoT"></div></div>
+  <div class="card"><h3>최근 24시간</h3><div id="vChart"></div></div>
+  <div class="card"><h3>알림 기록</h3><div id="vEv"></div></div>
+  <div class="card"><h3>🔔 소리 나는 알림 받기</h3>
+    <p class="tip">이 화면은 열어 볼 때만 보여요. 온도가 높을 때 휴대폰이 울리게 하려면 무료 앱 「ntfy」를 한 번 설치해 주세요.</p>
+    <ol class="tip" style="padding-left:22px"><li>플레이 스토어(또는 앱 스토어)에서 「ntfy」를 설치해요.</li><li>아래 버튼을 눌러 구독해요. (안 되면 앱에서 + 누르고 아래 코드 붙여 넣기)</li></ol>
+    <div class="res" id="vTopic" style="font-size:16px;word-break:break-all"></div>
+    <div class="row"><a id="ntfyLink" href="#"><button class="b1">ntfy 앱에서 구독</button></a><button class="b2" id="copyTopic">코드 복사</button></div>
+  </div>
+</div>
+
+<div id="dim" class="hide"><b id="dTemp">--</b><div id="dSt"></div><div style="font-size:16px;margin-top:20px">화면을 누르면 밝아져요</div></div>
+
+<script src="qrcode.js"></script>
+<script>
+'use strict';
+const VER='v001';
+const NTFY='https://ntfy.sh/';
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const LS={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}},set(k,v){localStorage.setItem(k,JSON.stringify(v))}};
+const DEF={box:null,n:3,slant:6,pol:'auto',dec:0,hi:-15,hold:30,beat:10,name:'냉동고'};
+let cfg=Object.assign({},DEF,LS.get('fz.cfg',{}));
+let topic=LS.get('fz.topic',null);
+const saveCfg=()=>LS.set('fz.cfg',cfg);
+const pad=n=>String(n).padStart(2,'0');
+const hm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const fmtV=v=>v==null?'--':(Number.isInteger(v)?String(v):v.toFixed(1));
+function show(id){['sHome','sCam','sRun','sView'].forEach(x=>$('#'+x).classList.toggle('hide',x!==id))}
+
+/* ---------- 7칸 숫자 읽기 ---------- */
+// 획 순서 a(위) b(오른위) c(오른아래) d(아래) e(왼아래) f(왼위) g(가운데)
+const SEGMAP={'1111110':'0','0110000':'1','1101101':'2','1111001':'3','0110011':'4','1011011':'5','1011111':'6','0011111':'6','1110000':'7','1110010':'7','1111111':'8','1111011':'9','1110011':'9','0000001':'-','1110111':'A','1001110':'C','0001101':'c','0111101':'d','1001111':'E','1000111':'F','0110111':'H','0001110':'L','0010101':'n','0011101':'o','1100111':'P','0000101':'r','0111110':'U','0011100':'u','0001111':'t','0000000':' '};
+const REG=[[.28,.72,0,.17],[.72,1,.1,.46],[.72,1,.54,.9],[.28,.72,.83,1],[0,.28,.54,.9],[0,.28,.1,.46],[.28,.72,.42,.58]];
+const wc=document.createElement('canvas'),wx=wc.getContext('2d',{willReadFrequently:true});
+function srcSize(s){return [s.videoWidth||s.naturalWidth||s.width,s.videoHeight||s.naturalHeight||s.height]}
+function grab(src,box,W){
+  const [sw,sh]=srcSize(src);if(!sw||!box)return null;
+  const sx=box.x*sw,sy=box.y*sh,bw=box.w*sw,bh=box.h*sh;
+  const H=Math.max(24,Math.round(W*bh/bw));
+  wc.width=W;wc.height=H;wx.drawImage(src,sx,sy,bw,bh,0,0,W,H);
+  const d=wx.getImageData(0,0,W,H).data,lum=new Float32Array(W*H);
+  for(let i=0,j=0;i<d.length;i+=4,j++)lum[j]=Math.max(d[i],d[i+1],d[i+2]);
+  return {W,H,lum};
+}
+function otsu(lum){
+  const h=new Float64Array(256);for(const v of lum)h[v|0]++;
+  const N=lum.length;let sum=0;for(let i=0;i<256;i++)sum+=i*h[i];
+  let sB=0,wB=0,best=0,t=128;
+  for(let i=0;i<256;i++){wB+=h[i];if(!wB)continue;const wF=N-wB;if(!wF)break;sB+=i*h[i];const mB=sB/wB,mF=(sum-sB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>best){best=v;t=i}}
+  let lo=255,hi=0;for(const v of lum){if(v<lo)lo=v;if(v>hi)hi=v}
+  return {t,contrast:hi-lo};
+}
+function decodeG(g,o){
+  const {W,H,lum}=g;const {t,contrast}=otsu(lum);
+  let above=0;for(const v of lum)if(v>t)above++;
+  const pol=o.pol==='auto'?(above/lum.length<0.5?'bright':'dark'):o.pol;
+  const fg=new Uint8Array(W*H);for(let j=0;j<fg.length;j++)fg[j]=pol==='dark'?(lum[j]<=t?1:0):(lum[j]>t?1:0);
+  const cw=W/o.n,k=Math.tan(o.slant*Math.PI/180);let txt='';const cells=[];
+  for(let c=0;c<o.n;c++){
+    const r=REG.map(([u0,u1,v0,v1])=>{let on=0,tot=0;for(let a=0;a<6;a++)for(let b=0;b<6;b++){const u=u0+(u1-u0)*(a+.5)/6,v=v0+(v1-v0)*(b+.5)/6;const y=Math.min(H-1,Math.floor(v*H));const x=Math.floor(c*cw+u*cw+(0.5-v)*H*k);tot++;if(x>=0&&x<W)on+=fg[y*W+x]}return on/tot});
+    const mx=Math.max(...r);
+    const bits=mx<0.3?'0000000':r.map(v=>v>=Math.max(0.3,mx*0.5)?'1':'0').join('');
+    const ch=SEGMAP[bits];cells.push({r,bits,ch});txt+=ch===undefined?'?':ch;
+  }
+  return {txt,cells,fg,W,H,pol,t,contrast,k};
+}
+function parseTxt(txt,dec){
+  const s=txt.replace(/\s+/g,'');
+  if(contrastLow)return {fail:'흐림'};
+  if(/^-?\d{1,4}$/.test(s)){let v=parseInt(s,10);if(dec)v=v/Math.pow(10,dec);if(v<-60||v>50)return {fail:'범위밖'};return {v}}
+  if(!s||s.includes('?')||/^[-\d]*$/.test(s))return {fail:s||'빈칸'};
+  return {code:s};
+}
+let contrastLow=false;
+function readOnce(src){
+  if(!cfg.box)return null;const g=grab(src,cfg.box,Math.round(70*cfg.n));if(!g)return null;
+  const d=decodeG(g,cfg);contrastLow=d.contrast<40;const p=parseTxt(d.txt,cfg.dec);return Object.assign(d,p);
+}
+function key(p){return p.v!=null?'v'+p.v:p.code?'c'+p.code:'f'}
+
+/* ---------- 카메라 ---------- */
+const vid=$('#vid'),timg=$('#timg'),ov=$('#ov');let stream=null,track=null,src=vid;
+async function startCam(){
+  if(stream)return true;
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
+    vid.srcObject=stream;await vid.play().catch(()=>{});track=stream.getVideoTracks()[0];
+    const cap=track.getCapabilities?track.getCapabilities():{};
+    if(cap.zoom){const z=$('#zoom');z.min=cap.zoom.min;z.max=cap.zoom.max;z.step=cap.zoom.step||0.1;z.value=cfg.zoom||cap.zoom.min;applyZoom();}else $('#zoomRow').classList.add('hide');
+    try{const c2={};if(cap.focusMode&&cap.focusMode.includes('continuous'))c2.focusMode='continuous';if(Object.keys(c2).length)await track.applyConstraints({advanced:[c2]})}catch(e){}
+    return true;
+  }catch(e){$('#live').textContent='카메라를 켤 수 없어요. 주소창 왼쪽 자물쇠 → 카메라 허용 후 새로고침 해 주세요.';$('#zoomRow').classList.add('hide');return false}
+}
+async function applyZoom(){const z=+$('#zoom').value;cfg.zoom=z;saveCfg();try{await track.applyConstraints({advanced:[{zoom:z}]})}catch(e){}}
+$('#zoom').addEventListener('input',applyZoom);
+
+/* 네모 그리기 */
+let drag=null;
+function drawOv(){
+  const r=ov.getBoundingClientRect();ov.width=r.width*devicePixelRatio;ov.height=r.height*devicePixelRatio;
+  const c=ov.getContext('2d');c.clearRect(0,0,ov.width,ov.height);const b=drag||cfg.box;if(!b)return;
+  const X=b.x*ov.width,Y=b.y*ov.height,W=b.w*ov.width,H=b.h*ov.height;
+  c.lineWidth=3*devicePixelRatio;c.strokeStyle='#facc15';c.strokeRect(X,Y,W,H);
+  c.strokeStyle='rgba(250,204,21,.7)';c.lineWidth=1.5*devicePixelRatio;
+  for(let i=1;i<cfg.n;i++){c.beginPath();c.moveTo(X+W*i/cfg.n,Y);c.lineTo(X+W*i/cfg.n,Y+H);c.stroke()}
+}
+ov.addEventListener('pointerdown',e=>{if(running)return;ov.setPointerCapture(e.pointerId);const r=ov.getBoundingClientRect();drag={sx:(e.clientX-r.left)/r.width,sy:(e.clientY-r.top)/r.height,x:0,y:0,w:0,h:0}});
+ov.addEventListener('pointermove',e=>{if(!drag)return;const r=ov.getBoundingClientRect();const x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));drag.x=Math.min(drag.sx,x);drag.y=Math.min(drag.sy,y);drag.w=Math.abs(x-drag.sx);drag.h=Math.abs(y-drag.sy);drawOv()});
+ov.addEventListener('pointerup',()=>{if(!drag)return;if(drag.w>0.03&&drag.h>0.02){cfg.box={x:drag.x,y:drag.y,w:drag.w,h:drag.h};saveCfg()}drag=null;drawOv()});
+
+/* 미리보기 그림 */
+function drawDbg(d){
+  const cv=$('#dbg');if(!d){cv.width=1;cv.height=1;return}
+  const S=3;cv.width=d.W*S;cv.height=d.H*S;const c=cv.getContext('2d');const im=c.createImageData(d.W,d.H);
+  for(let j=0;j<d.fg.length;j++){const v=d.fg[j]?255:30;im.data[j*4]=v;im.data[j*4+1]=v;im.data[j*4+2]=v;im.data[j*4+3]=255}
+  const tc=document.createElement('canvas');tc.width=d.W;tc.height=d.H;tc.getContext('2d').putImageData(im,0,0);
+  c.imageSmoothingEnabled=false;c.drawImage(tc,0,0,cv.width,cv.height);
+  const cw=d.W/cfg.n;
+  d.cells.forEach((cell,ci)=>{REG.forEach(([u0,u1,v0,v1],si)=>{const on=cell.bits[si]==='1';c.strokeStyle=on?'#22c55e':'rgba(148,163,184,.6)';c.lineWidth=on?3:1;
+    const yc=(v0+v1)/2*d.H,x=(ci*cw+u0*cw+(0.5-(v0+v1)/2)*d.H*d.k)*S;c.strokeRect(x,v0*d.H*S,(u1-u0)*cw*S,(v1-v0)*d.H*S)});
+    c.strokeStyle='#facc15';c.lineWidth=1;c.beginPath();c.moveTo(ci*cw*S,0);c.lineTo(ci*cw*S,cv.height);c.stroke()});
+}
+let liveT=null;
+function liveLoop(){
+  clearInterval(liveT);
+  liveT=setInterval(()=>{
+    if(running){return}drawOv();
+    if(!cfg.box){$('#live').textContent='네모를 먼저 그려 주세요';drawDbg(null);return}
+    const p=readOnce(src);if(!p)return;drawDbg(p);
+    const L=$('#live');
+    if(p.v!=null){L.innerHTML='읽은 온도: <span class="ok">'+fmtV(p.v)+'℃</span>'}
+    else if(p.code){L.innerHTML='읽은 글자: <span class="wn">'+p.code+'</span>'}
+    else L.innerHTML='<span class="er">못 읽음</span> <span class="mu" style="font-size:18px">('+(p.fail==='흐림'?'너무 흐려요':'「'+p.txt.trim()+'」')+')</span>';
+  },600);
+}
+
+/* 자동 맞추기 */
+$('#autoFit').addEventListener('click',async()=>{
+  const ex=$('#expect').value.trim().replace(/[℃도\s]/g,'');
+  if(!cfg.box){alert('먼저 화면에서 숫자에 네모를 그려 주세요.');return}
+  if(!/^-?\d+(\.\d)?$/.test(ex)){alert('지금 판넬에 보이는 숫자를 그대로 적어 주세요. 예: -18');return}
+  const want=parseFloat(ex),dec=ex.includes('.')?1:0;const digits=ex.replace('.','').length;
+  $('#live').textContent='맞추는 중…';await sleep(50);
+  const ns=[...new Set([digits,digits+1,Math.max(2,digits-1)])].filter(n=>n>=2&&n<=5);
+  let best=null;
+  for(const n of ns)for(const pol of ['bright','dark']){
+    let run=[];
+    for(let sl=0;sl<=20;sl++){
+      let hit=0;for(let f=0;f<2;f++){const g=grab(src,cfg.box,70*n);const d=decodeG(g,{n,slant:sl,pol});const p=parseTxt(d.txt,dec);if(p.v===want)hit++}
+      if(hit===2)run.push(sl);
+    }
+    if(run.length&&(!best||run.length>best.run.length))best={n,pol,run};
+  }
+  if(!best){$('#live').innerHTML='<span class="er">맞추지 못했어요.</span>';alert('자동으로 못 맞췄어요.\n① 네모를 숫자에 더 꼭 맞게 다시 그리기\n② 확대해서 숫자를 크게\n③ 화면 반사·그림자 줄이기\n후 다시 눌러 주세요.');return}
+  cfg.n=best.n;cfg.pol=best.pol;cfg.dec=dec;cfg.slant=best.run[Math.floor(best.run.length/2)];saveCfg();syncSetupUI();
+  $('#live').innerHTML='<span class="ok">맞췄어요! '+fmtV(want)+'℃</span>';
+});
+
+/* ---------- 설정 화면 ---------- */
+function syncSetupUI(){
+  document.querySelectorAll('#nSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.n===cfg.n));
+  $('#slant').value=cfg.slant;$('#slV').textContent=cfg.slant;$('#pol').value=cfg.pol;$('#dec').value=String(cfg.dec);
+  $('#cName').value=cfg.name;$('#cHi').value=cfg.hi;$('#cHold').value=String(cfg.hold);$('#cBeat').value=String(cfg.beat);
+}
+document.querySelectorAll('#nSeg button').forEach(b=>b.addEventListener('click',()=>{cfg.n=+b.dataset.n;saveCfg();syncSetupUI()}));
+$('#slant').addEventListener('input',e=>{cfg.slant=+e.target.value;$('#slV').textContent=cfg.slant;saveCfg()});
+$('#pol').addEventListener('change',e=>{cfg.pol=e.target.value;saveCfg()});
+$('#dec').addEventListener('change',e=>{cfg.dec=+e.target.value;saveCfg()});
+$('#cName').addEventListener('change',e=>{cfg.name=e.target.value.trim()||'냉동고';saveCfg()});
+$('#cHi').addEventListener('change',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)){cfg.hi=v;saveCfg()}});
+$('#cHold').addEventListener('change',e=>{cfg.hold=+e.target.value;saveCfg()});
+$('#cBeat').addEventListener('change',e=>{cfg.beat=+e.target.value;saveCfg()});
+$('#tfile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;timg.onload=()=>{src=timg;vid.classList.add('hide');timg.classList.remove('hide');drawOv()};timg.src=URL.createObjectURL(f)});
+
+/* ---------- 알림 보내기 (ntfy) ---------- */
+function newTopic(){const a='abcdefghijkmnpqrstuvwxyz23456789';let s='';const r=crypto.getRandomValues(new Uint8Array(16));for(const x of r)s+=a[x%a.length];return 'drawbread-fz-'+s}
+async function pub({title,msg,prio=1,tags=[],img=null}){
+  const q=new URLSearchParams({title,message:msg,priority:String(prio)});if(tags.length)q.set('tags',tags.join(','));
+  try{
+    if(img){q.set('filename','panel.jpg');await fetch(NTFY+topic+'?'+q,{method:'PUT',body:img})}
+    else await fetch(NTFY+topic+'?'+q,{method:'POST',body:''});
+    return true;
+  }catch(e){return false}
+}
+function photoBlob(){
+  return new Promise(res=>{
+    const b=cfg.box;if(!b)return res(null);const [sw,sh]=srcSize(src);if(!sw)return res(null);
+    const mx=b.w*0.35,my=b.h*0.6;const x=Math.max(0,b.x-mx),y=Math.max(0,b.y-my),w=Math.min(1-x,b.w+2*mx),h=Math.min(1-y,b.h+2*my);
+    const W=480,H=Math.round(W*(h*sh)/(w*sw));const c=document.createElement('canvas');c.width=W;c.height=H;
+    c.getContext('2d').drawImage(src,x*sw,y*sh,w*sw,h*sh,0,0,W,H);c.toBlob(bl=>res(bl),'image/jpeg',0.7);
+  });
+}
+
+/* ---------- 지키기 ---------- */
+let running=false,mT=null,cT=null,wake=null,st=LS.get('fz.st',{}),last=null;
+const saveSt=()=>LS.set('fz.st',st);
+async function lockScreen(){try{if('wakeLock' in navigator){wake=await navigator.wakeLock.request('screen')}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&running)lockScreen()});
+async function measure(){
+  const votes={},reps={};
+  for(let i=0;i<5;i++){const p=readOnce(src);if(p){const k=key(p);votes[k]=(votes[k]||0)+1;reps[k]=p}await sleep(300)}
+  let bk=null,bn=0;for(const k in votes){if(votes[k]>bn){bn=votes[k];bk=k}}
+  if(!bk||bn<3||bk==='f')return {t:Date.now(),v:null,code:null,fail:true};
+  const p=reps[bk];return {t:Date.now(),v:p.v??null,code:p.code||null};
+}
+function logAdd(e){const lg=LS.get('fz.log',[]);lg.push([e.t,e.v,e.code]);const cut=Date.now()-7*864e5;while(lg.length&&lg[0][0]<cut)lg.shift();LS.set('fz.log',lg)}
+function rule(){return '경고 기준: '+fmtV(cfg.hi)+'℃ 이상 '+cfg.hold+'분'}
+async function tick(){
+  const e=await measure();last=e;logAdd(e);const now=e.t;
+  if(e.v!=null){
+    if(st.failAt){await pub({title:cfg.name+' 숫자 읽기 다시 정상',msg:hm(now)+' '+fmtV(e.v)+'℃',prio:3,tags:['white_check_mark']});st.failAt=null}
+    st.failSince=null;
+    if(e.v>=cfg.hi){st.hiSince=st.hiSince||now;
+      if(now-st.hiSince>=cfg.hold*6e4&&(!st.alertAt||now-st.alertAt>=60*6e4)){st.alertAt=now;
+        await pub({title:'🚨 '+cfg.name+' 온도 높음 '+fmtV(e.v)+'℃',msg:Math.round((now-st.hiSince)/6e4)+'분째 '+fmtV(cfg.hi)+'℃ 이상이에요. 냉동고 문·전원을 확인해 주세요. ('+hm(now)+')',prio:5,tags:['rotating_light'],img:await photoBlob()})}}
+    else{if(st.alertAt){await pub({title:cfg.name+' 온도 정상 회복 '+fmtV(e.v)+'℃',msg:hm(now)+' 기준 아래로 내려왔어요.',prio:4,tags:['white_check_mark']})}st.hiSince=null;st.alertAt=null}
+  }else if(!e.code){
+    st.failSince=st.failSince||now;
+    if(now-st.failSince>=30*6e4&&(!st.failAt||now-st.failAt>=120*6e4)){st.failAt=now;
+      await pub({title:'⚠ '+cfg.name+' 숫자 읽기 실패 30분째',msg:'카메라 위치, 화면 가림, 조명 반사를 확인해 주세요. ('+hm(now)+')',prio:4,tags:['warning'],img:await photoBlob()})}
+  }
+  if(!st.lastBeat||now-st.lastBeat>=cfg.beat*6e4-5000){st.lastBeat=now;
+    const ttl=e.v!=null?cfg.name+' '+fmtV(e.v)+'℃':e.code?cfg.name+' 「'+e.code+'」 표시':cfg.name+' 읽기 실패';
+    const sx=e.v!=null?(e.v>=cfg.hi?'기준 이상':'정상'):e.code?'글자 표시(제상 중일 수 있음)':'숫자를 못 읽음';
+    await pub({title:ttl,msg:hm(now)+' · '+sx+' · '+rule(),prio:1,tags:['snowflake'],img:await photoBlob()})}
+  saveSt();renderRun();
+}
+async function cmdPoll(){
+  try{
+    const since=st.cmdSince||Math.floor(Date.now()/1000);
+    const r=await fetch(NTFY+topic+'/json?poll=1&since='+since);const tx=await r.text();
+    let want=false;for(const ln of tx.split('\n')){if(!ln.trim())continue;try{const m=JSON.parse(ln);if(m.event!=='message')continue;st.cmdSince=m.id;if((m.tags||[]).includes('cmd'))want=true}catch(e){}}
+    if(!st.cmdSince)st.cmdSince=since;saveSt();
+    if(want){const e=await measure();last=e;const ttl=e.v!=null?cfg.name+' '+fmtV(e.v)+'℃':e.code?cfg.name+' 「'+e.code+'」 표시':cfg.name+' 읽기 실패';
+      await pub({title:ttl+' (요청 사진)',msg:hm(e.t)+' 지금 모습이에요. '+rule(),prio:2,tags:['camera'],img:await photoBlob()});renderRun()}
+  }catch(e){}
+}
+function renderRun(){
+  $('#rName').textContent=cfg.name;const e=last;
+  if(!e){$('#rTemp').textContent='--';return}
+  $('#rTemp').textContent=e.v!=null?fmtV(e.v)+'℃':e.code||'??';$('#dTemp').textContent=$('#rTemp').textContent;
+  let s,c;if(e.v!=null){if(e.v>=cfg.hi){s=st.alertAt?'🚨 경고 보냄':'⚠ 기준 이상 ('+Math.round((Date.now()-st.hiSince)/6e4)+'분째)';c='er'}else{s='✅ 정상';c='ok'}}else if(e.code){s='글자 표시 (제상 중일 수 있음)';c='wn'}else{s='못 읽음'+(st.failSince?' ('+Math.round((Date.now()-st.failSince)/6e4)+'분째)':'');c='er'}
+  $('#rSt').textContent=s;$('#rSt').className='st '+c;$('#dSt').textContent=s;
+  $('#rLast').textContent=hm(e.t)+' 확인 · 1분마다 읽어요 · '+rule();
+  const lg=LS.get('fz.log',[]).slice(-8).reverse();
+  $('#rLog').innerHTML=lg.map(x=>hm(x[0])+'  '+(x[1]!=null?fmtV(x[1])+'℃':x[2]?'「'+x[2]+'」':'못 읽음')).join('<br>');
+}
+function qrImg(text){const q=qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(6,2)}
+async function startRun(auto){
+  if(!cfg.box){alert('먼저 숫자에 네모를 그려 주세요.');return}
+  const p=readOnce(src);if(auto!==true&&(!p||p.v==null)){if(!confirm('지금 온도를 못 읽고 있어요. 그래도 시작할까요?'))return}
+  if(!topic){topic=newTopic();LS.set('fz.topic',topic)}
+  running=true;LS.set('fz.mode','run');show('sRun');await lockScreen();
+  const vurl=location.origin+location.pathname+'#k='+topic;$('#qrbox').innerHTML='<img alt="보기 QR" src="'+qrImg(vurl)+'">';
+  st.lastBeat=0;st.cmdSince=Math.floor(Date.now()/1000);saveSt();
+  const e=await measure();last=e;logAdd(e);
+  await pub({title:cfg.name+' 지키기 시작 '+(e.v!=null?fmtV(e.v)+'℃':''),msg:hm(e.t)+' 시작했어요. '+rule()+', 평소 소식 '+cfg.beat+'분마다.',prio:3,tags:['arrow_forward'],img:await photoBlob()});
+  st.lastBeat=Date.now();saveSt();renderRun();
+  clearInterval(mT);clearInterval(cT);mT=setInterval(tick,60000);cT=setInterval(cmdPoll,20000);
+}
+function stopRun(){running=false;clearInterval(mT);clearInterval(cT);try{wake&&wake.release()}catch(e){}LS.set('fz.mode','cam');show('sCam');liveLoop()}
+$('#startBtn').addEventListener('click',()=>startRun(false));
+$('#stopBtn').addEventListener('click',()=>{if(confirm('지키기를 멈출까요? 멈춘 동안은 알림이 안 가요.'))stopRun()});
+$('#dimBtn').addEventListener('click',()=>$('#dim').classList.remove('hide'));
+$('#dim').addEventListener('click',()=>$('#dim').classList.add('hide'));
+$('#csvBtn').addEventListener('click',()=>{const lg=LS.get('fz.log',[]);const rows=['시각,온도(℃),표시글자'].concat(lg.map(x=>{const d=new Date(x[0]);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+','+(x[1]??'')+','+(x[2]??(x[1]==null?'못 읽음':''))}));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv'}));a.download='냉동고온도_'+new Date().toISOString().slice(0,10)+'.csv';a.click()});
+$('#testBtn').addEventListener('click',async()=>{const ok=await pub({title:'🔔 '+cfg.name+' 알림 시험',msg:'시험 알림이에요. 이 소리가 나면 경고도 이렇게 와요. ('+hm(Date.now())+')',prio:5,tags:['bell']});alert(ok?'시험 알림을 보냈어요.':'보내지 못했어요. 와이파이를 확인해 주세요.')});
+
+/* ---------- 보기 화면 ---------- */
+let vT=null;
+function ago(t){const m=Math.round((Date.now()-t)/6e4);return m<1?'방금':m<60?m+'분 전':Math.floor(m/60)+'시간 '+(m%60)+'분 전'}
+async function loadView(){
+  try{
+    const r=await fetch(NTFY+topic+'/json?poll=1&since=24h');const tx=await r.text();
+    const ms=tx.split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l)}catch(e){return null}}).filter(m=>m&&m.event==='message');
+    const data=ms.filter(m=>!(m.tags||[]).includes('cmd'));
+    if(!data.length){$('#vSt').textContent='아직 소식이 없어요. 공폰에서 「지키기 시작」을 눌렀는지 확인해 주세요.';return}
+    const L=data[data.length-1];const tm=L.title||'';const mt=tm.match(/(-?\d+(?:\.\d)?)℃/);
+    const nmM=[...data].reverse().find(m=>(m.tags||[]).some(t=>t==='snowflake'||t==='camera'));
+    const nm=nmM?(nmM.title||'').replace(/\s*(-?\d+(?:\.\d)?℃|「|읽기 실패).*$/,'').trim():'';$('#vName').textContent=nm||'냉동고';
+    const hiM=[...data].reverse().map(m=>(m.message||'').match(/경고 기준: (-?\d+(?:\.\d)?)℃/)).find(Boolean);const hiV=hiM?parseFloat(hiM[1]):-15;
+    $('#vTemp').textContent=mt?mt[1]+'℃':(tm.match(/「(.+)」/)||[])[1]||'??';
+    const lastAlert=[...data].reverse().find(m=>(m.tags||[]).some(t=>t==='rotating_light'||t==='white_check_mark'));
+    const alertOn=lastAlert&&(lastAlert.tags||[]).includes('rotating_light');
+    const old=(Date.now()-L.time*1000)>35*6e4;
+    let s,c;if(old){s='⚠ 공폰 소식이 '+ago(L.time*1000)+'에 끊겼어요 (전원·와이파이·화면 확인)';c='er'}
+    else if(alertOn){s='🚨 경고 중 ('+ago(lastAlert.time*1000)+' 경고)';c='er'}
+    else if(mt){const v=parseFloat(mt[1]);if(v>=hiV){s='⚠ 기준('+hiV+'℃) 이상';c='wn'}else{s='✅ 정상 (기준 '+hiV+'℃)';c='ok'}}
+    else if(/읽기 실패/.test(tm)){s='숫자를 못 읽고 있어요';c='er'}else{s='글자 표시 (제상 중일 수 있음)';c='wn'}
+    $('#vSt').textContent=s;$('#vSt').className='st '+c;$('#vLast').textContent=ago(L.time*1000)+' 소식 ('+hm(L.time*1000)+')';
+    const ph=[...data].reverse().find(m=>m.attachment&&m.attachment.expires*1000>Date.now());
+    if(ph){$('#vPhotoCard').classList.remove('hide');$('#vPhoto').src=ph.attachment.url;$('#vPhotoT').textContent=hm(ph.time*1000)+' 사진'}
+    // 그래프
+    const pts=data.map(m=>{const x=(m.title||'').match(/(-?\d+(?:\.\d)?)℃/);return x?[m.time*1000,parseFloat(x[1])]:null}).filter(Boolean);
+    drawChart(pts);
+    const evs=data.filter(m=>(m.priority||3)>=3).slice(-10).reverse();
+    $('#vEv').innerHTML=evs.length?evs.map(m=>'<div class="ev"><b>'+hm(m.time*1000)+'</b> '+esc(m.title||'')+'<br><span class="mu">'+esc(m.message||'')+'</span></div>').join(''):'<div class="tip">경고·시작 기록이 없어요.</div>';
+  }catch(e){$('#vSt').textContent='불러오지 못했어요. 인터넷 연결을 확인해 주세요.'}
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function drawChart(pts){
+  const el=$('#vChart');if(pts.length<2){el.innerHTML='<div class="tip">기록이 2개 이상 쌓이면 그래프가 보여요.</div>';return}
+  const W=640,H=220,pl=40,pr=10,pt=10,pb=26;const t0=pts[0][0],t1=pts[pts.length-1][0];
+  let lo=Math.min(...pts.map(p=>p[1])),hi=Math.max(...pts.map(p=>p[1]));lo=Math.floor(lo-2);hi=Math.ceil(hi+2);
+  const X=t=>pl+(W-pl-pr)*(t-t0)/Math.max(1,t1-t0),Y=v=>pt+(H-pt-pb)*(hi-v)/Math.max(1,hi-lo);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%">';
+  for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;s+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#e5e7eb"/><text x="2" y="'+(Y(v)+4)+'">'+v.toFixed(0)+'℃</text>'}
+  s+='<polyline fill="none" stroke="#22396F" stroke-width="3" points="'+pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')+'"/>';
+  s+='<text x="'+pl+'" y="'+(H-6)+'">'+hm(t0)+'</text><text x="'+(W-pr-40)+'" y="'+(H-6)+'">'+hm(t1)+'</text></svg>';el.innerHTML=s;
+}
+$('#snapBtn').addEventListener('click',async()=>{
+  const b=$('#snapBtn');b.disabled=true;b.textContent='공폰에 요청했어요… (최대 1분)';
+  const t=Math.floor(Date.now()/1000);await fetch(NTFY+topic+'?'+new URLSearchParams({title:'사진 요청',message:'보기 화면에서 지금 사진을 요청했어요.',priority:'1',tags:'cmd'}),{method:'POST',body:''}).catch(()=>{});
+  for(let i=0;i<14;i++){await sleep(5000);try{const r=await fetch(NTFY+topic+'/json?poll=1&since='+t);const tx=await r.text();if(tx.split('\n').some(l=>l.includes('"camera"'))){await loadView();break}}catch(e){}}
+  b.disabled=false;b.textContent='📷 지금 판넬 사진 받기';
+});
+$('#copyTopic').addEventListener('click',()=>{navigator.clipboard.writeText('https://ntfy.sh/'+topic).then(()=>alert('복사했어요.'),()=>{})});
+function startView(){
+  LS.set('fz.mode','view');show('sView');$('#htitle').textContent='👀 냉동고 온도 보기';$('#vTopic').textContent='https://ntfy.sh/'+topic;$('#ntfyLink').href='ntfy://ntfy.sh/'+topic;
+  loadView();clearInterval(vT);vT=setInterval(loadView,30000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadView()});
+}
+
+/* ---------- 시작 ---------- */
+async function goCam(){LS.set('fz.mode','cam');show('sCam');syncSetupUI();await startCam();liveLoop();window.addEventListener('resize',drawOv)}
+$('#goCam').addEventListener('click',goCam);
+$('#goView').addEventListener('click',()=>{if(LS.get('fz.vtopic',null)){topic=LS.get('fz.vtopic');startView()}else alert('공폰 「지키는 중」 화면의 QR을 내 휴대폰 카메라로 찍어 주세요.')});
+(function init(){
+  const m=location.hash.match(/k=([a-z0-9-]+)/);
+  if(m){topic=m[1];LS.set('fz.vtopic',topic);history.replaceState(null,'',location.pathname);startView();return}
+  const mode=LS.get('fz.mode',null);
+  if(mode==='view'&&LS.get('fz.vtopic',null)){topic=LS.get('fz.vtopic');startView();return}
+  if(mode==='cam'||mode==='run'){goCam().then(()=>{if(mode==='run'&&cfg.box)setTimeout(()=>startRun(true),2500)})}
+})();
+</script>
+</body>
+</html>
