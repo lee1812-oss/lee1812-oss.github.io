@@ -316,6 +316,7 @@ function cellState(d,w){
  }
  if(!hasLocals(w,d))return {s:'none',t:'-'};
  if(!roll){if(d<since)return {s:'none',t:'-'};return isRest(d)?{s:'off',t:'출근부 없음\n(휴일)'}:{s:'missing',t:'출근부 없음'};}
+ if(!(roll.rows||[]).some(x=>x.wp===w))return isRest(d)?{s:'off',t:'출근부 없음\n(휴일)'}:{s:'missing',t:'출근부에\n이 현장 없음'};
  const n=(roll.rows||[]).filter(x=>x.wp===w&&WORKED.includes(x.st)).length;
  if(cr.open)return {s:'mism',t:'불일치 '+cr.open};
  if(conf)return {s:'done',t:n+'명 ✓'};
