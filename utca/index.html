@@ -91,6 +91,12 @@ textarea.i{min-height:70px}
 .cal .dd.sun .dn,.cal .dd.hol .dn{color:var(--r)}.cal .dd.sat .dn{color:var(--b)}
 .cal .dd .wl{display:flex;justify-content:space-between;gap:2px;line-height:1.35}
 .lock{max-width:520px;margin:40px auto}
+html.bigtxt{zoom:1.15}
+.top .fz{margin-left:6px;min-height:40px;min-width:44px;border-radius:10px;border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;font-weight:800;font-size:16px}
+.daychips{display:flex;gap:8px;margin:0 0 10px}.daychips .chip{flex:1;min-height:54px;font-size:17px}
+.netbar{background:var(--obg);color:var(--o);border-bottom:2px solid var(--o);padding:8px 14px;font-weight:700;text-align:center}
+.chk{display:flex;align-items:center;gap:10px;min-height:54px;border:2px solid var(--line);border-radius:12px;padding:6px 12px;font-weight:700;font-size:17px;background:#fff}
+.chk input{width:26px;height:26px}
 #print{display:none}
 @media print{
  @page{size:A4 landscape;margin:8mm}
@@ -111,15 +117,16 @@ textarea.i{min-height:70px}
 </style>
 </head>
 <body>
-<div class="top"><div><h1>UTCA 출력일보</h1><div class="ver" id="ver"></div></div><div class="who" id="who"></div></div>
+<div class="top"><div><h1>UTCA 출력일보</h1><div class="ver" id="ver"></div></div><div class="who" id="who"></div><button class="fz" id="fz" title="글씨 크기">가+</button></div>
+<div class="netbar" id="netbar" style="display:none"></div>
 <nav class="nav" id="nav"></nav>
 <main id="app"><div class="card">불러오는 중...</div></main>
 <div id="print"></div>
 <script>
 'use strict';
-const APP_VER='v001';
+const APP_VER='v002';
 const API_URL='https://script.google.com/macros/s/AKfycbwQQiInBqD92iWow3Ap40Dm8qUpynAl8E-YEY8iewYiC9kRByU6BwEkoFovNr87-UQTBQ/exec';
-const LS='utcaDaily.';
+const LS=(API_URL.indexOf('__')===0||/[?&]demo=1/.test(location.search))?'utcaDaily.demo.':'utcaDaily.'; /* 시험판은 실제 앱 자료와 섞이지 않게 따로 보관 */
 const DEMO=/[?&]demo=1/.test(location.search)||API_URL.indexOf('__')===0;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -137,6 +144,9 @@ function holName(d){const h=(S.cfg.holidays||[]).find(x=>x.d===d);return h?h.nam
 function dayClass(d){if(holName(d))return 'hol';const w=dow(d);return w===0?'sun':w===6?'sat':'wk';}
 function isRest(d){const c=dayClass(d);return c==='sun'||c==='hol';}
 function nowKST(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',dateStyle:'short',timeStyle:'short'}).format(new Date());}
+function hourET(){return +new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',hourCycle:'h23'}).format(new Date());}
+function ymdDot(d){return d.slice(2,4)+'.'+d.slice(5,7)+'.'+d.slice(8,10);}
+const nrm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
 
 /* ---------- 상태 정의 (현장 공수 기준표 v1, 2026-10-29) ---------- */
 const ST={
@@ -182,9 +192,11 @@ const TOKEN=(()=>{const m=/[#&]k=([a-z0-9]+)/i.exec(location.hash);if(m){localSt
 /* ---------- 서버 ---------- */
 async function api(a,body){
  body=Object.assign({a,t:TOKEN},body||{});
- if(DEMO)return demoApi(body);
- const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
- if(!r.ok)throw new Error('서버 응답 '+r.status);
+ if(DEMO){if(localStorage.getItem(LS+'demo.offline'))throw Object.assign(new Error('인터넷 연결이 약해요'),{net:true});return demoApi(body);}
+ let r;
+ try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:ctl.signal});clearTimeout(tm);}
+ catch(e){throw Object.assign(new Error('인터넷 연결이 약해요'),{net:true});}
+ if(!r.ok)throw Object.assign(new Error('서버 응답 '+r.status),{net:r.status>=500});
  return r.json();
 }
 async function loadRange(from,to){
@@ -198,8 +210,31 @@ function applyLoad(r){
  if(r.cfg){S.cfg=r.cfg.data;S.cfgRev=r.cfg.rev;}
  Object.assign(S.items,r.items||{});
  localStorage.setItem(LS+'cache',JSON.stringify({people:S.people,peopleRev:S.peopleRev,cfg:S.cfg,cfgRev:S.cfgRev,at:Date.now()}));
+ keepItemCache();
 }
-async function refresh(){const t=todayET();const f=S.loaded.from<addD(t,-20)?S.loaded.from:addD(t,-20);S.loaded={from:'9999',to:'0000'};S.items={};await loadRange(f,addD(t,3));}
+/* 빠른 시작: 최근 3주 자료를 휴대폰에 보관해 두고, 열 때 먼저 보여 준 뒤 서버 자료로 바꿈 */
+function keepItemCache(){try{const lim=addD(todayET(),-21),o={};Object.keys(S.items).forEach(k=>{const d=k.split(':')[1]||'';if(d>=lim)o[k]=S.items[k];});localStorage.setItem(LS+'cacheItems',JSON.stringify(o));}catch(e){}}
+/* 보내지 못한 보고 보관함 (인터넷이 약할 때) */
+function outbox(){try{return JSON.parse(localStorage.getItem(LS+'outbox')||'[]');}catch(e){return [];}}
+function setOutbox(L){localStorage.setItem(LS+'outbox',JSON.stringify(L));showNet();}
+function obGet(key){return outbox().find(x=>x.key===key);}
+function toOutbox(key,data,reason){const L=outbox().filter(x=>x.key!==key);const cur=S.items[key];L.push({key,data,reason:reason||'',rev:cur?cur.rev:0,at:nowKST()});setOutbox(L);}
+let flushing=false;
+async function flushOutbox(silent){
+ if(flushing)return;const L=outbox();if(!L.length)return;flushing=true;let sent=0;
+ try{for(const x of L){try{const r=await api('save',{key:x.key,data:x.data,rev:x.rev,reason:x.reason});
+  if(r.ok){S.items[x.key]={data:x.data,rev:r.rev,at:r.at,by:r.by};setOutbox(outbox().filter(y=>y.key!==x.key));sent++;}
+  else{const M=outbox();const y=M.find(z=>z.key===x.key);if(y){y.err=r.error||'저장 안 됨';setOutbox(M);}}
+ }catch(e){if(e.net)break;}}}
+ finally{flushing=false;}
+ if(sent){toast('보관해 둔 보고 '+sent+'건을 보냈어요');keepItemCache();render();}
+}
+function showNet(){const b=$('#netbar');if(!b)return;const n=outbox().length;const off=navigator.onLine===false;
+ if(!n&&!off){b.style.display='none';return;}
+ b.style.display='';b.innerHTML=(off?'인터넷이 끊겨 있어요. ':'')+(n?'보내지 못한 보고 '+n+'건이 휴대폰에 보관돼 있어요. <button class="btn sm" data-a="flush">지금 다시 보내기</button>':'적은 내용은 휴대폰에 저장돼요.');}
+async function refresh(){const t=todayET();const f=S.loaded.from<addD(t,-20)?S.loaded.from:addD(t,-20),to=addD(t,3);
+ const r=await api('load',{from:f,to});if(!r.ok){if(r.code==='auth')localStorage.removeItem(LS+'k');throw new Error(r.error);}
+ S.items={};applyLoad(r);S.loaded={from:f,to};}
 async function save(key,data,reason){
  const cur=S.items[key]||(key==='people'?{rev:S.peopleRev}:key==='cfg'?{rev:S.cfgRev}:null);
  const r=await api('save',{key,data,rev:cur?cur.rev:0,reason:reason||''});
@@ -347,6 +382,9 @@ function render(){
   el.innerHTML=v==='report'?vReport():v==='local'?vLocal():v==='board'?vBoard():v==='check'?vCheck():v==='issues'?vIssues():v==='month'?vMonth():v==='admin'?vAdmin():v==='people'?vPeople():v==='users'?vUsers():v==='day'?vDay():vBoard();
  }catch(e){el.innerHTML='<div class="warnbox">화면 오류: '+esc(e.message)+'</div>';console.error(e);}
 }
+function dayChips(kind){const t=todayET(),y=addD(t,-1);return `<div class="daychips"><button class="chip ${S.date===y?'on':''}" data-a="setday" data-k="${kind}" data-d="${y}">어제 ${md(y)}</button><button class="chip ${S.date===t?'on':''}" data-a="setday" data-k="${kind}" data-d="${t}">오늘 ${md(t)}</button></div>`;}
+function prevReport(d,w){for(let i=1;i<=10;i++){const dd=addD(d,-i);const r=I('r:'+dd+':'+w);if(r&&!r.dayOff)return {d:dd,r};}return null;}
+function prevRoll(d){for(let i=1;i<=10;i++){const dd=addD(d,-i);const r=I('l:'+dd);if(r)return {d:dd,r};}return null;}
 function datebar(act){return `<div class="datebar"><button class="btn sm" data-a="${act}" data-n="-1">◀</button><label class="d" for="dpick">${md(S.date)}${holName(S.date)?' <span class="tag t-r">'+esc(holName(S.date))+'</span>':''}<br><span class="muted">${S.date===todayET()?'오늘 (미국 동부 시간)':'날짜를 눌러 바꾸기'}</span></label><input type="date" id="dpick" value="${S.date}" data-ch="pickdate"><button class="btn sm" data-a="${act}" data-n="1">▶</button></div>`;}
 
 /* ---------- 현장 보고 ---------- */
@@ -372,18 +410,24 @@ function vReport(){
  const wps=siteWps();
  if(!wps.length)return '<div class="card">보고할 현장이 없습니다. 사무실에 확인해 주세요.</div>';
  if(!S.wp||!wps.includes(S.wp))S.wp=wps[0];
- let h='<div class="card">'+datebar('rdate');
+ let h='<div class="card">'+datebar('rdate')+dayChips('r');
+ if(S.dateHint)h+='<div class="orbox">'+esc(S.dateHint)+'</div>';
  if(wps.length>1)h+='<div class="chips">'+wps.map(w=>{const c=cellState(S.date,w);return `<button class="chip ${S.wp===w?'on':''}" data-a="rwp" data-v="${w}">${esc(wpName(w))} ${c.s==='missing'?'🔴':c.s==='done'?'✅':I('r:'+S.date+':'+w)?'🟦':''}</button>`;}).join('')+'</div>';
  // 밀린 보고 알림
- const miss=[];const t=todayET(),since=S.cfg.since||'2000-01-01';for(let d=addD(t,-7);d<t;d=addD(d,1)){if(d<since)continue;wps.forEach(w=>{if(cellState(d,w).s==='missing')miss.push([d,w]);});}
+ const miss=[];const t=todayET(),since=S.cfg.since||'2000-01-01',tEnd=hourET()>=17?addD(t,1):t;for(let d=addD(t,-7);d<tEnd;d=addD(d,1)){if(d<since)continue;wps.forEach(w=>{if(cellState(d,w).s==='missing')miss.push([d,w]);});}
  if(miss.length)h+='<div class="warnbox">밀린 보고 '+miss.length+'건: '+miss.slice(0,6).map(m=>`<button class="btn sm" data-a="jump" data-d="${m[0]}" data-w="${m[1]}">${md(m[0])} ${esc(wpName(m[1]))}</button>`).join(' ')+(miss.length>6?' 외 '+(miss.length-6)+'건':'')+'</div>';
  h+='</div>';
  const key=reportKey(),cur=S.items[key];
+ const ob=obGet(key);
+ if(ob){h+=`<div class="card"><h2>${esc(wpName(S.wp))} · ${md(S.date)} <span class="tag t-o">휴대폰에 보관됨 · 아직 안 보내짐</span></h2>${ob.err?'<div class="warnbox">'+esc(ob.err)+'</div>':'<div class="muted">인터넷이 되면 자동으로 보내요. 앱을 닫아도 지워지지 않아요.</div>'}${reportSummaryHtml(ob.data,S.date)}<div class="row" style="margin-top:12px"><button class="btn pri" data-a="flush">지금 다시 보내기</button><button class="btn" data-a="kakao2" data-k="${key}">카톡 글 보기</button></div></div>`;return h;}
  if(cur&&!(S.draft&&S.draftKey===key&&S.draft.editing2)){
   const r=cur.data;
   h+=`<div class="card"><h2>${esc(wpName(S.wp))} · ${md(S.date)} <span class="tag t-g">보고 완료</span></h2><div class="muted">${esc(cur.by)} · ${esc(cur.at)} (한국 시간)${r.hist&&r.hist.length>1?' · 정정 '+(r.hist.length-1)+'번':''}</div>`;
   h+=reportSummaryHtml(r,S.date);
-  h+=`<div class="row" style="margin-top:12px"><button class="btn pri" data-a="kakao" data-k="${key}">카톡 글 보기·보내기</button><button class="btn" data-a="redit">고치기 (정정)</button></div></div>`;
+  h+=`<div class="row" style="margin-top:12px"><button class="btn pri" data-a="kakao" data-k="${key}">카톡 글 보기·보내기</button><button class="btn" data-a="redit">고치기 (정정)</button></div>`;
+  const nx=nextWp();if(nx)h+=`<button class="btn ok wide" style="margin-top:10px" data-a="rwp" data-v="${nx}">다음 현장: ${esc(wpName(nx))} 보고하기 ▶</button>`;
+  if(wps.length>1&&wps.filter(w=>I('r:'+S.date+':'+w)).length>1)h+=`<button class="btn wide" style="margin-top:10px" data-a="kakaoall">${md(S.date)} 보낸 현장 합쳐서 카톡 글 하나로</button>`;
+  h+='</div>';
   const cr=cross(S.date).byWp[S.wp];if(cr&&cr.list.length)h+='<div class="card"><h2>로컬 크로스체크</h2>'+cr.list.map(x=>`<div class="${x.fix?'okbox':'warnbox'}">${esc(x.name)}: ${esc(x.prob)}${x.fix?' → 해결: '+(x.fix.pick==='site'?'현장 보고가 맞음':'출근부가 맞음'):''}</div>`).join('')+'<button class="btn" data-a="go" data-v="check">크로스체크 화면으로</button></div>';
   return h;
  }
@@ -400,7 +444,9 @@ function vReport(){
   if(D.base)h+=`<div class="muted" style="margin-top:4px">기본: ${D.base.in}~${D.base.out} · 다르게 일한 사람은 이름을 눌러 시간을 고쳐요 (OT 자동 계산)</div>`;
   if(c==='sun'||c==='hol')h+='<div class="orbox">'+(c==='hol'?'공휴일':'일요일')+' 근무는 일한 시간 전부 OT입니다. 중간에 퇴근한 사람은 시간을 꼭 고쳐 주세요.</div>';
   const unset=D.rows.filter(x=>!x.st).length;
-  h+=`<label class="f">3. 사람별 상태 (모든 사람을 골라야 보낼 수 있어요)</label><div class="row"><button class="btn ${unset?'ok':''}" data-a="allwork" ${unset?'':'disabled'}>남은 ${unset}명 모두 출근</button><button class="btn" data-a="addp">+ 사람 추가</button></div>`;
+  const pv=prevReport(S.date,S.wp);
+  if(pv&&!D.editing)h+=`<button class="btn wide" style="margin-top:12px;border-color:var(--nv);color:var(--nv)" data-a="copyprev">지난 보고(${md(pv.d)})와 같게 채우기</button><div class="muted">상태·메모·다른 현장에서 온 사람을 그대로 가져와요. 시간은 오늘 기본시간으로 돌아가요.</div>`;
+  h+=`<label class="f">3. 사람별 상태 (모든 사람을 골라야 보낼 수 있어요)</label><div class="row"><button class="btn ${unset?'ok':''}" data-a="allwork" ${unset?'':'disabled'}>남은 ${unset}명 모두 출근</button><button class="btn" data-a="bulkot">퇴근시간 여러 명 한 번에</button><button class="btn" data-a="addp">+ 사람 추가</button></div>`;
   const grp=[['한국 인력',x=>x.kind==='KR'],['관리자',x=>x.kind==='KRM'],['로컬 인력',x=>isLocal(x.kind)]];
   grp.forEach(g=>{const list=D.rows.map((x,i)=>[x,i]).filter(a=>g[1](a[0]));if(!list.length)return;
    h+=`<div class="grp"><span>${g[0]} ${list.length}명</span><span>출근 ${list.filter(a=>WORKED.includes(a[0].st)).length}</span></div><div class="plist">`+list.map(([x,i])=>personBtn(x,i,D)).join('')+'</div>';});
@@ -459,7 +505,7 @@ function addPersonSheet(mode){
  const inDraft=new Set((mode==='local'?S.lroll.rows:S.draft.rows).map(x=>x.pid));
  const cand=(S.people.list||[]).filter(p=>p.active!==false&&!inDraft.has(p.id)&&(mode!=='local'||isLocal(p.kind)));
  let h='<h2>사람 추가</h2><div class="muted">다른 현장에서 온 사람은 목록에서 고르세요. 처음 보는 사람만 새 이름으로 넣어요.</div>';
- h+='<input class="i" id="psearch" placeholder="이름 찾기" data-in="psearch" style="margin:8px 0"><div class="plist" id="pcand">'+cand.map(p=>`<button class="pp" data-a="padd" data-m="${mode}" data-v="${p.id}" data-name="${esc(p.name)}"><div><div class="nm">${esc(p.name)}</div><div class="sm">${esc(KIND[p.kind])} · 지금 ${esc(wpName(p.wp))}</div></div></button>`).join('')+'</div>';
+ h+='<input class="i" id="psearch" placeholder="이름 찾기 (영문은 앞 몇 글자만)" data-in="psearch" style="margin:8px 0"><div class="plist" id="pcand">'+cand.map(p=>`<button class="pp" data-a="padd" data-m="${mode}" data-v="${p.id}" data-name="${esc(nrm(p.name))}"><div><div class="nm">${esc(p.name)}</div><div class="sm">${esc(KIND[p.kind])} · 지금 ${esc(wpName(p.wp))}</div></div></button>`).join('')+'</div>';
  h+=`<h3>새 이름 넣기</h3><input class="i" id="newname" placeholder="이름 (영문 이름은 성까지)"><div class="chips" style="margin-top:8px">${(mode==='local'?['LF','LD']:['KR','LF','LD','KRM']).map(k=>`<button class="chip" data-a="paddnew" data-m="${mode}" data-v="${k}">${KIND[k]}로 넣기</button>`).join('')}</div><div class="muted" style="margin-top:6px">새 이름은 사무실이 확인한 뒤 정식 인원으로 등록돼요.</div>`;
  sheet(h);
 }
@@ -482,6 +528,10 @@ function validateReport(D){
  if(roll){D.rows.filter(x=>isLocal(x.kind)).forEach(x=>{const r=(roll.rows||[]).find(y=>y.pid===x.pid);const a=WORKED.includes(x.st),b=r&&WORKED.includes(r.st);if(!r)warn.push(x.name+': 지창석 부장님 출근부에 없어요.');else if(a!==b)warn.push(x.name+': 출근부에는 「'+ST[r.st].l+'」이에요.');else if(a&&r.wp!==D.wp)warn.push(x.name+': 출근부에는 '+wpName(r.wp)+' 근무예요.');});
   (roll.rows||[]).filter(y=>y.wp===D.wp&&WORKED.includes(y.st)&&!D.rows.some(x=>x.pid===y.pid)).forEach(y=>warn.push(y.name+': 출근부에는 이 현장에 나왔는데 이 보고에는 없어요.'));}
  if(D.editing&&!(D.reason||'').trim())err.push('정정 이유를 적어 주세요.');
+ const t=todayET();
+ if(D.date>t)err.push(md(D.date)+'는 아직 오지 않은 날이에요. 날짜를 확인해 주세요.');
+ else if(D.date<addD(t,-1)&&!D.editing)warn.unshift('날짜 확인: '+md(D.date)+' 보고예요 (오늘은 '+md(t)+'). 날짜가 맞나요?');
+ if(!D.dayOff&&D.base){const late=D.rows.filter(x=>x.st==='work'&&!isLocal(x.kind)&&x.out&&tm(x.out)!=null&&tm(x.out)<tm(x.in||D.base.in));if(late.length)warn.push(late.map(x=>x.name).join(', ')+': 퇴근이 출근보다 이르면 다음날 퇴근(자정 넘김)으로 계산해요.');}
  return {err,warn};
 }
 function finalizeRows(D){
@@ -490,22 +540,26 @@ function finalizeRows(D){
   if(isLocal(x.kind)){o.in=s.time?o.in:'';}
   o.kindLabel=KIND[x.kind];o.stLabel=s.l;o.gs=s.gs;o.ot=otHours(o,D.date);delete o.carry;return o;});
 }
-function kakaoText(r,d,w){
- let t=`[출력일보] ${ymd2(d)} ${wpName(w)}`+(holName(d)?' (공휴일)':'')+'\n';
- if(r.dayOff)return t+'현장 전체 쉼: '+(r.offNote||'')+'\n- UTCA 출력일보 앱';
+/* 카톡 글: 기존 출력일보방 형식 (기준표 5번) 「26.10.24 [현장] - 이름/이름 (N명)출근」, OT는 이름(시간) */
+function kakaoText(r,d,w,noFoot){
+ let t=`${ymdDot(d)}(${WD[dow(d)]}) [${wpName(w)}]`+(holName(d)?' (공휴일)':'');
+ if(r.dayOff)return t+' - 현장 전체 쉼 ('+(r.offNote||'')+')'+(noFoot?'':'\n(UTCA 출력일보 앱)');
  const rows=r.rows||[];
+ const nm=x=>{const o=otHours(x,d);return x.name+(x.st==='move'?'(이동)':x.st==='arrive'?'(입국)':x.st==='night'?'(야간)':o?'('+o+')':'');};
  const kr=rows.filter(x=>!isLocal(x.kind)&&WORKED.includes(x.st)),lo=rows.filter(x=>isLocal(x.kind)&&WORKED.includes(x.st));
- if(r.base)t+=`기본 ${r.base.in}~${r.base.out}\n`;
- t+=`1. 한국 출근 ${kr.length}명: ${kr.map(x=>x.name+(x.st==='move'?'(이동)':x.st==='arrive'?'(입국)':x.st==='night'?'(야간)':'')).join('/')||'없음'}\n`;
- t+=`2. 로컬 출근 ${lo.length}명: ${lo.map(x=>x.name).join('/')||'없음'}\n`;
- const ot=rows.filter(x=>otHours(x,d)>0);if(ot.length)t+=`3. OT: ${ot.map(x=>x.name+' '+x.out+'까지('+otHours(x,d)+'h)').join(', ')}\n`;
- const rest=rows.filter(x=>!WORKED.includes(x.st));if(rest.length)t+=`${ot.length?4:3}. 쉼·기타: ${rest.map(x=>x.name+' '+ST[x.st].l+(x.st==='other'?'('+wpName(x.wp2)+')':x.note?'('+x.note+')':'')).join(', ')}\n`;
- if(r.hist&&r.hist.length>1)t+='※ 정정: '+(r.hist[r.hist.length-1].reason||'')+'\n';
- return t+'- UTCA 출력일보 앱';
+ t+=` - ${kr.map(nm).join('/')||'한국 인력 없음'} (${kr.length}명)출근`;
+ if(lo.length)t+=`\n로컬 - ${lo.map(x=>x.name).join('/')} (${lo.length}명)출근`;
+ if(r.base)t+=`\n근무 ${r.base.in}~${r.base.out}`;
+ const ot=rows.filter(x=>otHours(x,d)>0);if(ot.length)t+=` · 잔업: ${ot.map(x=>x.name+' '+x.out+'까지 '+otHours(x,d)+'h').join(', ')}`;
+ const rest=rows.filter(x=>!WORKED.includes(x.st));if(rest.length)t+=`\n${rest.map(x=>x.name+' '+ST[x.st].l+(x.st==='other'?'('+wpName(x.wp2)+')':x.note?'('+x.note+')':'')).join(' / ')}`;
+ if(r.hist&&r.hist.length>1)t+='\n※ 정정: '+(r.hist[r.hist.length-1].reason||'');
+ return t+(noFoot?'':'\n(UTCA 출력일보 앱)');
 }
-function kakaoSheet(text){
- sheet(`<h2>카톡방에 올릴 글</h2><div class="kt" id="ktext">${esc(text)}</div><div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="share">카톡으로 보내기</button><button class="btn" data-a="copy">복사</button></div><div class="muted" style="margin-top:6px">「카톡으로 보내기」를 누르고 카카오톡 → 출력일보방을 고르면 돼요.</div>`);
+function nextWp(){return siteWps().find(w=>w!==S.wp&&!I('r:'+S.date+':'+w)&&!obGet('r:'+S.date+':'+w));}
+function kakaoSheet(text,extra){
+ sheet(`<h2>카톡방에 올릴 글</h2><div class="kt" id="ktext">${esc(text)}</div><div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="share">카톡으로 보내기</button><button class="btn" data-a="copy">복사</button></div><div class="muted" style="margin-top:6px">「카톡으로 보내기」를 누르고 카카오톡 → 출력일보방을 고르면 돼요.</div>${extra||''}`);
 }
+function afterSendExtra(){const nx=nextWp();return nx?`<button class="btn ok wide" style="margin-top:12px" data-a="rwp" data-v="${nx}">다음 현장: ${esc(wpName(nx))} 보고하기 ▶</button>`:(siteWps().length>1?`<button class="btn wide" style="margin-top:12px" data-a="kakaoall">오늘 보낸 현장 합쳐서 카톡 글 하나로</button>`:'');}
 
 /* ---------- 로컬 출근부 ---------- */
 function startRoll(){
@@ -516,8 +570,9 @@ function startRoll(){
  S.lroll={date:S.date,rows,key};
 }
 function vLocal(){
- let h='<div class="card">'+datebar('ldate')+'<div class="muted">오하이오·랜싱·킹스턴·공장의 로컬 인력을 매일 한 번에 적어요. 현장 담당자 보고와 자동으로 맞춰 봐요.</div></div>';
+ let h='<div class="card">'+datebar('ldate')+dayChips('l')+(S.dateHint?'<div class="orbox">'+esc(S.dateHint)+'</div>':'')+'<div class="muted">오하이오·랜싱·킹스턴·공장의 로컬 인력을 매일 한 번에 적어요. 현장 담당자 보고와 자동으로 맞춰 봐요.</div></div>';
  const key='l:'+S.date,cur=S.items[key];
+ if(obGet(key))return h+`<div class="card"><h2>로컬 출근부 ${md(S.date)} <span class="tag t-o">휴대폰에 보관됨 · 아직 안 보내짐</span></h2><div class="muted">인터넷이 되면 자동으로 보내요.</div><button class="btn pri" style="margin-top:10px" data-a="flush">지금 다시 보내기</button></div>`;
  if(cur&&!(S.lroll&&S.lroll.key===key&&S.lroll.editing2)){
   const r=cur.data;
   h+=`<div class="card"><h2>로컬 출근부 ${md(S.date)} <span class="tag t-g">저장됨</span></h2><div class="muted">${esc(cur.by)} · ${esc(cur.at)}</div>`;
@@ -528,9 +583,10 @@ function vLocal(){
  }
  if(!S.lroll||S.lroll.key!==key)startRoll();
  const L=S.lroll,unset=L.rows.filter(x=>!x.st).length;
- h+=`<div class="card"><h2>로컬 출근부 적기 ${L.editing?'<span class="tag t-o">고치는 중</span>':''}</h2><div class="row"><button class="btn ${unset?'ok':''}" data-a="lallwork" ${unset?'':'disabled'}>남은 ${unset}명 모두 나옴</button><button class="btn" data-a="laddp">+ 사람 추가</button></div>`;
- WPS().forEach(w=>{const list=L.rows.map((x,i)=>[x,i]).filter(a=>a[0].wp===w.id);if(!list.length)return;
-  h+=`<div class="grp"><span>${esc(w.name)} ${list.length}명</span><span>나옴 ${list.filter(a=>WORKED.includes(a[0].st)).length}</span></div><div class="plist">`+list.map(([x,i])=>`<div class="pp ${x.st?'':'unset'}"><div style="flex:1"><div class="nm">${esc(x.name)}${x.isNew?' <span class="tag t-o">새 이름</span>':''}</div><div class="sm">${esc(KIND[x.kind])}${x.note?' · '+esc(x.note):''}</div><div class="chips" style="margin-top:6px">${['work','off','absent'].map(s=>`<button class="chip ${x.st===s?'on':''}" data-a="lst" data-i="${i}" data-v="${s}">${s==='work'?'나옴':ST[s].l}</button>`).join('')}<button class="chip" data-a="lmore" data-i="${i}">기타·현장 바꿈</button></div></div></div>`).join('')+'</div>';});
+ const pr=prevRoll(S.date);
+ h+=`<div class="card"><h2>로컬 출근부 적기 ${L.editing?'<span class="tag t-o">고치는 중</span>':''}</h2>`+(pr&&!L.editing?`<button class="btn wide" style="margin-bottom:10px;border-color:var(--nv);color:var(--nv)" data-a="lcopyprev">지난 출근부(${md(pr.d)})와 같게 채우기</button>`:'')+`<div class="row"><button class="btn ${unset?'ok':''}" data-a="lallwork" ${unset?'':'disabled'}>남은 ${unset}명 모두 나옴</button><button class="btn" data-a="laddp">+ 사람 추가</button></div><input class="i" data-in="lsearch" placeholder="이름 찾기 (예: yony, ivan)" style="margin-top:10px">`;
+ WPS().forEach(w=>{const list=L.rows.map((x,i)=>[x,i]).filter(a=>a[0].wp===w.id);if(!list.length)return;const un=list.filter(a=>!a[0].st).length;
+  h+=`<div class="grp"><span>${esc(w.name)} ${list.length}명</span><span>나옴 ${list.filter(a=>WORKED.includes(a[0].st)).length}${un?` <button class="btn sm" data-a="lgrpwork" data-v="${w.id}">이 현장 남은 ${un}명 나옴</button>`:''}</span></div><div class="plist">`+list.map(([x,i])=>`<div class="pp ${x.st?'':'unset'}" data-nm="${esc(nrm(x.name))}"><div style="flex:1"><div class="nm">${esc(x.name)}${x.isNew?' <span class="tag t-o">새 이름</span>':''}</div><div class="sm">${esc(KIND[x.kind])}${x.note?' · '+esc(x.note):''}</div><div class="chips" style="margin-top:6px">${['work','off','absent'].map(s=>`<button class="chip ${x.st===s?'on':''}" data-a="lst" data-i="${i}" data-v="${s}">${s==='work'?'나옴':ST[s].l}</button>`).join('')}<button class="chip" data-a="lmore" data-i="${i}">기타·현장 바꿈</button></div></div></div>`).join('')+'</div>';});
  if(L.editing)h+=`<label class="f">고친 이유</label><input class="i" data-ch="lreason" value="${esc(L.reason||'')}">`;
  h+='<button class="btn pri wide" style="margin-top:14px" data-a="lsubmit">저장하고 맞춰 보기</button>'+(L.editing?'<button class="btn wide" style="margin-top:8px" data-a="lcancel">고치기 그만두기</button>':'')+'</div>';
  return h;
@@ -705,7 +761,7 @@ const A={
  rdate(el){S.date=addD(S.date,+el.dataset.n);ensureDate().then(render);render();},
  ldate(el){S.date=addD(S.date,+el.dataset.n);S.lroll=null;ensureDate().then(render);render();},
  cdate(el){S.date=addD(S.date,+el.dataset.n);ensureDate().then(render);render();},
- rwp(el){S.wp=el.dataset.v;render();},
+ rwp(el){S.wp=el.dataset.v;closeSheet();S.view='report';render();scrollTo(0,0);},
  jump(el){S.date=el.dataset.d;S.wp=el.dataset.w;S.view='report';render();},
  dayoff(el){S.draft.dayOff=el.dataset.v==='1';keepDraft();render();},
  base(el){S.draft.base={in:el.dataset.i,out:el.dataset.o};keepDraft();render();},
@@ -739,9 +795,31 @@ const A={
   const prev=I(key);
   const hist=(prev&&prev.hist||[]).concat([{at:nowKST(),by:S.me.name,reason:D.editing?D.reason:'처음 보고'}]);
   const data={date:D.date,wp:D.wp,dayOff:!!D.dayOff,offNote:(D.offNote||'').trim(),base:D.dayOff?null:D.base,rows:D.dayOff?[]:finalizeRows(D),hist};
-  try{await save(key,data,D.editing?D.reason:'');dropDraft();closeSheet();render();kakaoSheet(kakaoText(data,data.date,data.wp));toast('저장했어요');}
-  catch(e){el.disabled=false;toast(e.message,4000);}
+  try{await save(key,data,D.editing?D.reason:'');dropDraft();closeSheet();render();kakaoSheet(kakaoText(data,data.date,data.wp),afterSendExtra());toast('저장했어요');keepItemCache();}
+  catch(e){
+   if(e.net){toOutbox(key,data,D.editing?D.reason:'');dropDraft();closeSheet();render();kakaoSheet(kakaoText(data,data.date,data.wp),'<div class="orbox">인터넷이 약해 아직 서버에 못 보냈어요. 휴대폰에 보관했고, 연결되면 자동으로 보내요. 카톡 글은 지금 보내도 돼요.</div>'+afterSendExtra());return;}
+   el.disabled=false;toast(e.message,4000);}
  },
+ setday(el){S.date=el.dataset.d;S.dateHint='';if(el.dataset.k==='l')S.lroll=null;ensureDate().then(render);render();},
+ copyprev(){const pv=prevReport(S.date,S.wp);if(!pv)return;const D=S.draft,b=baseFor(S.date);
+  if(pv.r.base){const pb=pv.r.base,pd=baseFor(pv.d);D.base=(pb.in===pd.in&&pb.out===pd.out)?b:{in:pb.in,out:pb.out};}else D.base=b;
+  const one=['arrive','move','quit'],keepNote=['paid','depart','off','other','siteoff','absent'];
+  const by={};(pv.r.rows||[]).forEach(x=>{by[x.pid]=x;});
+  D.rows.forEach(x=>{const p=by[x.pid];if(!p)return;x.st=one.includes(p.st)?'':p.st==='depart'?'paid':p.st;x.note=keepNote.includes(p.st)?(p.note||''):'';x.in='';x.out='';if(p.st==='other')x.wp2=p.wp2;delete x.carry;});
+  (pv.r.rows||[]).forEach(p=>{if(p.st==='quit'||D.rows.some(x=>x.pid===p.pid))return;const pp=pById(p.pid);if(pp&&pp.end&&pp.end<S.date)return;D.rows.push({pid:p.pid,name:p.name,kind:p.kind,st:one.includes(p.st)?'':p.st==='depart'?'paid':p.st,in:'',out:'',note:keepNote.includes(p.st)?(p.note||''):'',isNew:p.isNew,wp2:p.wp2});});
+  keepDraft();render();toast(md(pv.d)+' 보고대로 채웠어요. 오늘 다른 사람만 고쳐 주세요',3500);},
+ bulkot(){const D=S.draft;const L=D.rows.map((x,i)=>[x,i]).filter(a=>a[0].st==='work'&&!isLocal(a[0].kind));if(!L.length){toast('먼저 출근한 사람을 골라 주세요');return;}
+  const ts=dayClass(S.date)==='sat'?['15:00','16:00','17:00','18:00','19:00','20:00']:['17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+  sheet(`<h2>퇴근시간 여러 명 한 번에</h2><div class="muted">늦게까지 일한 사람을 고르고 퇴근시간을 누르세요. OT는 자동 계산돼요.</div><div class="plist" style="margin:10px 0">${L.map(([x,i])=>`<label class="chk"><input type="checkbox" class="bo" value="${i}"> ${esc(x.name)}<span class="muted" style="margin-left:auto">지금 ${esc(x.out||(D.base||{}).out||'')}</span></label>`).join('')}</div><div class="chips">${ts.map(t=>`<button class="chip" data-a="bulkapply" data-v="${t}">퇴근 ${t}</button>`).join('')}</div><label class="f">다른 시간 (자정을 넘기면 그대로 03:00)</label><div class="row"><input class="i" type="time" id="botime" style="flex:1"><button class="btn pri" data-a="bulkapply">적용</button></div>`);},
+ bulkapply(el){const t=el.dataset.v||($('#botime')||{}).value;if(!t){toast('시간을 골라 주세요');return;}const ch=[...document.querySelectorAll('.bo:checked')].map(x=>+x.value);if(!ch.length){toast('사람을 골라 주세요');return;}const D=S.draft;ch.forEach(i=>{D.rows[i].out=t===(D.base||{}).out?'':t;});keepDraft();closeSheet();render();toast(ch.length+'명 퇴근 '+t+'로 바꿨어요');},
+ kakaoall(){const L=siteWps().filter(w=>I('r:'+S.date+':'+w));if(!L.length){toast('아직 보낸 보고가 없어요');return;}kakaoSheet(L.map(w=>kakaoText(I('r:'+S.date+':'+w),S.date,w,true)).join('\n\n')+'\n(UTCA 출력일보 앱)');},
+ kakao2(el){const o=obGet(el.dataset.k);if(o){const p=el.dataset.k.split(':');kakaoSheet(kakaoText(o.data,p[1],p[2]));}},
+ async flush(){if(!outbox().length){showNet();return;}toast('다시 보내는 중...');await flushOutbox();if(outbox().length)toast('아직 못 보냈어요. 인터넷이 되는 곳에서 다시 눌러 주세요',4000);render();},
+ lcopyprev(){const pr=prevRoll(S.date);if(!pr)return;const L=S.lroll,by={};(pr.r.rows||[]).forEach(x=>{by[x.pid]=x;});
+  L.rows.forEach(x=>{const p=by[x.pid];if(!p)return;x.st=p.st==='quit'?'':p.st;x.wp=p.wp||x.wp;x.note=['work'].includes(p.st)?'':(p.note||'');});
+  (pr.r.rows||[]).forEach(p=>{if(p.st==='quit'||L.rows.some(x=>x.pid===p.pid))return;const pp=pById(p.pid);if(pp&&pp.end&&pp.end<S.date)return;L.rows.push({pid:p.pid,name:p.name,kind:p.kind,wp:p.wp,st:p.st,note:p.st==='work'?'':(p.note||''),isNew:p.isNew});});
+  keepRoll();render();toast(md(pr.d)+' 출근부대로 채웠어요. 다른 사람만 고쳐 주세요',3500);},
+ lgrpwork(el){S.lroll.rows.forEach(x=>{if(!x.st&&x.wp===el.dataset.v)x.st='work';});keepRoll();render();},
  kakao(el){const r=I(el.dataset.k);const p=el.dataset.k.split(':');kakaoSheet(kakaoText(r,p[1],p[2]));},
  async share(){const t=$('#ktext').textContent;if(navigator.share){try{await navigator.share({text:t});return;}catch(e){if(e.name==='AbortError')return;}}A.copy();},
  async copy(){const t=$('#ktext').textContent;try{await navigator.clipboard.writeText(t);toast('복사했어요. 카톡방에 붙여 넣으세요');}catch(e){const r=document.createRange();r.selectNodeContents($('#ktext'));getSelection().removeAllRanges();getSelection().addRange(r);toast('글을 길게 눌러 복사해 주세요');}},
@@ -760,7 +838,8 @@ const A={
   if(L.editing&&!(L.reason||'').trim()){toast('고친 이유를 적어 주세요');return;}
   el.disabled=true;
   const data={date:L.date,rows:L.rows.map(x=>Object.assign({},x,{kindLabel:KIND[x.kind],stLabel:(ST[x.st]||{}).l,gs:(ST[x.st]||{}).gs})),hist:((I(L.key)||{}).hist||[]).concat([{at:nowKST(),by:S.me.name,reason:L.editing?L.reason:'처음 저장'}])};
-  try{await save(L.key,data,L.reason||'');localStorage.removeItem(LS+'draft.'+L.key);S.lroll=null;toast('저장했어요');S.view='check';render();}catch(e){el.disabled=false;toast(e.message,4000);}
+  try{await save(L.key,data,L.reason||'');localStorage.removeItem(LS+'draft.'+L.key);S.lroll=null;toast('저장했어요');S.view='check';keepItemCache();render();}
+  catch(e){if(e.net){toOutbox(L.key,data,L.reason||'');localStorage.removeItem(LS+'draft.'+L.key);S.lroll=null;render();toast('인터넷이 약해 휴대폰에 보관했어요. 연결되면 자동으로 보내요',5000);return;}el.disabled=false;toast(e.message,4000);}
  },
  bshift(el){S.boardEnd=addD(S.boardEnd||todayET(),+el.dataset.n);if(S.boardEnd>todayET())S.boardEnd=todayET();ensureRange(addD(S.boardEnd,-7),S.boardEnd).then(render);render();},
  day(el){S.date=el.dataset.d;S.wp=el.dataset.w;S.view='day';render();scrollTo(0,0);},
@@ -797,7 +876,8 @@ document.addEventListener('change',e=>{const el=e.target;const c=el.dataset&&el.
  if(c==='reason'){S.draft.reason=el.value;keepDraft();}
  if(c==='lreason'){S.lroll.reason=el.value;keepRoll();}
 });
-document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.in==='psearch'){const q=el.value.trim().toLowerCase();document.querySelectorAll('#pcand .pp').forEach(b=>{b.style.display=!q||b.dataset.name.toLowerCase().includes(q)?'':'none';});}
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.in==='psearch'){const q=nrm(el.value);document.querySelectorAll('#pcand .pp').forEach(b=>{b.style.display=!q||b.dataset.name.includes(q)?'':'none';});}
+ if(el.dataset&&el.dataset.in==='lsearch'){const q=nrm(el.value);document.querySelectorAll('.pp[data-nm]').forEach(b=>{b.style.display=!q||b.dataset.nm.includes(q)?'':'none';});}
  if(el.dataset&&el.dataset.ch==='offnote'){S.draft.offNote=el.value;keepDraft();}
  if(el.dataset&&el.dataset.ch==='reason'){S.draft.reason=el.value;keepDraft();}
  if(el.dataset&&el.dataset.ch==='lreason'){S.lroll.reason=el.value;keepRoll();}});
@@ -808,20 +888,43 @@ function ensureMonth(){const d=monthDays(S.month);return ensureRange(addD(d[0],-
 async function guard(f){try{await f();}catch(e){toast(e.message,4000);}}
 
 /* ---------- 시작 ---------- */
+function setWho(){$('#who').innerHTML=esc(S.me.name)+'<br><span class="ver">'+({office:'사무실',site:'현장 담당',local:'로컬 관리',view:'보기만'}[S.me.role]||'')+'</span>';}
+function defView(){return S.me.role==='site'?'report':S.me.role==='local'?'local':'board';}
+/* 날짜 실수 방지: 오전(미국 동부)에 열었는데 어제 보고가 비어 있고 오늘 보고는 아직이면 어제 날짜로 열기 */
+function pickDate(){
+ const t=todayET(),y=addD(t,-1);S.date=t;S.dateHint='';if(hourET()>=12)return;
+ if(S.me.role==='site'){const w=siteWps();if(w.some(x=>cellState(y,x).s==='missing')&&!w.some(x=>I('r:'+t+':'+x))){S.date=y;S.wp=w.find(x=>cellState(y,x).s==='missing');}}
+ else if(S.me.role==='local'){if(!I('l:'+y)&&!I('l:'+t)&&!isRest(y))S.date=y;}
+ if(S.date===y)S.dateHint='어제('+md(y)+') '+(S.me.role==='local'?'출근부':'보고')+'가 아직 없어서 어제 날짜로 열었어요. 오늘 것이면 「오늘」을 누르세요.';
+}
 async function boot(){
  $('#ver').textContent=APP_VER+(DEMO?' · 시험판(저장은 이 기기만)':'');
+ if(localStorage.getItem(LS+'big'))document.documentElement.classList.add('bigtxt');
+ $('#fz').onclick=()=>{const on=document.documentElement.classList.toggle('bigtxt');if(on)localStorage.setItem(LS+'big','1');else localStorage.removeItem(LS+'big');toast(on?'글씨를 크게 했어요':'글씨를 보통으로 했어요');};
  if(!TOKEN&&!DEMO){$('#app').innerHTML='<div class="card lock"><h2>링크가 필요해요</h2><p>이 앱은 사람마다 받은 전용 링크로 열어요. 사무실(이혜영 부장)에게 링크를 받아 그 링크로 열어 주세요.</p></div>';$('#nav').innerHTML='';return;}
+ let early=false;
  try{
   const c=JSON.parse(localStorage.getItem(LS+'cache')||'null');if(c){S.people=c.people;S.peopleRev=c.peopleRev;S.cfg=c.cfg;S.cfgRev=c.cfgRev;}
-  const me=await api('me');
-  if(!me.ok){$('#app').innerHTML='<div class="card lock"><h2>열 수 없어요</h2><p>'+esc(me.error)+'</p></div>';$('#nav').innerHTML='';return;}
-  S.me=me.me;$('#who').innerHTML=esc(S.me.name)+'<br><span class="ver">'+({office:'사무실',site:'현장 담당',local:'로컬 관리',view:'보기만'}[S.me.role]||'')+'</span>';
-  await refresh();
-  S.view=S.me.role==='site'?'report':S.me.role==='local'?'local':'board';
-  render();
- }catch(e){$('#app').innerHTML='<div class="card"><div class="warnbox">불러오지 못했어요: '+esc(e.message)+'</div><button class="btn pri" onclick="location.reload()">다시 열기</button></div>';}
+  const cm=JSON.parse(localStorage.getItem(LS+'me')||'null'),ci=JSON.parse(localStorage.getItem(LS+'cacheItems')||'null');
+  if(c&&cm&&ci){S.me=cm;Object.assign(S.items,ci);setWho();S.view=defView();pickDate();render();early=true;$('#ver').textContent=APP_VER+' · 새로 불러오는 중...';}
+  showNet();
+  const t=todayET(),from=addD(t,-20),to=addD(t,3);
+  const [me,ld]=await Promise.all([api('me'),api('load',{from,to})]);
+  if(!me.ok){if(me.code==='auth'){localStorage.removeItem(LS+'k');localStorage.removeItem(LS+'me');}$('#app').innerHTML='<div class="card lock"><h2>열 수 없어요</h2><p>'+esc(me.error)+'</p></div>';$('#nav').innerHTML='';return;}
+  const changed=!early||!cm||cm.role!==me.me.role||cm.name!==me.me.name;
+  S.me=me.me;localStorage.setItem(LS+'me',JSON.stringify(S.me));setWho();
+  if(!ld.ok)throw new Error(ld.error);
+  S.items={};applyLoad(ld);S.loaded={from,to};
+  if(changed){S.view=defView();S.wp='';S.draft=null;S.lroll=null;pickDate();}
+  $('#ver').textContent=APP_VER+(DEMO?' · 시험판(저장은 이 기기만)':'');
+  render();flushOutbox();
+ }catch(e){
+  if(early){$('#ver').textContent=APP_VER+' · 저장된 자료로 보는 중';toast('새로 불러오지 못했어요 ('+e.message+'). 저장된 자료로 보고 있어요',5000);showNet();return;}
+  $('#app').innerHTML='<div class="card"><div class="warnbox">불러오지 못했어요: '+esc(e.message)+'</div><button class="btn pri" onclick="location.reload()">다시 열기</button></div>';}
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.me&&!S.draft&&!S.lroll){refresh().then(render).catch(()=>{});}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.me){flushOutbox();if(!S.draft&&!S.lroll)refresh().then(render).catch(()=>{});}});
+window.addEventListener('online',()=>{showNet();flushOutbox();});
+window.addEventListener('offline',showNet);
 
 /* ---------- 시험판 (주소 끝 ?demo=1): 이 기기 안에만 저장 ---------- */
 function demoApi(b){
