@@ -15,6 +15,8 @@
 <meta property="og:description" content="성경을 소리 내어 읽으면 저절로 체크돼요. 함께 읽어요.">
 <meta property="og:image" content="icon-512.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@700&display=swap">
 <style>
 :root{--n1:#010736;--n2:#0D1C42;--n3:#22396F;--n4:#3B5591;--cr:#FCF1D0;--cr2:#FFF8E6;--gold:#BF913C;--gold2:#9C7428;--ink:#14182B;--sub:#464B5E;--line:#E3DFD3;--bg:#F7F4EC;--ok:#2E7D4F;--warn:#C0392B;--fs:21px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -72,12 +74,31 @@ main{max-width:720px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-i
 .reader-head .t{flex:1;font-size:22px;font-weight:800;color:var(--n2)}
 .fsz{display:flex;gap:6px}
 .fsz button{min-width:48px;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:800;color:var(--n2)}
-.vs{background:#fff;border-radius:18px;border:1px solid var(--line);padding:14px 16px}
-.v{font-size:var(--fs);line-height:1.8;margin:0;padding:6px 8px;border-radius:10px;font-weight:600;transition:background .3s}
-.v sup{font-size:.62em;color:var(--gold2);font-weight:800;margin-right:5px;vertical-align:.35em}
-.v.done{background:#FBF3DC;color:#3A3420}
+.vs{background:#FFFDF8;border-radius:20px;border:1px solid var(--line);padding:16px 10px 20px}
+.v{font-family:var(--rf);font-weight:var(--rw);-webkit-text-stroke:var(--rs) currentColor;font-size:var(--fs);line-height:1.95;letter-spacing:-.01em;margin:0 0 2px;padding:8px 12px 8px 12px;border-radius:14px;border-left:5px solid transparent;color:#1A1D2C;transition:background .35s,color .35s,border-color .35s;cursor:pointer}
+.v sup{font-family:Pretendard,sans-serif;-webkit-text-stroke:0;font-size:.56em;color:var(--gold2);font-weight:800;margin-right:6px;vertical-align:.4em}
+.v.done{color:#6F6A5A}
 .v.done sup::after{content:" ✓";color:var(--ok)}
-.v.cur{outline:2.5px solid var(--gold);background:#FFFBEF}
+.v.cur{background:#FFF3D1;border-left-color:var(--gold);color:#0E1124}
+.rtools{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
+.rtools .t{flex:1 1 100%;font-size:23px;font-weight:800;color:var(--n2)}
+.pm{display:flex;align-items:center;border:1.5px solid var(--line);background:#fff;border-radius:14px;overflow:hidden}
+.pm button{width:52px;min-height:52px;border:none;background:none;font-size:26px;font-weight:800;color:var(--n2)}
+.pm span{font-size:16px;font-weight:800;color:var(--sub);padding:0 2px}
+.tool{flex:1;min-height:54px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--n2);font-weight:800;font-size:17px;padding:4px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tool.on{border-color:var(--gold);background:#FFF6E0}
+.hint{font-size:17px;color:var(--sub);margin:0 0 10px;line-height:1.5}
+.bgl{display:grid;gap:8px;margin:8px 0}
+.bgm,.fnt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;border:2px solid var(--line);background:#fff;border-radius:16px;padding:12px 16px;min-height:64px;color:var(--ink)}
+.bgm b{font-size:19px;color:var(--n2)}.bgm span{font-size:15px;color:var(--sub)}
+.bgm.on,.fnt.on{border-color:var(--gold);background:#FFF6E0}
+.bgm.on b::before,.fnt.on b::before{content:"✓ ";color:var(--gold2)}
+.fnt b{font-size:16px;color:var(--n2);font-family:Pretendard,sans-serif}.fnt .smp{font-size:24px;line-height:1.6;color:#1A1D2C;margin-top:2px}
+.vol{display:flex;align-items:center;gap:10px;margin:6px 0}.vol input{flex:1;height:36px;accent-color:var(--gold)}
+.chk{display:flex;gap:10px;align-items:center;font-weight:700;min-height:48px}.chk input{width:24px;height:24px;accent-color:var(--gold)}
+.dock .mus{background:rgba(252,241,208,.12);border:1.5px solid rgba(252,241,208,.5);color:var(--cr);border-radius:12px;padding:6px 8px;font-weight:700;font-size:14px;min-height:48px;max-width:96px;line-height:1.2}
+.dock .side{display:flex;flex-direction:column;gap:6px;flex:none}
+.fsbig{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(1,7,54,.85);color:var(--cr);font-size:26px;font-weight:800;padding:16px 26px;border-radius:18px;z-index:90;pointer-events:none}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--n2);color:var(--cr);padding:10px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(1,7,54,.25)}
 .dock .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px}
 .mic{width:76px;height:76px;border-radius:50%;border:4px solid var(--cr);background:var(--gold);color:#fff;font-size:34px;flex:none;display:flex;align-items:center;justify-content:center}
@@ -128,7 +149,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v002';
+const VER='v003';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -159,7 +180,15 @@ try{S=JSON.parse(localStorage.getItem(SKEY))}catch(e){}
 if(!S||!S.profiles)S={cur:null,profiles:{},font:21,rec:true};
 function save(){localStorage.setItem(SKEY,JSON.stringify(S))}
 const P=()=>S.profiles[S.cur];
-document.documentElement.style.setProperty('--fs',(S.font||21)+'px');
+/* 읽기 글꼴 (v003: 더 크고 부드럽게) */
+const FONTS={
+ soft:['부드러운 글씨','둥글고 편안해요','"Gowun Dodum",Pretendard,sans-serif',400,'.35px'],
+ clear:['또렷한 글씨','글자가 선명해요','Pretendard,sans-serif',500,'0px'],
+ book:['성경책 글씨','종이 성경처럼','"Gowun Batang",serif',700,'0px'],
+ myeong:['진한 명조','굵고 또렴한 명조','"Nanum Myeongjo",serif',700,'.2px']};
+if(!S.v3){S.font=Math.max(S.font||21,24);S.rfont=S.rfont||'soft';S.bgm=S.bgm||'off';if(S.bgmVol==null)S.bgmVol=.4;S.v3=1;try{save()}catch(e){}}
+function applyFont(){const f=FONTS[S.rfont]||FONTS.soft;const st=document.documentElement.style;st.setProperty('--rf',f[2]);st.setProperty('--rw',f[3]);st.setProperty('--rs',f[4]);st.setProperty('--fs',(S.font||24)+'px')}
+applyFont();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 
 /* 녹음 보관 (IndexedDB) */
@@ -285,7 +314,7 @@ function todayView(){
  <div class="card verse-card"><div class="lbl">오늘의 말씀</div><div class="txt">${esc(dv[3])}</div><div class="ref">${NAME[dv[0]-1]} ${dv[1]}:${dv[2]}</div></div>
  <div class="card"><h2>${head}</h2>
  ${t.keys.map(k=>{const [b,c]=k.split(':');return`<div class="ch-row" onclick="go('#/read/${b}/${c}')"><span class="nm">${kName(k)}</span>${stIcon(k,pr)}</div>`}).join('')||'<p class="note">읽을 곳이 없어요. 「성경」에서 골라 읽어 주세요.</p>'}
- ${firstUnread?`<button class="btn gold" onclick="go('#/read/${firstUnread.replace(':','/')}')">🎙 소리 내어 읽기 시작</button>`:''}
+ ${firstUnread?`<button class="btn gold" onclick="go('#/read/${firstUnread.replace(':','/')}')">🎙 말씀 보며 소리 내어 읽기</button>`:''}
  ${allDone?`<div class="amen" style="margin-top:10px"><div class="big">🙏</div><b style="font-size:20px;color:var(--ok)">오늘 분량을 모두 읽었어요. 아멘!</b></div>${nextUnread?`<button class="btn line" onclick="go('#/read/${nextUnread.replace(':','/')}')">내일 분량 미리 읽기</button>`:''}<button class="btn soft" onclick="shareCard()">📤 오늘 읽은 말씀 나누기</button>`:''}
  ${bh.length?`<p class="note warn">지난 날 못 읽은 곳이 ${bh.length}장 있어요. 괜찮아요, 오늘 분량부터 읽고 시간 날 때 채워요.</p><button class="btn line" onclick="go('#/read/${bh[0].replace(':','/')}')">못 읽은 곳부터 읽기 (${kName(bh[0])})</button>`:''}
  </div>
@@ -327,15 +356,23 @@ async function reader(b,c){
  R={b,c,k,verses,vg:verses.map(verseGrams),done:new Set(),fin:'',intr:'',active:false,completed:!!r,t0:0,sec:0};
  const prev=c>1?[b,c-1]:b>1?[b-1,VC[b-2].length]:null;const next=c<VC[b-1].length?[b,c+1]:b<66?[b+1,1]:null;
  $('main').innerHTML=`
- <div class="reader-head"><span class="t">${NAME[b-1]} ${c}${unit(b)} ${r?stIcon(k,pr):''}</span><div class="fsz"><button onclick="fontStep(-1)" aria-label="글자 작게">가−</button><button onclick="fontStep(1)" aria-label="글자 크게">가+</button></div></div>
- <p class="note" style="margin:0 0 10px">${SR?'아래 🎙 버튼을 누르고 소리 내어 읽으면, 읽은 절이 금색으로 바뀌고 다 읽으면 저절로 체크돼요. 종이 성경(개역개정)으로 읽어도 돼요.':'이 휴대폰 브라우저는 음성 인식이 안 돼요. 🎙로 녹음하며 읽고, 다 읽으면 「다 읽었어요」를 눌러 주세요. (안드로이드는 크롬, 아이폰은 사파리에서 가장 잘 돼요)'}</p>
- <div class="vs">${verses.map((v,i)=>`<p class="v" id="v${i}"><sup>${i+1}</sup>${esc(v)}</p>`).join('')}</div>
+ <div class="rtools"><span class="t">${NAME[b-1]} ${c}${unit(b)} ${r?stIcon(k,pr):''}</span><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button><button class="tool ${S.bgm&&S.bgm!=='off'?'on':''}" id="bgTool" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button></div>
+ <p class="hint">${SR?'🎙를 누르고 <b>이 화면의 말씀을 그대로</b> 소리 내어 읽어 주세요. 읽는 곳을 따라 화면이 저절로 넘어가고, 다 읽으면 저절로 체크돼요.':'🎙를 누르고 이 화면의 말씀을 소리 내어 읽어 주세요. 읽는 절을 손가락으로 누르면 표시가 따라와요. 다 읽으면 「다 읽었어요」를 눌러 주세요.'}</p>
+ <div class="vs">${verses.map((v,i)=>`<p class="v" id="v${i}" onclick="tapVerse(${i})"><sup>${i+1}</sup>${esc(v)}</p>`).join('')}</div>
  ${pr.memos[k]?`<div class="card" style="margin-top:14px"><h2>내 묵상</h2><div style="white-space:pre-wrap">${esc(pr.memos[k])}</div></div>`:''}
  <div class="navch">${prev?`<button class="btn line" onclick="go('#/read/${prev[0]}/${prev[1]}')">‹ 이전 ${unit(prev[0])}</button>`:''}${next?`<button class="btn line" onclick="go('#/read/${next[0]}/${next[1]}')">다음 ${unit(next[0])} ›</button>`:''}</div>
  <p class="foot">성경전서 개역한글판 (대한성서공회)</p><div style="height:110px"></div>`;
- document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙를 누르고 읽어 주세요'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙 누르고 읽기 시작'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><div class="side"><button class="mus" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div></div>`);
 }
-function fontStep(d){S.font=Math.max(17,Math.min(34,(S.font||21)+d*2));document.documentElement.style.setProperty('--fs',S.font+'px');save()}
+function fontStep(d){S.font=Math.max(18,Math.min(42,(S.font||24)+d*2));applyFont();save();
+ document.querySelectorAll('.fsbig').forEach(e=>e.remove());const t=document.createElement('div');t.className='fsbig';t.textContent='글자 크기 '+S.font;document.body.appendChild(t);setTimeout(()=>t.remove(),900);
+ const ce=$('.v.cur');if(ce)ce.scrollIntoView({block:'center'})}
+function fontSheet(){
+ const d=sheet(`<h2>가 글꼴 고르기</h2><p class="note" style="margin-top:0">눌러 보면 바로 바뀌어요. 눈이 편한 글씨를 골라 주세요.</p><div class="bgl">${Object.entries(FONTS).map(([k,f])=>`<button class="fnt ${S.rfont===k?'on':''}" data-k="${k}"><b>${f[0]} · ${f[1]}</b><span class="smp" style="font-family:${f[2].replace(/"/g,"'")};font-weight:${f[3]};-webkit-text-stroke:${f[4]} currentColor">여호와는 나의 목자시니 내가 부족함이 없으리로다</span></button>`).join('')}</div>
+ <div class="vol"><b>글자 크기</b><div class="pm" style="margin-left:auto"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div></div><button class="btn gold" id="fOk">다 골랐어요</button>`);
+ d.querySelectorAll('.fnt').forEach(b=>b.onclick=()=>{S.rfont=b.dataset.k;applyFont();save();d.querySelectorAll('.fnt').forEach(x=>x.classList.toggle('on',x===b));const lb=$('#fontLbl');if(lb)lb.textContent=FONTS[S.rfont][0]});
+ d.querySelector('#fOk').onclick=()=>d.remove();
+}
 function dockUpdate(){
  if(!R)return;const n=R.verses.length;const m=R.done.size;
  const sec=R.active?(R.sec+(Date.now()-R.t0)/1000):R.sec;
@@ -349,18 +386,122 @@ function evalNow(){
  R.verses.forEach((v,i)=>{if(!R.done.has(i)&&coverage(R.vg[i],G3,G2)>=TH_VERSE){R.done.add(i);const e=$('#v'+i);if(e)e.classList.add('done')}});
  // 앞뒤 절을 읽었는데 인식이 놓친 짧은 절은 읽은 것으로
  for(let i=1;i<R.verses.length-1;i++)if(!R.done.has(i)&&R.done.has(i-1)&&R.done.has(i+1)&&norm(R.verses[i]).length<25){R.done.add(i);$('#v'+i)?.classList.add('done')}
- let cur=0;while(R.done.has(cur))cur++;
+ let cur=R.tap||0;while(R.done.has(cur))cur++;
  document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));
- const ce=$('#v'+cur);if(ce&&R.active){ce.classList.add('cur');const rc=ce.getBoundingClientRect();if(rc.bottom>innerHeight-130||rc.top<70)ce.scrollIntoView({behavior:'smooth',block:'center'})}
+ const ce=$('#v'+cur);if(ce&&R.active){ce.classList.add('cur');followVerse(ce)}
  dockUpdate();
  if(!R.completed&&R.done.size>=Math.ceil(R.verses.length*TH_CH))complete('voice');
 }
 function schedEval(){if(!evalTimer)evalTimer=setTimeout(evalNow,350)}
+// 읽는 절을 화면 위쪽(눈높이)에 오게 저절로 넘기기
+function followVerse(ce){const rc=ce.getBoundingClientRect();const want=innerHeight*0.26;if(rc.top<80||rc.top>innerHeight*0.5||rc.bottom>innerHeight-140)window.scrollTo({top:scrollY+rc.top-want,behavior:'smooth'})}
+// 절을 누르면 「여기부터 읽어요」 표시
+function tapVerse(i){if(!R)return;R.tap=i;document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');if(R.active)followVerse(ce)}}
+
+/* ===== 배경음악: 저작권 걱정 없이 휴대폰이 직접 연주해요 ===== */
+const BGMS=[['off','음악 없이','내 목소리만 조용히'],['organ','잔잔한 오르간','따뜻한 화음이 천천히 바뀌어요'],['piano','새벽 피아노','맑은 피아노 소리가 띄엄띄엄'],['hymn','오르골 찬송','「나 같은 죄인 살리신」 느리게'],['rain','창밖 빗소리','차분한 빗소리'],['wave','잔잔한 파도','멀리서 들리는 바다'],['mine','내 음악 파일','휴대폰에 있는 음악을 골라요']];
+const bgmName=()=>{const x=BGMS.find(m=>m[0]===(S.bgm||'off'));return x?(x[0]==='off'?'음악 없음':x[1]):'음악 없음'};
+let AC=null,BG=null,REV=null,BUS=null,bgOn=null,bgTimer=null,bgSrcs=[],bgEl=null,bgGen=0,recMix=null;
+function ac(){
+ try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();BG=AC.createGain();BG.gain.value=0;BG.connect(AC.destination);
+  REV=AC.createConvolver();const n=Math.floor(AC.sampleRate*3.4),ib=AC.createBuffer(2,n,AC.sampleRate);for(let ch=0;ch<2;ch++){const d=ib.getChannelData(ch);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.8)}REV.buffer=ib;const rg=AC.createGain();rg.gain.value=.5;REV.connect(rg);rg.connect(BG)}
+  if(AC.state!=='running')AC.resume();}catch(e){return null}
+ return AC}
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+function noiseBuf(sec,brown){const n=Math.floor(AC.sampleRate*sec),b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(brown){l=(l+.02*w)/1.02;d[i]=l*3.5}else d[i]=w}return b}
+function loopSrc(buf){const s=AC.createBufferSource();s.buffer=buf;s.loop=true;s.start();bgSrcs.push(s);return s}
+// 악기 소리
+function padNote(m,t,dur,vel){const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vel,t+Math.min(2.4,dur/3));g.gain.setValueAtTime(vel,t+dur-1.8);g.gain.linearRampToValueAtTime(0,t+dur+.6);
+ const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=1300;g.connect(f);f.connect(BUS);
+ [['sine',0,1],['triangle',6,.45],['sine',-5,.4]].forEach(([ty,dt,a])=>{const o=AC.createOscillator(),og=AC.createGain();o.type=ty;o.frequency.value=mtof(m);o.detune.value=dt;og.gain.value=a;o.connect(og);og.connect(g);o.start(t);o.stop(t+dur+.8)})}
+function pianoNote(m,t,vel){const len=Math.max(1.6,5.5-(m-48)*.08);const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vel,t+.012);g.gain.exponentialRampToValueAtTime(vel*.35,t+.5);g.gain.exponentialRampToValueAtTime(.0005,t+len);
+ const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=3200;g.connect(f);f.connect(BUS);
+ [[1,1],[2,.32],[3,.12],[4,.05]].forEach(([h,a])=>{const o=AC.createOscillator(),og=AC.createGain();o.type='sine';o.frequency.value=mtof(m)*h;og.gain.value=a;o.connect(og);og.connect(g);o.start(t);o.stop(t+len+.1)})}
+function boxNote(m,t,vel){const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vel,t+.004);g.gain.exponentialRampToValueAtTime(.0005,t+2.6);g.connect(BUS);
+ [[1,1],[2,.18],[3.98,.07]].forEach(([h,a])=>{const o=AC.createOscillator(),og=AC.createGain();o.type='sine';o.frequency.value=mtof(m)*h;og.gain.value=a;o.connect(og);og.connect(g);o.start(t);o.stop(t+2.7)})}
+// 화음 (D장조: D Bm G A D G Em A)
+const PROG=[[50,57,62,66,69],[47,54,62,66,71],[43,55,62,67,71],[45,57,61,64,69],[50,57,62,66,69],[43,55,59,62,67],[40,55,59,62,67],[45,57,61,64,67]];
+// 나 같은 죄인 살리신 (Amazing Grace, 1779 · 저작권 만료) G장조 [음, 박]
+const HYMN=[[62,1],[67,2],[71,.5],[67,.5],[71,2],[69,1],[67,2],[64,1],[62,2],[62,1],[67,2],[71,.5],[67,.5],[71,2],[69,1],[74,5],[71,1],[74,2],[71,.5],[67,.5],[71,2],[69,1],[67,2],[64,1],[62,2],[62,1],[67,2],[71,.5],[67,.5],[71,2],[69,1],[67,5]];
+const HCH={G:[43,55,59,62],C:[48,55,60,64],D:[50,57,62,66],Em:[52,55,59,64]};
+const HBAR=['G','G','C','G','G','G','D','D','G','G','C','G','Em','D','G','G'];
+function bgmEngine(id,gen){
+ const now=AC.currentTime+.15;let next=now,step=0;
+ const loop=fn=>{fn();bgTimer=setInterval(()=>{if(gen!==bgGen)return;fn()},400)};
+ if(id==='organ')loop(()=>{while(next<AC.currentTime+4){PROG[step%8].forEach((m,j)=>padNote(m,next,8.2,j===0?.05:.035));next+=7.5;step++}});
+ else if(id==='piano')loop(()=>{while(next<AC.currentTime+4){const ch=PROG[step%8];const beat=1.7;pianoNote(ch[0],next,.16);padNote(ch[0]+12,next,beat*4+.3,.012);
+   const top=ch.slice(1).map(m=>m+12);let last=-1;[0,1,2,3].forEach(k=>{if(k===0||Math.random()<.75){let m;do{m=top[Math.floor(Math.random()*top.length)]}while(m===last&&top.length>1);last=m;pianoNote(m,next+k*beat+(k?Math.random()*.25:.05),.07+Math.random()*.03)}});next+=beat*4;step++}});
+ else if(id==='hymn'){const B=.85;loop(()=>{while(next<AC.currentTime+4){const [m,d]=HYMN[step%HYMN.length];boxNote(m+12,next,.13);
+   // 마디 첫박에 화음
+   let pos=0;for(let i=0;i<step%HYMN.length;i++)pos+=HYMN[i][1];
+   for(let bs=1;bs<49;bs+=3)if(bs>=pos&&bs<pos+d){const bar=(bs-1)/3;HCH[HBAR[bar]].forEach((x,j)=>padNote(x,next+(bs-pos)*B,B*3+.4,j===0?.03:.02))}
+   next+=d*B;step++;if(step%HYMN.length===0)next+=B}})}
+ else if(id==='rain'){const w=noiseBuf(4,false),br=noiseBuf(4,true);
+  const s1=loopSrc(w),h=AC.createBiquadFilter();h.type='highpass';h.frequency.value=900;const l=AC.createBiquadFilter();l.type='lowpass';l.frequency.value=6500;const g1=AC.createGain();g1.gain.value=.16;s1.connect(h);h.connect(l);l.connect(g1);g1.connect(BUS);
+  const s2=loopSrc(br),l2=AC.createBiquadFilter();l2.type='lowpass';l2.frequency.value=450;const g2=AC.createGain();g2.gain.value=.5;s2.connect(l2);l2.connect(g2);g2.connect(BUS);
+  loop(()=>{while(next<AC.currentTime+1){const s=AC.createBufferSource();s.buffer=w;const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800+Math.random()*3500;bp.Q.value=4;const g=AC.createGain();g.gain.setValueAtTime(0,next);g.gain.linearRampToValueAtTime(.25+Math.random()*.3,next+.003);g.gain.exponentialRampToValueAtTime(.001,next+.04);s.connect(bp);bp.connect(g);g.connect(BUS);s.start(next,Math.random()*3,.06);next+=.03+Math.random()*.12}})}
+ else if(id==='wave'){const br=noiseBuf(5,true),w=noiseBuf(3,false);
+  const s1=loopSrc(br),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=350;const g1=AC.createGain();g1.gain.value=.08;s1.connect(lp);lp.connect(g1);g1.connect(BUS);
+  const s2=loopSrc(w),hp=AC.createBiquadFilter();hp.type='bandpass';hp.frequency.value=2500;hp.Q.value=.5;const g2=AC.createGain();g2.gain.value=0;s2.connect(hp);hp.connect(g2);g2.connect(BUS);
+  loop(()=>{while(next<AC.currentTime+4){const up=3+Math.random()*1.5,dn=4.5+Math.random()*2,pk=.35+Math.random()*.25;
+   g1.gain.setValueAtTime(.08,next);g1.gain.linearRampToValueAtTime(pk,next+up);g1.gain.linearRampToValueAtTime(.08,next+up+dn);
+   lp.frequency.setValueAtTime(350,next);lp.frequency.linearRampToValueAtTime(1100,next+up);lp.frequency.linearRampToValueAtTime(350,next+up+dn);
+   g2.gain.setValueAtTime(0,next+up*.7);g2.gain.linearRampToValueAtTime(pk*.12,next+up+.4);g2.gain.linearRampToValueAtTime(0,next+up+dn*.8);next+=up+dn+.3}})}
+ else if(id==='mine'){mineGet().then(f=>{if(gen!==bgGen)return;if(!f){toast('「내 음악 파일」을 먼저 골라 주세요');return}
+  bgEl=new Audio(URL.createObjectURL(f.blob));bgEl.loop=true;try{const s=AC.createMediaElementSource(bgEl);const d=AC.createGain();d.gain.value=1.6;s.connect(d);d.connect(BG)}catch(e){}bgEl.play().catch(()=>{})})}
+}
+function bgmPlay(id){
+ if(!id||id==='off'){bgmStop();return}
+ if(!ac())return;const v=Math.max(.02,(S.bgmVol??.4))*.8;
+ if(bgOn===id){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(v,AC.currentTime,.3);return}
+ bgmStop(true);bgOn=id;const gen=++bgGen;
+ BUS=AC.createGain();BUS.gain.value={organ:2.2,piano:3,hymn:2.6,rain:1.5,wave:1.6}[id]||1;BUS.connect(BG);if(!['rain','wave'].includes(id))BUS.connect(REV);
+ BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setValueAtTime(BG.gain.value,AC.currentTime);BG.gain.linearRampToValueAtTime(v,AC.currentTime+1.8);
+ bgmEngine(id,gen);
+}
+function bgmStop(quick){
+ if(!AC||!bgOn){bgOn=null;return}
+ const gen=++bgGen;clearInterval(bgTimer);bgTimer=null;bgOn=null;
+ const t=AC.currentTime,fade=quick?.15:1.5;BG.gain.cancelScheduledValues(t);BG.gain.setValueAtTime(BG.gain.value,t);BG.gain.linearRampToValueAtTime(0,t+fade);
+ const srcs=bgSrcs;bgSrcs=[];const bus=BUS;BUS=null;const el=bgEl;bgEl=null;
+ const kill=()=>{srcs.forEach(s=>{try{s.stop()}catch(e){}});try{bus&&bus.disconnect()}catch(e){}if(el){try{el.pause();URL.revokeObjectURL(el.src)}catch(e){}}};
+ if(quick)kill();else setTimeout(kill,fade*1000+100);
+}
+function bgmVol(v){S.bgmVol=v;save();if(AC&&bgOn){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.15)}}
+// 내 음악 파일 보관 (이 휴대폰 안에만)
+function mdb(){return new Promise((ok,no)=>{const r=indexedDB.open('malsseum-bgm',1);r.onupgradeneeded=()=>r.result.createObjectStore('f',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function mineGet(){try{const d=await mdb();return await new Promise(ok=>{const q=d.transaction('f').objectStore('f').get('mine');q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})}catch(e){return null}}
+function minePick(after){const inp=document.createElement('input');inp.type='file';inp.accept='audio/*';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;if(f.size>40e6){toast('40MB보다 작은 음악 파일을 골라 주세요');return}
+ try{const d=await mdb();await new Promise((ok,no)=>{const t=d.transaction('f','readwrite');t.objectStore('f').put({id:'mine',name:f.name,blob:f});t.oncomplete=ok;t.onerror=()=>no(t.error)});S.bgmFile=f.name;save();after&&after()}catch(e){toast('음악을 저장하지 못했어요')}};inp.click()}
+function bgmLabels(){document.querySelectorAll('.bgName').forEach(e=>e.textContent=bgmName());$('#bgTool')?.classList.toggle('on',S.bgm!=='off')}
+function bgmSheet(){
+ const reading=!!(R&&R.active);
+ const list=()=>BGMS.map(([id,n,d])=>`<button class="bgm ${(S.bgm||'off')===id?'on':''}" data-id="${id}"><b>${n}</b><span>${id==='mine'&&S.bgmFile?esc(S.bgmFile):d}</span></button>`).join('');
+ const dm=sheet(`<h2>🎵 배경음악</h2><p class="note" style="margin-top:0">누르면 바로 들어 볼 수 있어요. 🎙를 누르면 이 음악이 잔잔하게 깔려요.</p><div class="bgl" id="bgl">${list()}</div>
+ <div class="vol"><b>소리</b><span>작게</span><input type="range" min="5" max="100" value="${Math.round((S.bgmVol??.4)*100)}" id="bgVol" aria-label="음악 소리 크기"><span>크게</span></div>
+ <label class="chk"><input type="checkbox" id="bgRec" ${S.bgmRec!==false?'checked':''}> 내 목소리 녹음에도 음악 같이 담기</label>
+ ${S.bgmFile?'<button class="btn line" id="bgMine" style="min-height:50px">내 음악 파일 바꾸기</button>':''}
+ <p class="note">이어폰을 끼고 읽으면 음악이 마이크에 섞이지 않아 내 목소리가 더 깨끗하고 인식도 잘 돼요. 스피커로 들을 때는 소리를 작게 해 주세요.</p>
+ <button class="btn gold" id="bgOk">이 음악으로 읽기</button>`);
+ const close=()=>{dm.remove();if(!(R&&R.active))bgmStop()};
+ dm.onclick=e=>{if(e.target===dm)close()};
+ const choose=id=>{const doIt=()=>{S.bgm=id;save();dm.querySelector('#bgl').innerHTML=list();bindL();bgmLabels();if(id==='off')bgmStop();else bgmPlay(id)};
+  if(id==='mine'&&!S.bgmFile){minePick(doIt);return}doIt()};
+ const bindL=()=>dm.querySelectorAll('.bgm').forEach(b=>b.onclick=()=>{if(b.dataset.id===bgOn&&b.dataset.id!=='off')return;choose(b.dataset.id)});
+ bindL();
+ dm.querySelector('#bgVol').oninput=e=>{bgmVol(e.target.value/100);if(!bgOn&&S.bgm!=='off')bgmPlay(S.bgm)};
+ dm.querySelector('#bgRec').onchange=e=>{S.bgmRec=e.target.checked;save()};
+ dm.querySelector('#bgMine')?.addEventListener('click',()=>minePick(()=>{S.bgm='mine';save();bgmStop(true);bgmPlay('mine');dm.querySelector('#bgl').innerHTML=list();bindL();bgmLabels()}));
+ dm.querySelector('#bgOk').onclick=()=>{bgmLabels();close();toast(S.bgm==='off'?'음악 없이 읽어요':`🎙를 누르면 「${bgmName()}」과 함께 읽어요`)};
+ if(!reading&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
+}
 
 let rec=null,mr=null,chunks=[],stream=null,tick=null,wake=null,recOff=false;
 async function toggleRead(){if(R&&R.active)return stopReading();startReading()}
 async function startReading(){
  if(!R)return;R.active=true;R.t0=Date.now();
+ if(S.bgm&&S.bgm!=='off'){ac();bgmPlay(S.bgm)}else if(S.bgmRec!==false&&AC)ac();
+ const ce0=$('#v'+(R.tap||0));if(ce0&&!R.done.size){ce0.classList.add('cur');followVerse(ce0)}
  $('#mic')?.classList.add('on');$('#mic').textContent='■';$('#dmsg').textContent=SR?'듣고 있어요. 천천히 또박또박 읽어 주세요':'녹음 중이에요. 다 읽으면 「다 읽었어요」';
  tick=setInterval(dockUpdate,1000);
  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
@@ -381,13 +522,17 @@ async function startRecorder(){
  try{
   stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
   const mt=['audio/webm;codecs=opus','audio/mp4','audio/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
-  mr=new MediaRecorder(stream,mt?{mimeType:mt}:{});chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mr.start(1000);mr._t0=Date.now();mr._k=R.k;
+  // 배경음악이 켜져 있으면 내 목소리와 음악을 섞어서 녹음
+  let rs=stream;
+  if(bgOn&&S.bgmRec!==false&&AC&&AC.state==='running'&&AC.createMediaStreamDestination){try{const dst=AC.createMediaStreamDestination();const ms=AC.createMediaStreamSource(stream);const vg=AC.createGain();vg.gain.value=1.3;ms.connect(vg);vg.connect(dst);const tap=AC.createGain();tap.gain.value=.7;BG.connect(tap);tap.connect(dst);recMix={ms,vg,tap};rs=dst.stream}catch(e){recMix=null;rs=stream}}
+  mr=new MediaRecorder(rs,mt?{mimeType:mt}:{});chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mr.start(1000);mr._t0=Date.now();mr._k=R.k;
  }catch(e){mr=null;if(!SR){toast('마이크를 쓸 수 없어요. 「다 읽었어요」로 체크해 주세요',4000)}}
 }
 function stopRecorder(discard){
  const m=mr;mr=null;if(!m)return Promise.resolve();
  return new Promise(ok=>{
   m.onstop=async()=>{try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null;
+   if(recMix){try{recMix.ms.disconnect();recMix.vg.disconnect();BG.disconnect(recMix.tap);recMix.tap.disconnect()}catch(e){}recMix=null}
    const sec=(Date.now()-m._t0)/1000;
    if(!discard&&sec>=8&&chunks.length){const blob=new Blob(chunks,{type:m.mimeType||'audio/webm'});try{await recPut({id:'r'+Date.now().toString(36),pid:S.cur,key:m._k,date:Date.now(),sec,mime:blob.type,blob,src:'app'})}catch(e){toast('녹음 저장 공간이 부족해요')}}
    chunks=[];ok()};
@@ -399,6 +544,7 @@ async function stopReading(silent){
  if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}
  try{wake&&wake.release()}catch(e){}wake=null;
  if(R&&R.active){R.sec+=(Date.now()-R.t0)/1000;R.active=false}
+ bgmStop(!!silent);
  await stopRecorder(false);
  if(silent){document.getElementById('dock')?.remove();return}
  $('#mic')?.classList.remove('on');const mi=$('#mic');if(mi)mi.textContent='🎙';
@@ -406,7 +552,7 @@ async function stopReading(silent){
  document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));
 }
 // 다른 화면으로 가면 독(dock)을 치운다
-const _shell=shell;shell=function(...a){document.getElementById('dock')?.remove();_shell(...a)};
+const _shell=shell;shell=function(...a){document.getElementById('dock')?.remove();bgmStop(true);_shell(...a)};
 
 function manualDone(){if(!R)return;
  if(R.completed){toast('이미 체크된 장이에요');return}
@@ -509,7 +655,8 @@ function moreView(){
  <div class="card"><h2>${esc(pr.name)}의 읽기 계획</h2><div id="mPlans">${planPicker(pr.plan.type,'changePlan')}</div><label class="f">시작한 날</label><input type="date" value="${pr.plan.start}" onchange="P().plan.start=this.value||ymd();save();toast('시작한 날을 바꿨어요')"><p class="note">계획을 바꿔도 읽은 기록은 그대로 남아요.</p></div>
  <div class="card"><h2>함께 읽기</h2><button class="btn gold" onclick="invite()">가족·성도님께 앱 보내기</button><button class="btn soft" onclick="shareCard()">📤 오늘 읽은 말씀 카드 나누기</button></div>
  <div class="card"><h2>설정</h2><label style="display:flex;gap:10px;align-items:center;font-weight:700;min-height:48px"><input type="checkbox" ${S.rec!==false?'checked':''} onchange="S.rec=this.checked;save()" style="width:24px;height:24px"> 읽을 때 내 목소리도 저장하기</label>
- <label class="f">성경 글자 크기</label><div class="fsz"><button onclick="fontStep(-1);toast('글자 '+S.font)">가−</button><button onclick="fontStep(1);toast('글자 '+S.font)">가+</button></div></div>
+ <label class="f">성경 글자</label><div class="rtools"><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button></div>
+ <label class="f">읽을 때 배경음악</label><button class="tool" id="bgTool" style="width:100%" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button></div>
  <div class="card"><h2>기록 지키기</h2><p class="note" style="margin-top:0">기록은 이 휴대폰에만 있어요. 휴대폰을 바꾸기 전에 「기록 파일 받기」로 저장해 두세요. (녹음은 「목소리」에서 하나씩 보내 둘 수 있어요)</p>
  <div class="row2"><button class="btn line" onclick="backup()">기록 파일 받기</button><button class="btn line" onclick="restore()">기록 파일 넣기</button></div></div>
  <button class="btn line" onclick="go('#/help')">도움말 · 설치 방법</button>
@@ -602,7 +749,7 @@ function helpView(){
  <h3>휴대폰 바탕화면에 앱 아이콘 만들기</h3><ol style="padding-left:22px">
  <li><b>갤럭시(안드로이드)</b>: 크롬으로 이 주소를 열고 오른쪽 위 ⋮ → 「홈 화면에 추가」 → 「설치」</li>
  <li><b>아이폰</b>: 사파리로 열고 아래 공유 버튼(□↑) → 「홈 화면에 추가」</li></ol>
- <h3>소리 내어 읽기</h3><ol style="padding-left:22px"><li>「오늘」에서 「소리 내어 읽기 시작」을 누르고 🎙 버튼을 눌러요.</li><li>처음 한 번 「마이크 허용」을 눌러 주세요.</li><li>또박또박 읽으면 읽은 절이 금색으로 바뀌고, 80% 넘게 읽으면 저절로 체크돼요.</li><li>앱 화면은 개역한글이지만 종이 성경(개역개정)으로 읽어도 체크돼요.</li><li>조용한 곳에서, 휴대폰을 입에서 30cm 안쪽에 두면 잘 돼요.</li></ol>
+ <h3>소리 내어 읽기</h3><ol style="padding-left:22px"><li>「오늘」에서 「소리 내어 읽기 시작」을 누르고 🎙 버튼을 눌러요.</li><li>처음 한 번 「마이크 허용」을 눌러 주세요.</li><li>또박또박 읽으면 읽은 절이 금색으로 바뀌고, 80% 넘게 읽으면 저절로 체크돼요.</li><li>따로 성경책을 펼 필요 없이, 읽기 화면의 말씀을 보면서 바로 읽으면 돼요. 읽는 절이 노란 표시로 따라오고 화면도 저절로 넘어가요.</li><li>「− 글자 +」로 크기를, 「가」 버튼으로 글꼴을, 「🎵」 버튼으로 배경음악을 고를 수 있어요. 음악은 「음악 없이」를 고르면 꺼져요.</li><li>종이 성경(개역개정)으로 읽어도 체크돼요.</li><li>조용한 곳에서, 휴대폰을 입에서 30cm 안쪽에 두면 잘 돼요.</li></ol>
  <h3>Plaud 녹음기로 읽기</h3><ol style="padding-left:22px"><li>Plaud로 녹음하며 읽어요.</li><li>Plaud 앱에서 받아쓰기 글을 복사해요.</li><li>「목소리 → Plaud 받아쓰기로 체크하기」에 붙여 넣어요.</li><li>Plaud 앱에서 녹음 파일을 내보내 「녹음 파일 가져오기」로 넣으면 가족이 들을 수 있어요.</li></ol>
  <h3>자녀와 함께</h3><ol style="padding-left:22px"><li>「더보기 → 가족 추가」로 아이 이름을 넣으면 아이 기록이 따로 쌓여요.</li><li>「목소리」에서 엄마·아빠가 읽은 말씀을 아이에게 들려줄 수 있어요. 📤로 카톡에 보낼 수도 있어요.</li><li>잠자리에서 「자녀와 함께 잠언 31일」을 한 장씩 같이 읽어 보세요.</li></ol>
  <h3>개인정보</h3><ol style="padding-left:22px"><li>읽은 기록·묵상·녹음은 이 휴대폰 안에만 저장돼요. 앱이 따로 모으지 않아요.</li><li>음성 인식은 휴대폰에 들어 있는 구글·애플 음성 인식 기능을 써요.</li><li>휴대폰을 바꾸기 전에 「더보기 → 기록 파일 받기」를 해 두세요.</li></ol>
