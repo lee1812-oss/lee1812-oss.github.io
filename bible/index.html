@@ -128,7 +128,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v001';
+const VER='v002';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -504,7 +504,7 @@ function plaudSave(){const ks=[...document.querySelectorAll('#pres input:checked
 function moreView(){
  const pr=P();
  shell('더보기',`
- <div class="card"><h2>우리 가족</h2>${Object.values(S.profiles).map(p=>`<div class="ch-row"><span style="width:14px;height:14px;border-radius:50%;background:${p.color}"></span><span class="nm">${esc(p.name)}${p.id===S.cur?' <span class="pill">지금</span>':''}</span><span class="note" style="margin:0">${planDone(p)}장</span><button class="ib" onclick="editProfile('${p.id}')">✏</button></div>`).join('')}
+ <div class="card"><h2>우리 가족</h2><p class="note" style="margin-top:0">이름을 누르면 바꾸기·계획·지우기를 할 수 있어요.</p>${Object.values(S.profiles).map(p=>`<button class="ch-row" style="width:100%;background:none;border:none;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)" onclick="memberSheet('${p.id}')"><span style="width:16px;height:16px;border-radius:50%;background:${p.color};flex:none"></span><span class="nm">${esc(p.name)}${p.id===S.cur?' <span class="pill">지금 읽는 사람</span>':''}<br><span class="note" style="font-weight:500">${esc(PLANS[p.plan.type].n)} · ${planDone(p)}장 · 연속 ${streak(p)}일</span></span><span style="font-size:24px;color:var(--sub)">›</span></button>`).join('')}
  <button class="btn line" onclick="addProfile()">+ 가족 추가 (자녀 등)</button><p class="note">한 휴대폰을 같이 쓰면 가족마다 따로 체크되고, 서로의 목소리를 들을 수 있어요.</p></div>
  <div class="card"><h2>${esc(pr.name)}의 읽기 계획</h2><div id="mPlans">${planPicker(pr.plan.type,'changePlan')}</div><label class="f">시작한 날</label><input type="date" value="${pr.plan.start}" onchange="P().plan.start=this.value||ymd();save();toast('시작한 날을 바꿨어요')"><p class="note">계획을 바꿔도 읽은 기록은 그대로 남아요.</p></div>
  <div class="card"><h2>함께 읽기</h2><button class="btn gold" onclick="invite()">가족·성도님께 앱 보내기</button><button class="btn soft" onclick="shareCard()">📤 오늘 읽은 말씀 카드 나누기</button></div>
@@ -516,11 +516,52 @@ function moreView(){
  <p class="foot">말씀 낭독 ${VER} · 성경전서 개역한글판 (대한성서공회)</p>`,{tab:'#/more'});
 }
 function changePlan(k){const pr=P();if(pr.plan.type===k)return;if(!confirm(`「${PLANS[k].n}」으로 바꿀까요? 오늘부터 새로 시작해요. (읽은 기록은 그대로 남아요)`))return;pr.plan.type=k;pr.plan.start=ymd();save();toast(PLANS[k].n+'으로 바꿨어요');moreView()}
-function addProfile(){const n=prompt('가족 이름을 적어 주세요 (예: 하은, 아빠)');if(!n||!n.trim())return;const kid=confirm('「자녀와 함께 잠언 31일」로 시작할까요?\n(취소를 누르면 「성경 1독 (1년)」으로 시작해요)');const t=kid?'pro31':'bible365';
- const id=newProfile(n.trim().slice(0,12),t,ymd());S.cur=id;save();toast(n.trim()+' 님으로 바꿨어요');go('#/today')}
-function editProfile(id){const p=S.profiles[id];const n=prompt('이름 바꾸기 (지우려면 「삭제」라고 적어 주세요)',p.name);if(n===null)return;
- if(n.trim()==='삭제'){if(Object.keys(S.profiles).length<2){toast('마지막 한 명은 지울 수 없어요');return}if(!confirm(p.name+'의 읽기 기록을 모두 지울까요? 되돌릴 수 없어요.'))return;delete S.profiles[id];if(S.cur===id)S.cur=Object.keys(S.profiles)[0];save();moreView();return}
- if(n.trim()){p.name=n.trim().slice(0,12);save();moreView()}}
+const QUICK=['아빠','엄마','첫째','둘째','셋째','할머니','할아버지'];
+const PLAN_SHORT=[['bible365','성경 1독 (1년)'],['pro31','잠언 31일 (자녀)'],['nt90','신약 90일'],['gospel40','복음서 40일'],['psa75','시편 75일'],['free','자유롭게']];
+function sheet(html){document.querySelectorAll('.dim').forEach(d=>d.remove());const dim=document.createElement('div');dim.className='dim';dim.innerHTML='<div class="sheet">'+html+'</div>';dim.onclick=e=>{if(e.target===dim)dim.remove()};document.body.appendChild(dim);return dim}
+function planChips(sel,attr){return '<div class="pchips">'+PLAN_SHORT.map(([k,n])=>`<button class="pchip ${k===sel?'on':''}" ${attr}="${k}">${n}</button>`).join('')+'</div>'}
+function addProfile(){
+ let plan='bible365';
+ const dim=sheet(`<h2>가족 추가</h2><label class="f">이름 (눌러서 고르거나 적어 주세요)</label><div class="pchips">${QUICK.map(q=>`<button class="pchip" data-q="${q}">${q}</button>`).join('')}</div><input type="text" id="addName" maxlength="12" placeholder="예: 조가은"><label class="f">읽기 계획</label><div id="addPlans">${planChips(plan,'data-p')}</div><button class="btn gold" id="addOk">추가하기</button><button class="btn line" id="addNo">닫기</button>`);
+ dim.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{dim.querySelector('#addName').value=b.dataset.q});
+ const bindP=()=>dim.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{plan=b.dataset.p;dim.querySelector('#addPlans').innerHTML=planChips(plan,'data-p');bindP()});bindP();
+ dim.querySelector('#addNo').onclick=()=>dim.remove();
+ dim.querySelector('#addOk').onclick=()=>{const n=dim.querySelector('#addName').value.trim();if(!n){toast('이름을 골라 주세요');return}if(Object.values(S.profiles).some(p=>p.name===n)){toast('같은 이름이 이미 있어요');return}newProfile(n.slice(0,12),plan,ymd());save();dim.remove();toast(n+' 님을 추가했어요');render()};
+}
+function memberSheet(id){
+ const p=S.profiles[id];if(!p)return;
+ const dim=sheet(`<h2>${esc(p.name)}</h2><p class="note" style="margin-top:0">${planDone(p)}장 읽음 · 연속 ${streak(p)}일</p>
+ ${id!==S.cur?'<button class="btn gold" id="mUse">이 사람으로 읽기</button>':'<p class="note"><span class="pill">지금 읽는 사람</span></p>'}
+ <label class="f">이름</label><input type="text" id="mName" maxlength="12" value="${esc(p.name)}">
+ <label class="f">읽기 계획 (누르면 오늘부터 새로 시작, 읽은 기록은 그대로)</label><div id="mPl">${planChips(p.plan.type,'data-mp')}</div>
+ <button class="btn" id="mSave">저장</button><button class="btn red" id="mDel">이 가족 지우기</button><button class="btn line" id="mNo">닫기</button>`);
+ let plan=p.plan.type;
+ const bindP=()=>dim.querySelectorAll('[data-mp]').forEach(b=>b.onclick=()=>{plan=b.dataset.mp;dim.querySelector('#mPl').innerHTML=planChips(plan,'data-mp');bindP()});bindP();
+ dim.querySelector('#mUse')?.addEventListener('click',async()=>{await stopReading(true);S.cur=id;save();dim.remove();toast(p.name+' 님으로 바꿨어요');go('#/today')});
+ dim.querySelector('#mNo').onclick=()=>dim.remove();
+ dim.querySelector('#mSave').onclick=()=>{const n=dim.querySelector('#mName').value.trim();if(n)p.name=n.slice(0,12);if(plan!==p.plan.type){p.plan.type=plan;p.plan.start=ymd()}save();dim.remove();toast('저장했어요');render()};
+ dim.querySelector('#mDel').onclick=()=>{if(Object.keys(S.profiles).length<2){toast('마지막 한 명은 지울 수 없어요');return}if(!confirm(p.name+' 님의 읽기 기록을 모두 지울까요? 되돌릴 수 없어요.'))return;delete S.profiles[id];if(S.cur===id)S.cur=Object.keys(S.profiles)[0];save();dim.remove();render()};
+}
+// 가족 링크(?fam=이름,이름*,...&me=이름) 로 열면 한 번에 등록 (* = 자녀, 잠언 31일)
+function famSheet(){
+ const F=window._fam;window._fam=null;if(!F)return;
+ const items=F.list.map(x=>({...x,plan:x.kid?'pro31':'bible365',on:true,has:Object.values(S.profiles).some(p=>p.name===x.name)}));
+ let me=F.me&&items.some(i=>i.name===F.me)?F.me:items[0].name;
+ const draw=()=>dim.querySelector('#famBody').innerHTML=items.map((it,i)=>`<div style="border:2px solid ${it.on?'var(--gold)':'var(--line)'};border-radius:14px;padding:10px 12px;margin-bottom:8px;background:${it.on?'var(--cr2)':'#fff'}">
+  <div style="display:flex;align-items:center;gap:8px"><button class="pchip ${it.on?'on':''}" data-on="${i}" style="flex:1;text-align:left;font-size:19px">${it.on?'✓ ':''}${esc(it.name)}${it.has?' (이미 있음)':''}</button><button class="pchip ${me===it.name?'on':''}" data-me="${i}">${me===it.name?'★ 이 휴대폰 주인':'☆ 주인'}</button></div>
+  ${it.on&&!it.has?`<div class="pchips" style="margin:8px 0 0">${[['bible365','성경 1독 (1년)'],['pro31','잠언 31일'],['nt90','신약 90일']].map(([k,n])=>`<button class="pchip ${it.plan===k?'on':''}" data-pl="${i}:${k}">${n}</button>`).join('')}</div>`:''}</div>`).join('');
+ const dim=sheet(`<h2>우리 가족 등록</h2><p class="note" style="margin-top:0">누르기만 하면 돼요. 이름을 눌러 빼거나 넣고, 계획을 누르고, 이 휴대폰 주인을 ★로 골라 주세요.</p><div id="famBody"></div><button class="btn gold" id="famOk">우리 가족 등록하기</button><button class="btn line" id="famNo">나중에</button>`);
+ dim.querySelector('#famBody').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.on){const it=items[+b.dataset.on];it.on=!it.on}
+  if(b.dataset.me){me=items[+b.dataset.me].name;items[+b.dataset.me].on=true}
+  if(b.dataset.pl){const [i,k]=b.dataset.pl.split(':');items[+i].plan=k}
+  draw()};
+ draw();
+ dim.querySelector('#famNo').onclick=()=>dim.remove();
+ dim.querySelector('#famOk').onclick=()=>{let n=0;items.filter(i=>i.on&&!i.has).forEach(i=>{newProfile(i.name,i.plan,ymd());n++});
+  const mp=Object.values(S.profiles).find(p=>p.name===me);if(mp)S.cur=mp.id;save();dim.remove();toast(`가족 ${n}명을 등록했어요. 지금은 ${me} 님이 읽어요`,3500);location.hash='#/today';render()};
+}
+
 function pickProfile(){const ps=Object.values(S.profiles);const dim=document.createElement('div');dim.className='dim';
  dim.innerHTML=`<div class="sheet"><h2>누가 읽나요?</h2>${ps.map(p=>`<button class="plan ${p.id===S.cur?'on':''}" data-id="${p.id}"><b>${esc(p.name)}</b><span>${esc(PLANS[p.plan.type].n)} · ${planDone(p)}장 읽음 · 연속 ${streak(p)}일</span></button>`).join('')}<button class="btn line" id="pAdd">+ 가족 추가</button><button class="btn soft" id="pClose">닫기</button></div>`;
  document.body.appendChild(dim);dim.onclick=e=>{if(e.target===dim)dim.remove()};
@@ -570,7 +611,11 @@ function helpView(){
 }
 
 /* 시작 */
+(function(){const q=new URLSearchParams(location.search);const f=q.get('fam');if(!f)return;
+ const list=f.split(',').map(s=>s.trim()).filter(Boolean).slice(0,12).map(s=>({name:s.replace(/\*$/,'').slice(0,12),kid:/\*$/.test(s)}));
+ if(list.length)window._fam={list,me:q.get('me')};history.replaceState(null,'',location.pathname+location.hash)})();
 render();
+if(window._fam)setTimeout(famSheet,300);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 // 새 버전이 올라오면 한 번 새로고침
 fetch('version.txt?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(v=>{v=v.trim();if(v&&v!==VER&&sessionStorage.getItem('upd')!==v){sessionStorage.setItem('upd',v);location.reload()}}).catch(()=>{});
