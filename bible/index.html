@@ -261,7 +261,7 @@ function onboarding(){
  <p class="foot">기록은 이 휴대폰 안에만 저장되고 어디로도 보내지 않아요.</p>`);
 }
 function obPick(k){obPlan=k;$('#obPlans').innerHTML=planPicker(k,'obPick')}
-function newProfile(name,type,start){const id='p'+Date.now().toString(36);S.profiles[id]={id,name,color:COLORS[Object.keys(S.profiles).length%COLORS.length],plan:{type,start},read:{},days:{},memos:{},created:Date.now()};return id}
+function newProfile(name,type,start){const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);S.profiles[id]={id,name,color:COLORS[Object.keys(S.profiles).length%COLORS.length],plan:{type,start},read:{},days:{},memos:{},created:Date.now()};return id}
 function obDone(){const n=$('#obName').value.trim();if(!n){toast('이름을 적어 주세요');return}
  S.cur=newProfile(n.slice(0,12),obPlan,$('#obStart').value||ymd());save();location.hash='#/today';render()}
 
