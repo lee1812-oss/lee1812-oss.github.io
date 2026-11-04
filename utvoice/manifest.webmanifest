@@ -1,0 +1,17 @@
+{
+  "name": "UTCA 음성 소통",
+  "short_name": "UTCA 소통",
+  "description": "UTCA 대표님과 녹음·글·사진을 주고받는 앱",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1C42",
+  "theme_color": "#0D1C42",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
