@@ -149,7 +149,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v003';
+const VER='v004';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -275,6 +275,26 @@ function render(){
  return todayView();
 }
 
+/* ===== 앱 설치 (안드로이드: 앱 파일 APK 또는 크롬 설치, 아이폰: 홈 화면에 추가) ===== */
+const APK='malsseum.apk';
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid=/Android/i.test(navigator.userAgent);
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true||/[?&]app=1/.test(location.search);
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__inst=e});
+window.addEventListener('appinstalled',()=>{window.__inst=null;toast('설치했어요. 홈 화면의 「말씀 낭독」 아이콘으로 열어 주세요.',4000)});
+function installCard(){
+ if(standalone)return '';
+ const ios='<p class="note" style="margin-top:0"><b>아이폰</b>은 사파리로 열고 아래 가운데 <b>공유 단추(□↑)</b> → <b>「홈 화면에 추가」</b> → 「추가」를 누르면 앱 아이콘이 생겨요.</p>';
+ const and=`<a href="${APK}" download style="text-decoration:none"><button class="btn gold">⬇ 안드로이드 앱 파일(APK) 내려받기</button></a><button class="btn line" onclick="doInstall()">📲 크롬으로 바로 설치하기</button><p class="note">APK는 내려받은 파일을 열고 「설치」를 누르면 돼요. 「출처를 알 수 없는 앱」 허용을 물으면 「허용」을 눌러 주세요. 크롬이 「이미 설치됨」이라고 하면 APK로 설치하면 돼요.</p>`;
+ return `<div class="card"><h2>📲 휴대폰에 앱으로 설치</h2>${isIOS?ios:isAndroid?and:and+ios}</div>`;
+}
+async function doInstall(){
+ const p=window.__inst;
+ if(p){p.prompt();const c=await p.userChoice;window.__inst=null;if(c.outcome==='accepted')toast('설치하고 있어요. 홈 화면의 「말씀 낭독」 아이콘으로 열어 주세요.',4000);return}
+ const d=sheet(`<h2>📲 앱 설치하기</h2><p>크롬이 「이미 설치됨」이라고 하거나 설치 창이 안 뜨면, <b>앱 파일(APK)</b>로 설치해 주세요. 가장 확실해요.</p><a href="${APK}" download style="text-decoration:none"><button class="btn gold">⬇ 안드로이드 앱 파일(APK) 내려받기</button></a><ol style="padding-left:22px;margin:12px 0"><li>내려받은 <b>malsseum.apk</b>를 눌러 열어요.</li><li>「출처를 알 수 없는 앱」을 물으면 「설정」 → 「이 출처 허용」을 켜요.</li><li>「설치」를 누르면 홈 화면에 「말씀 낭독」이 생겨요.</li></ol><p class="note">또는 크롬 오른쪽 위 ⋮ → 「앱 설치」나 「홈 화면에 추가」를 눌러도 돼요.</p><button class="btn line" id="iClose">닫기</button>`);
+ d.querySelector('#iClose').onclick=()=>d.remove();
+}
+
 /* ===== 처음 시작 ===== */
 let obPlan='bible365';
 function planPicker(sel,fn){return Object.entries(PLANS).map(([k,v])=>`<button class="plan ${k===sel?'on':''}" onclick="${fn}('${k}')"><b>${v.n}</b><span>${v.d}</span></button>`).join('')}
@@ -321,6 +341,7 @@ function todayView(){
  <div class="stats"><div class="stat"><b>${streak(pr)}</b><span>연속 읽은 날</span></div><div class="stat"><b>${total?Math.floor(done/total*100):0}%</b><span>${done}/${total}장</span></div><div class="stat"><b id="recMin">-</b><span>내 목소리</span></div></div>
  <div class="card"><h2>${esc(PLANS[pr.plan.type].n)}</h2><div class="bar" style="width:100%;height:12px"><i style="width:${total?done/total*100:0}%"></i></div>
  <p class="note">${pr.plan.type==='pro31'?'매달 날짜와 같은 장을 읽어요 · 이번 달 기준':PLANS[pr.plan.type].days?`${pr.plan.start} 시작 · ${PLANS[pr.plan.type].days}일 계획`:'계획 없이 자유롭게'} · 「더보기」에서 바꿀 수 있어요</p></div>
+ ${installCard()}
  <div class="row2"><button class="btn line" onclick="go('#/plaud')">Plaud로 읽었어요</button><button class="btn line" onclick="invite()">함께 읽자고 초대</button></div>
  `,{tab:'#/today',sub:'소리 내어 읽는 우리 가족 성경'});
 }
@@ -653,6 +674,7 @@ function moreView(){
  <div class="card"><h2>우리 가족</h2><p class="note" style="margin-top:0">이름을 누르면 바꾸기·계획·지우기를 할 수 있어요.</p>${Object.values(S.profiles).map(p=>`<button class="ch-row" style="width:100%;background:none;border:none;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)" onclick="memberSheet('${p.id}')"><span style="width:16px;height:16px;border-radius:50%;background:${p.color};flex:none"></span><span class="nm">${esc(p.name)}${p.id===S.cur?' <span class="pill">지금 읽는 사람</span>':''}<br><span class="note" style="font-weight:500">${esc(PLANS[p.plan.type].n)} · ${planDone(p)}장 · 연속 ${streak(p)}일</span></span><span style="font-size:24px;color:var(--sub)">›</span></button>`).join('')}
  <button class="btn line" onclick="addProfile()">+ 가족 추가 (자녀 등)</button><p class="note">한 휴대폰을 같이 쓰면 가족마다 따로 체크되고, 서로의 목소리를 들을 수 있어요.</p></div>
  <div class="card"><h2>${esc(pr.name)}의 읽기 계획</h2><div id="mPlans">${planPicker(pr.plan.type,'changePlan')}</div><label class="f">시작한 날</label><input type="date" value="${pr.plan.start}" onchange="P().plan.start=this.value||ymd();save();toast('시작한 날을 바꿨어요')"><p class="note">계획을 바꿔도 읽은 기록은 그대로 남아요.</p></div>
+ ${installCard()}
  <div class="card"><h2>함께 읽기</h2><button class="btn gold" onclick="invite()">가족·성도님께 앱 보내기</button><button class="btn soft" onclick="shareCard()">📤 오늘 읽은 말씀 카드 나누기</button></div>
  <div class="card"><h2>설정</h2><label style="display:flex;gap:10px;align-items:center;font-weight:700;min-height:48px"><input type="checkbox" ${S.rec!==false?'checked':''} onchange="S.rec=this.checked;save()" style="width:24px;height:24px"> 읽을 때 내 목소리도 저장하기</label>
  <label class="f">성경 글자</label><div class="rtools"><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button></div>
@@ -747,7 +769,7 @@ async function shareCard(){
 function helpView(){
  shell('도움말',`<div class="card help">
  <h3>휴대폰 바탕화면에 앱 아이콘 만들기</h3><ol style="padding-left:22px">
- <li><b>갤럭시(안드로이드)</b>: 크롬으로 이 주소를 열고 오른쪽 위 ⋮ → 「홈 화면에 추가」 → 「설치」</li>
+ <li><b>갤럭시(안드로이드)</b>: 「더보기 → 안드로이드 앱 파일(APK) 내려받기」를 누르고, 받은 파일을 열어 「설치」를 눌러요. (또는 크롬 ⋮ → 「앱 설치」)</li>
  <li><b>아이폰</b>: 사파리로 열고 아래 공유 버튼(□↑) → 「홈 화면에 추가」</li></ol>
  <h3>소리 내어 읽기</h3><ol style="padding-left:22px"><li>「오늘」에서 「소리 내어 읽기 시작」을 누르고 🎙 버튼을 눌러요.</li><li>처음 한 번 「마이크 허용」을 눌러 주세요.</li><li>또박또박 읽으면 읽은 절이 금색으로 바뀌고, 80% 넘게 읽으면 저절로 체크돼요.</li><li>따로 성경책을 펼 필요 없이, 읽기 화면의 말씀을 보면서 바로 읽으면 돼요. 읽는 절이 노란 표시로 따라오고 화면도 저절로 넘어가요.</li><li>「− 글자 +」로 크기를, 「가」 버튼으로 글꼴을, 「🎵」 버튼으로 배경음악을 고를 수 있어요. 음악은 「음악 없이」를 고르면 꺼져요.</li><li>종이 성경(개역개정)으로 읽어도 체크돼요.</li><li>조용한 곳에서, 휴대폰을 입에서 30cm 안쪽에 두면 잘 돼요.</li></ol>
  <h3>Plaud 녹음기로 읽기</h3><ol style="padding-left:22px"><li>Plaud로 녹음하며 읽어요.</li><li>Plaud 앱에서 받아쓰기 글을 복사해요.</li><li>「목소리 → Plaud 받아쓰기로 체크하기」에 붙여 넣어요.</li><li>Plaud 앱에서 녹음 파일을 내보내 「녹음 파일 가져오기」로 넣으면 가족이 들을 수 있어요.</li></ol>
