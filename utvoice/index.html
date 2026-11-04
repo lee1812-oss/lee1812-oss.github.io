@@ -14,6 +14,7 @@
 :root{--nv:#0D1C42;--nv2:#22396F;--nv3:#3A5590;--cr:#FCF1D0;--gd:#BF913C;--bg:#EEF0F4;--tx:#141A26;--sub:#4A5163;--ln:#D5D9E2;--red:#C62828;--or:#C25E00;--gr:#1F7A45;--bl:#1F5FA8}
 html.fs1{font-size:17px}html.fs2{font-size:19px}html.fs3{font-size:22px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 button{font:inherit;cursor:pointer;border:0;border-radius:14px;min-height:54px;padding:0 16px;font-weight:700}
 input,textarea,select{font:inherit;color:var(--tx)}
@@ -209,11 +210,11 @@ const md = (ms, tz) => fmt(ms, tz, { month: 'numeric', day: 'numeric', weekday: 
 const hourIn = (ms, tz) => Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(new Date(ms)));
 const myTz = () => (S.me && S.me.tz) || 'Asia/Seoul';
 const others = () => S.members.filter(m => S.me && m.id !== S.me.id);
-const otherTz = () => { const o = others()[0]; return o ? o.tz : 'America/New_York'; };
+const otherTz = () => { const my = myTz(), o = others().find(x => x.tz && x.tz !== my) || S.members.find(x => x.tz && x.tz !== my); return o ? o.tz : (my === 'Asia/Seoul' ? 'America/New_York' : 'Asia/Seoul'); };
 const nameOf = id => { const m = S.members.find(x => x.id === id); return m ? m.name + (m.title ? ' ' + m.title : '') : (id || ''); };
 const durTxt = s => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 function drawClock() {
-  const now = Date.now(), zones = [...new Set(['Asia/Seoul', myTz(), otherTz()])].slice(0, 2);
+  const now = Date.now(), zones = [...new Set([myTz(), otherTz()])].slice(0, 2);
   $('#clk').innerHTML = zones.map(tz => { const h = hourIn(now, tz), night = h >= 22 || h < 7;
     return `<div>${tz === 'Asia/Seoul' ? '🇰🇷' : '🇺🇸'} ${esc(tzName(tz))} ${night ? '🌙 밤' : ''}<b>${esc(md(now, tz))} ${esc(hm(now, tz))}</b></div>`; }).join('');
 }
@@ -383,6 +384,7 @@ async function play(id, fromQueue) {
   playerUi();
 }
 P.a.ontimeupdate = playerUi; P.a.onplay = playerUi; P.a.onpause = playerUi;
+P.a.onerror = () => { if (!P.a.src) return; toast('이 녹음은 재생이 안 돼요. ⋯ → 「내려받기」로 들어 보세요.', 4000); playerUi(); const nx = P.queue.shift(); if (nx) setTimeout(() => { scrollToMsg(nx); play(nx, true); }, 700); };
 P.a.onended = () => { playerUi(); const nx = P.queue.shift(); if (nx) setTimeout(() => { scrollToMsg(nx); play(nx, true); }, 700); else P.id = P.id; };
 function playUnheard() { const q = unheardVoices().map(m => m.id); if (!q.length) return; const first = q.shift(); P.queue = q; scrollToMsg(first); play(first, true); }
 function scrollToMsg(id) { const el = document.getElementById('b_' + id); if (!el) return; el.scrollIntoView({ block: 'center', behavior: 'smooth' }); const b = el.querySelector('.bub'); b.classList.remove('hl'); void b.offsetWidth; b.classList.add('hl'); }
