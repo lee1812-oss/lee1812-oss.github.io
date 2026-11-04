@@ -1,5 +1,5 @@
-/* UTCA 음성 소통 서비스워커 v003: 앱 화면을 보관해 인터넷이 약해도 열리게 하고, 새 메시지 알림을 띄웁니다. */
-var API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', CACHE = 'utv-v003', SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'utca-logo.png'];
+/* UTCA 음성 소통 서비스워커 v004: 앱 화면을 보관해 인터넷이 약해도 열리게 하고, 새 메시지 알림을 띄웁니다. */
+var API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', CACHE = 'utv-v004', SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'utca-logo.png'];
 self.addEventListener('install', function (e) { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).catch(function () {})); });
 self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k.indexOf('utv-') === 0 && k !== CACHE; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); })); });
 self.addEventListener('fetch', function (e) {
