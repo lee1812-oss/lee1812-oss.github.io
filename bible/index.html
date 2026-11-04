@@ -69,6 +69,18 @@ main{max-width:720px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-i
 .cell.read{background:var(--n2);color:var(--cr);border-color:var(--n2)}
 .cell.today{border-color:var(--gold);border-width:3px}
 .cell .dot{position:absolute;right:5px;top:4px;font-size:11px}
+.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:64px;line-height:1.1}
+.cell .vlab{font-size:12px;font-weight:700;color:var(--sub);margin-top:3px}
+.cell.read .vlab{color:var(--cr);opacity:.85}
+.cell.part{background:linear-gradient(to top,#F3D98F var(--p),#fff var(--p));border-color:var(--gold)}
+.cell.part .vlab{color:#7A5200}
+.book .bn small.bpart{display:block;font-size:14px;font-weight:600;color:#7A5200;margin-top:2px}
+.card.total .tnum{display:flex;align-items:baseline;gap:6px;margin:4px 0 8px}
+.card.total .tnum b{font-size:34px;color:var(--n2)}
+.card.total .tnum span{font-size:17px;color:var(--sub)}
+.card.total .tnum em{margin-left:auto;font-style:normal;font-weight:800;font-size:20px;color:var(--gold2)}
+.bar.big{width:100%;height:12px}
+.lastp{font-size:17px;margin:12px 0 2px}
 /* 읽기 화면 */
 .reader-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .reader-head .t{flex:1;font-size:22px;font-weight:800;color:var(--n2)}
@@ -165,7 +177,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v006';
+const VER='v007';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -363,16 +375,24 @@ function todayView(){
 }
 
 /* ===== 성경 전체 ===== */
+// 장마다 읽은 절 수 (다 읽은 장은 전체 절, 읽는 중인 장은 저장된 절)
+function vRead(pr,b,c){const k=K(b,c),n=VC[b-1][c-1];if(pr.read[k])return n;const v=pr.vp&&pr.vp[k];return v&&v.d?Math.min(n,v.d.length):0}
+function vUpto(pr,b,c){const v=pr.vp&&pr.vp[K(b,c)];return v&&v.d&&v.d.length?Math.max(...v.d)+1:0}
+function lastSpot(pr){let best=null;for(const k in (pr.vp||{})){const v=pr.vp[k];if(v&&v.d&&v.d.length&&!pr.read[k]&&(!best||v.t>best.t))best={k,t:v.t,part:true}}for(const k in pr.read){const r=pr.read[k];if(r&&r.t&&(!best||r.t>best.t))best={k,t:r.t,part:false}}return best}
 function bibleView(){
- const pr=P();
- const row=b=>{const n=VC[b-1].length;let r=0;for(let c=1;c<=n;c++)if(pr.read[K(b,c)])r++;return`<button class="book" onclick="go('#/book/${b}')"><span class="bn">${NAME[b-1]}</span><span class="bar"><i style="width:${r/n*100}%"></i></span><span class="cnt">${r}/${n}</span></button>`};
+ const pr=P();let tv=0,tr=0,tc=0,tcr=0;
+ const row=b=>{const n=VC[b-1].length;let r=0,vs=0,vr=0,parts=[];for(let c=1;c<=n;c++){const vn=VC[b-1][c-1];vs+=vn;const x=vRead(pr,b,c);vr+=x;if(pr.read[K(b,c)])r++;else if(x)parts.push(c+unit(b)+' '+vUpto(pr,b,c)+'절까지')}tv+=vs;tr+=vr;tc+=n;tcr+=r;
+  return`<button class="book" onclick="go('#/book/${b}')"><span class="bn">${NAME[b-1]}${parts.length?`<small class="bpart">📖 ${parts.slice(0,2).join(', ')}${parts.length>2?' 외':''} 읽는 중</small>`:''}</span><span class="bar"><i style="width:${vr/vs*100}%"></i></span><span class="cnt">${r}/${n}${unit(b)}</span></button>`};
  let ot='',nt='';for(let b=1;b<=39;b++)ot+=row(b);for(let b=40;b<=66;b++)nt+=row(b);
- shell('성경 66권',`<div class="books"><h3>신약 27권</h3>${nt}<h3>구약 39권</h3>${ot}</div>`,{tab:'#/bible',sub:'읽은 곳이 금색으로 채워져요'});
+ const ls=lastSpot(pr);let lastHtml='';
+ if(ls){const [b,c]=ls.k.split(':').map(Number);if(ls.part){const u=vUpto(pr,b,c);lastHtml=`<p class="lastp">마지막으로 읽은 곳: <b>${NAME[b-1]} ${c}${unit(b)} ${u}절</b>까지</p><button class="btn gold" onclick="go('#/read/${b}/${c}')">▶ ${NAME[b-1]} ${c}${unit(b)} ${Math.min(u+1,VC[b-1][c-1])}절부터 이어 읽기</button>`}else{const nx=c<VC[b-1].length?[b,c+1]:b<66?[b+1,1]:null;lastHtml=`<p class="lastp">마지막으로 읽은 곳: <b>${NAME[b-1]} ${c}${unit(b)}</b> 끝까지</p>${nx?`<button class="btn gold" onclick="go('#/read/${nx[0]}/${nx[1]}')">▶ ${NAME[nx[0]-1]} ${nx[1]}${unit(nx[0])}부터 이어 읽기</button>`:''}`}}
+ const sum=`<div class="card total"><h2>성경 읽기 완성표</h2><div class="tnum"><b>${tr.toLocaleString()}</b><span>/ ${tv.toLocaleString()}절</span><em>${(tr/tv*100).toFixed(tr&&tr/tv<.001?2:1)}%</em></div><div class="bar big"><i style="width:${tr/tv*100}%"></i></div><p class="note" style="margin:6px 0 0">다 읽은 장 ${tcr.toLocaleString()} / ${tc.toLocaleString()}장 · 읽는 중인 장은 읽은 절까지 금색으로 채워져요</p>${lastHtml}</div>`;
+ shell('성경 66권',`${sum}<div class="books"><h3>신약 27권</h3>${nt}<h3>구약 39권</h3>${ot}</div>`,{tab:'#/bible',sub:'읽은 장·절이 금색으로 채워져요'});
 }
 function bookView(b){
  const pr=P();const n=VC[b-1].length;const tk=new Set(todayPortion(pr).keys);
- let g='';for(let c=1;c<=n;c++){const k=K(b,c),r=pr.read[k];g+=`<button class="cell ${r?'read':''} ${tk.has(k)?'today':''}" onclick="go('#/read/${b}/${c}')">${c}${r&&r.how!=='check'?'<span class="dot">🎙</span>':''}</button>`}
- shell(NAME[b-1],`<div class="card"><div class="grid">${g}</div><p class="note">진한 칸 = 읽음 · 🎙 = 소리 내어 읽음 · 금색 테두리 = 오늘 분량</p></div>`,{back:true,sub:`${n}${unit(b)} 중 ${Array.from({length:n},(_,i)=>pr.read[K(b,i+1)]).filter(Boolean).length}${unit(b)} 읽음`});
+ let g='',vs=0,vr=0;for(let c=1;c<=n;c++){const k=K(b,c),r=pr.read[k],vn=VC[b-1][c-1],x=vRead(pr,b,c);vs+=vn;vr+=x;const pc=!r&&x?Math.round(x/vn*100):0;g+=`<button class="cell ${r?'read':''} ${pc?'part':''} ${tk.has(k)?'today':''}" ${pc?`style="--p:${pc}%"`:''} onclick="go('#/read/${b}/${c}')">${c}${r&&r.how!=='check'?'<span class="dot">🎙</span>':''}<span class="vlab">${r?vn+'절':pc?vUpto(pr,b,c)+'/'+vn+'절':vn+'절'}</span></button>`}
+ shell(NAME[b-1],`<div class="card"><div class="grid">${g}</div><p class="note">진한 칸 = 다 읽은 장 · 금색으로 반쯤 찬 칸 = 읽는 중 (「9/31절」 = 31절 중 9절까지) · 🎙 = 소리 내어 읽음 · 금색 테두리 = 오늘 분량</p></div>`,{back:true,sub:`${n}${unit(b)} 중 ${Array.from({length:n},(_,i)=>pr.read[K(b,i+1)]).filter(Boolean).length}${unit(b)} 다 읽음 · ${vr.toLocaleString()}/${vs.toLocaleString()}절`});
 }
 
 /* ===== 낭독 인식 ===== */
@@ -425,14 +445,14 @@ let evalTimer=null;
 // 절 하나를 읽음으로 표시하고 이 휴대폰에 저장 (장을 다 못 읽어도 절까지 남아요)
 function markV(i){if(!R||R.done.has(i))return;R.done.add(i);if(R.active&&R.mk)R.mk[i]=Date.now();$('#v'+i)?.classList.add('done');saveProg()}
 let progT=null;
-function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size)pr.vp[R.k]={d:[...R.done].sort((a,b)=>a-b),t:Date.now(),n:R.verses.length};else delete pr.vp[R.k];save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
+function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size){const d=[...R.done].sort((a,b)=>a-b),o=pr.vp[R.k];if(!o||o.d.join()!==d.join())pr.vp[R.k]={d,t:Date.now(),n:R.verses.length}}else delete pr.vp[R.k];save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
 // 방금 들은 말이 어느 절 어디쥐인지 찾기
 function locate(){
  const recent=norm(R.last||'').slice(-40);if(recent.length<5)return null;
  const RG=grams(recent,3);if(!RG.size)return null;
  let best=-1,bs=0;const from=Math.max(0,R.pos-1),to=Math.min(R.verses.length-1,R.pos+6);
  for(let i=from;i<=to;i++){const vs=R.vn[i];let h=0;RG.forEach(g=>{if(vs.includes(g))h++});const sc=h/RG.size-(i<R.pos?.12:0)-Math.max(0,i-R.pos-1)*.04;if(sc>bs){bs=sc;best=i}}
- if(best<0||bs<.42)return null;
+ if(best<0||bs<(best>=R.pos&&best<=R.pos+1?.32:.42))return null;
  // 같은 말이 절 안에 두 번 나와도 앞질러 가지 않게, 지금까지 읽은 곳 근처부터 찾기
  const vs=R.vn[best],tail=recent.slice(-14),base=best===R.pos?Math.max(0,Math.floor((R.frac||0)*vs.length)-8):0;let pm=-1;for(let j=0;j+3<=tail.length;j++){const ix=vs.indexOf(tail.substr(j,3),base);if(ix>pm)pm=ix}
  return {i:best,frac:pm<0?0:Math.min(1,(pm+3)/vs.length)};
@@ -498,7 +518,7 @@ function autoRun(){
   autoRaf=requestAnimationFrame(f)};
  autoRaf=requestAnimationFrame(f);
 }function spdStep(d){S.spd=Math.max(1,Math.min(10,(S.spd||5)+d));save();const b=$('#spdN');if(b)b.textContent=S.spd}
-function setMode(m){S.follow=m;save();if(R){const was=R.active;R.mode=m;$('#spd')?.classList.toggle('on',m==='auto');const b=$('#modeBtn');if(b)b.innerHTML=modeLabel();if(was&&m==='auto'){if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}if(S.rec!==false&&!mr)startRecorder();autoRun()}else if(was&&m==='voice'){toast('🎙를 다시 눌러 주세요');stopReading()}}}
+function setMode(m){S.follow=m;save();setTimeout(bgmApplyVol,50);if(R){const was=R.active;R.mode=m;$('#spd')?.classList.toggle('on',m==='auto');const b=$('#modeBtn');if(b)b.innerHTML=modeLabel();if(was&&m==='auto'){if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}if(S.rec!==false&&!mr)startRecorder();autoRun()}else if(was&&m==='voice'){toast('🎙를 다시 눌러 주세요');stopReading()}}}
 const modeLabel=()=>S.follow==='auto'?'⏬ 일정 속도':'🗣 목소리 따라';
 function modeSheet(){const d=sheet(`<h2>화면 넘기는 방식</h2><div class="bgl"><button class="bgm ${S.follow!=='auto'?'on':''}" data-m="voice"><b>🗣 내 목소리를 따라 (추천)</b><span>읽는 말을 알아듣고 그 절로 화면이 저절로 흘러가요. 읽은 절이 저장돼요.</span></button><button class="bgm ${S.follow==='auto'?'on':''}" data-m="auto"><b>⏬ 일정한 속도로</b><span>자막처럼 천천히 올라가요. 아래 − + 로 속도를 맞춰요. 음성 인식이 안 되는 휴대폰에 좋아요.</span></button></div><button class="btn line" id="mClose">닫기</button>`);d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);d.remove()});d.querySelector('#mClose').onclick=()=>d.remove()}
 function schedEval(){if(!evalTimer)evalTimer=setTimeout(evalNow,350)}
@@ -565,11 +585,15 @@ function bgmEngine(id,gen){
  else if(id==='mine'){mineGet().then(f=>{if(gen!==bgGen)return;if(!f){toast('「내 음악 파일」을 먼저 골라 주세요');return}
   bgEl=new Audio(URL.createObjectURL(f.blob));bgEl.loop=true;try{const s=AC.createMediaElementSource(bgEl);const d=AC.createGain();d.gain.value=1.6;s.connect(d);d.connect(BG)}catch(e){}bgEl.play().catch(()=>{})})}
 }
+// 목소리 따라 읽는 동안은 음악을 자동으로 작게 (마이크가 음악보다 내 목소리를 더 잘 듣게)
+const ducking=()=>!!(R&&R.active&&R.mode==='voice'&&S.duck!==false);
+function effVol(){const v=S.bgmVol??.4;return ducking()?Math.max(.03,Math.min(v*.35,.18)):v}
+function bgmApplyVol(){if(!bgOn)return;const v=effVol();if(String(bgOn).startsWith('yt:')){try{ytP&&ytReady&&ytP.setVolume(Math.max(2,Math.round(v*100)))}catch(e){}return}if(AC&&BG){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.3)}}
 function bgmPlay(id){
  if(!id||id==='off'){bgmStop();return}
  if(String(id).startsWith('yt:')){if(bgOn&&!String(bgOn).startsWith('yt:'))bgmStop(true);bgOn=id;ytPlay(id.slice(3),true);return}
  if(String(bgOn).startsWith('yt:'))ytStop();
- if(!ac())return;const v=Math.max(.02,(S.bgmVol??.4))*.8;
+ if(!ac())return;const v=Math.max(.02,effVol())*.8;
  if(bgOn===id){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(v,AC.currentTime,.3);return}
  bgmStop(true);bgOn=id;const gen=++bgGen;
  BUS=AC.createGain();BUS.gain.value={organ:2.2,piano:3,hymn:2.6,rain:1.5,wave:1.6}[id]||1;BUS.connect(BG);if(!['rain','wave'].includes(id))BUS.connect(REV);
@@ -585,7 +609,7 @@ function bgmStop(quick){
  const kill=()=>{srcs.forEach(s=>{try{s.stop()}catch(e){}});try{bus&&bus.disconnect()}catch(e){}if(el){try{el.pause();URL.revokeObjectURL(el.src)}catch(e){}}};
  if(quick)kill();else setTimeout(kill,fade*1000+100);
 }
-function bgmVol(v){S.bgmVol=v;save();if(String(bgOn).startsWith('yt:')){try{ytP&&ytReady&&ytP.setVolume(Math.round(v*100))}catch(e){}return}if(AC&&bgOn){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.15)}}
+function bgmVol(v){S.bgmVol=v;save();bgmApplyVol()}
 
 /* ===== 유튜브 음악 (인터넷 필요, 작은 화면으로 함께 보여요) ===== */
 const YT_LIST=[
@@ -605,7 +629,7 @@ function ytWarm(){if(ytP)return;const id=String(S.bgm).startsWith('yt:')?S.bgm.s
 function ytTitle(id){const a=YT_LIST.find(x=>x[0]===id);if(a)return a[1];const m=(S.ytMine||[]).find(x=>x.id===id);return m?m.t:'유튜브 음악'}
 async function ytPlay(id,play){
  ytWant=!!play;const box=ytBox();if(play){box.classList.add('on');setTimeout(()=>{try{if(ytWant&&ytCur===id&&ytP&&![1,3].includes(ytP.getPlayerState())&&!(ytP.getCurrentTime()>.5))toast('음악이 안 나오면 왼쪽 아래 작은 화면의 ▶를 한 번 눌러 주세요',5000)}catch(e){}},4000)}$('#ytt').textContent=ytTitle(id);
- const vol=Math.round((S.bgmVol??.4)*100);const st=Math.floor((S.ytPos||{})[id]||0);
+ const vol=Math.max(2,Math.round(effVol()*100));const st=Math.floor((S.ytPos||{})[id]||0);
  if(ytP&&ytReady){try{if(ytCur!==id){ytCur=id;play?ytP.loadVideoById({videoId:id,startSeconds:st}):ytP.cueVideoById({videoId:id,startSeconds:st})}else if(play)ytP.playVideo();ytP.setVolume(vol)}catch(e){}return}
  if(ytP){ytCur=id;return}
  await ytLoadApi();if(ytP)return;ytCur=id;
@@ -634,6 +658,7 @@ function bgmSheet(){
  ytWarm();
  const dm=sheet(`<h2>🎵 배경음악</h2><p class="note" style="margin-top:0">누르면 바로 들어 볼 수 있어요. 🎙를 누르면 이 음악이 함께 흘러요.</p><div class="bgl" id="bgl">${list()}</div>
  <div class="vol"><b>소리</b><span>작게</span><input type="range" min="5" max="100" value="${Math.round((S.bgmVol??.4)*100)}" id="bgVol" aria-label="음악 소리 크기"><span>크게</span></div>
+ <label class="chk"><input type="checkbox" id="bgDuck" ${S.duck!==false?'checked':''}> 🗣 읽는 동안 음악 저절로 작게 <small style="color:var(--sub);font-weight:500">(목소리 인식이 잘 돼요 · 추천)</small></label>
  <label class="chk"><input type="checkbox" id="bgRec" ${S.bgmRec!==false?'checked':''}> 내 목소리 녹음에도 음악 같이 담기 <small style="color:var(--sub);font-weight:500">(휴대폰 연주만)</small></label>
  ${S.bgmFile?'<button class="btn line" id="bgMine" style="min-height:50px">내 음악 파일 바꾸기</button>':''}
  <p class="note">이어폰을 끼고 읽으면 음악이 마이크에 섞이지 않아 목소리 따라가기가 훨씬 정확해요. 스피커로 들을 때는 소리를 작게 해 주세요.</p>
@@ -653,6 +678,7 @@ function bgmSheet(){
  bind();
  dm.querySelector('#bgVol').oninput=e=>{bgmVol(e.target.value/100);if(!bgOn&&S.bgm!=='off')bgmPlay(S.bgm)};
  dm.querySelector('#bgRec').onchange=e=>{S.bgmRec=e.target.checked;save()};
+ dm.querySelector('#bgDuck').onchange=e=>{S.duck=e.target.checked;save();bgmApplyVol()};
  dm.querySelector('#bgMine')?.addEventListener('click',()=>minePick(()=>{S.bgm='mine';save();bgmStop(true);bgmPlay('mine');refresh()}));
  dm.querySelector('#bgOk').onclick=()=>{bgmLabels();close();toast(S.bgm==='off'?'음악 없이 읽어요':`🎙를 누르면 「${bgmName()}」과 함께 읽어요`)};
  if(!(R&&R.active)&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
@@ -668,17 +694,19 @@ async function startReading(){
  const ce0=$('#v'+R.pos);if(ce0){ce0.classList.add('cur');glide(ce0.getBoundingClientRect().top-innerHeight*.3)}
  $('#mic')?.classList.add('on');$('#mic').textContent='■';
  $('#dmsg').textContent=R.mode==='voice'?'듣고 있어요. 화면을 보며 그대로 읽어 주세요':'화면이 천천히 올라가요. 속도는 − + 로';
- tick=setInterval(dockUpdate,1000);
+ tick=setInterval(dockUpdate,1000);bgmApplyVol();if(ducking()&&S.bgm&&S.bgm!=='off'&&!S.duckTold){S.duckTold=1;save();toast('🎙 읽는 동안은 음악을 작게 줄여서 목소리를 더 잘 알아들어요',4000)}
  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
  if(!R||!R.active)return;
  if(R.mode==='voice'&&SR){startSR();watchSR()}else autoRun();
  R.recT0=Date.now();
  if(S.rec!==false&&!(recOff&&R.mode==='voice'))startRecorder();
 }
+// 음악·잡음 때문에 말을 다르게 알아들어도, 후보 중 지금 읽는 구절과 가장 비슷한 것을 골라요
+function pickAlt(x){if(!x||!x.length)return '';if(x.length<2||!R)return x[0].transcript;const w=R.vn.slice(Math.max(0,R.pos-1),R.pos+3).join('');let best=x[0].transcript,bs=-1;for(let a=0;a<x.length;a++){const g=grams(norm(x[a].transcript),3);let h=0;g.forEach(z=>{if(w.includes(z))h++});const sc=g.size?h/g.size:0;if(a===0||sc>bs+.08){if(sc>bs){bs=sc;best=x[a].transcript}}}return best}
 function startSR(){
- rec=new SR();rec.lang='ko-KR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
- rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)R.fin+=' '+x[0].transcript;else it+=' '+x[0].transcript}
-  R.intr=it;R.last=e.results[e.results.length-1][0].transcript;if(R.last.trim()){R.gotRes=true;R.heard=true}schedEval()};
+ rec=new SR();rec.lang='ko-KR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=4;
+ rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)R.fin+=' '+pickAlt(x);else it+=' '+pickAlt(x)}
+  R.intr=it;R.last=pickAlt(e.results[e.results.length-1]);if(R.last.trim()){R.gotRes=true;R.heard=true}schedEval()};
  rec.onerror=e=>{
   if(e.error==='not-allowed'||e.error==='service-not-allowed'){toast('마이크 사용을 허용해 주세요 (주소창 왼쪽 자물쇠 → 마이크 허용)',4500);stopReading();}
   else if(e.error==='audio-capture'&&mr){recOff=true;stopRecorder(true);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}
