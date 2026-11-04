@@ -156,6 +156,8 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 .rec{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}
 .rec .w{flex:1;min-width:0}
 .rec .w b{display:block;font-size:18px}
+.dock .heard{font-size:13px;color:#F3D98F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dock .heard:empty{display:none}
 .rec.chain{background:#FFF7E3;border-radius:14px;padding:12px 10px;margin-bottom:6px;border-bottom:0}
 .rec .w span{font-size:15px;color:var(--sub)}
 .ib{min-width:48px;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:20px;color:var(--n2)}
@@ -177,7 +179,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v007';
+const VER='v008';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -422,7 +424,7 @@ async function reader(b,c){
  ${pr.memos[k]?`<div class="card" style="margin-top:14px"><h2>내 묵상</h2><div style="white-space:pre-wrap">${esc(pr.memos[k])}</div></div>`:''}
  <div class="navch">${prev?`<button class="btn line" onclick="go('#/read/${prev[0]}/${prev[1]}')">‹ 이전 ${unit(prev[0])}</button>`:''}${next?`<button class="btn line" onclick="go('#/read/${next[0]}/${next[1]}')">다음 ${unit(next[0])} ›</button>`:''}</div>
  <p class="foot">성경전서 개역한글판 (대한성서공회)</p><div style="height:62vh"></div>`;
- document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="spd ${R.mode==='auto'?'on':''}" id="spd"><span>넘기는 속도</span><button onclick="spdStep(-1)" aria-label="느리게">−</button><b id="spdN">${S.spd||5}</b><button onclick="spdStep(1)" aria-label="빠르게">+</button></div><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙 누르고 읽기 시작'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><div class="side"><button class="mus" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="spd ${R.mode==='auto'?'on':''}" id="spd"><span>넘기는 속도</span><button onclick="spdStep(-1)" aria-label="느리게">−</button><b id="spdN">${S.spd||5}</b><button onclick="spdStep(1)" aria-label="빠르게">+</button></div><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="heard" id="dheard"></div><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙 누르고 읽기 시작'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><div class="side"><button class="mus" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div></div>`);
  if(vp.length){const e=$('#v'+R.pos);if(e){e.classList.add('cur');setTimeout(()=>window.scrollTo(0,scrollY+e.getBoundingClientRect().top-innerHeight*.3),60)}dockUpdate()}
  if(String(S.bgm).startsWith('yt:'))ytPlay(S.bgm.slice(3),false);
 }
@@ -443,7 +445,7 @@ function dockUpdate(){
 }
 let evalTimer=null;
 // 절 하나를 읽음으로 표시하고 이 휴대폰에 저장 (장을 다 못 읽어도 절까지 남아요)
-function markV(i){if(!R||R.done.has(i))return;R.done.add(i);if(R.active&&R.mk)R.mk[i]=Date.now();$('#v'+i)?.classList.add('done');saveProg()}
+function markV(i){if(!R||R.done.has(i))return;R.done.add(i);if(R.active&&R.mk){R.mk[i]=Date.now();R.lastProg=Date.now()}$('#v'+i)?.classList.add('done');saveProg()}
 let progT=null;
 function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size){const d=[...R.done].sort((a,b)=>a-b),o=pr.vp[R.k];if(!o||o.d.join()!==d.join())pr.vp[R.k]={d,t:Date.now(),n:R.verses.length}}else delete pr.vp[R.k];save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
 // 방금 들은 말이 어느 절 어디쥐인지 찾기
@@ -587,7 +589,7 @@ function bgmEngine(id,gen){
 }
 // 목소리 따라 읽는 동안은 음악을 자동으로 작게 (마이크가 음악보다 내 목소리를 더 잘 듣게)
 const ducking=()=>!!(R&&R.active&&R.mode==='voice'&&S.duck!==false);
-function effVol(){const v=S.bgmVol??.4;return ducking()?Math.max(.03,Math.min(v*.35,.18)):v}
+function effVol(){const v=S.bgmVol??.4;return ducking()?(R.musicLow?.035:Math.max(.03,Math.min(v*.35,.12))):v}
 function bgmApplyVol(){if(!bgOn)return;const v=effVol();if(String(bgOn).startsWith('yt:')){try{ytP&&ytReady&&ytP.setVolume(Math.max(2,Math.round(v*100)))}catch(e){}return}if(AC&&BG){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.3)}}
 function bgmPlay(id){
  if(!id||id==='off'){bgmStop();return}
@@ -684,10 +686,13 @@ function bgmSheet(){
  if(!(R&&R.active)&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
 }
 
-let rec=null,mr=null,chunks=[],chunkT=[],stream=null,tick=null,wake=null,recOff=false;
+let mic=null,rec=null,mr=null,chunks=[],chunkT=[],stream=null,tick=null,wake=null,recOff=false;
+// 휴대폰이 내보내는 음악 소리를 빼고 내 목소리만 듣는 마이크 (영상통화처럼 메아리 제거)
+async function getMic(){if(mic&&mic.active&&mic.getAudioTracks()[0]?.readyState==='live')return mic;try{mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){mic=null}return mic}
+function dropMic(){try{mic&&mic.getTracks().forEach(t=>t.stop())}catch(e){}mic=null}
 async function toggleRead(){if(R&&R.active)return stopReading();startReading()}
 async function startReading(){
- if(!R)return;R.active=true;R.t0=Date.now();R.gotRes=false;R.wd1=0;R.last='';R.frac=0;R.handUntil=0;
+ if(!R)return;R.active=true;R.t0=Date.now();R.gotRes=false;R.wd1=0;R.wd0=0;R.lastRes=0;R.lastProg=0;R.musicLow=0;R.musicOff=0;R.last='';R.frac=0;R.handUntil=0;
  if(R.tap!=null)R.pos=R.tap;else{let p=0;while(R.done.has(p)&&p<R.verses.length-1)p++;R.pos=p}
  R.tap=null;R.startPos=R.pos;R.mk={};R.ht={};R._pv=null;R._sp=R.pos;R.segAt=norm(R.fin+' '+R.intr).length;paintCur();
  if(S.bgm&&S.bgm!=='off'){ac();bgmPlay(S.bgm)}else if(S.bgmRec!==false&&AC)ac();
@@ -697,7 +702,7 @@ async function startReading(){
  tick=setInterval(dockUpdate,1000);bgmApplyVol();if(ducking()&&S.bgm&&S.bgm!=='off'&&!S.duckTold){S.duckTold=1;save();toast('🎙 읽는 동안은 음악을 작게 줄여서 목소리를 더 잘 알아들어요',4000)}
  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
  if(!R||!R.active)return;
- if(R.mode==='voice'&&SR){startSR();watchSR()}else autoRun();
+ if(R.mode==='voice'&&SR){if(S.aec!==false&&!R.noTrack)await getMic();if(!R||!R.active)return;startSR();watchSR()}else autoRun();
  R.recT0=Date.now();
  if(S.rec!==false&&!(recOff&&R.mode==='voice'))startRecorder();
 }
@@ -706,28 +711,41 @@ function pickAlt(x){if(!x||!x.length)return '';if(x.length<2||!R)return x[0].tra
 function startSR(){
  rec=new SR();rec.lang='ko-KR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=4;
  rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)R.fin+=' '+pickAlt(x);else it+=' '+pickAlt(x)}
-  R.intr=it;R.last=pickAlt(e.results[e.results.length-1]);if(R.last.trim()){R.gotRes=true;R.heard=true}schedEval()};
+  R.intr=it;R.last=pickAlt(e.results[e.results.length-1]);if(R.last.trim()){R.gotRes=true;R.heard=true;R.lastRes=Date.now();const hd=$('#dheard');if(hd)hd.textContent='들린 말: '+R.last.trim().slice(-22)}schedEval()};
  rec.onerror=e=>{
   if(e.error==='not-allowed'||e.error==='service-not-allowed'){toast('마이크 사용을 허용해 주세요 (주소창 왼쪽 자물쇠 → 마이크 허용)',4500);stopReading();}
   else if(e.error==='audio-capture'&&mr){recOff=true;stopRecorder(true);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}
   else if(e.error==='network'){$('#dmsg').textContent='인터넷이 약해요. 인식이 잠깐 멈출 수 있어요'}
  };
- rec.onend=()=>{if(R&&R.active&&R.mode==='voice'){R.fin+=' '+R.intr;R.intr='';setTimeout(()=>{try{R&&R.active&&rec&&rec.start()}catch(e){}},120)}};
- try{rec.start()}catch(e){}
+ const tr=(!R.noTrack&&mic&&mic.active)?mic.getAudioTracks()[0]:null;R.useTrack=!!tr;
+ const go=()=>{if(!rec)return;try{tr&&!R.noTrack?rec.start(tr):rec.start()}catch(e){if(tr&&!R.noTrack){R.noTrack=true;R.useTrack=false;try{rec.start()}catch(x){}}}};
+ rec.onend=()=>{if(R&&R.active&&R.mode==='voice'){R.fin+=' '+R.intr;R.intr='';setTimeout(()=>{if(R&&R.active&&rec)go()},120)}};
+ go();
+ const dm=$('#dmsg');if(dm)dm.textContent=R.useTrack?'듣고 있어요 · 🎧 음악은 거르고 목소리만':'듣고 있어요. 화면을 보며 그대로 읽어 주세요';
 }
-// 목소리가 인식되지 않으면: ① 녹음을 잠시 끄고 따라가기 먼저 ② 그래도 안 되면 일정한 속도로
+function restartSR(RR){if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}setTimeout(()=>{if(R===RR&&RR.active&&RR.mode==='voice')startSR()},300)}
+// 목소리가 인식되지 않으면: ⓪ 깨끗한 마이크 연결이 안 되는 휴대폰은 보통 방식으로 ① 녹음을 잠시 끄고 따라가기 먼저 ② 그래도 안 되면 일정한 속도로
+// 음악 지킴이: 말소리는 들리는데 12초 넘게 한 절도 못 따라가면 음악을 더 줄이고, 그래도 안 되면 이번엔 음악을 꺼요
 function watchSR(){
  clearInterval(R.wd);const RR=R;
  RR.wd=setInterval(()=>{
-  if(R!==RR||!RR.active||RR.mode!=='voice'||RR.gotRes){clearInterval(RR.wd);return}
-  const el=(Date.now()-RR.t0)/1000;
-  if(!RR.wd1&&el>=12){RR.wd1=Date.now();if(mr){recOff=true;stopRecorder(true);if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}setTimeout(()=>{if(RR.active&&RR.mode==='voice')startSR()},400);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}}
-  else if(RR.wd1&&Date.now()-RR.wd1>14000){clearInterval(RR.wd);toast('목소리 인식이 안 돼서 일정한 속도로 넘길게요. 아래 − + 로 속도를 맞춰 주세요',5500);setMode('auto')}
+  if(R!==RR||!RR.active||RR.mode!=='voice'){clearInterval(RR.wd);return}
+  const now=Date.now();
+  if(!RR.gotRes){
+   if(RR.useTrack&&!RR.wd0&&now-RR.t0>=9000){RR.wd0=now;RR.noTrack=true;RR.useTrack=false;restartSR(RR);return}
+   const base=RR.wd0||RR.t0;
+   if(!RR.wd1&&now-base>=12000){RR.wd1=now;if(mr&&!RR.useTrack){recOff=true;stopRecorder(true);restartSR(RR);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}}
+   else if(RR.wd1&&now-RR.wd1>14000){clearInterval(RR.wd);toast('목소리 인식이 안 돼서 일정한 속도로 넘길게요. 아래 − + 로 속도를 맞춰 주세요',5500);setMode('auto')}
+   return}
+  if(bgOn&&now-RR.t0>12000&&now-(RR.lastRes||0)<3000&&now-(RR.lastProg||RR.t0)>12000){
+   if(!RR.musicLow){RR.musicLow=now;bgmApplyVol();toast('🎵 목소리가 잘 안 들려서 음악을 더 작게 줄였어요',3500)}
+   else if(!RR.musicOff&&now-RR.musicLow>12000){RR.musicOff=1;bgmStop(true);toast('🎵 음악 때문에 목소리를 잘 못 알아들어서 이번엔 음악을 껐어요. 이어폰을 끼면 음악과 함께 읽을 수 있어요',6000)}
+  }
  },1000);
 }
 async function startRecorder(){
  try{
-  stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+  stream=(mic&&mic.active)?mic:await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
   const mt=['audio/webm;codecs=opus','audio/mp4','audio/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
   // 배경음악이 켜져 있으면 내 목소리와 음악을 섞어서 녹음
   let rs=stream;
@@ -738,7 +756,7 @@ async function startRecorder(){
 function stopRecorder(discard,plan){
  const m=mr;mr=null;if(!m)return Promise.resolve();
  return new Promise(ok=>{
-  m.onstop=async()=>{try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null;
+  m.onstop=async()=>{try{stream&&stream!==mic&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null;
    if(recMix){try{recMix.ms.disconnect();recMix.vg.disconnect();BG.disconnect(recMix.tap);recMix.tap.disconnect()}catch(e){}recMix=null}
    let sec=(Date.now()-m._t0)/1000,parts=chunks,cut=false;
    // 끝까지 못 읽은 절은 잘라내고, 다 읽은 절까지만 저장
@@ -773,6 +791,7 @@ async function stopReading(silent){
  if(R&&R.active){R.sec+=(Date.now()-R.t0)/1000;R.active=false}
  bgmStop(!!silent);
  await stopRecorder(false,plan);
+ dropMic();
  if(silent){document.getElementById('dock')?.remove();return}
  $('#mic')?.classList.remove('on');const mi=$('#mic');if(mi)mi.textContent='🎙';
  const dm=$('#dmsg');if(dm&&R&&!R.completed){let p=0;while(R.done.has(p)&&p<R.verses.length-1)p++;dm.textContent=plan&&plan.to!=null?`${plan.to+1}절까지 저장했어요. 🎙를 누르면 ${p+1}절부터 이어 읽어요`:`잠시 멈췄어요 (${R.done.size}/${R.verses.length}절). 🎙를 누르면 ${p+1}절부터 이어 읽어요`}
