@@ -22,5 +22,17 @@
         "D8:82:9B:14:84:0A:89:98:9E:4E:41:37:98:4A:BE:3B:0D:E3:73:E5:A1:A8:57:A2:DA:BF:31:45:68:2D:2D:02"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.lee1812.malsseum",
+      "sha256_cert_fingerprints": [
+        "E4:F3:1D:D9:0F:37:34:2F:D5:D0:6B:1D:F1:68:26:C0:AD:DB:D7:78:1C:7D:2F:74:C1:D0:B7:E4:29:92:DD:51"
+      ]
+    }
   }
 ]
