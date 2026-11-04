@@ -233,7 +233,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <body>
 <header>
   <button class="ghost" id="backBtn" style="display:none" aria-label="뒤로">← 뒤로</button>
-  <h1 id="ttl">바로연락<span class="ver">v039</span></h1>
+  <h1 id="ttl">바로연락<span class="ver">v040</span></h1>
   <button class="ghost" id="setBtn" aria-label="설정">설정</button>
 </header>
 <div id="instBar" style="display:none;max-width:640px;margin:10px auto 0;padding:0 14px"></div>
@@ -254,7 +254,7 @@ body.batch #sheet .in{max-height:calc(96vh - var(--bbh,124px))}
 <div id="toast"></div>
 <script>
 'use strict';
-const VER='v039';
+const VER='v040';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -280,6 +280,7 @@ const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const digits=s=>String(s||'').replace(/\D/g,'');
 function fmtPhone(s){let d=digits(s);if(d.startsWith('82')&&d.length>=11)d='0'+d.slice(2).replace(/^0/,'');
   if(/^02/.test(d)){return d.length===9?d.replace(/(02)(\d{3})(\d{4})/,'$1-$2-$3'):d.replace(/(02)(\d{4})(\d{4})/,'$1-$2-$3')}
+  if(/^050\d/.test(d)&&d.length===11)return d.replace(/(\d{4})(\d{3})(\d{4})/,'$1-$2-$3');if(/^050\d/.test(d)&&d.length===12)return d.replace(/(\d{4})(\d{4})(\d{4})/,'$1-$2-$3');
   if(d.length===11)return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
   if(d.length===10)return d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3');
   if(d.length===8)return d.replace(/(\d{4})(\d{4})/,'$1-$2');
@@ -303,15 +304,16 @@ function parseCard(txt){
     if(signPhones(l).length){used.add(i);return}
     if(o.email&&l.replace(/\s/g,'').includes(o.email)){used.add(i);return}
     if(o.web&&l.includes(o.web)){used.add(i);return}
-    const AP='^(?:(?:제?\\d+\\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터)\\s*[:：.]?\\s*)?(?:\\(?\\d{5}\\)?\\s*)?(주소|Add(ress)?|A\\.|A:)?\\s*[:：.]?\\s*(?:\\(?\\d{5}\\)?\\s*)?('+REG+')';
+    const AP='^(?:(?:제?\\d+\\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터)\\s*[:：.]?\\s*)?(?:\\(?\\d{5}\\)?\\s*)?(주소|Add(ress)?|A\\.|A:|A(?=\\s))?\\s*[:：.]?\\s*(?:\\(?\\d{5}\\)?\\s*)?('+REG+')';
     if(o.address&&!o._a2&&new RegExp(AP).test(l)&&/(시|군|구|읍|면|동|로|길|번지|\d)/.test(l)){o._a2=l;used.add(i);return}
     if(!o.address&&(new RegExp(AP).test(l))&&/(시|군|구|읍|면|동|로|길|번지|\d)/.test(l)){
       const lab=(l.match(/^((?:제?\d+\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터))/)||[])[1];
-      let a=l.replace(/^(?:(?:제?\d+\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터)\s*[:：.]?\s*)?/,'').replace(/^\(?\d{5}\)?\s*/,'').replace(/^(주소|Add(ress)?|A\.|A:)\s*[:：.]?\s*/i,'').replace(/^\(?\d{5}\)?\s*/,'');if(lab)o._lab=lab.replace(/\s/g,'');
-      const nx=lines[i+1];if(nx&&!new RegExp(AP).test(nx)&&(/^(\d|[가-힣]+(동|층|호)|\(|,)/.test(nx)||/(\d+층|\d+호|빌딩|타워|프라자|상가|오피스텔)/.test(nx))&&!/[@]|\d{3,4}-\d{4}/.test(nx)){a+=' '+nx;used.add(i+1)}
+      let a=l.replace(/^(?:(?:제?\d+\s*)?(?:공장|본사|본점|사무소|사무실|지사|지점|연구소|사업장|물류센터|매장|센터)\s*[:：.]?\s*)?/,'').replace(/^\(?\d{5}\)?\s*/,'').replace(/^(주소|Add(ress)?|A\.|A:|A(?=\s))\s*[:：.]?\s*/i,'').replace(/^\(?\d{5}\)?\s*/,'');if(lab)o._lab=lab.replace(/\s/g,'');
+      const nx=lines[i+1];if(nx&&!new RegExp(AP).test(nx)&&(/^(\d|[가-힣]+(동|층|호)|\(|,)/.test(nx)||/(\d+층|\d+호|빌딩|타워|프라자|플라자|상가|오피스텔|센터|지식산업|아파트|스퀘어|\d+차|\b[A-Z]?\d{3,4}$)/.test(nx))&&!/[@]|\d{3,4}-\d{4}/.test(nx)){a+=' '+nx;used.add(i+1)}
       o.address=a.trim();used.add(i);return}
   });
   if(o._a2){o.memo=o._a2;}delete o._a2;delete o._lab;
+  {const ems=[...new Set((all.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g)||[]))].filter(e=>e!==o.email);if(ems.length){o.memo=(o.memo?o.memo+'\n':'')+'다른 메일: '+ems.join(', ');lines.forEach((l,i)=>{if(ems.some(e=>l.replace(/\s/g,'').includes(e)))used.add(i)})}}
   const rest=lines.filter((l,i)=>!used.has(i));
   const NOTCO=/(인증|농림축산식품부|식품의약품안전처|식약처|HACCP|ISO\s?\d|^PPANG|^www)/i;
   {const FREE=/^(naver|gmail|daum|hanmail|kakao|nate|hotmail|outlook|yahoo|icloud|korea)$/i;let dom=(o.web||'').replace(/^https?:\/\//i,'').replace(/^www\./i,'').split(/[.\/]/)[0];if(!dom&&o.email){dom=o.email.split('@')[1].split('.')[0];if(FREE.test(dom))dom=''}
@@ -337,7 +339,8 @@ function parseCard(txt){
       if(isDept(t)&&!tRe.test(t)){if(!o.dept)o.dept=t;else if(hit&&!o.dept.includes(t))o.dept+=' '+t;hit=true;continue}
       if(/^[가-힣]{2,4}$/.test(t)&&!COMP.test(t)&&!tRe.test(t))loose.push(t);
     }
-    if(loose.length&&(hit||tk.length<=2))nameC.push({n:loose[0],w:(hit?2:1)+(loose[0].length===3?.5:0)});
+    const nmBad=t=>new RegExp('^('+REG+')').test(t)&&/(도|시)$/.test(t);
+    if(loose.length&&!/\d/.test(l)&&!nmBad(loose[0])&&(hit||tk.length<=2)){const li=lines.indexOf(l),nx2=(lines[li+1]||'').trim();let w=(hit?2:1)+(loose[0].length===3?.5:0);if(tk.length===1)w+=1;if(/^[A-Z][A-Za-z-]*(\s+[A-Z][A-Za-z-]*)+$/.test(nx2))w+=1.5;nameC.push({n:loose[0],w})}
   }
   if(!o.name&&nameC.length){nameC.sort((x,y)=>y.w-x.w);o.name=nameC[0].n}
   if(!o.name){
