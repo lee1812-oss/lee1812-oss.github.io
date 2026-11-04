@@ -77,7 +77,9 @@ main{max-width:720px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-i
 .vs{background:#FFFDF8;border-radius:20px;border:1px solid var(--line);padding:16px 10px 20px}
 .v{font-family:var(--rf);font-weight:var(--rw);-webkit-text-stroke:var(--rs) currentColor;font-size:var(--fs);line-height:1.95;letter-spacing:-.01em;margin:0 0 2px;padding:8px 12px 8px 12px;border-radius:14px;border-left:5px solid transparent;color:#1A1D2C;transition:background .35s,color .35s,border-color .35s;cursor:pointer}
 .v sup{font-family:Pretendard,sans-serif;-webkit-text-stroke:0;font-size:.56em;color:var(--gold2);font-weight:800;margin-right:6px;vertical-align:.4em}
-.v.done{color:#6F6A5A}
+.v.done,.v .rd{color:#A35400}
+.v .rd{transition:color .3s}
+.rdkey{color:#A35400;font-weight:800}
 .v.done sup::after{content:" ✓";color:var(--ok)}
 .v.cur{background:#FFF3D1;border-left-color:var(--gold);color:#0E1124}
 .rtools{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
@@ -142,6 +144,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 .rec{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}
 .rec .w{flex:1;min-width:0}
 .rec .w b{display:block;font-size:18px}
+.rec.chain{background:#FFF7E3;border-radius:14px;padding:12px 10px;margin-bottom:6px;border-bottom:0}
 .rec .w span{font-size:15px;color:var(--sub)}
 .ib{min-width:48px;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:20px;color:var(--n2)}
 .ib.play{background:var(--n2);color:var(--cr);border-color:var(--n2)}
@@ -162,7 +165,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v005';
+const VER='v006';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -394,7 +397,7 @@ async function reader(b,c){
  $('main').innerHTML=`
  <div class="rtools"><span class="t">${NAME[b-1]} ${c}${unit(b)} ${r?stIcon(k,pr):''}</span><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button><button class="tool ${S.bgm&&S.bgm!=='off'?'on':''}" id="bgTool" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button>${SR?`<button class="tool" id="modeBtn" style="flex-basis:100%" onclick="modeSheet()">${modeLabel()} 넘기기</button>`:''}</div>
  ${vp.length?`<p class="hint" style="color:var(--ok);font-weight:700">지난번에 ${vp.length}절을 읽었어요. 🎙를 누르면 ${R.pos+1}절부터 이어서 읽어요.</p>`:''}
- <p class="hint">${SR?'🎙를 누르고 <b>이 화면의 말씀을 그대로</b> 소리 내어 읽어 주세요. 읽는 곳을 따라 화면이 저절로 넘어가고, 다 읽으면 저절로 체크돼요.':'🎙를 누르고 이 화면의 말씀을 소리 내어 읽어 주세요. 읽는 절을 손가락으로 누르면 표시가 따라와요. 다 읽으면 「다 읽었어요」를 눌러 주세요.'}</p>
+ <p class="hint">${SR?'🎙를 누르고 <b>이 화면의 말씀을 그대로</b> 소리 내어 읽어 주세요. 읽는 곳을 따라 화면이 저절로 넘어가고, <span class="rdkey">읽은 곳은 글자 색이 바뀌어요.</span> 중간에 멈추면 다 읽은 절까지만 저장되고, 다음엔 그 다음 절부터 이어 읽어요.':'🎙를 누르고 이 화면의 말씀을 소리 내어 읽어 주세요. 읽는 절을 손가락으로 누르면 표시가 따라와요. 다 읽으면 「다 읽었어요」를 눌러 주세요.'}</p>
  <div class="vs">${verses.map((v,i)=>`<p class="v${R.done.has(i)?' done':''}" id="v${i}" onclick="tapVerse(${i})"><sup>${i+1}</sup>${esc(v)}</p>`).join('')}</div>
  ${pr.memos[k]?`<div class="card" style="margin-top:14px"><h2>내 묵상</h2><div style="white-space:pre-wrap">${esc(pr.memos[k])}</div></div>`:''}
  <div class="navch">${prev?`<button class="btn line" onclick="go('#/read/${prev[0]}/${prev[1]}')">‹ 이전 ${unit(prev[0])}</button>`:''}${next?`<button class="btn line" onclick="go('#/read/${next[0]}/${next[1]}')">다음 ${unit(next[0])} ›</button>`:''}</div>
@@ -420,9 +423,9 @@ function dockUpdate(){
 }
 let evalTimer=null;
 // 절 하나를 읽음으로 표시하고 이 휴대폰에 저장 (장을 다 못 읽어도 절까지 남아요)
-function markV(i){if(!R||R.done.has(i))return;R.done.add(i);$('#v'+i)?.classList.add('done');saveProg()}
+function markV(i){if(!R||R.done.has(i))return;R.done.add(i);if(R.active&&R.mk)R.mk[i]=Date.now();$('#v'+i)?.classList.add('done');saveProg()}
 let progT=null;
-function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size)pr.vp[R.k]={d:[...R.done].sort((a,b)=>a-b),t:Date.now(),n:R.verses.length};save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
+function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size)pr.vp[R.k]={d:[...R.done].sort((a,b)=>a-b),t:Date.now(),n:R.verses.length};else delete pr.vp[R.k];save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
 // 방금 들은 말이 어느 절 어디쥐인지 찾기
 function locate(){
  const recent=norm(R.last||'').slice(-40);if(recent.length<5)return null;
@@ -430,33 +433,43 @@ function locate(){
  let best=-1,bs=0;const from=Math.max(0,R.pos-1),to=Math.min(R.verses.length-1,R.pos+6);
  for(let i=from;i<=to;i++){const vs=R.vn[i];let h=0;RG.forEach(g=>{if(vs.includes(g))h++});const sc=h/RG.size-(i<R.pos?.12:0)-Math.max(0,i-R.pos-1)*.04;if(sc>bs){bs=sc;best=i}}
  if(best<0||bs<.42)return null;
- const vs=R.vn[best],tail=recent.slice(-14);let pm=-1;for(let j=0;j+3<=tail.length;j++){const ix=vs.lastIndexOf(tail.substr(j,3));if(ix>pm)pm=ix}
+ // 같은 말이 절 안에 두 번 나와도 앞질러 가지 않게, 지금까지 읽은 곳 근처부터 찾기
+ const vs=R.vn[best],tail=recent.slice(-14),base=best===R.pos?Math.max(0,Math.floor((R.frac||0)*vs.length)-8):0;let pm=-1;for(let j=0;j+3<=tail.length;j++){const ix=vs.indexOf(tail.substr(j,3),base);if(ix>pm)pm=ix}
  return {i:best,frac:pm<0?0:Math.min(1,(pm+3)/vs.length)};
 }
 function evalNow(){
  evalTimer=null;if(!R)return;
  const T=norm(R.fin+' '+R.intr);const G3=grams(T,3),G2=grams(T,2);
  // 지금 읽는 곳 바로 다음 절까지만 체크 (비슷한 구절이 뒤에 또 나와도 미리 체크되지 않게)
- R.verses.forEach((v,i)=>{if(i<=R.pos+1&&!R.done.has(i)&&coverage(R.vg[i],G3,G2)>=TH_VERSE)markV(i)});
+ // 목소리 따라 모드: 지나온 절은 45%면 체크, 지금 읽는 절은 거의 끝까지(80%) 읽어야 체크 → 읽던 절 중간에 멈추면 그 절은 다음에 처음부터
+ const TC=T.slice(R.segAt||0),GC3=grams(TC,3),GC2=grams(TC,2);
+ if(R.active&&R.mode==='voice'){R.verses.forEach((v,i)=>{if(!R.done.has(i)&&((i<R.pos&&coverage(R.vg[i],G3,G2)>=TH_VERSE)||(i===R.pos&&coverage(R.vg[i],GC3,GC2)>=.8)))markV(i)});if(R.done.has(R.pos)&&R.pos<R.verses.length-1){R.pos++;R.frac=0}}
+ else R.verses.forEach((v,i)=>{if(i<=R.pos+1&&!R.done.has(i)&&coverage(R.vg[i],G3,G2)>=TH_VERSE)markV(i)});
  if(R.mode!=='auto'){
   const L=locate();
   if(L){
+   if(R.active&&R.ht&&R.ht[L.i]==null)R.ht[L.i]=Date.now();
    if(L.i>R.pos){for(let j=R.pos;j<L.i;j++)if(!R.done.has(j)&&(coverage(R.vg[j],G3,G2)>=.25||R.vn[j].length<25))markV(j);R.pos=L.i;R.frac=L.frac}
    else if(L.i===R.pos)R.frac=Math.max(R.frac||0,L.frac);
    // 한 절을 거의 다 읽으면 미리 다음 절로
-   if(R.frac>=.88&&R.pos<R.verses.length-1&&coverage(R.vg[R.pos],G3,G2)>=.6){markV(R.pos);R.pos++;R.frac=0}
+   if(R.frac>=.88&&R.pos<R.verses.length-1&&coverage(R.vg[R.pos],GC3,GC2)>=.6){markV(R.pos);R.pos++;R.frac=0}
   }
  }
  // 앞뒤 절을 읽었는데 인식이 놓친 짧은 절은 읽은 것으로
  for(let i=1;i<Math.min(R.pos,R.verses.length-1);i++)if(!R.done.has(i)&&R.done.has(i-1)&&R.done.has(i+1)&&R.vn[i].length<25)markV(i);
+ if(R._sp!==R.pos){R._sp=R.pos;R.segAt=Math.max(0,T.length-20)}
  if(R.active)showPos();
  dockUpdate();
  if(!R.completed&&R.done.size>=Math.ceil(R.verses.length*TH_CH))complete(R.heard?'voice':'check');
 }
+// 읽은 만큼 글자 색 바꾸기 (지금 읽는 절은 읽은 글자까지만)
+function vmap(i){R.vmp=R.vmp||[];if(!R.vmp[i]){const m=[],v=R.verses[i];for(let j=0;j<v.length;j++)if(/[가-힣0-9]/.test(v[j]))m.push(j);R.vmp[i]=m}return R.vmp[i]}
+function plainV(i){const e=$('#v'+i);if(e&&R){e.innerHTML=`<sup>${i+1}</sup>${esc(R.verses[i])}`;e._o=0}}
+function paintCur(){if(!R)return;const i=R.pos;if(R._pv!=null&&R._pv!==i&&!R.done.has(R._pv))plainV(R._pv);R._pv=i;if(R.done.has(i))return;const e=$('#v'+i);if(!e)return;const m=vmap(i);const k=Math.round(Math.max(0,Math.min(1,R.frac||0))*m.length);const o=k<=0?0:m[Math.min(k,m.length)-1]+1;if(e._o===o)return;e._o=o;const v=R.verses[i];e.innerHTML=`<sup>${i+1}</sup><span class="rd">${esc(v.slice(0,o))}</span>${esc(v.slice(o))}`}
 // 지금 읽는 절 표시 + 그 줄이 화면 위쪽 30%에 오도록 부드럽게 흘려가기
 function showPos(){
  document.querySelectorAll('.v.cur').forEach(e=>{if(e.id!=='v'+R.pos)e.classList.remove('cur')});
- const e=$('#v'+R.pos);if(!e)return;e.classList.add('cur');
+ const e=$('#v'+R.pos);if(!e)return;e.classList.add('cur');paintCur();
  if(R.mode==='auto'||Date.now()<(R.handUntil||0))return;
  const rc=e.getBoundingClientRect();const y=rc.top+Math.max(0,rc.height*(R.frac||0)-30);const d=y-innerHeight*.3;
  if(Math.abs(d)>20)glide(d);
@@ -472,14 +485,15 @@ const cps=()=>3+(S.spd||5)*.4;
 function autoRun(){
  cancelAnimationFrame(autoRaf);let last=performance.now();
  const chars=R.vn.reduce((a,s)=>a+s.length,0)||1;const docTop=i=>{const e=$('#v'+i);return e?e.getBoundingClientRect().top+scrollY:0};
- R.ay=docTop(R.pos)+4;let resync=false;
+ R.ay=docTop(R.pos)+4;let resync=false;if(R.ht&&R.ht[R.pos]==null)R.ht[R.pos]=Date.now();
  const f=t=>{if(!R||!R.active||R.mode!=='auto'){autoRaf=null;return}
   const dt=Math.min(.2,(t-last)/1000);last=t;
   if(Date.now()<(R.handUntil||0))resync=true;
   else{if(resync){R.ay=scrollY+innerHeight*.3;resync=false}
    const ppc=$('.vs').offsetHeight/chars;R.ay+=cps()*ppc*dt;window.scrollTo(0,R.ay-innerHeight*.3)}
   let idx=0;for(let i=0;i<R.verses.length;i++){if(docTop(i)<=R.ay)idx=i;else break}
-  if(idx!==R.pos){if(idx>R.pos)for(let j=R.pos;j<idx;j++)markV(j);R.pos=idx;showPos();dockUpdate()}
+  if(idx!==R.pos){if(idx>R.pos)for(let j=R.pos;j<idx;j++)markV(j);if(R.ht&&R.ht[idx]==null)R.ht[idx]=Date.now();R.pos=idx;R.frac=0;showPos();dockUpdate()}
+  {const ce=$('#v'+idx);if(ce){const fr=Math.max(0,Math.min(1,(R.ay-docTop(idx))/(ce.offsetHeight||1)));if(Math.abs(fr-(R.frac||0))>.02){R.frac=fr;paintCur()}}}
   const le=$('#v'+(R.verses.length-1));if(le&&R.ay>le.getBoundingClientRect().bottom+scrollY){markV(R.verses.length-1);dockUpdate();if(!R.completed){complete(R.heard?'voice':'check');return}}
   autoRaf=requestAnimationFrame(f)};
  autoRaf=requestAnimationFrame(f);
@@ -490,8 +504,14 @@ function modeSheet(){const d=sheet(`<h2>화면 넘기는 방식</h2><div class="
 function schedEval(){if(!evalTimer)evalTimer=setTimeout(evalNow,350)}
 // 읽는 절을 화면 위쪽(눈높이)에 오게 저절로 넘기기
 function followVerse(ce){const rc=ce.getBoundingClientRect();const want=innerHeight*0.26;if(rc.top<80||rc.top>innerHeight*0.5||rc.bottom>innerHeight-140)window.scrollTo({top:scrollY+rc.top-want,behavior:'smooth'})}
+function setTapMark(i){R.tap=i;document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');followVerse(ce)}}
 // 절을 누르면 「여기부터 읽어요」 표시
-function tapVerse(i){if(!R)return;R.tap=i;if(R.active){R.pos=i;R.frac=0;R.handUntil=0;R.tap=null;if(R.mode==='auto'){const e=$('#v'+i);if(e){R.ay=e.getBoundingClientRect().top+scrollY+4;window.scrollTo(0,R.ay-innerHeight*.3)}}}document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');if(R.active)followVerse(ce)}}
+function tapVerse(i){if(!R)return;
+ if(!R.active){const n=R.verses.length;const d=sheet(`<h2>${NAME[R.b-1]} ${R.c}${unit(R.b)} ${i+1}절</h2><div class="bgl"><button class="bgm" data-a="start"><b>🎙 ${i+1}절부터 읽기</b><span>여기서부터 녹음하며 읽어요</span></button>${R.completed?'':`<button class="bgm" data-a="upto"><b>✓ 1~${i+1}절까지 읽었어요</b><span>여기까지 읽은 것으로 저장해요.${i<n-1?` 다음엔 ${i+2}절부터 이어 읽어요.`:''}</span></button><button class="bgm" data-a="from"><b>↺ ${i+1}절부터 다시 읽을래요</b><span>${i+1}절부터 뒤쪽 읽음 표시를 지워요</span></button>`}</div><button class="btn line" data-a="x">닫기</button>`);
+  d.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;d.remove();if(a==='x')return;
+   if(a==='upto'){for(let j=0;j<=i;j++)markV(j);saveProg(true);if(i>=n-1){complete('check');return}setTapMark(i+1);dockUpdate();const dm=$('#dmsg');if(dm)dm.textContent=`${i+1}절까지 저장했어요. 🎙를 누르면 ${i+2}절부터 이어 읽어요`;toast(`1~${i+1}절 읽음으로 저장했어요`);return}
+   if(a==='from'){for(let j=i;j<n;j++){if(R.done.has(j)){R.done.delete(j);$('#v'+j)?.classList.remove('done')}}saveProg(true);dockUpdate()}
+   setTapMark(i);if(a==='start')startReading()});return}R.tap=i;if(R.active){R.pos=i;R.frac=0;R.handUntil=0;R.tap=null;if(R.mode==='auto'){const e=$('#v'+i);if(e){R.ay=e.getBoundingClientRect().top+scrollY+4;window.scrollTo(0,R.ay-innerHeight*.3)}}}document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');if(R.active)followVerse(ce)}}
 
 /* ===== 배경음악: 저작권 걱정 없이 휴대폰이 직접 연주해요 ===== */
 const BGMS=[['off','음악 없이','내 목소리만 조용히'],['organ','잔잔한 오르간','따뜻한 화음이 천천히 바뀌어요'],['piano','새벽 피아노','맑은 피아노 소리가 띄엄띄엄'],['hymn','오르골 찬송','「나 같은 죄인 살리신」 느리게'],['rain','창밖 빗소리','차분한 빗소리'],['wave','잔잔한 파도','멀리서 들리는 바다'],['mine','내 음악 파일','휴대폰에 있는 음악을 골라요']];
@@ -638,12 +658,12 @@ function bgmSheet(){
  if(!(R&&R.active)&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
 }
 
-let rec=null,mr=null,chunks=[],stream=null,tick=null,wake=null,recOff=false;
+let rec=null,mr=null,chunks=[],chunkT=[],stream=null,tick=null,wake=null,recOff=false;
 async function toggleRead(){if(R&&R.active)return stopReading();startReading()}
 async function startReading(){
  if(!R)return;R.active=true;R.t0=Date.now();R.gotRes=false;R.wd1=0;R.last='';R.frac=0;R.handUntil=0;
  if(R.tap!=null)R.pos=R.tap;else{let p=0;while(R.done.has(p)&&p<R.verses.length-1)p++;R.pos=p}
- R.tap=null;
+ R.tap=null;R.startPos=R.pos;R.mk={};R.ht={};R._pv=null;R._sp=R.pos;R.segAt=norm(R.fin+' '+R.intr).length;paintCur();
  if(S.bgm&&S.bgm!=='off'){ac();bgmPlay(S.bgm)}else if(S.bgmRec!==false&&AC)ac();
  const ce0=$('#v'+R.pos);if(ce0){ce0.classList.add('cur');glide(ce0.getBoundingClientRect().top-innerHeight*.3)}
  $('#mic')?.classList.add('on');$('#mic').textContent='■';
@@ -652,6 +672,7 @@ async function startReading(){
  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
  if(!R||!R.active)return;
  if(R.mode==='voice'&&SR){startSR();watchSR()}else autoRun();
+ R.recT0=Date.now();
  if(S.rec!==false&&!(recOff&&R.mode==='voice'))startRecorder();
 }
 function startSR(){
@@ -683,31 +704,50 @@ async function startRecorder(){
   // 배경음악이 켜져 있으면 내 목소리와 음악을 섞어서 녹음
   let rs=stream;
   if(bgOn&&S.bgmRec!==false&&AC&&AC.state==='running'&&AC.createMediaStreamDestination){try{const dst=AC.createMediaStreamDestination();const ms=AC.createMediaStreamSource(stream);const vg=AC.createGain();vg.gain.value=1.3;ms.connect(vg);vg.connect(dst);const tap=AC.createGain();tap.gain.value=.7;BG.connect(tap);tap.connect(dst);recMix={ms,vg,tap};rs=dst.stream}catch(e){recMix=null;rs=stream}}
-  mr=new MediaRecorder(rs,mt?{mimeType:mt}:{});chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mr.start(1000);mr._t0=Date.now();mr._k=R.k;
+  mr=new MediaRecorder(rs,mt?{mimeType:mt}:{});chunks=[];chunkT=[];mr.ondataavailable=e=>{if(e.data&&e.data.size){chunks.push(e.data);chunkT.push(Date.now())}};mr.start(250);mr._t0=Date.now();mr._k=R.k;
  }catch(e){mr=null;if(!SR){toast('마이크를 쓸 수 없어요. 「다 읽었어요」로 체크해 주세요',4000)}}
 }
-function stopRecorder(discard){
+function stopRecorder(discard,plan){
  const m=mr;mr=null;if(!m)return Promise.resolve();
  return new Promise(ok=>{
   m.onstop=async()=>{try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null;
    if(recMix){try{recMix.ms.disconnect();recMix.vg.disconnect();BG.disconnect(recMix.tap);recMix.tap.disconnect()}catch(e){}recMix=null}
-   const sec=(Date.now()-m._t0)/1000;
-   if(!discard&&sec>=8&&chunks.length){const blob=new Blob(chunks,{type:m.mimeType||'audio/webm'});try{await recPut({id:'r'+Date.now().toString(36),pid:S.cur,key:m._k,date:Date.now(),sec,mime:blob.type,blob,src:'app'})}catch(e){toast('녹음 저장 공간이 부족해요')}}
-   chunks=[];ok()};
+   let sec=(Date.now()-m._t0)/1000,parts=chunks,cut=false;
+   // 끝까지 못 읽은 절은 잘라내고, 다 읽은 절까지만 저장
+   if(plan&&plan.cutAt&&plan.cutAt-m._t0<sec*1000-300){const keep=[];chunks.forEach((c,j)=>{if(j===0||chunkT[j]-250<plan.cutAt)keep.push(c)});parts=keep;sec=Math.max(1,(plan.cutAt-m._t0)/1000);cut=true}
+   const minSec=plan&&plan.to!=null?3:8;
+   if(!discard&&sec>=minSec&&parts.length){const blob=new Blob(parts,{type:m.mimeType||'audio/webm'});const o={id:'r'+Date.now().toString(36),pid:S.cur,key:m._k,date:Date.now(),sec,mime:blob.type,blob,src:'app'};if(plan&&plan.to!=null){o.from=plan.from+1;o.to=plan.to+1;o.cut=cut;o.vt=plan.vt}try{await recPut(o);if(plan&&plan.to!=null)toast(`🎙 ${o.from}~${o.to}절 녹음을 저장했어요`)}catch(e){toast('녹음 저장 공간이 부족해요')}}
+   chunks=[];chunkT=[];ok()};
   try{m.stop()}catch(e){ok()}
  });
 }
+// 멈출 때: 끝까지 못 읽은 절은 「안 읽음」으로 두고, 녹음을 자를 곳을 정해요
+function finishPlan(){
+ if(!R||!R.active||!R.mk)return null;
+ const n=R.verses.length;
+ if(R.completed)return {from:R.startPos,to:n-1,cutAt:null,vt:null};
+ let ms=Object.keys(R.mk).map(Number);
+ if(R.mode==='voice'&&ms.length){const lm=Math.max(...ms);if(lm===R.pos&&lm<n-1&&(R.frac||0)<.8){R.done.delete(lm);delete R.mk[lm];$('#v'+lm)?.classList.remove('done');plainV(lm);ms=ms.filter(x=>x!==lm)}}
+ if(!R.done.has(R.pos))plainV(R.pos);
+ if(!ms.length)return {from:R.startPos,to:null,cutAt:null,vt:null};
+ const last=Math.max(...ms),from=Math.min(R.startPos,...ms);
+ let cutAt=null;const nx=R.ht[last+1];
+ if(last<n-1&&nx){const lag=R.mode==='voice'?1800:0;cutAt=Math.max((R.ht[last]||R.recT0||0)+500,nx-lag)}
+ const vt={};Object.keys(R.ht).forEach(i=>{if(+i<=last&&mr)vt[+i+1]=Math.max(0,Math.round((R.ht[i]-mr._t0)/100)/10)});
+ return {from,to:last,cutAt,vt};
+}
 async function stopReading(silent){
+ const plan=finishPlan();
  clearInterval(tick);tick=null;cancelAnimationFrame(autoRaf);autoRaf=null;if(R)clearInterval(R.wd);
  if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}
  saveProg(true);
  try{wake&&wake.release()}catch(e){}wake=null;
  if(R&&R.active){R.sec+=(Date.now()-R.t0)/1000;R.active=false}
  bgmStop(!!silent);
- await stopRecorder(false);
+ await stopRecorder(false,plan);
  if(silent){document.getElementById('dock')?.remove();return}
  $('#mic')?.classList.remove('on');const mi=$('#mic');if(mi)mi.textContent='🎙';
- const dm=$('#dmsg');if(dm&&R&&!R.completed)dm.textContent=`잠시 멈췄어요 (${R.done.size}/${R.verses.length}절). 🎙를 누르면 이어서 읽어요`;
+ const dm=$('#dmsg');if(dm&&R&&!R.completed){let p=0;while(R.done.has(p)&&p<R.verses.length-1)p++;dm.textContent=plan&&plan.to!=null?`${plan.to+1}절까지 저장했어요. 🎙를 누르면 ${p+1}절부터 이어 읽어요`:`잠시 멈췄어요 (${R.done.size}/${R.verses.length}절). 🎙를 누르면 ${p+1}절부터 이어 읽어요`}
  document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));
 }
 // 다른 화면으로 가면 독(dock)을 치운다
@@ -748,7 +788,16 @@ async function voiceView(){
  let rs=[];try{rs=await recAll()}catch(e){}
  rs=rs.filter(r=>vFilter==='all'||r.pid===vFilter).sort((a,b)=>b.date-a.date);
  const el=$('#recList');if(!el)return;
- el.innerHTML=rs.length?rs.map(r=>{const pn=S.profiles[r.pid]?.name||'(지운 가족)';const d=new Date(r.date);return`<div class="rec"><button class="ib play" onclick="playRec('${r.id}',this)">▶</button><div class="w"><b>${kName(r.key)}</b><span>${esc(pn)} · ${d.getMonth()+1}/${d.getDate()} · ${fmtMin(r.sec)}${r.src==='file'?' · 가져온 파일':''}</span></div><button class="ib" onclick="shareRec('${r.id}')" aria-label="보내기">📤</button><button class="ib" onclick="delRec('${r.id}')" aria-label="지우기">🗑</button></div>`}).join(''):'<p class="note">아직 녹음이 없어요. 「오늘」에서 🎙를 누르고 읽으면 목소리가 저장돼요.</p>';
+ // 같은 장을 나눠 읽은 녹음은 「이어 듣기」로 한 번에
+ const grp={};rs.forEach(r=>{if(r.from){const g=r.pid+'|'+r.key;(grp[g]=grp[g]||[]).push(r)}});
+ const chains=Object.values(grp).filter(a=>a.length>1).map(a=>{a.sort((x,y)=>x.from-y.from||x.date-y.date);const pn=S.profiles[a[0].pid]?.name||'';const tot=a.reduce((s,r)=>s+r.sec,0);return`<div class="rec chain"><button class="ib play" onclick="playChain('${a.map(r=>r.id).join(',')}',this)">▶</button><div class="w"><b>${kName(a[0].key)} 이어 듣기</b><span>${esc(pn)} · ${a.length}번 나눠 읽음 · ${a[0].from}~${Math.max(...a.map(r=>r.to))}절 · ${fmtMin(tot)}</span></div></div>`}).join('');
+ el.innerHTML=rs.length?chains+rs.map(r=>{const pn=S.profiles[r.pid]?.name||'(지운 가족)';const d=new Date(r.date);return`<div class="rec"><button class="ib play" onclick="playRec('${r.id}',this)">▶</button><div class="w"><b>${kName(r.key)}${r.from?` ${r.from}~${r.to}절`:''}</b><span>${esc(pn)} · ${d.getMonth()+1}/${d.getDate()} · ${fmtMin(r.sec)}${r.src==='file'?' · 가져온 파일':''}</span></div><button class="ib" onclick="shareRec('${r.id}')" aria-label="보내기">📤</button><button class="ib" onclick="delRec('${r.id}')" aria-label="지우기">🗑</button></div>`}).join(''):'<p class="note">아직 녹음이 없어요. 「오늘」에서 🎙를 누르고 읽으면 목소리가 저장돼요.</p>';
+}
+async function playChain(ids,btn){
+ const key='c:'+ids;
+ if(audioEl){audioEl.pause();audioEl=null;document.querySelectorAll('.ib.play').forEach(b=>b.textContent='▶');if(playing===key){playing=null;return}}
+ const all=await recAll();const list=ids.split(',').map(id=>all.find(r=>r.id===id)).filter(Boolean);let n=0;playing=key;btn.textContent='❚❚';
+ const nx=()=>{if(playing!==key)return;if(n>=list.length){btn.textContent='▶';playing=null;audioEl=null;return}const r=list[n++];audioEl=new Audio(URL.createObjectURL(r.blob));audioEl.onended=nx;audioEl.play().catch(()=>toast('재생할 수 없는 파일이에요'))};nx();
 }
 async function getRec(id){return (await recAll()).find(r=>r.id===id)}
 async function playRec(id,btn){
