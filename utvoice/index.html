@@ -78,10 +78,10 @@ footer{flex:none;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2p
 .unb{display:none;width:100%;background:var(--red);color:#fff;margin-bottom:8px}.unb.on{display:block}
 .rpl{display:none;align-items:center;gap:8px;background:#EAF3FB;border-left:4px solid var(--gd);border-radius:8px;padding:6px 8px;margin-bottom:8px;font-size:.86rem}.rpl.on{display:flex}
 .rpl span{flex:1}.rpl button{min-height:40px;min-width:40px;padding:0;background:none;font-size:1.1rem}
-.cmp{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 3.4rem;gap:8px}
+.cmp{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) 3rem;gap:8px}
 .cmp button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp .rec{padding:0 6px;background:var(--red);color:#fff;font-size:1.08rem;min-height:62px}
-.cmp .tb{background:var(--nv2);color:#fff;min-height:62px;font-size:1rem;padding:0 8px}
+.cmp .tb{background:var(--nv2);color:#fff;min-height:62px;font-size:.98rem;padding:0 4px}
 .cmp .pl{background:#E4E8F1;color:var(--nv);min-height:62px;font-size:1.3rem;padding:0}
 .ov{position:fixed;inset:0;background:rgba(10,16,32,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}.ov.on{display:flex}
 .sh{background:#fff;width:100%;max-width:680px;border-radius:22px 22px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);max-height:92dvh;overflow-y:auto}
@@ -255,6 +255,7 @@ function autoFit() {
     root.style.fontSize = fs + 'px';
     let guard = 0;
     while (overflowing() && fs > 12 && guard++ < 20) { fs -= 0.5; root.style.fontSize = fs + 'px'; }
+    if (guard > 0) root.style.fontSize = (fs - 0.5) + 'px';   // 한 단계 여유
   }, 30);
 }
 window.addEventListener('resize', autoFit);
