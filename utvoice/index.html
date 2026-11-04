@@ -102,7 +102,13 @@ footer{background:#fff;border-top:1px solid var(--ln);padding:8px 10px calc(env(
 .ok{color:var(--gr);font-weight:700}.warn{color:var(--or);font-weight:700}.bad{color:var(--red);font-weight:700}
 .toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:#1B2333;color:#fff;padding:12px 18px;border-radius:14px;font-size:.92rem;z-index:80;max-width:90%;display:none;text-align:center}.toast.on{display:block}
 .lock{position:fixed;inset:0;background:var(--nv);color:#fff;z-index:90;display:none;align-items:center;justify-content:center;padding:24px}.lock.on{display:flex}
-.lock .in{max-width:440px;width:100%;text-align:center}
+.lock{overflow-y:auto;align-items:flex-start}
+.lock .in{max-width:440px;width:100%;text-align:center;margin:auto 0;padding:10px 0 30px}
+.who2{display:flex;gap:8px;margin-top:12px}.who2 button{flex:1;margin:0;background:#173062;color:#fff;border:2px solid #3A5590;min-height:62px}.who2 button.on{background:var(--cr);color:var(--nv);border-color:var(--gd)}
+.lerr{color:#FFB4B4!important;font-weight:700;min-height:1.2em}
+.inst2{margin-top:18px;background:#13275A;border-radius:16px;padding:14px;text-align:left}.inst2 h3{margin:0 0 6px;font-size:1.02rem;color:var(--cr)}.inst2 p{margin:4px 0;font-size:.88rem}.inst2 button{margin-top:8px}
+.inst2 .b2{background:#22396F;color:#fff}
+.ibar{display:none;align-items:center;gap:8px;background:#FFF5DA;color:#5A4500;padding:8px 12px;font-size:.88rem}.ibar.on{display:flex}.ibar span{flex:1}.ibar button{min-height:44px;padding:0 12px;font-size:.88rem}
 .lock img{width:96px;height:96px;border-radius:22px}
 .lock h2{margin:12px 0 4px}.lock p{color:#C9D2E8;font-size:.95rem}
 .lock input{width:100%;min-height:56px;border-radius:12px;border:0;padding:0 12px;margin-top:10px}
@@ -115,6 +121,7 @@ footer{background:#fff;border-top:1px solid var(--ln);padding:8px 10px calc(env(
 </head>
 <body>
 <div class="kk" id="kk">카카오톡 안에서 열렸어요. 녹음·설치가 잘 되려면 휴대폰 기본 브라우저(크롬·사파리)로 열어 주세요.<button id="kkOpen">기본 브라우저로 열기</button></div>
+<div class="ibar" id="ibar"><span>📲 앱으로 설치하면 새 녹음이 올 때 알림이 와요</span><button class="b1" id="ibarGo">설치</button><button class="b2" id="ibarX">✕</button></div>
 <header>
   <div class="wrap">
     <div class="hd1">
@@ -156,15 +163,19 @@ footer{background:#fff;border-top:1px solid var(--ln);padding:8px 10px calc(env(
 <div class="lock" id="lock"><div class="in">
   <img src="icon-192.png" alt="">
   <h2>UTCA 음성 소통</h2>
-  <p id="lockMsg">이혜영 부장에게 받은 <b>연결 링크</b>로 열어 주세요.<br>링크를 받았는데 이 화면이 보이면, 링크 전체를 복사해서 아래에 붙여 넣어 주세요.</p>
-  <input id="keyIn" placeholder="연결 링크 붙여 넣기" autocomplete="off">
-  <button id="keyGo">연결하기</button>
+  <p id="lockMsg">누구신지 고르고 비밀번호를 넣어 주세요.<br>한 번 로그인하면 이 휴대폰에서는 다시 묻지 않아요.</p>
+  <div class="who2" id="whoBtns"><span class="tl" style="color:#C9D2E8">불러오는 중…</span></div>
+  <input id="pwIn" type="password" inputmode="numeric" autocomplete="current-password" placeholder="비밀번호" maxlength="30">
+  <button id="pwGo">로그인</button>
+  <p class="lerr" id="lerr"></p>
+  <div class="inst2" id="inst2"></div>
 </div></div>
 <input type="file" id="fPhoto" accept="image/*" hidden>
 <input type="file" id="fAudio" accept="audio/*,.m4a,.mp3,.wav,.aac,.ogg,.webm,.amr" hidden>
 <script>
 'use strict';
-const API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', VER = 'v001', BUILT = '2026-11-04';
+const APK = 'utca-voice.apk';
+const API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', VER = 'v002', BUILT = '2026-11-04';
 const $ = s => document.querySelector(s);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -223,17 +234,53 @@ function drawClock() {
 function toast(t, ms = 2600) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); }
 function beep() { try { const ac = new (window.AudioContext || window.webkitAudioContext)(), o = ac.createOscillator(), g = ac.createGain(); o.connect(g); g.connect(ac.destination); o.frequency.value = 880; g.gain.setValueAtTime(.001, ac.currentTime); g.gain.exponentialRampToValueAtTime(.3, ac.currentTime + .02); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .5); o.start(); o.stop(ac.currentTime + .55); setTimeout(() => ac.close(), 800); } catch (e) { } }
 
-/* ---------- 열쇠(연결 링크) ---------- */
-function takeKey(str) { const m = String(str || '').match(/[#&?]k=([\w-]{16,})/) || String(str || '').trim().match(/^([\w-]{16,})$/); return m ? m[1] : ''; }
-function lockShow(why) {
-  $('#lock').classList.add('on');
-  if (why === 'key') $('#lockMsg').innerHTML = '<b>연결이 끊겼어요.</b><br>열쇠가 바뀌었거나 사용이 멈춘 링크예요. 이혜영 부장에게 새 연결 링크를 받아 붙여 넣어 주세요.';
+/* ---------- 로그인 (이름 고르기 + 비밀번호) ---------- */
+let whoSel = LS.get('utv_who', '');
+async function rawApi(q) { const r = await fetch(API, { method: 'POST', body: JSON.stringify(q) }); return r.json(); }
+async function lockShow(why) {
+  $('#lock').classList.add('on'); $('#inst2').innerHTML = installHtml(true); bindInstall($('#inst2'));
+  if (why === 'key') $('#lockMsg').innerHTML = '<b>다시 로그인해 주세요.</b><br>비밀번호가 바뀌었거나 로그인이 풀렸어요.';
+  try {
+    const j = await rawApi({ op: 'who' }); const ms = (j && j.members) || [];
+    if (ms.length === 1) whoSel = ms[0].id;
+    $('#whoBtns').innerHTML = ms.map(m => `<button data-who="${esc(m.id)}" class="${whoSel === m.id ? 'on' : ''}">${esc(m.name + ' ' + (m.title || ''))}</button>`).join('');
+    $('#whoBtns').querySelectorAll('[data-who]').forEach(b => b.onclick = () => { whoSel = b.dataset.who; LS.set('utv_who', whoSel); $('#whoBtns').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('#pwIn').focus(); });
+  } catch (e) { $('#whoBtns').innerHTML = '<span class="lerr">인터넷 연결을 확인해 주세요.</span>'; }
 }
-$('#keyGo').onclick = async () => {
-  const k = takeKey($('#keyIn').value); if (!k) return toast('링크 모양이 맞지 않아요. 받은 링크 전체를 붙여 넣어 주세요.');
-  S.k = k; localStorage.setItem('utv_k', k); await idb.set('kv', 'k', k);
-  try { await boot(); $('#lock').classList.remove('on'); } catch (e) { toast('연결하지 못했어요: ' + e.message); }
-};
+async function doLogin() {
+  const pw = $('#pwIn').value.trim(), er = $('#lerr'); er.textContent = '';
+  if (!whoSel) { er.textContent = '위에서 누구신지 먼저 눌러 주세요.'; return; }
+  if (!pw) { er.textContent = '비밀번호를 넣어 주세요.'; return; }
+  $('#pwGo').disabled = true; $('#pwGo').textContent = '확인 중…';
+  try {
+    const j = await rawApi({ op: 'login', id: whoSel, pw });
+    if (!j.ok) { er.textContent = j.err === 'locked' ? `비밀번호를 여러 번 틀려 잠겼어요. ${j.min || 15}분 뒤에 다시 해 주세요.` : `비밀번호가 맞지 않아요.${j.left ? ' (남은 기회 ' + j.left + '번)' : ''}`; return; }
+    S.k = j.k; localStorage.setItem('utv_k', j.k); await idb.set('kv', 'k', j.k).catch(() => { });
+    $('#pwIn').value = '';
+    await boot(); $('#lock').classList.remove('on'); recoverDraft();
+    toast('로그인했어요. 이 휴대폰에서는 다시 묻지 않아요.');
+  } catch (e) { er.textContent = '연결이 안 돼요. 인터넷을 확인하고 다시 눌러 주세요.'; }
+  finally { $('#pwGo').disabled = false; $('#pwGo').textContent = '로그인'; }
+}
+$('#pwGo').onclick = doLogin;
+$('#pwIn').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+/* ---------- 앱 설치 (안드로이드: 바로 설치 또는 APK, 아이폰: 홈 화면에 추가) ---------- */
+const isAndroid = /Android/i.test(navigator.userAgent);
+function installHtml(dark) {
+  if (standalone) return dark ? '' : '<p class="ok">앱으로 설치돼서 열려 있어요.</p>';
+  const h3 = dark ? '<h3>📲 앱으로 설치하기</h3>' : '';
+  const ios = `<p><b>아이폰</b>은 사파리에서 열고 아래 가운데 <b>공유 단추(□↑)</b> → <b>「홈 화면에 추가」</b> → 「추가」를 누르면 앱 아이콘이 생겨요.</p><p class="tl" style="color:inherit">(아이폰은 앱스토어 밖에서 앱 파일을 설치할 수 없어서 이 방법이 가장 간단해요.)</p>`;
+  const and = `<button class="b1" data-inst="1" style="width:100%">📲 지금 앱 설치하기</button><a href="${APK}" download style="text-decoration:none"><button class="b2" style="width:100%">⬇ 안드로이드 앱 파일(APK) 내려받기</button></a><p class="tl" style="color:inherit">「지금 앱 설치하기」가 안 되면 크롬 오른쪽 위 ⋮ → 「앱 설치」 또는 「홈 화면에 추가」를 눌러 주세요. APK는 내려받은 파일을 열고 「설치」를 누르면 돼요(「출처를 알 수 없는 앱」 허용을 물을 수 있어요).</p>`;
+  return h3 + (isIOS ? ios : isAndroid ? and : and + ios);
+}
+function bindInstall(root) { root.querySelectorAll('[data-inst]').forEach(b => b.onclick = doInstall); }
+async function doInstall() {
+  const p = window.__inst;
+  if (p) { p.prompt(); const c = await p.userChoice; window.__inst = null; if (c.outcome === 'accepted') { toast('설치하고 있어요. 홈 화면의 「UTCA 소통」 아이콘으로 열어 주세요.', 4000); $('#ibar').classList.remove('on'); } return; }
+  if (isIOS) return sheet(`<h2>📲 아이폰에 설치하기</h2>${installHtml(false)}<div class="btns"><button class="b2" data-close>알겠어요</button></div>`);
+  sheet(`<h2>📲 앱 설치하기</h2><p>크롬 오른쪽 위 <b>⋮</b> → <b>「앱 설치」</b> 또는 <b>「홈 화면에 추가」</b>를 눌러 주세요.</p><p>또는 앱 파일을 내려받아 설치할 수도 있어요.</p><a href="${APK}" download style="text-decoration:none"><button class="b1" style="width:100%">⬇ 안드로이드 앱 파일(APK) 내려받기</button></a><div class="btns"><button class="b2" data-close>닫기</button></div>`);
+}
 
 /* ---------- 받아오기 ---------- */
 let syncing = false;
@@ -609,10 +656,15 @@ function renderSet() {
     <div class="btns"><button class="b1" id="mailSave">저장</button></div></div>
   <div class="card"><h3>🔠 글자 크기</h3><div class="seg">${[1, 2, 3].map(n => `<button data-fs="${n}" class="${S.set.fs === n ? 'on' : ''}">${['보통', '크게', '아주 크게'][n - 1]}</button>`).join('')}</div></div>
   <div class="card"><h3>⏩ 듣기 속도 (기본)</h3><div class="seg">${[1, 1.25, 1.5, 2].map(n => `<button data-rate="${n}" class="${S.set.rate === n ? 'on' : ''}">${n}배</button>`).join('')}</div><p>녹음 옆 「1배속」 단추를 눌러도 바뀌어요.</p></div>
-  <div class="card"><h3>📲 앱 설치 (홈 화면에 아이콘)</h3>${standalone ? '<p class="ok">설치된 앱으로 열려 있어요.</p>' : `<p><b>안드로이드(크롬)</b>: 오른쪽 위 ⋮ → 「홈 화면에 추가」 또는 「앱 설치」</p><p><b>아이폰(사파리)</b>: 아래 가운데 공유 단추(□↑) → 「홈 화면에 추가」</p><div class="btns" id="instWrap" ${window.__inst ? '' : 'hidden'}><button class="b1" id="inst">📲 지금 설치하기</button></div>`}</div>
+  <div class="card"><h3>📲 앱 설치 (홈 화면에 아이콘)</h3>${installHtml(false)}</div>
+  <div class="card"><h3>🔑 비밀번호 바꾸기</h3><p>6자리 이상. 바꾸면 다른 휴대폰에 로그인된 것은 모두 풀려요(이 휴대폰은 그대로).</p>
+    <input type="password" id="pwOld" placeholder="지금 비밀번호" autocomplete="current-password" style="width:100%;min-height:52px;border:2px solid var(--ln);border-radius:12px;padding:0 12px;margin-top:6px">
+    <input type="password" id="pwNew" placeholder="새 비밀번호 (6자리 이상)" autocomplete="new-password" style="width:100%;min-height:52px;border:2px solid var(--ln);border-radius:12px;padding:0 12px;margin-top:6px">
+    <input type="password" id="pwNew2" placeholder="새 비밀번호 한 번 더" autocomplete="new-password" style="width:100%;min-height:52px;border:2px solid var(--ln);border-radius:12px;padding:0 12px;margin-top:6px">
+    <div class="btns"><button class="b1" id="pwSave">비밀번호 바꾸기</button></div></div>
   <div class="card"><h3>💡 끊김에 강하게 만들었어요</h3><p>1. 녹음은 1초마다 휴대폰에 먼저 저장돼요. 전화가 오거나 앱이 꺼져도 다시 열면 살릴 수 있어요.</p><p>2. 보내다 연결이 끊기면 「⚠ 아직 못 보냈어요」로 남고, 연결되면 저절로 다시 보내요.</p><p>3. 한 번 들은 녹음은 휴대폰에 보관돼서 인터넷이 없어도 다시 들을 수 있어요.</p><p>4. 숫자·주소·이름은 소리로 헷갈리기 쉬우니 녹음할 때 「덧붙일 글」에 적어 주세요.</p></div>
-  <div class="card"><h3>🔒 보안</h3><p>녹음·글·사진은 UTCA 구글 드라이브의 <b>비공개 폴더</b>에만 저장돼요. 이 앱 주소만으로는 아무것도 볼 수 없고, 사람마다 따로 받은 연결 링크(열쇠)가 있어야 열려요.</p><p class="warn">연결 링크는 다른 사람에게 보내지 마세요. 휴대폰을 바꾸거나 잃어버리면 이혜영 부장에게 알려 주세요(그 열쇠를 바로 막을 수 있어요).</p>
-    <div class="btns"><button class="b2" id="unlink" style="color:var(--red)">이 휴대폰 연결 끊기</button></div></div>
+  <div class="card"><h3>🔒 보안</h3><p>녹음·글·사진은 UTCA 구글 드라이브의 <b>비공개 폴더</b>에만 저장돼요. 이 앱 주소만으로는 아무것도 볼 수 없고, 본인 비밀번호로 로그인해야 열려요. 비밀번호를 5번 틀리면 15분 동안 잠겨요.</p><p class="warn">비밀번호는 다른 사람에게 알려 주지 마세요. 휴대폰을 잃어버리면 다른 기기에서 비밀번호를 바꾸거나 이혜영 부장에게 알려 주세요(그 휴대폰의 로그인이 바로 풀려요).</p>
+    <div class="btns"><button class="b2" id="unlink" style="color:var(--red)">로그아웃 (이 휴대폰)</button></div></div>
   <div class="foot">UTCA 음성 소통 ${VER} · ${BUILT}</div>`;
   const sb = $('#setBox');
   sb.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { S.set.fs = Number(b.dataset.fs); LS.set('utv_set', S.set); applyFs(); renderSet(); });
@@ -620,8 +672,15 @@ function renderSet() {
   if ($('#pOn')) $('#pOn').onclick = pushOn;
   if ($('#pTest')) $('#pTest').onclick = async () => { try { const r = await api('ptest', {}, 1); toast(r.total ? '시험 알림을 보냈어요 (' + r.sent + '/' + r.total + '대)' : '먼저 「알림 켜기」를 눌러 주세요'); } catch (e) { toast('보내지 못했어요: ' + e.message); } };
   $('#mailSave').onclick = async () => { try { const r = await api('setme', { mail: $('#mail').value, notify: $('#mailOn').checked }, 2); S.me.mail = r.mail; S.me.notify = r.notify; LS.set('utv_me', S.me); toast(r.mail ? '저장했어요: ' + r.mail : ($('#mail').value ? '메일 주소 모양이 맞지 않아요' : '저장했어요 (메일 알림 없음)')); renderSet(); } catch (e) { toast('저장하지 못했어요'); } };
-  if ($('#inst')) $('#inst').onclick = async () => { const p = window.__inst; if (!p) return; p.prompt(); await p.userChoice; window.__inst = null; renderSet(); };
-  $('#unlink').onclick = async () => { if (!await ask('이 휴대폰의 연결을 끊을까요?\n저장된 대화·녹음도 이 휴대폰에서 지워져요. 다시 쓰려면 연결 링크가 필요해요.', '연결 끊기', '취소')) return;
+  bindInstall(sb);
+  $('#pwSave').onclick = async () => {
+    const o = $('#pwOld').value.trim(), n = $('#pwNew').value.trim(), n2 = $('#pwNew2').value.trim();
+    if (!/^\S{6,30}$/.test(n)) return toast('새 비밀번호는 6자리 이상(띄어쓰기 없이)으로 넣어 주세요.');
+    if (n !== n2) return toast('새 비밀번호 두 칸이 서로 달라요.');
+    try { const r = await api('setpw', { old: o, pw: n }, 1); S.k = r.k; localStorage.setItem('utv_k', r.k); await idb.set('kv', 'k', r.k); toast('비밀번호를 바꿨어요 ✅', 3500); renderSet(); }
+    catch (e) { toast(e.message === 'oldpw' ? '지금 비밀번호가 맞지 않아요.' : '바꾸지 못했어요: ' + e.message, 3500); }
+  };
+  $('#unlink').onclick = async () => { if (!await ask('이 휴대폰에서 로그아웃할까요?\n저장된 대화·녹음도 이 휴대폰에서 지워져요. 다시 쓰려면 비밀번호로 로그인하면 돼요(대화는 그대로 다시 나와요).', '로그아웃', '취소')) return;
     try { const reg = await navigator.serviceWorker.getRegistration(); const s = reg && await reg.pushManager.getSubscription(); if (s) { await api('poff', { ep: s.endpoint }, 1).catch(() => { }); await s.unsubscribe(); } } catch (e) { }
     ['utv_k', 'utv_me', 'utv_mem', 'utv_msgs', 'utv_since'].forEach(k => localStorage.removeItem(k)); for (const s of ['kv', 'media', 'out', 'draft']) await idb.clear(s).catch(() => { }); location.replace('./'); };
 }
@@ -677,7 +736,9 @@ $('#rplX').onclick = () => setReply(null);
 $('#btnSrch').onclick = () => { showTab('chat'); $('#srch').classList.toggle('on'); if ($('#srch').classList.contains('on')) $('#q').focus(); else { S.q = ''; $('#q').value = ''; render(); } };
 $('#qx').onclick = () => { $('#srch').classList.remove('on'); S.q = ''; $('#q').value = ''; render(); };
 $('#q').oninput = () => { S.q = $('#q').value; render(); };
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__inst = e; if ($('#instWrap')) $('#instWrap').hidden = false; });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__inst = e; });
+window.addEventListener('appinstalled', () => { $('#ibar').classList.remove('on'); window.__inst = null; });
+$('#ibarGo').onclick = doInstall; $('#ibarX').onclick = () => { $('#ibar').classList.remove('on'); LS.set('utv_ibar', Date.now()); };
 window.addEventListener('online', () => { setNet(true); sync(); });
 window.addEventListener('offline', () => setNet(false));
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { sync(); drawClock(); } });
@@ -692,17 +753,17 @@ async function boot() {
 (async function start() {
   applyFs();
   if (isKakao) { $('#kk').classList.add('on'); $('#kkOpen').onclick = () => { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href); }; }
-  const hk = takeKey(location.hash);
-  if (hk) { S.k = hk; localStorage.setItem('utv_k', hk); if (!isKakao) history.replaceState(null, '', location.pathname + location.search); }
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  if (!standalone && (isIOS || isAndroid) && Date.now() - LS.get('utv_ibar', 0) > 3 * 86400000) $('#ibar').classList.add('on');
   if (S.k) idb.set('kv', 'k', S.k).catch(() => { });
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
   drawClock(); setInterval(drawClock, 30000);
+  setInterval(() => { if (!document.hidden && S.me && S.k) sync(); }, 15000);
   if (!S.k) { lockShow(); return; }
   if (S.me) { $('#hdMe').textContent = nameOf(S.me.id) + ' (으)로 연결됨'; render(); }
   S.out = (await idb.all('out').catch(() => [])) || []; S.out.sort((a, b) => a.at - b.at);
   try { await boot(); } catch (e) { if (!S.me) { if (e.srv) lockShow('key'); else { $('#hdMe').textContent = '연결 안 됨 · 인터넷을 확인해 주세요'; } } }
   recoverDraft();
-  setInterval(() => { if (!document.hidden) sync(); }, 15000);
 })();
 </script>
 </body>
