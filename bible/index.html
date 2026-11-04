@@ -98,6 +98,19 @@ main{max-width:720px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-i
 .chk{display:flex;gap:10px;align-items:center;font-weight:700;min-height:48px}.chk input{width:24px;height:24px;accent-color:var(--gold)}
 .dock .mus{background:rgba(252,241,208,.12);border:1.5px solid rgba(252,241,208,.5);color:var(--cr);border-radius:12px;padding:6px 8px;font-weight:700;font-size:14px;min-height:48px;max-width:96px;line-height:1.2}
 .dock .side{display:flex;flex-direction:column;gap:6px;flex:none}
+.ytbox{position:fixed;left:10px;bottom:calc(112px + env(safe-area-inset-bottom));width:216px;z-index:60;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.35);visibility:hidden;pointer-events:none}
+.ytbox.on{visibility:visible;pointer-events:auto}
+.yth{display:flex;align-items:center;gap:6px;background:var(--n1);color:var(--cr);font-size:13px;font-weight:700;padding:4px 4px 4px 10px}
+.yth span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yth button{background:none;border:none;color:var(--cr);font-size:18px;min-width:40px;min-height:36px}
+.ytw{width:216px;height:122px}
+.bgh{font-size:17px;color:var(--n2);margin:14px 2px 4px;font-weight:800;cursor:pointer}.bgh small{font-size:13px;color:var(--sub);font-weight:600;margin-left:4px}
+details>summary.bgh{list-style:none;padding:10px 4px;border-top:1px solid var(--line)}details>summary.bgh::-webkit-details-marker{display:none}
+.bgrow{display:flex;gap:6px;align-items:stretch}.bgrow .bgm{flex:1}.bgdel{border:2px solid var(--line);background:#fff;border-radius:14px;min-width:48px;font-size:18px;color:var(--sub)}
+.ytadd{display:flex;gap:6px;margin-top:6px}.ytadd input{flex:1;min-height:52px;border:2px solid var(--line);border-radius:14px;padding:0 12px;font-size:17px;min-width:0}.ytadd button{min-width:72px;border:none;border-radius:14px;background:var(--n2);color:var(--cr);font-weight:800;font-size:17px}
+.spd{display:none;max-width:720px;margin:0 auto 8px;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:15px}
+.spd.on{display:flex}.spd button{width:48px;height:40px;border-radius:12px;border:1.5px solid rgba(252,241,208,.5);background:rgba(252,241,208,.12);color:var(--cr);font-size:22px;font-weight:800}.spd b{font-size:20px;min-width:24px;text-align:center}
+.st.part{background:#FFF3D1;color:var(--gold2)}
 .fsbig{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(1,7,54,.85);color:var(--cr);font-size:26px;font-weight:800;padding:16px 26px;border-radius:18px;z-index:90;pointer-events:none}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--n2);color:var(--cr);padding:10px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(1,7,54,.25)}
 .dock .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px}
@@ -149,7 +162,7 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--n2)}
 <div id="app"></div>
 <script src="meta.js"></script>
 <script>
-const VER='v004';
+const VER='v005';
 const NAME='창세기 출애굽기 레위기 민수기 신명기 여호수아 사사기 룻기 사무엘상 사무엘하 열왕기상 열왕기하 역대상 역대하 에스라 느헤미야 에스더 욥기 시편 잠언 전도서 아가 이사야 예레미야 예레미야애가 에스겔 다니엘 호세아 요엘 아모스 오바댜 요나 미가 나훔 하박국 스바냐 학개 스가랴 말라기 마태복음 마가복음 누가복음 요한복음 사도행전 로마서 고린도전서 고린도후서 갈라디아서 에베소서 빌립보서 골로새서 데살로니가전서 데살로니가후서 디모데전서 디모데후서 디도서 빌레몬서 히브리서 야고보서 베드로전서 베드로후서 요한일서 요한이서 요한삼서 유다서 요한계시록'.split(' ');
 const AB='창 출 레 민 신 수 삿 룻 삼상 삼하 왕상 왕하 대상 대하 스 느 에 욥 시 잠 전 아 사 렘 애 겔 단 호 욜 암 옵 욘 미 나 합 습 학 슥 말 마 막 눅 요 행 롬 고전 고후 갈 엡 빌 골 살전 살후 딤전 딤후 딛 몬 히 약 벧전 벧후 요일 요이 요삼 유 계'.split(' ');
 const unit=b=>b===19?'편':'장';
@@ -315,7 +328,7 @@ function obDone(){const n=$('#obName').value.trim();if(!n){toast('이름을 적�
  S.cur=newProfile(n.slice(0,12),obPlan,$('#obStart').value||ymd());save();location.hash='#/today';render()}
 
 /* ===== 오늘 ===== */
-function stIcon(k,pr=P()){const r=pr.read[k];if(!r||!doneFor(k,pr))return'<span class="st no">아직</span>';return r.how==='voice'?'<span class="st voice">🎙 낭독 완료</span>':r.how==='plaud'?'<span class="st plaud">🎙 Plaud 낭독</span>':'<span class="st check">✓ 읽음</span>'}
+function stIcon(k,pr=P()){const r=pr.read[k];if(!r||!doneFor(k,pr)){const v=pr.vp&&pr.vp[k];return v&&v.d.length?'<span class="st part">'+v.d.length+'/'+v.n+'절</span>':'<span class="st no">아직</span>'}return r.how==='voice'?'<span class="st voice">🎙 낭독 완료</span>':r.how==='plaud'?'<span class="st plaud">🎙 Plaud 낭독</span>':'<span class="st check">✓ 읽음</span>'}
 function todayView(){
  const pr=P();const t=todayPortion(pr);const pd=planDays(pr.plan.type);
  const doy=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);const dv=DV[doy%DV.length];
@@ -374,16 +387,21 @@ async function reader(b,c){
  let bk;try{bk=await book(b)}catch(e){$('main').innerHTML='<div class="card">인터넷 연결을 확인해 주세요. 한 번 연 책은 다음부터 인터넷 없이도 열려요.</div>';return}
  if(location.hash!==`#/read/${b}/${c}`)return;
  const verses=bk[c-1];const pr=P();const k=K(b,c);const r=pr.read[k];
- R={b,c,k,verses,vg:verses.map(verseGrams),done:new Set(),fin:'',intr:'',active:false,completed:!!r,t0:0,sec:0};
+ R={b,c,k,verses,vg:verses.map(verseGrams),vn:verses.map(norm),done:new Set(),fin:'',intr:'',last:'',pos:0,frac:0,active:false,completed:!!r,t0:0,sec:0,mode:(SR&&S.follow!=='auto')?'voice':'auto'};
+ const vp=(!r&&pr.vp&&pr.vp[k])?pr.vp[k].d.filter(i=>i<verses.length):[];vp.forEach(i=>R.done.add(i));
+ if(vp.length){let p=Math.max(...vp)+1;if(p>=verses.length){p=0;while(R.done.has(p))p++}R.pos=Math.min(p,verses.length-1);R.tap=R.pos}
  const prev=c>1?[b,c-1]:b>1?[b-1,VC[b-2].length]:null;const next=c<VC[b-1].length?[b,c+1]:b<66?[b+1,1]:null;
  $('main').innerHTML=`
- <div class="rtools"><span class="t">${NAME[b-1]} ${c}${unit(b)} ${r?stIcon(k,pr):''}</span><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button><button class="tool ${S.bgm&&S.bgm!=='off'?'on':''}" id="bgTool" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button></div>
+ <div class="rtools"><span class="t">${NAME[b-1]} ${c}${unit(b)} ${r?stIcon(k,pr):''}</span><div class="pm"><button onclick="fontStep(-1)" aria-label="글자 작게">−</button><span>글자</span><button onclick="fontStep(1)" aria-label="글자 크게">+</button></div><button class="tool" onclick="fontSheet()">가 <span id="fontLbl">${FONTS[S.rfont]?.[0]||'글꼴'}</span></button><button class="tool ${S.bgm&&S.bgm!=='off'?'on':''}" id="bgTool" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button>${SR?`<button class="tool" id="modeBtn" style="flex-basis:100%" onclick="modeSheet()">${modeLabel()} 넘기기</button>`:''}</div>
+ ${vp.length?`<p class="hint" style="color:var(--ok);font-weight:700">지난번에 ${vp.length}절을 읽었어요. 🎙를 누르면 ${R.pos+1}절부터 이어서 읽어요.</p>`:''}
  <p class="hint">${SR?'🎙를 누르고 <b>이 화면의 말씀을 그대로</b> 소리 내어 읽어 주세요. 읽는 곳을 따라 화면이 저절로 넘어가고, 다 읽으면 저절로 체크돼요.':'🎙를 누르고 이 화면의 말씀을 소리 내어 읽어 주세요. 읽는 절을 손가락으로 누르면 표시가 따라와요. 다 읽으면 「다 읽었어요」를 눌러 주세요.'}</p>
- <div class="vs">${verses.map((v,i)=>`<p class="v" id="v${i}" onclick="tapVerse(${i})"><sup>${i+1}</sup>${esc(v)}</p>`).join('')}</div>
+ <div class="vs">${verses.map((v,i)=>`<p class="v${R.done.has(i)?' done':''}" id="v${i}" onclick="tapVerse(${i})"><sup>${i+1}</sup>${esc(v)}</p>`).join('')}</div>
  ${pr.memos[k]?`<div class="card" style="margin-top:14px"><h2>내 묵상</h2><div style="white-space:pre-wrap">${esc(pr.memos[k])}</div></div>`:''}
  <div class="navch">${prev?`<button class="btn line" onclick="go('#/read/${prev[0]}/${prev[1]}')">‹ 이전 ${unit(prev[0])}</button>`:''}${next?`<button class="btn line" onclick="go('#/read/${next[0]}/${next[1]}')">다음 ${unit(next[0])} ›</button>`:''}</div>
- <p class="foot">성경전서 개역한글판 (대한성서공회)</p><div style="height:110px"></div>`;
- document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙 누르고 읽기 시작'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><div class="side"><button class="mus" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div></div>`);
+ <p class="foot">성경전서 개역한글판 (대한성서공회)</p><div style="height:62vh"></div>`;
+ document.body.insertAdjacentHTML('beforeend',`<div class="dock" id="dock"><div class="spd ${R.mode==='auto'?'on':''}" id="spd"><span>넘기는 속도</span><button onclick="spdStep(-1)" aria-label="느리게">−</button><b id="spdN">${S.spd||5}</b><button onclick="spdStep(1)" aria-label="빠르게">+</button></div><div class="in"><button class="mic" id="mic" onclick="toggleRead()" aria-label="읽기 시작">🎙</button><div class="info"><div class="msg" id="dmsg">${r?'이미 읽은 장이에요. 다시 읽어도 좋아요':'🎙 누르고 읽기 시작'}</div><div class="sub2" id="dsub">0/${verses.length}절 · 00:00</div><div class="pbar"><i id="dbar"></i></div></div><div class="side"><button class="mus" onclick="bgmSheet()">🎵 <span class="bgName">${bgmName()}</span></button><button class="manual" onclick="manualDone()">다 읽었어요</button></div></div></div>`);
+ if(vp.length){const e=$('#v'+R.pos);if(e){e.classList.add('cur');setTimeout(()=>window.scrollTo(0,scrollY+e.getBoundingClientRect().top-innerHeight*.3),60)}dockUpdate()}
+ if(String(S.bgm).startsWith('yt:'))ytPlay(S.bgm.slice(3),false);
 }
 function fontStep(d){S.font=Math.max(18,Math.min(42,(S.font||24)+d*2));applyFont();save();
  document.querySelectorAll('.fsbig').forEach(e=>e.remove());const t=document.createElement('div');t.className='fsbig';t.textContent='글자 크기 '+S.font;document.body.appendChild(t);setTimeout(()=>t.remove(),900);
@@ -401,27 +419,83 @@ function dockUpdate(){
  const bar=$('#dbar');if(bar)bar.style.width=Math.min(100,m/Math.ceil(n*TH_CH)*100)+'%';
 }
 let evalTimer=null;
+// 절 하나를 읽음으로 표시하고 이 휴대폰에 저장 (장을 다 못 읽어도 절까지 남아요)
+function markV(i){if(!R||R.done.has(i))return;R.done.add(i);$('#v'+i)?.classList.add('done');saveProg()}
+let progT=null;
+function saveProg(now){if(!R||R.completed)return;const doIt=()=>{progT=null;if(!R||R.completed)return;const pr=P();pr.vp=pr.vp||{};if(R.done.size)pr.vp[R.k]={d:[...R.done].sort((a,b)=>a-b),t:Date.now(),n:R.verses.length};save()};if(now){clearTimeout(progT);doIt()}else if(!progT)progT=setTimeout(doIt,1500)}
+// 방금 들은 말이 어느 절 어디쥐인지 찾기
+function locate(){
+ const recent=norm(R.last||'').slice(-40);if(recent.length<5)return null;
+ const RG=grams(recent,3);if(!RG.size)return null;
+ let best=-1,bs=0;const from=Math.max(0,R.pos-1),to=Math.min(R.verses.length-1,R.pos+6);
+ for(let i=from;i<=to;i++){const vs=R.vn[i];let h=0;RG.forEach(g=>{if(vs.includes(g))h++});const sc=h/RG.size-(i<R.pos?.12:0)-Math.max(0,i-R.pos-1)*.04;if(sc>bs){bs=sc;best=i}}
+ if(best<0||bs<.42)return null;
+ const vs=R.vn[best],tail=recent.slice(-14);let pm=-1;for(let j=0;j+3<=tail.length;j++){const ix=vs.lastIndexOf(tail.substr(j,3));if(ix>pm)pm=ix}
+ return {i:best,frac:pm<0?0:Math.min(1,(pm+3)/vs.length)};
+}
 function evalNow(){
  evalTimer=null;if(!R)return;
  const T=norm(R.fin+' '+R.intr);const G3=grams(T,3),G2=grams(T,2);
- R.verses.forEach((v,i)=>{if(!R.done.has(i)&&coverage(R.vg[i],G3,G2)>=TH_VERSE){R.done.add(i);const e=$('#v'+i);if(e)e.classList.add('done')}});
+ // 지금 읽는 곳 바로 다음 절까지만 체크 (비슷한 구절이 뒤에 또 나와도 미리 체크되지 않게)
+ R.verses.forEach((v,i)=>{if(i<=R.pos+1&&!R.done.has(i)&&coverage(R.vg[i],G3,G2)>=TH_VERSE)markV(i)});
+ if(R.mode!=='auto'){
+  const L=locate();
+  if(L){
+   if(L.i>R.pos){for(let j=R.pos;j<L.i;j++)if(!R.done.has(j)&&(coverage(R.vg[j],G3,G2)>=.25||R.vn[j].length<25))markV(j);R.pos=L.i;R.frac=L.frac}
+   else if(L.i===R.pos)R.frac=Math.max(R.frac||0,L.frac);
+   // 한 절을 거의 다 읽으면 미리 다음 절로
+   if(R.frac>=.88&&R.pos<R.verses.length-1&&coverage(R.vg[R.pos],G3,G2)>=.6){markV(R.pos);R.pos++;R.frac=0}
+  }
+ }
  // 앞뒤 절을 읽었는데 인식이 놓친 짧은 절은 읽은 것으로
- for(let i=1;i<R.verses.length-1;i++)if(!R.done.has(i)&&R.done.has(i-1)&&R.done.has(i+1)&&norm(R.verses[i]).length<25){R.done.add(i);$('#v'+i)?.classList.add('done')}
- let cur=R.tap||0;while(R.done.has(cur))cur++;
- document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));
- const ce=$('#v'+cur);if(ce&&R.active){ce.classList.add('cur');followVerse(ce)}
+ for(let i=1;i<Math.min(R.pos,R.verses.length-1);i++)if(!R.done.has(i)&&R.done.has(i-1)&&R.done.has(i+1)&&R.vn[i].length<25)markV(i);
+ if(R.active)showPos();
  dockUpdate();
- if(!R.completed&&R.done.size>=Math.ceil(R.verses.length*TH_CH))complete('voice');
+ if(!R.completed&&R.done.size>=Math.ceil(R.verses.length*TH_CH))complete(R.heard?'voice':'check');
 }
+// 지금 읽는 절 표시 + 그 줄이 화면 위쪽 30%에 오도록 부드럽게 흘려가기
+function showPos(){
+ document.querySelectorAll('.v.cur').forEach(e=>{if(e.id!=='v'+R.pos)e.classList.remove('cur')});
+ const e=$('#v'+R.pos);if(!e)return;e.classList.add('cur');
+ if(R.mode==='auto'||Date.now()<(R.handUntil||0))return;
+ const rc=e.getBoundingClientRect();const y=rc.top+Math.max(0,rc.height*(R.frac||0)-30);const d=y-innerHeight*.3;
+ if(Math.abs(d)>20)glide(d);
+}
+let glideRaf=null;
+function glide(d){cancelAnimationFrame(glideRaf);const y0=scrollY,t0=performance.now(),dur=Math.min(900,350+Math.abs(d)*.8);const f=t=>{const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);window.scrollTo(0,y0+d*e);if(p<1)glideRaf=requestAnimationFrame(f)};glideRaf=requestAnimationFrame(f)}
+// 손으로 화면을 만지면 4초 동안은 저절로 넘기지 않아요
+['touchstart','wheel'].forEach(ev=>window.addEventListener(ev,()=>{if(R&&R.active){R.handUntil=Date.now()+4000;cancelAnimationFrame(glideRaf)}},{passive:true}));
+
+/* 일정한 속도로 넘기기 (목소리 인식이 안 되는 휴대폰용) */
+let autoRaf=null;
+const cps=()=>3+(S.spd||5)*.4;
+function autoRun(){
+ cancelAnimationFrame(autoRaf);let last=performance.now();
+ const chars=R.vn.reduce((a,s)=>a+s.length,0)||1;const docTop=i=>{const e=$('#v'+i);return e?e.getBoundingClientRect().top+scrollY:0};
+ R.ay=docTop(R.pos)+4;let resync=false;
+ const f=t=>{if(!R||!R.active||R.mode!=='auto'){autoRaf=null;return}
+  const dt=Math.min(.2,(t-last)/1000);last=t;
+  if(Date.now()<(R.handUntil||0))resync=true;
+  else{if(resync){R.ay=scrollY+innerHeight*.3;resync=false}
+   const ppc=$('.vs').offsetHeight/chars;R.ay+=cps()*ppc*dt;window.scrollTo(0,R.ay-innerHeight*.3)}
+  let idx=0;for(let i=0;i<R.verses.length;i++){if(docTop(i)<=R.ay)idx=i;else break}
+  if(idx!==R.pos){if(idx>R.pos)for(let j=R.pos;j<idx;j++)markV(j);R.pos=idx;showPos();dockUpdate()}
+  const le=$('#v'+(R.verses.length-1));if(le&&R.ay>le.getBoundingClientRect().bottom+scrollY){markV(R.verses.length-1);dockUpdate();if(!R.completed){complete(R.heard?'voice':'check');return}}
+  autoRaf=requestAnimationFrame(f)};
+ autoRaf=requestAnimationFrame(f);
+}function spdStep(d){S.spd=Math.max(1,Math.min(10,(S.spd||5)+d));save();const b=$('#spdN');if(b)b.textContent=S.spd}
+function setMode(m){S.follow=m;save();if(R){const was=R.active;R.mode=m;$('#spd')?.classList.toggle('on',m==='auto');const b=$('#modeBtn');if(b)b.innerHTML=modeLabel();if(was&&m==='auto'){if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}if(S.rec!==false&&!mr)startRecorder();autoRun()}else if(was&&m==='voice'){toast('🎙를 다시 눌러 주세요');stopReading()}}}
+const modeLabel=()=>S.follow==='auto'?'⏬ 일정 속도':'🗣 목소리 따라';
+function modeSheet(){const d=sheet(`<h2>화면 넘기는 방식</h2><div class="bgl"><button class="bgm ${S.follow!=='auto'?'on':''}" data-m="voice"><b>🗣 내 목소리를 따라 (추천)</b><span>읽는 말을 알아듣고 그 절로 화면이 저절로 흘러가요. 읽은 절이 저장돼요.</span></button><button class="bgm ${S.follow==='auto'?'on':''}" data-m="auto"><b>⏬ 일정한 속도로</b><span>자막처럼 천천히 올라가요. 아래 − + 로 속도를 맞춰요. 음성 인식이 안 되는 휴대폰에 좋아요.</span></button></div><button class="btn line" id="mClose">닫기</button>`);d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);d.remove()});d.querySelector('#mClose').onclick=()=>d.remove()}
 function schedEval(){if(!evalTimer)evalTimer=setTimeout(evalNow,350)}
 // 읽는 절을 화면 위쪽(눈높이)에 오게 저절로 넘기기
 function followVerse(ce){const rc=ce.getBoundingClientRect();const want=innerHeight*0.26;if(rc.top<80||rc.top>innerHeight*0.5||rc.bottom>innerHeight-140)window.scrollTo({top:scrollY+rc.top-want,behavior:'smooth'})}
 // 절을 누르면 「여기부터 읽어요」 표시
-function tapVerse(i){if(!R)return;R.tap=i;document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');if(R.active)followVerse(ce)}}
+function tapVerse(i){if(!R)return;R.tap=i;if(R.active){R.pos=i;R.frac=0;R.handUntil=0;R.tap=null;if(R.mode==='auto'){const e=$('#v'+i);if(e){R.ay=e.getBoundingClientRect().top+scrollY+4;window.scrollTo(0,R.ay-innerHeight*.3)}}}document.querySelectorAll('.v.cur').forEach(e=>e.classList.remove('cur'));const ce=$('#v'+i);if(ce){ce.classList.add('cur');if(R.active)followVerse(ce)}}
 
 /* ===== 배경음악: 저작권 걱정 없이 휴대폰이 직접 연주해요 ===== */
 const BGMS=[['off','음악 없이','내 목소리만 조용히'],['organ','잔잔한 오르간','따뜻한 화음이 천천히 바뀌어요'],['piano','새벽 피아노','맑은 피아노 소리가 띄엄띄엄'],['hymn','오르골 찬송','「나 같은 죄인 살리신」 느리게'],['rain','창밖 빗소리','차분한 빗소리'],['wave','잔잔한 파도','멀리서 들리는 바다'],['mine','내 음악 파일','휴대폰에 있는 음악을 골라요']];
-const bgmName=()=>{const x=BGMS.find(m=>m[0]===(S.bgm||'off'));return x?(x[0]==='off'?'음악 없음':x[1]):'음악 없음'};
+const bgmName=()=>{const id=S.bgm||'off';if(id.startsWith('yt:'))return ytTitle(id.slice(3));const x=BGMS.find(m=>m[0]===id);return x?(x[0]==='off'?'음악 없음':x[1]):'음악 없음'};
 let AC=null,BG=null,REV=null,BUS=null,bgOn=null,bgTimer=null,bgSrcs=[],bgEl=null,bgGen=0,recMix=null;
 function ac(){
  try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();BG=AC.createGain();BG.gain.value=0;BG.connect(AC.destination);
@@ -473,6 +547,8 @@ function bgmEngine(id,gen){
 }
 function bgmPlay(id){
  if(!id||id==='off'){bgmStop();return}
+ if(String(id).startsWith('yt:')){if(bgOn&&!String(bgOn).startsWith('yt:'))bgmStop(true);bgOn=id;ytPlay(id.slice(3),true);return}
+ if(String(bgOn).startsWith('yt:'))ytStop();
  if(!ac())return;const v=Math.max(.02,(S.bgmVol??.4))*.8;
  if(bgOn===id){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(v,AC.currentTime,.3);return}
  bgmStop(true);bgOn=id;const gen=++bgGen;
@@ -481,6 +557,7 @@ function bgmPlay(id){
  bgmEngine(id,gen);
 }
 function bgmStop(quick){
+ if(String(bgOn).startsWith('yt:')){ytStop();bgOn=null;return}
  if(!AC||!bgOn){bgOn=null;return}
  const gen=++bgGen;clearInterval(bgTimer);bgTimer=null;bgOn=null;
  const t=AC.currentTime,fade=quick?.15:1.5;BG.gain.cancelScheduledValues(t);BG.gain.setValueAtTime(BG.gain.value,t);BG.gain.linearRampToValueAtTime(0,t+fade);
@@ -488,7 +565,38 @@ function bgmStop(quick){
  const kill=()=>{srcs.forEach(s=>{try{s.stop()}catch(e){}});try{bus&&bus.disconnect()}catch(e){}if(el){try{el.pause();URL.revokeObjectURL(el.src)}catch(e){}}};
  if(quick)kill();else setTimeout(kill,fade*1000+100);
 }
-function bgmVol(v){S.bgmVol=v;save();if(AC&&bgOn){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.15)}}
+function bgmVol(v){S.bgmVol=v;save();if(String(bgOn).startsWith('yt:')){try{ytP&&ytReady&&ytP.setVolume(Math.round(v*100))}catch(e){}return}if(AC&&bgOn){BG.gain.cancelScheduledValues(AC.currentTime);BG.gain.setTargetAtTime(Math.max(.02,v)*.8,AC.currentTime,.15)}}
+
+/* ===== 유튜브 음악 (인터넷 필요, 작은 화면으로 함께 보여요) ===== */
+const YT_LIST=[
+ ['Rfd0S9g8I08','경쾌한 피아노 찬양','하루를 기분 좋게 · 밝은 CCM 피아노'],
+ ['BvalcyC9pxw','위로와 평안 CCM 피아노','10시간 · 중간광고 없음 · Worship Flow'],
+ ['BnoItYbsJbw','평안과 소망 CCM 피아노','3시간 · 중간광고 없음 · 겨자씨워십'],
+ ['pEt89CrE-6A','기도할 때 듣는 피아노 찬양','2시간 · 택피아노'],
+ ['3yZrAoChwP0','찬송가 피아노와 첼로','2시간 · 따뜻하고 깊은 소리'],
+ ['R4gwU0cQOLU','위로가 되는 찬송가 피아노','3시간 · 인기 찬송가'],
+ ['0V8yNAZZfSE','Piano Worship','3시간 · 해외 찬양 피아노']];
+let ytP=null,ytReady=false,ytApi=null,ytCur=null,ytWant=false;
+function ytLoadApi(){return ytApi||(ytApi=new Promise(ok=>{if(window.YT&&YT.Player)return ok();window.onYouTubeIframeAPIReady=()=>ok();const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{ytApi=null;toast('유튜브에 연결하지 못했어요. 인터넷을 확인해 주세요',4000)};document.head.appendChild(s)}))}
+function ytBox(){let b=$('#ytbox');if(!b){document.body.insertAdjacentHTML('beforeend','<div id="ytbox" class="ytbox"><div class="yth"><span id="ytt">유튜브 음악</span><button onclick="ytOff()" aria-label="음악 끄기">✕</button></div><div class="ytw"><div id="ytp"></div></div></div>');b=$('#ytbox')}return b}
+function ytOff(){bgmStop(true)}
+// 음악 목록을 열 때 유튜브를 미리 준비해 두면, 누르는 순간 바로 재생돼요
+function ytWarm(){if(ytP)return;const id=String(S.bgm).startsWith('yt:')?S.bgm.slice(3):YT_LIST[0][0];ytPlay(id,false)}
+function ytTitle(id){const a=YT_LIST.find(x=>x[0]===id);if(a)return a[1];const m=(S.ytMine||[]).find(x=>x.id===id);return m?m.t:'유튜브 음악'}
+async function ytPlay(id,play){
+ ytWant=!!play;const box=ytBox();if(play){box.classList.add('on');setTimeout(()=>{try{if(ytWant&&ytCur===id&&ytP&&![1,3].includes(ytP.getPlayerState())&&!(ytP.getCurrentTime()>.5))toast('음악이 안 나오면 왼쪽 아래 작은 화면의 ▶를 한 번 눌러 주세요',5000)}catch(e){}},4000)}$('#ytt').textContent=ytTitle(id);
+ const vol=Math.round((S.bgmVol??.4)*100);const st=Math.floor((S.ytPos||{})[id]||0);
+ if(ytP&&ytReady){try{if(ytCur!==id){ytCur=id;play?ytP.loadVideoById({videoId:id,startSeconds:st}):ytP.cueVideoById({videoId:id,startSeconds:st})}else if(play)ytP.playVideo();ytP.setVolume(vol)}catch(e){}return}
+ if(ytP){ytCur=id;return}
+ await ytLoadApi();if(ytP)return;ytCur=id;
+ ytP=new YT.Player('ytp',{width:'100%',height:'100%',videoId:id,host:'https://www.youtube.com',playerVars:{autoplay:play?1:0,playsinline:1,rel:0,modestbranding:1,start:st},
+  events:{onReady:e=>{ytReady=true;try{e.target.setVolume(vol);if(ytCur!==id)e.target.cueVideoById(ytCur);if(ytWant)e.target.playVideo()}catch(x){}},
+   onStateChange:e=>{if(e.data===0){try{e.target.seekTo(0);e.target.playVideo()}catch(x){}}if(e.data===1){try{const t=e.target.getVideoData().title;if(t){$('#ytt').textContent=t;const m=(S.ytMine||[]).find(x=>x.id===ytCur);if(m&&m.t!==t){m.t=t;save();bgmLabels()}}}catch(x){}}},
+   onError:()=>{toast('이 유튜브 영상은 앱 안에서 틀 수 없어요. 다른 음악을 골라 주세요',4500)}}});
+}
+function ytStop(){ytWant=false;if(ytP&&ytReady){try{const t=ytP.getCurrentTime();if(ytCur&&t>5){S.ytPos=S.ytPos||{};S.ytPos[ytCur]=Math.floor(t);save()}ytP.pauseVideo()}catch(e){}}$('#ytbox')?.classList.remove('on')}
+function ytId(u){u=String(u||'').trim();const m=u.match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/)||u.match(/^([\w-]{11})$/);return m?m[1]:null}
+
 // 내 음악 파일 보관 (이 휴대폰 안에만)
 function mdb(){return new Promise((ok,no)=>{const r=indexedDB.open('malsseum-bgm',1);r.onupgradeneeded=()=>r.result.createObjectStore('f',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
 async function mineGet(){try{const d=await mdb();return await new Promise(ok=>{const q=d.transaction('f').objectStore('f').get('mine');q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})}catch(e){return null}}
@@ -496,48 +604,77 @@ function minePick(after){const inp=document.createElement('input');inp.type='fil
  try{const d=await mdb();await new Promise((ok,no)=>{const t=d.transaction('f','readwrite');t.objectStore('f').put({id:'mine',name:f.name,blob:f});t.oncomplete=ok;t.onerror=()=>no(t.error)});S.bgmFile=f.name;save();after&&after()}catch(e){toast('음악을 저장하지 못했어요')}};inp.click()}
 function bgmLabels(){document.querySelectorAll('.bgName').forEach(e=>e.textContent=bgmName());$('#bgTool')?.classList.toggle('on',S.bgm!=='off')}
 function bgmSheet(){
- const reading=!!(R&&R.active);
- const list=()=>BGMS.map(([id,n,d])=>`<button class="bgm ${(S.bgm||'off')===id?'on':''}" data-id="${id}"><b>${n}</b><span>${id==='mine'&&S.bgmFile?esc(S.bgmFile):d}</span></button>`).join('');
- const dm=sheet(`<h2>🎵 배경음악</h2><p class="note" style="margin-top:0">누르면 바로 들어 볼 수 있어요. 🎙를 누르면 이 음악이 잔잔하게 깔려요.</p><div class="bgl" id="bgl">${list()}</div>
+ const item=(id,n,d)=>`<button class="bgm ${(S.bgm||'off')===id?'on':''}" data-id="${id}"><b>${n}</b><span>${d}</span></button>`;
+ const list=()=>item('off','음악 없이','내 목소리만 조용히')+
+  `<h3 class="bgh">▶ 유튜브 찬양 연주 <small>인터넷 필요</small></h3>`+
+  YT_LIST.map(([v,n,d])=>item('yt:'+v,n,d)).join('')+
+  (S.ytMine||[]).map(m=>`<div class="bgrow">${item('yt:'+m.id,esc(m.t||'내가 넣은 유튜브'),'내가 넣은 유튜브')}<button class="bgdel" data-del="${m.id}" aria-label="지우기">✕</button></div>`).join('')+
+  `<div class="ytadd"><input id="ytUrl" inputmode="url" placeholder="유튜브 주소를 붙여 넣으세요"><button id="ytAdd">넣기</button></div><button class="btn line" id="ytFind" style="min-height:50px;margin-top:0">🔎 유튜브에서 다른 찬양 찾아보기</button><p class="note" style="margin:4px 2px 6px">마음에 드는 영상에서 「공유 → 링크 복사」를 누르고 여기에 붙여 넣으면 목록에 들어와요.</p>`+
+  `<details ${['organ','piano','hymn','rain','wave','mine'].includes(S.bgm)?'open':''}><summary class="bgh">♪ 휴대폰이 직접 연주 <small>인터넷 없이</small></summary><div class="bgl">${BGMS.filter(m=>m[0]!=='off').map(([id,n,d])=>item(id,n,id==='mine'&&S.bgmFile?esc(S.bgmFile):d)).join('')}</div></details>`;
+ ytWarm();
+ const dm=sheet(`<h2>🎵 배경음악</h2><p class="note" style="margin-top:0">누르면 바로 들어 볼 수 있어요. 🎙를 누르면 이 음악이 함께 흘러요.</p><div class="bgl" id="bgl">${list()}</div>
  <div class="vol"><b>소리</b><span>작게</span><input type="range" min="5" max="100" value="${Math.round((S.bgmVol??.4)*100)}" id="bgVol" aria-label="음악 소리 크기"><span>크게</span></div>
- <label class="chk"><input type="checkbox" id="bgRec" ${S.bgmRec!==false?'checked':''}> 내 목소리 녹음에도 음악 같이 담기</label>
+ <label class="chk"><input type="checkbox" id="bgRec" ${S.bgmRec!==false?'checked':''}> 내 목소리 녹음에도 음악 같이 담기 <small style="color:var(--sub);font-weight:500">(휴대폰 연주만)</small></label>
  ${S.bgmFile?'<button class="btn line" id="bgMine" style="min-height:50px">내 음악 파일 바꾸기</button>':''}
- <p class="note">이어폰을 끼고 읽으면 음악이 마이크에 섞이지 않아 내 목소리가 더 깨끗하고 인식도 잘 돼요. 스피커로 들을 때는 소리를 작게 해 주세요.</p>
+ <p class="note">이어폰을 끼고 읽으면 음악이 마이크에 섞이지 않아 목소리 따라가기가 훨씬 정확해요. 스피커로 들을 때는 소리를 작게 해 주세요.</p>
  <button class="btn gold" id="bgOk">이 음악으로 읽기</button>`);
  const close=()=>{dm.remove();if(!(R&&R.active))bgmStop()};
  dm.onclick=e=>{if(e.target===dm)close()};
- const choose=id=>{const doIt=()=>{S.bgm=id;save();dm.querySelector('#bgl').innerHTML=list();bindL();bgmLabels();if(id==='off')bgmStop();else bgmPlay(id)};
+ const refresh=()=>{dm.querySelector('#bgl').innerHTML=list();bind();bgmLabels()};
+ const choose=id=>{const doIt=()=>{S.bgm=id;save();refresh();if(id==='off')bgmStop();else bgmPlay(id)};
   if(id==='mine'&&!S.bgmFile){minePick(doIt);return}doIt()};
- const bindL=()=>dm.querySelectorAll('.bgm').forEach(b=>b.onclick=()=>{if(b.dataset.id===bgOn&&b.dataset.id!=='off')return;choose(b.dataset.id)});
- bindL();
+ const bind=()=>{
+  dm.querySelectorAll('.bgm').forEach(b=>b.onclick=()=>{if(b.dataset.id===bgOn&&b.dataset.id!=='off')return;choose(b.dataset.id)});
+  dm.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{S.ytMine=(S.ytMine||[]).filter(m=>m.id!==b.dataset.del);if(S.bgm==='yt:'+b.dataset.del){S.bgm='off';bgmStop()}save();refresh()});
+  const add=()=>{const v=ytId(dm.querySelector('#ytUrl').value);if(!v){toast('유튜브 주소를 확인해 주세요');return}S.ytMine=S.ytMine||[];if(!S.ytMine.find(m=>m.id===v)&&!YT_LIST.find(x=>x[0]===v))S.ytMine.unshift({id:v,t:'내가 넣은 유튜브'});save();choose('yt:'+v)};
+  dm.querySelector('#ytAdd').onclick=add;dm.querySelector('#ytUrl').onkeydown=e=>{if(e.key==='Enter')add()};
+  dm.querySelector('#ytFind').onclick=()=>window.open('https://www.youtube.com/results?search_query='+encodeURIComponent('찬양 피아노 연주 광고없음'),'_blank');
+ };
+ bind();
  dm.querySelector('#bgVol').oninput=e=>{bgmVol(e.target.value/100);if(!bgOn&&S.bgm!=='off')bgmPlay(S.bgm)};
  dm.querySelector('#bgRec').onchange=e=>{S.bgmRec=e.target.checked;save()};
- dm.querySelector('#bgMine')?.addEventListener('click',()=>minePick(()=>{S.bgm='mine';save();bgmStop(true);bgmPlay('mine');dm.querySelector('#bgl').innerHTML=list();bindL();bgmLabels()}));
+ dm.querySelector('#bgMine')?.addEventListener('click',()=>minePick(()=>{S.bgm='mine';save();bgmStop(true);bgmPlay('mine');refresh()}));
  dm.querySelector('#bgOk').onclick=()=>{bgmLabels();close();toast(S.bgm==='off'?'음악 없이 읽어요':`🎙를 누르면 「${bgmName()}」과 함께 읽어요`)};
- if(!reading&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
+ if(!(R&&R.active)&&S.bgm&&S.bgm!=='off')bgmPlay(S.bgm);
 }
 
 let rec=null,mr=null,chunks=[],stream=null,tick=null,wake=null,recOff=false;
 async function toggleRead(){if(R&&R.active)return stopReading();startReading()}
 async function startReading(){
- if(!R)return;R.active=true;R.t0=Date.now();
+ if(!R)return;R.active=true;R.t0=Date.now();R.gotRes=false;R.wd1=0;R.last='';R.frac=0;R.handUntil=0;
+ if(R.tap!=null)R.pos=R.tap;else{let p=0;while(R.done.has(p)&&p<R.verses.length-1)p++;R.pos=p}
+ R.tap=null;
  if(S.bgm&&S.bgm!=='off'){ac();bgmPlay(S.bgm)}else if(S.bgmRec!==false&&AC)ac();
- const ce0=$('#v'+(R.tap||0));if(ce0&&!R.done.size){ce0.classList.add('cur');followVerse(ce0)}
- $('#mic')?.classList.add('on');$('#mic').textContent='■';$('#dmsg').textContent=SR?'듣고 있어요. 천천히 또박또박 읽어 주세요':'녹음 중이에요. 다 읽으면 「다 읽었어요」';
+ const ce0=$('#v'+R.pos);if(ce0){ce0.classList.add('cur');glide(ce0.getBoundingClientRect().top-innerHeight*.3)}
+ $('#mic')?.classList.add('on');$('#mic').textContent='■';
+ $('#dmsg').textContent=R.mode==='voice'?'듣고 있어요. 화면을 보며 그대로 읽어 주세요':'화면이 천천히 올라가요. 속도는 − + 로';
  tick=setInterval(dockUpdate,1000);
  try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
- if(SR){
-  rec=new SR();rec.lang='ko-KR';rec.continuous=true;rec.interimResults=true;
-  rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)R.fin+=' '+x[0].transcript;else it+=' '+x[0].transcript}R.intr=it;schedEval()};
-  rec.onerror=e=>{
-   if(e.error==='not-allowed'||e.error==='service-not-allowed'){toast('마이크 사용을 허용해 주세요 (주소창 왼쪽 자물쇠 → 마이크 허용)',4500);stopReading();}
-   else if(e.error==='audio-capture'&&mr){recOff=true;stopRecorder(true);toast('이 휴대폰은 녹음과 인식을 같이 못 해서, 인식만 할게요',4000)}
-   else if(e.error==='network'){$('#dmsg').textContent='인터넷이 약해요. 인식이 잠깐 멈출 수 있어요'}
-  };
-  rec.onend=()=>{if(R&&R.active){R.fin+=' '+R.intr;R.intr='';setTimeout(()=>{try{R&&R.active&&rec.start()}catch(e){}},150)}};
-  try{rec.start()}catch(e){}
- }
- if(S.rec!==false&&!recOff)startRecorder();
+ if(!R||!R.active)return;
+ if(R.mode==='voice'&&SR){startSR();watchSR()}else autoRun();
+ if(S.rec!==false&&!(recOff&&R.mode==='voice'))startRecorder();
+}
+function startSR(){
+ rec=new SR();rec.lang='ko-KR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
+ rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)R.fin+=' '+x[0].transcript;else it+=' '+x[0].transcript}
+  R.intr=it;R.last=e.results[e.results.length-1][0].transcript;if(R.last.trim()){R.gotRes=true;R.heard=true}schedEval()};
+ rec.onerror=e=>{
+  if(e.error==='not-allowed'||e.error==='service-not-allowed'){toast('마이크 사용을 허용해 주세요 (주소창 왼쪽 자물쇠 → 마이크 허용)',4500);stopReading();}
+  else if(e.error==='audio-capture'&&mr){recOff=true;stopRecorder(true);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}
+  else if(e.error==='network'){$('#dmsg').textContent='인터넷이 약해요. 인식이 잠깐 멈출 수 있어요'}
+ };
+ rec.onend=()=>{if(R&&R.active&&R.mode==='voice'){R.fin+=' '+R.intr;R.intr='';setTimeout(()=>{try{R&&R.active&&rec&&rec.start()}catch(e){}},120)}};
+ try{rec.start()}catch(e){}
+}
+// 목소리가 인식되지 않으면: ① 녹음을 잠시 끄고 따라가기 먼저 ② 그래도 안 되면 일정한 속도로
+function watchSR(){
+ clearInterval(R.wd);const RR=R;
+ RR.wd=setInterval(()=>{
+  if(R!==RR||!RR.active||RR.mode!=='voice'||RR.gotRes){clearInterval(RR.wd);return}
+  const el=(Date.now()-RR.t0)/1000;
+  if(!RR.wd1&&el>=12){RR.wd1=Date.now();if(mr){recOff=true;stopRecorder(true);if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}setTimeout(()=>{if(RR.active&&RR.mode==='voice')startSR()},400);toast('이 휴대폰은 녹음과 목소리 따라가기를 같이 못 해서, 따라가기를 먼저 할게요',4500)}}
+  else if(RR.wd1&&Date.now()-RR.wd1>14000){clearInterval(RR.wd);toast('목소리 인식이 안 돼서 일정한 속도로 넘길게요. 아래 − + 로 속도를 맞춰 주세요',5500);setMode('auto')}
+ },1000);
 }
 async function startRecorder(){
  try{
@@ -561,8 +698,9 @@ function stopRecorder(discard){
  });
 }
 async function stopReading(silent){
- clearInterval(tick);tick=null;
+ clearInterval(tick);tick=null;cancelAnimationFrame(autoRaf);autoRaf=null;if(R)clearInterval(R.wd);
  if(rec){try{rec.onend=null;rec.abort()}catch(e){}rec=null}
+ saveProg(true);
  try{wake&&wake.release()}catch(e){}wake=null;
  if(R&&R.active){R.sec+=(Date.now()-R.t0)/1000;R.active=false}
  bgmStop(!!silent);
@@ -582,7 +720,7 @@ function manualDone(){if(!R)return;
 async function complete(how){
  if(!R)return;const wasActive=R.active;R.completed=true;
  const sec=R.active?R.sec+(Date.now()-R.t0)/1000:R.sec;
- markRead(R.k,how,sec);vib([80,60,160]);
+ markRead(R.k,how,sec);vib([80,60,160]);{const pr=P();if(pr.vp){delete pr.vp[R.k];save()}}
  R.verses.forEach((_,i)=>{R.done.add(i);$('#v'+i)?.classList.add('done')});dockUpdate();
  if(wasActive){await stopReading()}
  const b=R.b,c=R.c,k=R.k;const next=c<VC[b-1].length?[b,c+1]:b<66?[b+1,1]:null;
@@ -771,7 +909,7 @@ function helpView(){
  <h3>휴대폰 바탕화면에 앱 아이콘 만들기</h3><ol style="padding-left:22px">
  <li><b>갤럭시(안드로이드)</b>: 「더보기 → 안드로이드 앱 파일(APK) 내려받기」를 누르고, 받은 파일을 열어 「설치」를 눌러요. (또는 크롬 ⋮ → 「앱 설치」)</li>
  <li><b>아이폰</b>: 사파리로 열고 아래 공유 버튼(□↑) → 「홈 화면에 추가」</li></ol>
- <h3>소리 내어 읽기</h3><ol style="padding-left:22px"><li>「오늘」에서 「소리 내어 읽기 시작」을 누르고 🎙 버튼을 눌러요.</li><li>처음 한 번 「마이크 허용」을 눌러 주세요.</li><li>또박또박 읽으면 읽은 절이 금색으로 바뀌고, 80% 넘게 읽으면 저절로 체크돼요.</li><li>따로 성경책을 펼 필요 없이, 읽기 화면의 말씀을 보면서 바로 읽으면 돼요. 읽는 절이 노란 표시로 따라오고 화면도 저절로 넘어가요.</li><li>「− 글자 +」로 크기를, 「가」 버튼으로 글꼴을, 「🎵」 버튼으로 배경음악을 고를 수 있어요. 음악은 「음악 없이」를 고르면 꺼져요.</li><li>종이 성경(개역개정)으로 읽어도 체크돼요.</li><li>조용한 곳에서, 휴대폰을 입에서 30cm 안쪽에 두면 잘 돼요.</li></ol>
+ <h3>소리 내어 읽기</h3><ol style="padding-left:22px"><li>「오늘」에서 「소리 내어 읽기 시작」을 누르고 🎙 버튼을 눌러요.</li><li>처음 한 번 「마이크 허용」을 눌러 주세요.</li><li>또박또박 읽으면 읽은 절이 금색으로 바뀌고, 80% 넘게 읽으면 저절로 체크돼요.</li><li>따로 성경책을 펼 필요 없이, 읽기 화면의 말씀을 보면서 바로 읽으면 돼요. 읽는 절이 노란 표시로 따라오고 화면도 저절로 넘어가요.</li><li>「− 글자 +」로 크기를, 「가」 버튼으로 글꼴을, 「🎵」 버튼으로 배경음악(유튜브 찬양 연주, 내가 넣은 유튜브 주소, 휴대폰 연주)을 고를 수 있어요. 「음악 없이」를 고르면 꺼져요.</li><li>읽는 소리를 알아듣고 그 절로 화면이 저절로 흘러가요. 화면을 손으로 만지면 4초 동안 기다려 줘요. 목소리 인식이 안 되는 휴대폰은 「일정 속도로」 넘기기를 쓰고 − + 로 속도를 맞춰요.</li><li>장을 다 못 읽어도 읽은 절까지 저장돼요. 다음에 열면 그 다음 절부터 이어서 읽어요.</li><li>종이 성경(개역개정)으로 읽어도 체크돼요.</li><li>조용한 곳에서, 휴대폰을 입에서 30cm 안쪽에 두면 잘 돼요.</li></ol>
  <h3>Plaud 녹음기로 읽기</h3><ol style="padding-left:22px"><li>Plaud로 녹음하며 읽어요.</li><li>Plaud 앱에서 받아쓰기 글을 복사해요.</li><li>「목소리 → Plaud 받아쓰기로 체크하기」에 붙여 넣어요.</li><li>Plaud 앱에서 녹음 파일을 내보내 「녹음 파일 가져오기」로 넣으면 가족이 들을 수 있어요.</li></ol>
  <h3>자녀와 함께</h3><ol style="padding-left:22px"><li>「더보기 → 가족 추가」로 아이 이름을 넣으면 아이 기록이 따로 쌓여요.</li><li>「목소리」에서 엄마·아빠가 읽은 말씀을 아이에게 들려줄 수 있어요. 📤로 카톡에 보낼 수도 있어요.</li><li>잠자리에서 「자녀와 함께 잠언 31일」을 한 장씩 같이 읽어 보세요.</li></ol>
  <h3>개인정보</h3><ol style="padding-left:22px"><li>읽은 기록·묵상·녹음은 이 휴대폰 안에만 저장돼요. 앱이 따로 모으지 않아요.</li><li>음성 인식은 휴대폰에 들어 있는 구글·애플 음성 인식 기능을 써요.</li><li>휴대폰을 바꾸기 전에 「더보기 → 기록 파일 받기」를 해 두세요.</li></ol>
