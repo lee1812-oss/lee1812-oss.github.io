@@ -23,7 +23,7 @@ img{max-width:100%}
 .wrap{max-width:680px;width:100%;margin:0 auto}
 header{background:#fff;color:var(--tx);padding:calc(env(safe-area-inset-top) + 8px) 0 0;box-shadow:0 2px 10px rgba(14,58,99,.10);position:relative;z-index:5;flex:none}
 .hd1{display:flex;align-items:center;gap:10px;padding:0 14px}
-.logo{height:2.1rem;width:auto;flex:none;display:block}
+.logo{height:2.4rem;width:auto;flex:none;display:block}
 .ttl{flex:1;min-width:0;border-left:2px solid #E1E7EF;padding-left:10px;line-height:1.25}
 .ttl b{display:block;font-size:1.08rem;color:var(--nv);letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ttl small{display:block;font-size:.74rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -78,11 +78,11 @@ footer{flex:none;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2p
 .unb{display:none;width:100%;background:var(--red);color:#fff;margin-bottom:8px}.unb.on{display:block}
 .rpl{display:none;align-items:center;gap:8px;background:#EAF3FB;border-left:4px solid var(--gd);border-radius:8px;padding:6px 8px;margin-bottom:8px;font-size:.86rem}.rpl.on{display:flex}
 .rpl span{flex:1}.rpl button{min-height:40px;min-width:40px;padding:0;background:none;font-size:1.1rem}
-.cmp{display:flex;gap:8px}
+.cmp{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 3.4rem;gap:8px}
 .cmp button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cmp .rec{flex:2.2;background:var(--red);color:#fff;font-size:1.08rem;min-height:62px}
-.cmp .tb{flex:1;background:var(--nv2);color:#fff;min-height:62px;font-size:1rem;padding:0 8px}
-.cmp .pl{flex:.7;background:#E4E8F1;color:var(--nv);min-height:62px;font-size:1.3rem;padding:0}
+.cmp .rec{padding:0 6px;background:var(--red);color:#fff;font-size:1.08rem;min-height:62px}
+.cmp .tb{background:var(--nv2);color:#fff;min-height:62px;font-size:1rem;padding:0 8px}
+.cmp .pl{background:#E4E8F1;color:var(--nv);min-height:62px;font-size:1.3rem;padding:0}
 .ov{position:fixed;inset:0;background:rgba(10,16,32,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}.ov.on{display:flex}
 .sh{background:#fff;width:100%;max-width:680px;border-radius:22px 22px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);max-height:92dvh;overflow-y:auto}
 .sh h2{margin:0 0 10px;font-size:1.15rem;color:var(--nv)}
@@ -386,7 +386,7 @@ function render() {
   if (S.tab === 'todo') renderTodo();
   playerUi();
   if (S.tab === 'chat' && (atBottom || render.first !== false)) { main.scrollTop = main.scrollHeight; render.first = false; }
-  markSeen();
+  markSeen(); autoFit();
 }
 function renderTodo() {
   const all = sorted().filter(m => !m.del), open = all.filter(m => m.todo === 1), done = all.filter(m => m.todo === 2).reverse().slice(0, 30), my = myTz();
