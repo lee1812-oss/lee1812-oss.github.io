@@ -38,6 +38,11 @@ header{background:#fff;color:var(--tx);padding:calc(env(safe-area-inset-top) + 8
 .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:2px 14px 10px;padding:4px;background:#EEF2F7;border-radius:14px}
 .tabs button{background:none;color:var(--sub);border-radius:11px;min-height:46px;padding:0 6px;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tabs button.on{background:#fff;color:var(--nv);box-shadow:0 1px 4px rgba(14,58,99,.18)}
+.rooms{display:none;gap:6px;margin:0 14px 8px}.rooms.on{display:grid}
+.rooms button{min-height:50px;padding:2px 6px;border-radius:12px;background:#fff;border:2px solid var(--ln);color:var(--sub);font-size:.9rem;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rooms button small{display:block;font-size:.7rem;font-weight:500;color:inherit;opacity:.85}
+.rooms button.on{background:var(--nv);border-color:var(--nv);color:#fff}
+.rooms .cnt{margin-left:3px}
 .cnt{display:inline-block;min-width:22px;padding:0 6px;border-radius:12px;background:var(--red);color:#fff;font-size:.72rem;line-height:20px;margin-left:4px;vertical-align:1px}main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .pane{display:none;padding:10px 12px 20px}.pane.on{display:block}
 .srch{display:none;gap:8px;margin-bottom:8px}.srch.on{display:flex}
@@ -121,7 +126,7 @@ footer{flex:none;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2p
 .lock{position:fixed;inset:0;background:var(--nv);color:#fff;z-index:90;display:none;align-items:center;justify-content:center;padding:24px}.lock.on{display:flex}
 .lock{overflow-y:auto;align-items:flex-start}
 .lock .in{max-width:440px;width:100%;text-align:center;margin:auto 0;padding:10px 0 30px}
-.who2{display:flex;gap:8px;margin-top:12px}.lock .who2 button{flex:1;margin:0;background:#173062;color:#fff;border:2px solid #3A5590;min-height:62px}.lock .who2 button.on{background:var(--cr);color:var(--nv);border-color:var(--gd)}
+.who2{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.lock .who2 button{flex:1 1 40%;margin:0;background:#173062;color:#fff;border:2px solid #3A5590;min-height:62px}.lock .who2 button.on{background:var(--cr);color:var(--nv);border-color:var(--gd)}
 .lerr{color:#FFB4B4!important;font-weight:700;min-height:1.2em}
 .inst2{margin-top:18px;background:#13275A;border-radius:16px;padding:14px;text-align:left}.inst2 h3{margin:0 0 6px;font-size:1.02rem;color:var(--cr)}.inst2 p{margin:4px 0;font-size:.88rem}.inst2 button{margin-top:8px}
 .inst2 .b2{background:#22396F;color:#fff}
@@ -148,6 +153,7 @@ footer{flex:none;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2p
       <button class="ib" id="btnSrch" aria-label="찾기">🔍</button>
     </div>
     <div class="clk" id="clk"></div>
+    <div class="rooms" id="rooms"></div>
     <div class="tabs" id="tabs">
       <button data-tab="chat" class="on">💬 대화<span class="cnt" id="cUn" hidden></span></button>
       <button data-tab="todo">📌 할 일<span class="cnt" id="cTodo" hidden></span></button>
@@ -193,12 +199,12 @@ footer{flex:none;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2p
 <script>
 'use strict';
 const APK = 'utca-voice.apk';
-const API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', VER = 'v004', BUILT = '2026-11-04';
+const API = 'https://script.google.com/macros/s/AKfycbwoQPipOSJMnrkCI24OsPwjFfx-kiJRuAqPqNEw6Kmn-hVAv2Vju92bMx_ibOgPiLKm/exec', VER = 'v005', BUILT = '2026-11-04';
 const $ = s => document.querySelector(s);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } } };
-const S = { k: localStorage.getItem('utv_k') || '', me: LS.get('utv_me', null), members: LS.get('utv_mem', []), msgs: LS.get('utv_msgs', {}), since: LS.get('utv_since', 0),
+const S = { k: localStorage.getItem('utv_k') || '', me: LS.get('utv_me', null), members: LS.get('utv_mem', []), msgs: LS.get('utv_msgs', {}), since: LS.get('utv_since', 0), rooms: LS.get('utv_rooms', []), room: LS.get('utv_room', ''),
   set: Object.assign({ fs: 2, rate: 1 }, LS.get('utv_set', {})), out: [], tab: 'chat', reply: null, q: '', online: true, vapid: '' };
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isKakao = /KAKAOTALK/i.test(navigator.userAgent);
@@ -238,7 +244,14 @@ const hm = (ms, tz) => fmt(ms, tz, { hour: 'numeric', minute: '2-digit' });
 const md = (ms, tz) => fmt(ms, tz, { month: 'numeric', day: 'numeric', weekday: 'short' });
 const hourIn = (ms, tz) => Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(new Date(ms)));
 const myTz = () => (S.me && S.me.tz) || 'Asia/Seoul';
-const others = () => S.members.filter(m => S.me && m.id !== S.me.id);
+/* 1:1 대화방: 이혜영 부장은 방이 여러 개(대표님·김수진 이사님·이명진 이사님), 다른 분은 방 하나 */
+const DEF_ROOM = 'ceo-lee';
+const roomOf = m => m.room || DEF_ROOM;
+const curRoom = () => { const rs = S.rooms || []; if (!rs.length) return DEF_ROOM; return rs.some(r => r.id === S.room) ? S.room : rs[0].id; };
+const roomWho = id => ((S.rooms || []).find(r => r.id === id) || { who: [] }).who;
+const roomMate = id => S.members.find(m => S.me && m.id !== S.me.id && roomWho(id).includes(m.id));
+const others = () => { const w = roomWho(curRoom()); return S.members.filter(m => S.me && m.id !== S.me.id && (!w.length || w.includes(m.id))); };
+const mateTz = () => { const o = others()[0]; return o && o.tz ? o.tz : myTz(); };
 const otherTz = () => { const my = myTz(), o = others().find(x => x.tz && x.tz !== my) || S.members.find(x => x.tz && x.tz !== my); return o ? o.tz : (my === 'Asia/Seoul' ? 'America/New_York' : 'Asia/Seoul'); };
 const nameOf = id => { const m = S.members.find(x => x.id === id); return m ? m.name + (m.title ? ' ' + m.title : '') : (id || ''); };
 const durTxt = s => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -330,10 +343,11 @@ async function sync(first) {
   try {
     const r = await api('list', { since: S.since }, 1);
     let fresh = 0;
-    (r.msgs || []).forEach(m => { if (!S.msgs[m.id] && S.me && m.from !== S.me.id && S.since > 0) fresh++; S.msgs[m.id] = m; if (m.updated > S.since) S.since = m.updated; });
+    let freshFrom = ''; (r.msgs || []).forEach(m => { if (!S.msgs[m.id] && S.me && m.from !== S.me.id && S.since > 0) { fresh++; freshFrom = m.from; } S.msgs[m.id] = m; if (m.updated > S.since) S.since = m.updated; });
     if (r.members) { S.members = r.members; LS.set('utv_mem', S.members); }
+    if (r.rooms) { S.rooms = r.rooms; LS.set('utv_rooms', S.rooms); }
     saveMsgs();
-    if (fresh) { if (navigator.vibrate) navigator.vibrate([250, 120, 250]); beep(); toast('📩 새 메시지 ' + fresh + '개가 왔어요'); }
+    if (fresh) { if (navigator.vibrate) navigator.vibrate([250, 120, 250]); beep(); toast('📩 ' + (freshFrom ? nameOf(freshFrom) + '님 ' : '') + '새 메시지 ' + fresh + '개가 왔어요'); }
     if (r.msgs && r.msgs.length || first) render();
   } catch (e) { } finally { syncing = false; }
   processOut();
@@ -342,7 +356,24 @@ function saveMsgs() { LS.set('utv_msgs', S.msgs); LS.set('utv_since', S.since); 
 
 /* ---------- 화면 그리기 ---------- */
 const P = { a: new Audio(), id: null, url: '', queue: [], loading: null };
-function sorted() { return Object.values(S.msgs).sort((a, b) => a.at - b.at); }
+function sorted() { const r = curRoom(); return Object.values(S.msgs).filter(m => roomOf(m) === r).sort((a, b) => a.at - b.at); }
+function unseenIn(room) { return Object.values(S.msgs).filter(m => roomOf(m) === room && S.me && m.from !== S.me.id && !m.del && !(m.heard || {})[S.me.id]).length; }
+function unseenAll() { return Object.values(S.msgs).filter(m => S.me && m.from !== S.me.id && !m.del && !(m.heard || {})[S.me.id]).length; }
+function hdTxt() { const o = others().map(x => nameOf(x.id)).join(', '); return nameOf(S.me.id) + (o ? ' ↔ ' + o : ' · 로그인됨'); }
+function drawRooms() {
+  const rs = S.rooms || [], box = $('#rooms'); box.classList.toggle('on', rs.length > 1);
+  if (rs.length < 2) { box.innerHTML = ''; return; }
+  const cur = curRoom(); box.style.gridTemplateColumns = `repeat(${rs.length},minmax(0,1fr))`;
+  box.innerHTML = rs.map(r => { const o = roomMate(r.id), n = unseenIn(r.id); return `<button data-room="${esc(r.id)}" class="${r.id === cur ? 'on' : ''}">${esc(o ? o.name : r.id)}${n ? `<span class="cnt">${n}</span>` : ''}<small>${esc(o ? (o.title || '') + (o.tz && o.tz !== 'Asia/Seoul' ? ' · 미국' : '') : '')}</small></button>`; }).join('');
+}
+function setRoom(id) {
+  if (id === curRoom()) return; S.room = id; LS.set('utv_room', id); setReply(null);
+  S.q = ''; $('#q').value = ''; $('#srch').classList.remove('on'); P.queue = [];
+  $('#hdMe').textContent = hdTxt(); drawClock(); render.first = true; render();
+  const m = $('#main'); m.scrollTop = m.scrollHeight;
+}
+/* 처음 열 때: 지금 방에 새 메시지가 없고 다른 방에 있으면 그 방으로 */
+function autoRoom() { const rs = S.rooms || []; if (rs.length < 2 || unseenIn(curRoom())) return; const r = rs.find(x => unseenIn(x.id)); if (r) setRoom(r.id); }
 function unheardVoices() { return sorted().filter(m => S.me && m.from !== S.me.id && !m.del && m.type === 'voice' && !(m.heard || {})[S.me.id]); }
 function unseenCount() { return sorted().filter(m => S.me && m.from !== S.me.id && !m.del && !(m.heard || {})[S.me.id]).length; }
 function quoteHtml(id) {
@@ -351,7 +382,7 @@ function quoteHtml(id) {
   return `<div class="q" data-go="${esc(id)}">↩ ${esc(nameOf(m.from))}: ${esc(what)}</div>`;
 }
 function bubble(m, pend) {
-  const mine = S.me && m.from === S.me.id, my = myTz(), ot = otherTz();
+  const mine = S.me && m.from === S.me.id, my = myTz(), ot = mateTz();
   const isNew = !mine && !m.del && !(m.heard || {})[S.me ? S.me.id : ''];
   const id = pend ? 'o_' + m.cid : m.id;
   let h = `<div class="row ${mine ? 'me' : 'you'}" id="b_${esc(id)}"><div class="bub${m.type === 'voice' && !m.del ? ' vo' : ''}${isNew && m.type === 'voice' ? ' new' : ''}">`;
@@ -384,17 +415,17 @@ function render() {
   const q = S.q.trim(), my = myTz();
   let list = sorted(); if (q) list = list.filter(m => (m.text || '').includes(q));
   let h = '', lastDay = '';
-  if (!list.length && !S.out.length) h = q ? `<div class="empty"><b>찾는 글이 없어요</b>다른 낱말로 찾아보세요.</div>` : `<div class="empty"><b>아직 주고받은 메시지가 없어요</b>아래 빨간 「🎙 녹음하기」를 눌러 첫 녹음을 보내 보세요.<br>글로 남기려면 「✏️ 글쓰기」를 누르세요.</div>`;
+  if (!list.length && !S.out.length) h = q ? `<div class="empty"><b>찾는 글이 없어요</b>다른 낱말로 찾아보세요.</div>` : `<div class="empty"><b>아직 ${esc(others().map(x => nameOf(x.id)).join(', ') || '상대')}님과 주고받은 메시지가 없어요</b>아래 빨간 「🎙 녹음하기」를 눌러 첫 녹음을 보내 보세요.<br>글로 남기려면 「✏️ 글쓰기」를 누르세요.</div>`;
   list.forEach(m => { const d = md(m.at, my); if (d !== lastDay) { h += `<div class="day"><span>${esc(fmt(m.at, my, { month: 'long', day: 'numeric', weekday: 'short' }))}</span></div>`; lastDay = d; } h += bubble(m); });
-  if (!q) S.out.forEach(o => { h += bubble(Object.assign({ from: S.me.id, heard: {} }, o), true); });
+  if (!q) S.out.filter(o => (o.room || DEF_ROOM) === curRoom()).forEach(o => { h += bubble(Object.assign({ from: S.me.id, heard: {} }, o), true); });
   $('#list').innerHTML = h;
   $('#list').querySelectorAll('img[data-img]').forEach(loadImg);
-  const un = unheardVoices().length, uc = unseenCount(), td = sorted().filter(m => m.todo === 1 && !m.del).length;
-  $('#cUn').hidden = !uc; $('#cUn').textContent = uc;
+  const un = unheardVoices().length, uc = unseenCount(), ua = unseenAll(), td = sorted().filter(m => m.todo === 1 && !m.del).length;
+  $('#cUn').hidden = !uc; $('#cUn').textContent = uc; drawRooms();
   $('#cTodo').hidden = !td; $('#cTodo').textContent = td;
   $('#unb').classList.toggle('on', un > 0 && S.tab === 'chat'); $('#unb').textContent = '▶ 안 들은 녹음 ' + un + '개 차례로 듣기';
-  if (navigator.setAppBadge) { uc ? navigator.setAppBadge(uc).catch(() => { }) : navigator.clearAppBadge().catch(() => { }); }
-  document.title = (uc ? '(' + uc + ') ' : '') + 'UTCA 음성 소통';
+  if (navigator.setAppBadge) { ua ? navigator.setAppBadge(ua).catch(() => { }) : navigator.clearAppBadge().catch(() => { }); }
+  document.title = (ua ? '(' + ua + ') ' : '') + 'UTCA 음성 소통';
   if (S.tab === 'todo') renderTodo();
   playerUi();
   if (S.tab === 'chat' && (atBottom || render.first !== false)) { main.scrollTop = main.scrollHeight; render.first = false; }
@@ -480,7 +511,7 @@ function scrollToMsg(id) { const el = document.getElementById('b_' + id); if (!e
 /* ---------- 보내기 (먼저 휴대폰에 저장 → 연결되면 보냄, 끊기면 저절로 다시) ---------- */
 const newCid = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 async function queueSend(o) {
-  const it = Object.assign({ cid: newCid(), at: Date.now(), text: '', dur: 0, mime: '', reply: S.reply ? S.reply.id : '', todo: 0, done: 0 }, o);
+  const it = Object.assign({ cid: newCid(), at: Date.now(), text: '', dur: 0, mime: '', reply: S.reply ? S.reply.id : '', todo: 0, done: 0, room: curRoom() }, o);
   S.out.push(it); await idb.set('out', it.cid, it); setReply(null); render(); processOut();
 }
 let outBusy = false;
@@ -504,7 +535,7 @@ async function sendOne(it) {
       it.done = i + 1; it.prog = Math.round(it.done / (n + 1) * 100); await idb.set('out', it.cid, it); render();
     }
   }
-  const msg = { cid: it.cid, type: it.type, text: it.text, dur: it.dur, mime: it.mime, reply: it.reply, todo: it.todo, n };
+  const msg = { cid: it.cid, type: it.type, text: it.text, dur: it.dur, mime: it.mime, reply: it.reply, todo: it.todo, n, room: it.room || DEF_ROOM };
   let r = await api('send', { m: msg }, 3);
   if (r.miss) { for (const i of r.miss) await api('up', { cid: it.cid, i, data: b64.slice(i * CH, (i + 1) * CH) }, 3); r = await api('send', { m: msg }, 3); if (r.miss) throw new Error('조각 누락'); }
   S.msgs[r.m.id] = r.m; if (r.m.updated > S.since) { /* since는 목록 받기에서만 올린다 */ }
@@ -687,7 +718,7 @@ function setReply(m) { S.reply = m; $('#rpl').classList.toggle('on', !!m); if (m
 function renderSet() {
   const me = S.me || {}, pushOk = 'PushManager' in window && 'serviceWorker' in navigator, perm = window.Notification ? Notification.permission : 'none';
   $('#setBox').innerHTML = `
-  <div class="card"><h3>👤 이 휴대폰</h3><p><b style="color:var(--nv);font-size:1.05rem">${esc(nameOf(me.id))}</b> (으)로 연결돼 있어요.</p><p>대화 상대: ${others().map(o => esc(nameOf(o.id)) + ' · ' + esc(tzName(o.tz))).join(', ') || '-'}</p></div>
+  <div class="card"><h3>👤 이 휴대폰</h3><p><b style="color:var(--nv);font-size:1.05rem">${esc(nameOf(me.id))}</b> (으)로 연결돼 있어요.</p><p>대화 상대: ${S.members.filter(o => o.id !== me.id).map(o => esc(nameOf(o.id)) + ' · ' + esc(tzName(o.tz))).join(', ') || '-'}</p></div>
   <div class="card"><h3>🔔 휴대폰 알림 (새 녹음이 오면 울림)</h3>
     <p id="pushSt">${!pushOk ? (isIOS && !standalone ? '<span class="warn">아이폰은 먼저 아래 「앱 설치」로 홈 화면에 추가한 뒤, 그 앱에서 켤 수 있어요.</span>' : '<span class="warn">이 브라우저는 알림을 지원하지 않아요. 메일 알림을 켜 주세요.</span>') : perm === 'granted' ? '<span class="ok">알림 허용됨</span>' : perm === 'denied' ? '<span class="bad">알림이 막혀 있어요. 휴대폰 설정 → 앱/사이트 알림에서 허용해 주세요.</span>' : '아직 안 켰어요.'}</p>
     ${pushOk ? '<div class="btns"><button class="b1" id="pOn">🔔 알림 켜기</button><button class="b2" id="pTest">시험 알림</button></div>' : ''}</div>
@@ -723,7 +754,7 @@ function renderSet() {
   };
   $('#unlink').onclick = async () => { if (!await ask('이 휴대폰에서 로그아웃할까요?\n저장된 대화·녹음도 이 휴대폰에서 지워져요. 다시 쓰려면 비밀번호로 로그인하면 돼요(대화는 그대로 다시 나와요).', '로그아웃', '취소')) return;
     try { const reg = await navigator.serviceWorker.getRegistration(); const s = reg && await reg.pushManager.getSubscription(); if (s) { await api('poff', { ep: s.endpoint }, 1).catch(() => { }); await s.unsubscribe(); } } catch (e) { }
-    ['utv_k', 'utv_me', 'utv_mem', 'utv_msgs', 'utv_since'].forEach(k => localStorage.removeItem(k)); for (const s of ['kv', 'media', 'out', 'draft']) await idb.clear(s).catch(() => { }); location.replace('./'); };
+    ['utv_k', 'utv_me', 'utv_mem', 'utv_msgs', 'utv_since', 'utv_rooms', 'utv_room'].forEach(k => localStorage.removeItem(k)); for (const s of ['kv', 'media', 'out', 'draft']) await idb.clear(s).catch(() => { }); location.replace('./'); };
 }
 function applyFs() { document.documentElement.className = 'fs' + S.set.fs; autoFit(); }
 function u8key(b64) { const p = '='.repeat((4 - b64.length % 4) % 4), s = atob((b64 + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(s, c => c.charCodeAt(0)); }
@@ -754,8 +785,9 @@ $('#ov').addEventListener('click', e => { if (e.target.id === 'ov' && !$('#ov').
 
 /* ---------- 눌렀을 때 ---------- */
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-play],[data-more],[data-seek],[data-spd],[data-skip],[data-go],[data-todo],[data-retry],[data-tab]'); if (!t) return;
+  const t = e.target.closest('[data-play],[data-more],[data-seek],[data-spd],[data-skip],[data-go],[data-todo],[data-retry],[data-tab],[data-room]'); if (!t) return;
   if (t.dataset.tab) return showTab(t.dataset.tab);
+  if (t.dataset.room) return setRoom(t.dataset.room);
   if (t.dataset.play) return play(t.dataset.play);
   if (t.dataset.more) return openMore(t.dataset.more);
   if (t.dataset.spd) { const r = [1, 1.25, 1.5, 2]; S.set.rate = r[(r.indexOf(S.set.rate) + 1) % r.length]; P.a.playbackRate = S.set.rate; LS.set('utv_set', S.set); return playerUi(); }
@@ -787,9 +819,9 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) { sy
 /* ---------- 시작 ---------- */
 async function boot() {
   const r = await api('me', {}, 2);
-  S.me = r.me; S.members = r.members; S.vapid = r.vapid; LS.set('utv_me', S.me); LS.set('utv_mem', S.members);
-  $('#hdMe').textContent = nameOf(S.me.id) + ' · 로그인됨';
-  drawClock(); render(); await sync(true);
+  S.me = r.me; S.members = r.members; S.vapid = r.vapid; S.rooms = r.rooms || []; LS.set('utv_me', S.me); LS.set('utv_mem', S.members); LS.set('utv_rooms', S.rooms);
+  $('#hdMe').textContent = hdTxt();
+  drawClock(); render(); await sync(true); autoRoom();
 }
 (async function start() {
   applyFs();
@@ -801,7 +833,7 @@ async function boot() {
   drawClock(); setInterval(drawClock, 30000);
   setInterval(() => { if (!document.hidden && S.me && S.k) sync(); }, 15000);
   if (!S.k) { lockShow(); return; }
-  if (S.me) { $('#hdMe').textContent = nameOf(S.me.id) + ' · 로그인됨'; render(); }
+  if (S.me) { $('#hdMe').textContent = hdTxt(); render(); }
   S.out = (await idb.all('out').catch(() => [])) || []; S.out.sort((a, b) => a.at - b.at);
   try { await boot(); } catch (e) { if (!S.me) { if (e.srv) lockShow('key'); else { $('#hdMe').textContent = '연결 안 됨 · 인터넷을 확인해 주세요'; } } }
   recoverDraft();
