@@ -971,7 +971,7 @@ html.ph[data-step="3"] #phoneApp #bAgain{background:transparent!important;color:
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v049", PNAME="건강상태확인일지";
+var VER="v050", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -2199,6 +2199,105 @@ if(MODE0==="phone"){
 }
 var vtg=$("verTag");if(vtg)vtg.textContent=PNAME+" "+VER;
 $("chips").innerHTML=["팀장 확인 후 작업 가능","팀장 확인 후 작업 제외"].map(function(s){return '<button class="chip">'+s+'</button>'}).join("");
+/* ===== v050 [W1] 생산실 직원 위생 점검: 매주 첫 근무일(보통 월요일) 태블릿 위쪽 「🧼 위생 점검」 → 출근자별 이상 없음/문제 있음/휴무 → 점검자 PIN 서명 → 17:30 조조가 K-HACCP에 옮겨 적음 ===== */
+var W1={info:null,loading:false,force:false,rows:null};
+var W1I=["상의","하의","위생모","위생화","위생마스크","앞치마·토시","위생장갑","액세서리","상처"];
+var W1B=["불량","불량","불량","불량","불량","불량","불량","착용","있음"];
+(function(){var st=document.createElement("style");st.textContent=
+'.w1b{border:3px solid transparent}.w1b.todo{background:#fff4e5;color:#b54708;border-color:#E8590C}.w1b.done{background:var(--okbg);color:var(--ok);border-color:var(--ok)}'+
+'@keyframes w1pl{0%,100%{box-shadow:0 0 0 0 #E8590C66}50%{box-shadow:0 0 0 7px #E8590C00}}.w1b.todo{animation:w1pl 1.6s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.w1b.todo{animation:none}}'+
+'.w1ov{position:fixed;inset:0;z-index:40;background:#0009;display:flex;align-items:stretch;justify-content:center;padding:12px}'+
+'.w1p{background:var(--card);color:var(--ink);border-radius:20px;width:100%;max-width:1100px;display:flex;flex-direction:column;overflow:hidden}'+
+'.w1h{display:flex;align-items:center;gap:12px;padding:14px 18px;background:#010736;color:#FCF1D0}.w1h b{font-size:24px;display:block}.w1h span{font-size:17px;opacity:.9}.w1h .w1x{margin-left:auto;height:54px;padding:0 22px;border-radius:14px;background:#FCF1D0;color:#010736;font-weight:800;font-size:18px}'+
+'.w1bd{flex:1;overflow:auto;padding:12px 16px}.w1g{margin:0 0 10px;font-size:17px;line-height:1.5;color:var(--ink);word-break:keep-all}'+
+'.w1c{border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}.w1c.s-ok{border-color:var(--ok);background:var(--okbg)}.w1c.s-bad{border-color:var(--bad);background:var(--badbg)}.w1c.s-off{background:var(--chip)}'+
+'.w1r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.w1n{font-size:24px;font-weight:800;min-width:110px}'+
+'.w1s{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}.w1s button{height:58px;min-width:140px;padding:0 16px;border-radius:14px;font-size:19px;font-weight:800;background:var(--card);border:2px solid var(--line);color:var(--ink)}'+
+'.w1s button.on[data-s=ok]{background:var(--ok);border-color:var(--ok);color:#fff}.w1s button.on[data-s=bad]{background:var(--bad);border-color:var(--bad);color:#fff}.w1s button.on[data-s=off]{background:#6b7487;border-color:#6b7487;color:#fff}'+
+'.w1it{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.w1it button{height:54px;padding:0 14px;border-radius:12px;font-size:18px;font-weight:700;background:var(--card);border:2px solid var(--bad);color:var(--bad)}.w1it button.on{background:var(--bad);color:#fff}'+
+'.w1m{width:100%;margin-top:8px;height:54px;font-size:18px;padding:0 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink)}'+
+'.w1f{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:2px solid var(--line)}.w1f .w1msg{font-size:18px;font-weight:700;word-break:keep-all}.w1f .w1go{margin-left:auto;height:62px;padding:0 26px;border-radius:16px;font-size:20px;font-weight:800;background:var(--chip);color:var(--sub)}.w1f .w1go.ready{background:#010736;color:#FCF1D0}'+
+'.w1sv{margin:0 0 10px;padding:10px 14px;border-radius:12px;background:var(--okbg);color:var(--ok);font-weight:800;font-size:17px}.w1late{margin:0 0 10px;padding:10px 14px;border-radius:12px;background:#fff4e5;color:#b54708;font-weight:700;font-size:17px;border:2px solid #E8590C}';
+document.head.appendChild(st)})();
+function w1Day(d){                       /* 그 주의 첫 근무일인가 (보통 월요일, 월요일이 쉬면 화요일…) */
+  if(!d||restOf(d))return false;
+  var p=d.split("-"),w=new Date(+p[0],+p[1]-1,+p[2]).getDay();if(w===0||w===6)return false;
+  for(var i=1;i<w;i++){if(!restOf(addDay(d,-i)))return false}
+  return true;
+}
+function w1Load(cb){
+  if(W1.loading)return;W1.loading=true;
+  api("apiW1Get",K,TODAY).then(function(r){W1.loading=false;if(r&&r.ok){W1.info=r;w1Paint()}if(cb)cb(r)}).catch(function(e){W1.loading=false;if(cb)cb(null)});
+}
+function w1Paint(){
+  if(UI!=="tablet")return;
+  var b=$("w1Btn");
+  if(!b){var tb=document.querySelector("#tabletApp .tabs");if(!tb)return;b=document.createElement("button");b.id="w1Btn";b.className="tab w1b hide";b.onclick=function(){w1Open()};tb.insertBefore(b,tb.firstChild)}
+  var inf=W1.info&&W1.info.date===TODAY?W1.info:null, show=curDate===TODAY&&(W1.force||w1Day(TODAY)||!!(inf&&inf.rec));
+  b.classList.toggle("hide",!show);if(!show)return;
+  if(!inf&&!W1.loading)w1Load();
+  var done=!!(inf&&inf.rec);
+  b.classList.toggle("done",done);b.classList.toggle("todo",!done);
+  b.textContent=done?"✅ 위생 점검 완료":"🧼 위생 점검 (오늘)";
+}
+function w1Open(){
+  busy("위생 점검 불러오는 중…");
+  W1.loading=false;
+  w1Load(function(r){
+    unbusy();
+    if(!r||!r.ok){toast((r&&r.msg)||"연결이 불안정해요. 잠시 후 다시 해 주세요");return}
+    var sv=r.rec&&r.rec.rows||[];
+    W1.rows=r.staff.map(function(p,i){var s=sv.filter(function(x){return x.name===p.name})[0];
+      return s?{name:p.name,st:s.st,bad:(s.bad||[]).slice(),memo:s.memo||""}:{name:p.name,st:r.off[p.name]?"off":"",bad:[],memo:""}});
+    w1Draw();
+  });
+}
+function w1Close(){$("ovHost").innerHTML="";W1.rows=null}
+function w1Left(){return W1.rows.filter(function(r){return !r.st||(r.st==="bad"&&!r.bad.length)}).length}
+function w1Draw(){
+  var r=W1.info,ck=r.checker,H=$("ovHost"),late=hm(new Date())>="17:30";
+  var h='<div class="w1ov"><div class="w1p"><div class="w1h"><div><b>🧼 생산실 직원 위생 점검</b><span>'+esc(mdW(TODAY))+' · 점검자 '+esc(ck?ck.name:"(지정 안 됨)")+'</span></div><button class="w1x" id="w1X">닫기</button></div><div class="w1bd">';
+  if(r.rec)h+='<p class="w1sv">✅ '+esc(String(r.rec.at).slice(11,16))+' '+esc(r.rec.by)+' 님이 저장했어요. 고치면 다시 서명해야 해요.</p>';
+  if(late)h+='<p class="w1late">⚠ 17시 30분이 지났어요. 지금 고치면 K-HACCP 일지에는 자동으로 들어가지 않으니, 저장 후 관리자에게 알려 주세요.</p>';
+  h+='<p class="w1g">출근한 사람마다 복장·위생 상태를 보고 하나를 눌러 주세요. 문제가 있으면 해당 항목을 골라 주세요.</p>';
+  W1.rows.forEach(function(x,i){
+    h+='<div class="w1c s-'+(x.st||"no")+'"><div class="w1r"><div class="w1n">'+esc(x.name)+'</div><div class="w1s">'+
+      [["ok","✅ 이상 없음"],["bad","⚠ 문제 있음"],["off","휴무"]].map(function(o){return '<button data-i="'+i+'" data-s="'+o[0]+'" class="'+(x.st===o[0]?"on":"")+'">'+o[1]+'</button>'}).join("")+'</div></div>';
+    if(x.st==="bad"){
+      h+='<div class="w1it">'+W1I.map(function(n,j){return '<button data-i="'+i+'" data-b="'+j+'" class="'+(x.bad.indexOf(j)>=0?"on":"")+'">'+esc(n)+' '+W1B[j]+'</button>'}).join("")+'</div>'+
+        '<input class="w1m" data-i="'+i+'" maxlength="100" placeholder="조치 내용 (예: 위생모 새것으로 바꿈)" value="'+esc(x.memo)+'">';
+    }
+    h+='</div>';
+  });
+  var left=w1Left();
+  h+='</div><div class="w1f"><span class="w1msg" id="w1Msg">'+(left?'아직 '+left+'명 남았어요':'모두 골랐어요. 점검자가 서명해 주세요')+'</span><button class="w1go'+(left?"":" ready")+'" id="w1Go">'+esc(ck?ck.name:"점검자")+' 서명하고 저장</button></div></div></div>';
+  H.innerHTML=h;
+  $("w1X").onclick=w1Close;
+  Array.prototype.forEach.call(H.querySelectorAll(".w1s button"),function(b){b.onclick=function(){var x=W1.rows[+b.dataset.i];x.st=b.dataset.s;if(x.st!=="bad"){x.bad=[];x.memo=""}w1Keep(function(){w1Draw()})}});
+  Array.prototype.forEach.call(H.querySelectorAll(".w1it button"),function(b){b.onclick=function(){var x=W1.rows[+b.dataset.i],j=+b.dataset.b,k=x.bad.indexOf(j);if(k>=0)x.bad.splice(k,1);else x.bad.push(j);w1Keep(function(){w1Draw()})}});
+  Array.prototype.forEach.call(H.querySelectorAll(".w1m"),function(m){m.oninput=function(){W1.rows[+m.dataset.i].memo=m.value}});
+  $("w1Go").onclick=w1Save;
+}
+function w1Keep(fn){var bd=document.querySelector(".w1bd"),y=bd?bd.scrollTop:0;fn();bd=document.querySelector(".w1bd");if(bd)bd.scrollTop=y}
+function w1Save(){
+  var left=w1Left();if(left){toast("아직 "+left+"명 남았어요");return}
+  if(!W1.rows.some(function(x){return x.st!=="off"})){toast("출근한 사람이 없어요");return}
+  var ck=W1.info.checker;if(!ck||!ck.id){toast("점검자가 명단에 없어요. 관리자에게 문의하세요");return}
+  var p=person(ck.id);if(p)p.hasPin=!!ck.hasPin;
+  var rows=W1.rows.map(function(x){return {name:x.name,st:x.st,bad:x.bad.slice().sort(function(a,b){return a-b}),memo:x.memo}});
+  askPin(ck.id,"위생 점검 서명",function(pin,isNew){
+    busy("저장 중…");
+    api("apiW1Save",K,TODAY,rows,pin,!!isNew,"["+VER+"] "+navigator.userAgent).then(function(r){
+      unbusy();
+      if(r&&r.ok){W1.info.rec=r.rec;if(r.checker)W1.info.checker=r.checker;var pp=person(ck.id);if(pp)pp.hasPin=true;w1Close();w1Paint();toast(r.msg);return}
+      if(r&&r.needPin){W1.info.checker.hasPin=false;w1Save();return}
+      toast((r&&r.msg)||"저장하지 못했어요");
+      if(r&&/PIN이 맞지/.test(r.msg||""))w1Save();
+    }).catch(netFail);
+  });
+}
+(function(){var r0=render;render=function(){r0.apply(this,arguments);try{w1Paint()}catch(e){}}})();
+window.__w1Open=function(){W1.force=true;w1Paint();w1Open()};   /* 시험용: 월요일이 아니어도 화면 열기 */
 (function boot(){
   function fail(){$("boot").innerHTML='연결이 잘 안 돼요.<br>잠시 후 다시 시도해 주세요.<br><br><button class="go2" id="bRetry" style="height:56px;padding:0 24px;border-radius:14px;background:var(--pri);color:#fff;font-weight:800">다시 불러오기</button>';$("bRetry").onclick=function(){$("boot").textContent="불러오는 중…";BOOT0=null;boot()}}
   function go(r){
