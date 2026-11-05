@@ -51,11 +51,11 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <header>
   <h1>📢 생산실 방송</h1>
   <span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
-  <button class="hbtn" id="btnTest">소리 시험</button>
+  <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <main>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v002 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v003 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov"><div class="box">
@@ -129,14 +129,24 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   }
 
   /* ---------- 소리 ---------- */
+  /* 소리 크기: 띵동·녹음은 증폭(압축기로 찢어짐 방지). 읽어 주기 목소리는 윈도우 음량을 따름 */
+  var VOLS = [{ n: '보통', g: 1.2 }, { n: '크게', g: 2.2 }, { n: '최대', g: 3.5 }];
+  var volIdx = Number(localStorage.getItem('bang_vol') || 2), mGain = null;
+  function master() {
+    if (!actx) return null;
+    if (!mGain) { mGain = actx.createGain(); var cp = actx.createDynamicsCompressor(); cp.threshold.value = -6; cp.knee.value = 6; cp.ratio.value = 12; cp.attack.value = 0.003; cp.release.value = 0.2; mGain.connect(cp); cp.connect(actx.destination); }
+    mGain.gain.value = VOLS[volIdx].g; return mGain;
+  }
+  function showVol() { btnVol.textContent = '🔊 ' + VOLS[volIdx].n; }
   function chime(n) {
     if (!actx) return Promise.resolve();
+    var out = master();
     var t = actx.currentTime + 0.05, notes = n === 1 ? [880] : [784, 988, 1175, 784, 988, 1175];
     notes.forEach(function (f, i) {
       var o = actx.createOscillator(), g = actx.createGain();
-      o.type = 'sine'; o.frequency.value = f;
-      g.gain.setValueAtTime(0.0001, t + i * 0.32); g.gain.exponentialRampToValueAtTime(0.6, t + i * 0.32 + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.32 + 0.3);
-      o.connect(g); g.connect(actx.destination); o.start(t + i * 0.32); o.stop(t + i * 0.32 + 0.32);
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + i * 0.32); g.gain.exponentialRampToValueAtTime(0.95, t + i * 0.32 + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.32 + 0.3);
+      o.connect(g); g.connect(out); o.start(t + i * 0.32); o.stop(t + i * 0.32 + 0.32);
     });
     return new Promise(function (res) { setTimeout(res, notes.length * 320 + 300); });
   }
@@ -175,9 +185,22 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   function playVoice(m) {
     return getAudio(m).then(function (src) {
       return new Promise(function (res) {
+        if (actx && actx.decodeAudioData) {
+          try {
+            var bin = atob(src.split(',')[1]), buf = new Uint8Array(bin.length);
+            for (var k = 0; k < bin.length; k++) buf[k] = bin.charCodeAt(k);
+            actx.decodeAudioData(buf.buffer, function (ab) {
+              var s = actx.createBufferSource(); s.buffer = ab; s.connect(master()); s.onended = function () { res(true); }; s.start();
+            }, function () { plain(); });
+            return;
+          } catch (e) { }
+        }
+        plain();
+        function plain() {
         var a = new Audio(src); a.volume = 1;
         a.onended = function () { res(true); }; a.onerror = function () { res(false); };
         var p = a.play(); if (p && p.catch) p.catch(function () { res(false); });
+        }
       });
     }).catch(function () { return false; });
   }
@@ -215,6 +238,8 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     m.ack = Date.now(); render();
     call({ op: 'ack', id: m.id, by: '생산실' }).catch(function () { });
   }
+  $('btnVol').onclick = function () { volIdx = (volIdx + 1) % VOLS.length; localStorage.setItem('bang_vol', String(volIdx)); showVol(); unlock(); busy = false; chime(1); };
+  showVol();
   $('btnTest').onclick = function () { unlock(); busy = false; announce({ from: '시험', text: koVoice ? '소리 시험입니다. 잘 들리면 정상이에요.' : '', hasVoice: false }); if (!koVoice) alert('이 포스기에서는 한국어 읽어 주기 음성을 찾지 못했어요. 글은 화면으로, 녹음은 소리로 나와요.'); };
 
   /* ---------- 목록 ---------- */
@@ -272,7 +297,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     poll().then(function (s) {
       if (s === 'stop') return;
       var h = new Date().getHours(), night = h >= 21 || h < 6;
-      setTimeout(loop, night ? 30000 : (failN ? 15000 : 6000));
+      setTimeout(loop, night ? 15000 : (failN ? 15000 : 5000));
     });
   }
 
