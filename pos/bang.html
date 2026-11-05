@@ -62,6 +62,39 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 #gerr{color:#B42318;font-weight:800;min-height:28px;margin-top:10px;font-size:19px}
 #start{width:100%;height:96px;font-size:34px;background:#1E7B45;color:#fff;border:0;border-radius:18px;font-weight:800;cursor:pointer}
 .note{font-size:17px;color:#4A4038;margin-top:14px;line-height:1.5}
+.b-rep{background:#22396F;color:#fff}
+.reps{margin-top:8px}
+.rep{font-size:20px;color:#22396F;font-weight:700;margin-top:4px;white-space:pre-wrap}
+.rep button{margin-left:8px;height:38px;font-size:17px;border:2px solid #22396F;background:#fff;color:#22396F;border-radius:10px;font-weight:800;cursor:pointer}
+#ov .b-rep{flex:1.2;background:#22396F;color:#fff;border:0}
+/* 답장 화면 */
+#rp{position:fixed;inset:0;z-index:15;background:#F2EFEA;display:none;flex-direction:column}
+#rp.on{display:flex}
+#rp .top{background:#22396F;color:#fff;padding:12px 22px;display:flex;align-items:center;gap:14px}
+#rp .top h2{margin:0;font-size:30px;font-weight:900;white-space:nowrap}
+#rp .orig{font-size:20px;opacity:.9;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;min-width:0}
+#rp .body{flex:1;overflow:auto;padding:14px 22px}
+#rpMic{width:100%;height:84px;border:0;border-radius:18px;background:#C0392B;color:#fff;font-size:34px;font-weight:900;cursor:pointer;margin-bottom:12px}
+.grp{margin-bottom:10px}
+.grp .gt{font-size:19px;font-weight:900;color:#5A3A22;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips button{min-height:62px;padding:8px 20px;font-size:24px;font-weight:800;border:3px solid #C9B7A2;background:#fff;color:#1E1A17;border-radius:16px;cursor:pointer}
+.chips button.sel{background:#22396F;border-color:#22396F;color:#fff}
+#rp .foot{background:#fff;border-top:2px solid #DDD5CB;padding:12px 22px;display:flex;gap:14px;align-items:center}
+#rpPrev{flex:1;font-size:24px;font-weight:800;color:#22396F;min-width:0}
+#rp .foot .btn{height:80px;font-size:30px;border-radius:16px}
+#rpCancel{background:#EFE6DA;color:#3B2716;min-width:150px}
+#rpSend{background:#1E7B45;color:#fff;min-width:260px}
+#rpSend:disabled{background:#9AA0A6;cursor:default}
+/* 녹음 중 */
+#rec{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;text-align:center}
+#rec.on{display:flex}
+#recState{font-size:44px;font-weight:900;color:#B42318}
+#recTxt{font-size:34px;font-weight:800;color:#1E1A17;min-height:50px;max-width:1000px;white-space:pre-wrap}
+#recBtns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+#recBtns .btn{height:90px;font-size:32px;border-radius:18px;min-width:220px}
+.b-stop{background:#B42318;color:#fff}
+#toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:#1E7B45;color:#fff;font-size:40px;font-weight:900;padding:26px 44px;border-radius:22px;z-index:30;display:none}
 </style></head><body>
 <header>
   <h1>📢 생산실 방송</h1>
@@ -72,15 +105,26 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v007 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v008 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
   <div class="bar"><span class="badge" id="ovBadge">📢 전달사항</span><span id="ovWho"></span><span class="ago" id="ovAgo"></span></div>
   <div class="msg" id="ovMsg"><div><div class="big" id="ovTxt"></div><div class="voice" id="ovVoice"></div></div></div>
   <div class="more" id="ovMore"></div>
-  <div class="row"><button class="btn b-play" id="ovAgain">🔊 다시 듣기</button><button class="btn b-ok" id="ovOk">✅ 확인했어요</button></div>
+  <div class="row"><button class="btn b-play" id="ovAgain">🔊 다시 듣기</button><button class="btn b-rep" id="ovRep">💬 답장</button><button class="btn b-ok" id="ovOk">✅ 확인했어요</button></div>
 </div>
+
+<div id="rp">
+  <div class="top"><h2>💬 답장 보내기</h2><span class="orig" id="rpOrig"></span></div>
+  <div class="body" id="rpBody">
+    <button id="rpMic">🎤 말로 답장하기 (눌러서 말하기)</button>
+    <div id="rpChips"></div>
+  </div>
+  <div id="rec"><div id="recState"></div><div id="recTxt"></div><div id="recBtns"></div></div>
+  <div class="foot" id="rpFoot"><div id="rpPrev">아래에서 보낼 말을 고르세요 (여러 개 고를 수 있어요)</div><button class="btn" id="rpCancel">닫기</button><button class="btn" id="rpSend" disabled>📨 보내기</button></div>
+</div>
+<div id="toast"></div>
 
 <div id="gate"><div class="box" id="gbox"></div></div>
 
@@ -236,7 +280,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   function helper(cmd) { try { window.postMessage({ bangHelper: 1, cmd: cmd }, '*'); } catch (e) { } }
   function hasHelper() { return document.documentElement.getAttribute('data-bang-helper') === '1'; }
   function announce(m, again) {
-    if (busy) return Promise.resolve();
+    if (busy || replying) return Promise.resolve();
     busy = true;
     helper('duck');
     try { speechSynthesis.cancel(); } catch (e) { }
@@ -284,6 +328,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     tick();
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
+  $('ovRep').onclick = function () { if (current) openReply(current); };
   $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; helper('restore'); ack(m); tones([784, 1047], 0.18); nextOv(); };
   /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
   var titleT = 0;
@@ -312,14 +357,170 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     $('list').innerHTML = arr.map(function (m) {
       return '<div class="card' + (m.ack ? '' : ' new') + '"><div class="body"><div class="meta"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
         (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
-        (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + '</div><div class="side">' +
+        (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + repHtml(m) + '</div><div class="side">' +
         '<button class="btn b-play" data-p="' + m.id + '">🔊 듣기</button>' +
+        '<button class="btn b-rep" data-r="' + m.id + '">💬 답장</button>' +
         (m.ack ? '<div class="done">✅ 확인 ' + hm(m.ack) + '</div>' : '<button class="btn b-ok" data-a="' + m.id + '">✅ 확인</button>') + '</div></div>';
     }).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-p]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-p')); if (m) { busy = false; announce(m); } }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-r]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-r')); if (m) openReply(m); }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ra]'), function (b) { b.onclick = function () { var x = b.getAttribute('data-ra').split('|'); playReply(x[0], Number(x[1])); }; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (m) { ack(m); if (current && current.id === m.id) nextOv(); } }; });
   }
   function byId(id) { return msgs.filter(function (m) { return m.id === id; })[0]; }
+  function repHtml(m) {
+    if (!m.replies || !m.replies.length) return '';
+    return '<div class="reps">' + m.replies.map(function (r, i) {
+      return '<div class="rep">↳ ' + (r.voice ? '🎤' : '💬') + ' 우리 답장 ' + hm(r.t) + ' · ' + esc(r.text || '(녹음)') + (r.voice ? '<button data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>';
+    }).join('') + '</div>';
+  }
+  function playReply(id, i) {
+    call({ op: 'raudio', id: id, i: i }).then(function (r) { if (r.ok) { var a = new Audio('data:' + r.mime + ';base64,' + r.b64); a.play(); } }).catch(function () { });
+  }
+  function toast(t, ms) { var el = $('toast'); el.textContent = t; el.style.display = 'block'; setTimeout(function () { el.style.display = 'none'; }, ms || 2500); }
+
+  /* ---------- 답장 (골라서 보내기 + 말로 보내기) ---------- */
+  var QUICK = [
+    { g: '👌 알겠어요', c: ['네, 알겠습니다', '바로 하겠습니다', '지금 하고 있어요', '다 했습니다', '이미 했어요'] },
+    { g: '⏰ 언제', c: ['10분 뒤에 할게요', '30분 뒤에 할게요', '1시간 뒤에 할게요', '점심 뒤에 할게요', '오늘 안에 할게요', '내일 할게요'] },
+    { g: '⚠️ 상황', c: ['지금 바빠요, 조금 뒤 확인할게요', '재료가 부족해요', '기계에 문제가 있어요', '사람이 부족해요', '시간이 더 필요해요', '잘 모르겠어요, 다시 알려 주세요'] },
+    { g: '🙋 부탁', c: ['전화 주세요', '생산실로 와 주세요', '사무실로 갈게요', '담당자에게 전할게요'] }
+  ];
+  var replying = null, picks = [], rec = null;
+  function openReply(m) {
+    replying = m; picks = [];
+    try { speechSynthesis.cancel(); } catch (e) { } busy = false;
+    $('rpOrig').textContent = (m.from || '') + ' · ' + hm(m.t) + ' · ' + (m.text || '녹음');
+    $('rpChips').innerHTML = QUICK.map(function (q, gi) {
+      return '<div class="grp"><div class="gt">' + q.g + '</div><div class="chips">' + q.c.map(function (c, ci) { return '<button data-q="' + gi + '_' + ci + '">' + esc(c) + '</button>'; }).join('') + '</div></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-q]'), function (b) {
+      b.onclick = function () {
+        var k = b.getAttribute('data-q').split('_'), t = QUICK[k[0]].c[k[1]], at = picks.indexOf(t);
+        if (at >= 0) { picks.splice(at, 1); b.className = ''; } else { picks.push(t); b.className = 'sel'; }
+        showPicks();
+      };
+    });
+    showPicks(); recView(false);
+    $('rp').className = 'on';
+  }
+  function showPicks() {
+    $('rpPrev').textContent = picks.length ? '보낼 말: ' + picks.join(' · ') : '아래에서 보낼 말을 고르세요 (여러 개 고를 수 있어요)';
+    $('rpSend').disabled = !picks.length;
+    $('rpSend').textContent = picks.length > 1 ? '📨 ' + picks.length + '개 보내기' : '📨 보내기';
+  }
+  function closeReply() { stopRec(true); replying = null; $('rp').className = ''; }
+  $('rpCancel').onclick = closeReply;
+  $('rpSend').onclick = function () { if (picks.length) sendReply({ text: picks.join(' · ') }); };
+  function sendReply(o) {
+    var m = replying; if (!m) return;
+    $('rpSend').disabled = true; $('rpSend').textContent = '보내는 중…';
+    o.op = 'reply'; o.id = m.id;
+    call(o).then(function (r) {
+      if (!r.ok) throw new Error(r.err);
+      if (!m.ack) m.ack = Date.now();
+      m.replies = (m.replies || []).concat([{ t: Date.now(), text: o.text || '', voice: !!o.b64 }]);
+      closeReply(); render(); tones([784, 1047], 0.18);
+      toast(m.sts ? '✅ 답장 보냈어요 (슬랙에 올라가요)' : '✅ 답장 보냈어요');
+      if (current && current.id === m.id) nextOv();
+    }).catch(function () {
+      showPicks(); if (rec && rec.done) recDone();
+      toast('❌ 못 보냈어요. 인터넷을 확인하고 다시 눌러 주세요', 3500);
+    });
+  }
+  /* 말로 답장: 누른 동안만 마이크 켜짐(최대 30초). 녹음(WAV) + 글자 변환을 같이 보냄 */
+  function recView(on) {
+    $('rec').className = on ? 'on' : '';
+    $('rpBody').style.display = on ? 'none' : '';
+    $('rpFoot').style.display = on ? 'none' : '';
+  }
+  function recBtns(list) {
+    $('recBtns').innerHTML = list.map(function (b, i) { return '<button class="btn ' + b[1] + '" data-rb="' + i + '">' + b[0] + '</button>'; }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rb]'), function (el) { el.onclick = list[Number(el.getAttribute('data-rb'))][2]; });
+  }
+  $('rpMic').onclick = startRec;
+  function startRec() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('이 포스기에서는 마이크를 쓸 수 없어요', 3500); return; }
+    recView(true);
+    $('recState').textContent = '마이크 켜는 중…'; $('recTxt').textContent = '';
+    recBtns([['취소', 'b-play', function () { stopRec(true); recView(false); }]]);
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }).then(function (st) {
+      if (!replying) { st.getTracks().forEach(function (t) { t.stop(); }); return; }
+      helper('duck');
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var src = ctx.createMediaStreamSource(st), pr = ctx.createScriptProcessor(4096, 1, 1), bufs = [];
+      pr.onaudioprocess = function (e) { if (rec && !rec.done) bufs.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+      src.connect(pr); pr.connect(ctx.destination);
+      rec = { st: st, ctx: ctx, pr: pr, bufs: bufs, rate: ctx.sampleRate, t0: Date.now(), text: '', interim: '', done: false };
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        try {
+          var sr = new SR(); sr.lang = 'ko-KR'; sr.continuous = true; sr.interimResults = true;
+          sr.onresult = function (ev) {
+            var fin = '', inter = '';
+            for (var i = 0; i < ev.results.length; i++) { if (ev.results[i].isFinal) fin += ev.results[i][0].transcript; else inter += ev.results[i][0].transcript; }
+            rec.text = fin.trim(); rec.interim = inter.trim();
+            $('recTxt').textContent = (rec.text + ' ' + rec.interim).trim();
+          };
+          sr.onerror = function () { }; sr.start(); rec.sr = sr;
+        } catch (e) { }
+      }
+      recBtns([['취소', 'b-play', function () { stopRec(true); recView(false); }], ['⏹ 다 했어요', 'b-stop', function () { stopRec(false); }]]);
+      rec.timer = setInterval(function () {
+        var s = Math.floor((Date.now() - rec.t0) / 1000);
+        $('recState').textContent = '🔴 말씀하세요 · ' + s + '초 / 30초';
+        if (s >= 30) stopRec(false);
+      }, 300);
+    }).catch(function () {
+      recView(false); toast('마이크를 찾지 못했거나 막혀 있어요. 마이크를 꽂고 다시 눌러 주세요', 4000);
+    });
+  }
+  function stopRec(cancel) {
+    if (!rec || rec.done) { if (cancel) rec = null; return; }
+    rec.done = true; clearInterval(rec.timer);
+    rec.dur = Math.round((Date.now() - rec.t0) / 1000);
+    try { rec.sr && rec.sr.stop(); } catch (e) { }
+    try { rec.st.getTracks().forEach(function (t) { t.stop(); }); rec.pr.disconnect(); rec.ctx.close(); } catch (e) { }
+    helper('restore');
+    if (cancel) { rec = null; return; }
+    $('recState').textContent = '글자로 바꾸는 중…';
+    setTimeout(recDone, 1200);
+  }
+  function recDone() {
+    if (!rec) return;
+    if (!rec.wav) rec.wav = wavB64(rec.bufs, rec.rate);
+    var said = (rec.text + ' ' + rec.interim).trim();
+    rec.said = said;
+    $('recState').textContent = '이렇게 보낼게요 (' + rec.dur + '초 녹음)';
+    $('recTxt').textContent = (picks.length ? picks.join(' · ') + '\n' : '') + (said || '(글자로 못 바꿨어요. 녹음으로 보내요)');
+    recBtns([
+      ['▶ 들어 보기', 'b-play', function () { var a = new Audio('data:audio/wav;base64,' + rec.wav); a.play(); }],
+      ['🔁 다시 하기', 'b-play', function () { rec = null; startRec(); }],
+      ['📨 보내기', 'b-ok', function () {
+        $('recBtns').innerHTML = '<div style="font-size:32px;font-weight:900">보내는 중…</div>';
+        var txt = (picks.length ? picks.join(' · ') + (said ? ' · ' : '') : '') + said;
+        sendReply({ text: txt, b64: rec.wav, mime: 'audio/wav', dur: rec.dur });
+      }]
+    ]);
+  }
+  function wavB64(bufs, rate) {
+    var len = 0; bufs.forEach(function (b) { len += b.length; });
+    var all = new Float32Array(len), o = 0; bufs.forEach(function (b) { all.set(b, o); o += b.length; });
+    var R = 16000, ratio = rate / R, n = Math.floor(len / ratio), pcm = new Int16Array(n);
+    for (var i = 0; i < n; i++) {
+      var s0 = Math.floor(i * ratio), s1 = Math.min(len, Math.floor((i + 1) * ratio)), sum = 0, c = 0;
+      for (var j = s0; j < s1; j++) { sum += all[j]; c++; }
+      var v = c ? sum / c : 0; v = Math.max(-1, Math.min(1, v)); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7FFF;
+    }
+    var buf = new ArrayBuffer(44 + n * 2), dv = new DataView(buf);
+    function ws(p, s) { for (var k = 0; k < s.length; k++) dv.setUint8(p + k, s.charCodeAt(k)); }
+    ws(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); ws(8, 'WAVE'); ws(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, R, true); dv.setUint32(28, R * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); ws(36, 'data'); dv.setUint32(40, n * 2, true);
+    new Int16Array(buf, 44).set(pcm);
+    var bytes = new Uint8Array(buf), bin = '', CH = 0x8000;
+    for (var p = 0; p < bytes.length; p += CH) bin += String.fromCharCode.apply(null, bytes.subarray(p, p + CH));
+    return btoa(bin);
+  }
   function notify(m) {
     try {
       if (window.Notification && Notification.permission === 'granted' && document.hidden) {
