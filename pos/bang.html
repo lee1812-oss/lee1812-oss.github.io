@@ -30,11 +30,10 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 /* 새 소식 큰 화면 */
 #ov{position:fixed;inset:0;display:none;flex-direction:column;z-index:10;background:#0D1C42;color:#fff}
 #ov.on{display:flex}
-#ov.flash{animation:fl 1s steps(1) infinite}
+/* v011: 깜빡임은 CSS 애니메이션 대신 같은 시계로 맞춤(키오스크·TV 박자 일치) */
+#ov.flash.lit{background:#B35A00}
 #ov.urg{background:#8E1B12}
-#ov.urg.flash{animation:fu .7s steps(1) infinite}
-@keyframes fl{0%{background:#0D1C42}50%{background:#B35A00}}
-@keyframes fu{0%{background:#8E1B12}50%{background:#E0A800}}
+#ov.urg.flash.lit{background:#E0A800}
 #ov .bar{display:flex;align-items:center;gap:18px;padding:16px 26px;font-size:32px;font-weight:800;background:rgba(0,0,0,.3)}
 #ov .badge{background:#FFD24D;color:#1E1A17;padding:6px 18px;border-radius:12px;white-space:nowrap}
 #ov .ago{margin-left:auto;font-size:28px;color:#FFE7A3;white-space:nowrap}
@@ -108,7 +107,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v010 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v011 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -306,13 +305,14 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     var who = m.from || '사무실', head = m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ';
     function round(i) {
       if (i > total || !alive()) return Promise.resolve();
+      annRound = i; annTotal = total; setBadge(); tvPost();
       var lead = i === 1 ? head + who + (m.text ? ' 전달입니다. ' : ' 녹음입니다. ') : '다시 알려 드립니다. ';
       return speak(m.text ? lead + m.text : lead).then(function () {
         if (!m.hasVoice || !alive()) return;
         return (m.text && i === 1 ? speak('녹음도 들려 드립니다.') : Promise.resolve()).then(function () { if (alive()) return playVoice(m); });
       }).then(function () { return round(i + 1); });
     }
-    function fin() { if (tok === annTok) { busy = false; helper('restore'); } }
+    function fin() { if (tok === annTok) { busy = false; helper('restore'); annRound = 0; setBadge(); tvPost(); } }
     return new Promise(function (r) { setTimeout(r, hasHelper() ? 500 : 0); })
       .then(function () { if (alive()) return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42); })
       .then(function () { return round(1); })
@@ -329,15 +329,26 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   }
   window.addEventListener('resize', fitText);
   function ovClass(m, flash) { $('ov').className = 'on' + (flash ? ' flash' : '') + (m.urgent ? ' urg' : ''); }
+  /* v011: 깜빡임·회차를 하나의 시계(flashFs)로 맞춰 키오스크와 TV가 같은 박자로 보이게 함 */
+  var flashFs = 0, flashFe = 0, annRound = 0, annTotal = 0;
+  function badgeTxt(u, r, t) { return (u ? '🚨 긴급 전달' : '📢 전달사항') + (r && t > 1 ? ' · 방송 ' + r + '/' + t : ''); }
+  function setBadge() { if (current) $('ovBadge').textContent = badgeTxt(current.urgent, annRound, annTotal); }
+  function flashSync() {
+    var ov = $('ov'); if (!current || !flashFs || (' ' + ov.className + ' ').indexOf(' on ') < 0) return;
+    var now = Date.now(), fl = !flashFe || now < flashFe, per = current.urgent ? 700 : 1000;
+    var lit = fl && Math.floor((now - flashFs) / (per / 2)) % 2 === 1;
+    var c = 'on' + (fl ? ' flash' : '') + (current.urgent ? ' urg' : '') + (lit ? ' lit' : '');
+    if (ov.className !== c) ov.className = c;
+  }
+  setInterval(flashSync, 25);
   function showOv(m) {
-    current = m;
-    $('ovBadge').textContent = m.urgent ? '🚨 긴급 전달' : '📢 전달사항';
+    current = m; flashFs = Date.now(); flashFe = m.urgent ? 0 : flashFs + 10000; annRound = 0;
+    setBadge();
     $('ovWho').textContent = (m.from || '') + ' · ' + hm(m.t) + (m.via === 'slack' ? ' · 슬랙' : '');
     $('ovTxt').textContent = m.text || '';
     $('ovTxt').style.display = m.text ? 'block' : 'none';
     $('ovVoice').textContent = m.hasVoice ? '🎤 녹음 ' + (m.dur ? m.dur + '초 ' : '') + '— 소리로 들려 드려요' : '';
-    ovClass(m, true);
-    if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 10000);
+    ovClass(m, true); flashSync();
     fitText(); tick();
     clearInterval(repeatT);
   }
@@ -357,7 +368,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   var bc = null; try { bc = new BroadcastChannel('bang_tv'); } catch (e) { }
   function tvPost() {
     if (!bc || TVQ) return;
-    var s = current ? { on: 1, id: current.id || '', text: current.text || '', from: current.from || '', t: current.t, urgent: !!current.urgent, via: current.via || '', hasVoice: !!current.hasVoice, dur: current.dur || 0, more: queue.length } : { on: 0 };
+    var s = current ? { on: 1, id: current.id || '', text: current.text || '', from: current.from || '', t: current.t, urgent: !!current.urgent, via: current.via || '', hasVoice: !!current.hasVoice, dur: current.dur || 0, more: queue.length, fs: flashFs, fe: flashFe, rd: annRound, rt: annTotal } : { on: 0 };
     try { bc.postMessage(s); } catch (e) { }
   }
   if (bc && !TVQ) bc.onmessage = function (e) { if (e.data && e.data.hello) tvPost(); };
@@ -611,18 +622,18 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
       $('ovAgo').textContent = ago(s.t);
       $('ovMore').textContent = s.more ? '다음 전달 ' + s.more + '건 더 있어요' : '';
       document.title = '📺 TV 표시 · 전달';
-      if (k === key) return;
-      key = k; current = s;
-      $('ovBadge').textContent = s.urgent ? '🚨 긴급 전달' : '📢 전달사항';
+      flashFs = s.fs || flashFs; flashFe = s.fe || 0; annRound = s.rd || 0; annTotal = s.rt || 0;
+      if (k === key) { setBadge(); return; }
+      key = k; current = s; setBadge();
       $('ovWho').textContent = (s.from || '') + ' · ' + hm(s.t) + (s.via === 'slack' ? ' · 슬랙' : '');
       $('ovTxt').textContent = s.text || ''; $('ovTxt').style.display = s.text ? 'block' : 'none';
       $('ovVoice').textContent = s.hasVoice ? '🎤 녹음 ' + (s.dur ? s.dur + '초 ' : '') + '— 키오스크에서 소리로 들려 드려요' : '';
-      ovClass(s, true);
-      if (!s.urgent) setTimeout(function () { if (key === k) ovClass(s, false); }, 10000);
+      ovClass(s, true); flashSync();
       fitText();
     };
     var hi = function () { try { bc.postMessage({ hello: 1 }); } catch (e) { } };
     hi(); setInterval(function () { if (Date.now() - last > 5000) hi(); }, 3000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) { hi(); flashSync(); fitText(); } });
   }
   if (TVQ) tvMode(); else if (!pin) gatePin(); else gateStart();
 })();
