@@ -55,7 +55,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 </header>
 <main>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v001 · 이 화면은 켜 두기만 하면 돼요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v002 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov"><div class="box">
@@ -114,6 +114,9 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     });
   }
   function gateStart() {
+    /* 크롬을 --autoplay-policy=no-user-gesture-required 로 켠 포스기는 누르지 않아도 바로 시작 */
+    try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
+    if (actx && actx.state === 'running') { $('gate').style.display = 'none'; loop(); return; }
     $('gate').style.display = 'flex';
     $('gbox').innerHTML = '<h2>📢 생산실 방송</h2><p>화면을 한 번 눌러야 소리가 나요.<br>아래 버튼을 눌러 주세요.</p><button id="start">🔊 소리 켜고 시작</button>' +
       '<div class="note">포스기를 껐다 켜면 이 버튼을 한 번 더 눌러 주세요.</div>';
@@ -221,7 +224,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     if (!arr.length) { $('list').innerHTML = '<div class="empty">오늘 받은 말이 아직 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div>'; return; }
     $('list').innerHTML = arr.map(function (m) {
       return '<div class="card' + (m.ack ? '' : ' new') + '"><div class="body"><div class="meta"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
-        (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
+        (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
         (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + '</div><div class="side">' +
         '<button class="btn b-play" data-p="' + m.id + '">🔊 듣기</button>' +
         (m.ack ? '<div class="done">✅ 확인 ' + hm(m.ack) + '</div>' : '<button class="btn b-ok" data-a="' + m.id + '">✅ 확인</button>') + '</div></div>';
