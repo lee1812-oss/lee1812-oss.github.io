@@ -28,14 +28,29 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 .tag{display:inline-block;font-size:16px;padding:2px 10px;border-radius:20px;background:#5A3A22;color:#fff;margin-left:6px}
 .tag.u{background:#C0392B}
 /* 새 소식 큰 화면 */
-#ov{position:fixed;inset:0;background:rgba(30,20,12,.92);display:none;align-items:center;justify-content:center;z-index:10;padding:24px}
+#ov{position:fixed;inset:0;display:none;flex-direction:column;z-index:10;background:#0D1C42;color:#fff}
 #ov.on{display:flex}
-#ov .box{background:#fff;border-radius:22px;max-width:1000px;width:100%;padding:28px 30px;border:8px solid #C0392B}
-#ov .who{font-size:26px;font-weight:800;color:#5A3A22;margin-bottom:12px}
-#ov .big{font-size:44px;line-height:1.4;font-weight:800;white-space:pre-wrap;max-height:55vh;overflow:auto}
-#ov .voice{font-size:26px;color:#3B2716;margin-top:10px}
-#ov .row{display:flex;gap:14px;margin-top:22px}
-#ov .row .btn{flex:1;height:84px;font-size:30px}
+#ov.flash{animation:fl 1s steps(1) infinite}
+#ov.urg{background:#8E1B12}
+#ov.urg.flash{animation:fu .7s steps(1) infinite}
+@keyframes fl{0%{background:#0D1C42}50%{background:#B35A00}}
+@keyframes fu{0%{background:#8E1B12}50%{background:#E0A800}}
+#ov .bar{display:flex;align-items:center;gap:18px;padding:16px 26px;font-size:32px;font-weight:800;background:rgba(0,0,0,.3)}
+#ov .badge{background:#FFD24D;color:#1E1A17;padding:6px 18px;border-radius:12px;white-space:nowrap}
+#ov .ago{margin-left:auto;font-size:28px;color:#FFE7A3;white-space:nowrap}
+#ov .msg{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 36px;text-align:center;overflow:hidden;min-height:0}
+#ov .msg>div{max-width:100%}
+#ov .big{font-weight:900;line-height:1.3;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+#ov .voice{font-size:40px;font-weight:800;margin-top:14px;color:#FFE7A3}
+#ov .more{text-align:center;font-size:26px;font-weight:800;color:#FFE7A3;min-height:8px}
+#ov .row{display:flex;gap:18px;padding:16px 26px 24px}
+#ov .row .btn{height:120px;font-size:44px;border-radius:22px}
+#ov .b-ok{flex:2.3;background:#1E9E5A;color:#fff;border:5px solid #fff}
+#ov .b-play{flex:1;background:#FCF1D0;color:#3B2716;border:0}
+.band{display:flex;align-items:center;gap:20px;border-radius:16px;padding:16px 24px;margin-bottom:16px;font-size:38px;font-weight:900;color:#fff}
+.band.ok{background:#1E7B45}.band.bad{background:#B42318;animation:fu2 1.2s steps(1) infinite}
+@keyframes fu2{50%{background:#7A1F16}}
+.band #clk{font-size:60px;background:rgba(0,0,0,.2);padding:2px 14px;border-radius:10px}
 /* 시작 화면 */
 #gate{position:fixed;inset:0;background:#F2EFEA;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px}
 #gate .box{background:#fff;border:1px solid #DDD5CB;border-radius:20px;padding:26px 30px;width:100%;max-width:560px;text-align:center}
@@ -54,19 +69,17 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <main>
+  <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v003 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v004 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
-<div id="ov"><div class="box">
-  <div class="who" id="ovWho"></div>
-  <div class="big" id="ovTxt"></div>
-  <div class="voice" id="ovVoice"></div>
-  <div class="row">
-    <button class="btn b-play" id="ovAgain">🔊 다시 듣기</button>
-    <button class="btn b-ok" id="ovOk">✅ 확인했어요</button>
-  </div>
-</div></div>
+<div id="ov">
+  <div class="bar"><span class="badge" id="ovBadge">📢 전달사항</span><span id="ovWho"></span><span class="ago" id="ovAgo"></span></div>
+  <div class="msg" id="ovMsg"><div><div class="big" id="ovTxt"></div><div class="voice" id="ovVoice"></div></div></div>
+  <div class="more" id="ovMore"></div>
+  <div class="row"><button class="btn b-play" id="ovAgain">🔊 다시 듣기</button><button class="btn b-ok" id="ovOk">✅ 확인했어요</button></div>
+</div>
 
 <div id="gate"><div class="box" id="gbox"></div></div>
 
@@ -204,37 +217,81 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
       });
     }).catch(function () { return false; });
   }
-  function announce(m) {
+  /* 안내 방송 소리: 시작음(도-미-솔-도) → 말 → 끝음, 긴급은 빠른 경보음 */
+  function tones(seq, step) {
+    if (!actx) return Promise.resolve();
+    var out = master(), t = actx.currentTime + 0.05; step = step || 0.42;
+    seq.forEach(function (f, i) {
+      [1, 2].forEach(function (h) {
+        var o = actx.createOscillator(), g = actx.createGain(), a = t + i * step, pk = h === 1 ? 0.95 : 0.35;
+        o.type = h === 1 ? 'triangle' : 'sine'; o.frequency.value = f * h;
+        g.gain.setValueAtTime(0.0001, a); g.gain.exponentialRampToValueAtTime(pk, a + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, a + step * 1.6);
+        o.connect(g); g.connect(out); o.start(a); o.stop(a + step * 1.7);
+      });
+    });
+    return new Promise(function (res) { setTimeout(res, (seq.length * step + 0.6) * 1000); });
+  }
+  var T_START = [523, 659, 784, 1047], T_END = [1047, 784], T_URG = [988, 784, 988, 784, 988, 784];
+  function announce(m, again) {
     if (busy) return Promise.resolve();
     busy = true;
     try { speechSynthesis.cancel(); } catch (e) { }
-    return chime(2).then(function () {
-      return m.text ? speak(m.from + ' 말씀입니다. ' + m.text) : Promise.resolve();
+    var who = m.from || '사무실', head = again ? '아직 확인하지 않은 전달사항이 있습니다. ' : (m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ');
+    var once = m.text ? head + who + ' 전달입니다. ' + m.text : '';
+    var twice = m.text && !again && m.text.length <= 80 ? ' 다시 한 번 알려 드립니다. ' + m.text : '';
+    return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42).then(function () {
+      return once ? speak(once + twice) : Promise.resolve();
     }).then(function () {
-      if (m.hasVoice) return speak(m.text ? '녹음도 들려 드릴게요.' : m.from + ' 녹음입니다.').then(function () { return playVoice(m); });
-    }).then(function () { busy = false; }, function () { busy = false; });
+      if (m.hasVoice) return speak(m.text ? '녹음도 들려 드립니다.' : head + who + ' 녹음입니다.').then(function () { return playVoice(m); });
+    }).then(function () { return tones(T_END, 0.35); }).then(function () { busy = false; }, function () { busy = false; });
   }
 
-  /* ---------- 새 소식 큰 화면 ---------- */
+  /* ---------- 새 소식 큰 화면 (화면 가득, 깜빡임, 글자 크기 자동) ---------- */
+  function ago(t) { var s = Math.floor((Date.now() - t) / 1000); return s < 60 ? '방금 전' : Math.floor(s / 60) + '분째 확인 안 함'; }
+  function fitText() {
+    var box = $('ovMsg'), el = $('ovTxt'); if (!current || !el.textContent) return;
+    var size = 170; el.style.fontSize = size + 'px';
+    while (size > 40 && (box.scrollHeight > box.clientHeight + 2 || el.scrollWidth > box.clientWidth - 20)) { size -= 6; el.style.fontSize = size + 'px'; }
+  }
+  window.addEventListener('resize', fitText);
+  function ovClass(m, flash) { $('ov').className = 'on' + (flash ? ' flash' : '') + (m.urgent ? ' urg' : ''); }
   function showOv(m) {
     current = m;
-    $('ovWho').innerHTML = '📢 ' + esc(m.from) + ' · ' + hm(m.t) + (m.urgent ? ' <span class="tag u">급함</span>' : '');
+    $('ovBadge').textContent = m.urgent ? '🚨 긴급 전달' : '📢 전달사항';
+    $('ovWho').textContent = (m.from || '') + ' · ' + hm(m.t) + (m.via === 'slack' ? ' · 슬랙' : '');
     $('ovTxt').textContent = m.text || '';
     $('ovTxt').style.display = m.text ? 'block' : 'none';
-    $('ovVoice').textContent = m.hasVoice ? '🎤 녹음 ' + (m.dur ? m.dur + '초' : '') + ' (소리로 들려 드려요)' : '';
-    $('ov').className = 'on';
+    $('ovVoice').textContent = m.hasVoice ? '🎤 녹음 ' + (m.dur ? m.dur + '초 ' : '') + '— 소리로 들려 드려요' : '';
+    ovClass(m, true);
+    if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 10000);
+    fitText(); tick();
     clearInterval(repeatT);
     var n = 0;
-    repeatT = setInterval(function () { n++; if (n > (m.urgent ? 5 : 3) || !current) { clearInterval(repeatT); return; } announce(current); }, m.urgent ? 60000 : 120000);
+    repeatT = setInterval(function () {
+      n++; if (n > (m.urgent ? 60 : 10) || current !== m) { clearInterval(repeatT); return; }
+      ovClass(m, true); if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 6000);
+      announce(m, true);
+    }, m.urgent ? 30000 : 60000);
   }
   function nextOv() {
     current = null; $('ov').className = ''; clearInterval(repeatT);
     var m = queue.shift();
     if (m) { showOv(m); announce(m); }
+    tick();
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
-  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } ack(m); nextOv(); };
-  function ack(m) {
+  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; ack(m); tones([784, 1047], 0.18); nextOv(); };
+  /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
+  var titleT = 0;
+  function tick() {
+    var d = new Date(); $('clk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    var un = msgs.filter(function (m) { return !m.ack; }).length;
+    $('band').className = 'band ' + (un ? 'bad' : 'ok');
+    $('bandTxt').textContent = un ? '확인 안 한 전달 ' + un + '건' : '새 전달 없음 · 모두 확인함';
+    if (current) { $('ovAgo').textContent = ago(current.t); $('ovMore').textContent = queue.length ? '다음 전달 ' + queue.length + '건 더 있어요' : ''; }
+    titleT++; document.title = un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
+  }
+  setInterval(tick, 1000);  function ack(m) {
     m.ack = Date.now(); render();
     call({ op: 'ack', id: m.id, by: '생산실' }).catch(function () { });
   }
