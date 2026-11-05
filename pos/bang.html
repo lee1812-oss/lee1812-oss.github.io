@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>생산실 방송 · 받는 화면</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#F2EFEA;color:#1E1A17;font-family:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;word-break:keep-all;overflow-wrap:break-word;font-size:20px}
+header{display:flex;align-items:center;gap:14px;background:#5A3A22;color:#fff;padding:12px 20px}
+header h1{font-size:26px;margin:0;font-weight:800;flex:1}
+.st{font-size:18px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.dot{width:14px;height:14px;border-radius:50%;background:#9AA0A6;display:inline-block}
+.dot.ok{background:#3DDC84}.dot.bad{background:#FF5A4F}
+.hbtn{height:46px;padding:0 16px;border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer}
+main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
+.empty{background:#fff;border:1px solid #DDD5CB;border-radius:16px;padding:36px;text-align:center;font-size:22px;color:#4A4038}
+.card{background:#fff;border:2px solid #DDD5CB;border-radius:16px;padding:16px 18px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start}
+.card.new{border-color:#C0392B;background:#FFF6F4}
+.card .meta{font-size:18px;color:#4A4038;margin-bottom:6px;font-weight:700}
+.card .meta b{color:#5A3A22}
+.card .txt{font-size:26px;line-height:1.45;font-weight:700;white-space:pre-wrap}
+.card .body{flex:1;min-width:0}
+.card .side{display:flex;flex-direction:column;gap:8px;min-width:170px}
+.btn{height:58px;border:0;border-radius:12px;font-size:21px;font-weight:800;cursor:pointer;padding:0 18px}
+.b-ok{background:#1E7B45;color:#fff}.b-play{background:#EFE6DA;color:#3B2716;border:2px solid #C9B7A2}
+.done{font-size:18px;color:#1E7B45;font-weight:800;text-align:center;padding:8px 0}
+.tag{display:inline-block;font-size:16px;padding:2px 10px;border-radius:20px;background:#5A3A22;color:#fff;margin-left:6px}
+.tag.u{background:#C0392B}
+/* 새 소식 큰 화면 */
+#ov{position:fixed;inset:0;background:rgba(30,20,12,.92);display:none;align-items:center;justify-content:center;z-index:10;padding:24px}
+#ov.on{display:flex}
+#ov .box{background:#fff;border-radius:22px;max-width:1000px;width:100%;padding:28px 30px;border:8px solid #C0392B}
+#ov .who{font-size:26px;font-weight:800;color:#5A3A22;margin-bottom:12px}
+#ov .big{font-size:44px;line-height:1.4;font-weight:800;white-space:pre-wrap;max-height:55vh;overflow:auto}
+#ov .voice{font-size:26px;color:#3B2716;margin-top:10px}
+#ov .row{display:flex;gap:14px;margin-top:22px}
+#ov .row .btn{flex:1;height:84px;font-size:30px}
+/* 시작 화면 */
+#gate{position:fixed;inset:0;background:#F2EFEA;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px}
+#gate .box{background:#fff;border:1px solid #DDD5CB;border-radius:20px;padding:26px 30px;width:100%;max-width:560px;text-align:center}
+#gate h2{font-size:30px;margin:0 0 8px;color:#5A3A22}
+#gate p{font-size:20px;line-height:1.5;margin:0 0 16px;color:#3B332D}
+#pinv{height:66px;border:3px solid #C9B7A2;border-radius:14px;font-size:36px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-weight:800}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button{height:70px;font-size:32px;font-weight:800;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:14px;cursor:pointer}
+#gerr{color:#B42318;font-weight:800;min-height:28px;margin-top:10px;font-size:19px}
+#start{width:100%;height:96px;font-size:34px;background:#1E7B45;color:#fff;border:0;border-radius:18px;font-weight:800;cursor:pointer}
+.note{font-size:17px;color:#4A4038;margin-top:14px;line-height:1.5}
+</style></head><body>
+<header>
+  <h1>📢 생산실 방송</h1>
+  <span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
+  <button class="hbtn" id="btnTest">소리 시험</button>
+</header>
+<main>
+  <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
+  <div class="note">v001 · 이 화면은 켜 두기만 하면 돼요. 결제 화면이 위에 있어도 소리는 나요.</div>
+</main>
+
+<div id="ov"><div class="box">
+  <div class="who" id="ovWho"></div>
+  <div class="big" id="ovTxt"></div>
+  <div class="voice" id="ovVoice"></div>
+  <div class="row">
+    <button class="btn b-play" id="ovAgain">🔊 다시 듣기</button>
+    <button class="btn b-ok" id="ovOk">✅ 확인했어요</button>
+  </div>
+</div></div>
+
+<div id="gate"><div class="box" id="gbox"></div></div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbxoQ4OCTBGw06Z6ttoSHiEnLt__WQ5NL-As1t66U9vQVH-tGOl_kDMYfUuod9ouU1QFOQ/exec';
+  var LS = 'bang_recv_pin';
+  var pin = localStorage.getItem(LS) || '';
+  var ver = -1, msgs = [], first = true, seen = {}, queue = [], busy = false, actx = null, koVoice = null, current = null, repeatT = null, failN = 0;
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function hm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+  function call(o) {
+    o.pin = pin;
+    return fetch(API, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); });
+  }
+  function status(ok, t) { $('dot').className = 'dot ' + (ok ? 'ok' : 'bad'); $('stt').textContent = t; }
+
+  /* ---------- 시작 화면 (번호 → 소리 켜기) ---------- */
+  function gatePin(err) {
+    var typed = '';
+    $('gate').style.display = 'flex';
+    $('gbox').innerHTML = '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>' +
+      '<div id="pinv">&nbsp;</div><div class="pad">' +
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0, '확인'].map(function (k) { return '<button data-k="' + k + '">' + k + '</button>'; }).join('') +
+      '</div><div id="gerr">' + (err || '') + '</div>';
+    var show = function () { $('pinv').textContent = typed ? typed.replace(/./g, '●') : '\u00a0'; };
+    Array.prototype.forEach.call(document.querySelectorAll('.pad button'), function (b) {
+      b.onclick = function () {
+        var k = b.getAttribute('data-k');
+        if (k === '지움') typed = typed.slice(0, -1);
+        else if (k === '확인') {
+          if (typed.length < 6) { $('gerr').textContent = '번호를 끝까지 넣어 주세요.'; return; }
+          pin = typed; $('gerr').textContent = '확인 중…';
+          call({ op: 'who' }).then(function (r) {
+            if (r.ok) { localStorage.setItem(LS, pin); gateStart(); }
+            else { pin = ''; typed = ''; show(); $('gerr').textContent = r.err === 'locked' ? '여러 번 틀려서 15분 동안 잠겼어요.' : '번호가 맞지 않아요. 다시 넣어 주세요.'; }
+          }).catch(function () { pin = ''; $('gerr').textContent = '인터넷 연결을 확인해 주세요.'; });
+          return;
+        } else if (typed.length < 12) typed += k;
+        show();
+      };
+    });
+  }
+  function gateStart() {
+    $('gate').style.display = 'flex';
+    $('gbox').innerHTML = '<h2>📢 생산실 방송</h2><p>화면을 한 번 눌러야 소리가 나요.<br>아래 버튼을 눌러 주세요.</p><button id="start">🔊 소리 켜고 시작</button>' +
+      '<div class="note">포스기를 껐다 켜면 이 버튼을 한 번 더 눌러 주세요.</div>';
+    $('start').onclick = function () { unlock(); $('gate').style.display = 'none'; chime(1); loop(); };
+  }
+  function unlock() {
+    try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== 'running') actx.resume(); } catch (e) { }
+    try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) { }
+    if (window.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { } }
+  }
+
+  /* ---------- 소리 ---------- */
+  function chime(n) {
+    if (!actx) return Promise.resolve();
+    var t = actx.currentTime + 0.05, notes = n === 1 ? [880] : [784, 988, 1175, 784, 988, 1175];
+    notes.forEach(function (f, i) {
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + i * 0.32); g.gain.exponentialRampToValueAtTime(0.6, t + i * 0.32 + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.32 + 0.3);
+      o.connect(g); g.connect(actx.destination); o.start(t + i * 0.32); o.stop(t + i * 0.32 + 0.32);
+    });
+    return new Promise(function (res) { setTimeout(res, notes.length * 320 + 300); });
+  }
+  function pickVoice() {
+    var vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+    var ko = vs.filter(function (v) { return /^ko/i.test(v.lang); });
+    koVoice = ko.filter(function (v) { return /Google/.test(v.name); })[0] || ko[0] || null;
+  }
+  if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  function speak(text) {
+    return new Promise(function (res) {
+      if (!window.speechSynthesis || !koVoice || !text) return res(false);
+      var parts = String(text).split(/(?<=[.!?。\n])\s*/).filter(function (s) { return s.trim(); });
+      var chunks = [], cur = '';
+      parts.forEach(function (p) { if ((cur + ' ' + p).length > 120 && cur) { chunks.push(cur); cur = p; } else cur = cur ? cur + ' ' + p : p; });
+      if (cur) chunks.push(cur);
+      var i = 0, guard = setTimeout(function () { res(true); }, 60000);
+      (function next() {
+        if (i >= chunks.length) { clearTimeout(guard); return res(true); }
+        var u = new SpeechSynthesisUtterance(chunks[i++]);
+        u.voice = koVoice; u.lang = koVoice.lang; u.rate = 0.95; u.volume = 1;
+        u.onend = next; u.onerror = next;
+        speechSynthesis.speak(u);
+      })();
+    });
+  }
+  var audioCache = {};
+  function getAudio(m) {
+    if (audioCache[m.id]) return Promise.resolve(audioCache[m.id]);
+    return call({ op: 'audio', id: m.id }).then(function (r) {
+      if (!r.ok) throw new Error('audio');
+      var src = 'data:' + (r.mime || 'audio/webm') + ';base64,' + r.b64;
+      audioCache[m.id] = src; return src;
+    });
+  }
+  function playVoice(m) {
+    return getAudio(m).then(function (src) {
+      return new Promise(function (res) {
+        var a = new Audio(src); a.volume = 1;
+        a.onended = function () { res(true); }; a.onerror = function () { res(false); };
+        var p = a.play(); if (p && p.catch) p.catch(function () { res(false); });
+      });
+    }).catch(function () { return false; });
+  }
+  function announce(m) {
+    if (busy) return Promise.resolve();
+    busy = true;
+    try { speechSynthesis.cancel(); } catch (e) { }
+    return chime(2).then(function () {
+      return m.text ? speak(m.from + ' 말씀입니다. ' + m.text) : Promise.resolve();
+    }).then(function () {
+      if (m.hasVoice) return speak(m.text ? '녹음도 들려 드릴게요.' : m.from + ' 녹음입니다.').then(function () { return playVoice(m); });
+    }).then(function () { busy = false; }, function () { busy = false; });
+  }
+
+  /* ---------- 새 소식 큰 화면 ---------- */
+  function showOv(m) {
+    current = m;
+    $('ovWho').innerHTML = '📢 ' + esc(m.from) + ' · ' + hm(m.t) + (m.urgent ? ' <span class="tag u">급함</span>' : '');
+    $('ovTxt').textContent = m.text || '';
+    $('ovTxt').style.display = m.text ? 'block' : 'none';
+    $('ovVoice').textContent = m.hasVoice ? '🎤 녹음 ' + (m.dur ? m.dur + '초' : '') + ' (소리로 들려 드려요)' : '';
+    $('ov').className = 'on';
+    clearInterval(repeatT);
+    var n = 0;
+    repeatT = setInterval(function () { n++; if (n > (m.urgent ? 5 : 3) || !current) { clearInterval(repeatT); return; } announce(current); }, m.urgent ? 60000 : 120000);
+  }
+  function nextOv() {
+    current = null; $('ov').className = ''; clearInterval(repeatT);
+    var m = queue.shift();
+    if (m) { showOv(m); announce(m); }
+  }
+  $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
+  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } ack(m); nextOv(); };
+  function ack(m) {
+    m.ack = Date.now(); render();
+    call({ op: 'ack', id: m.id, by: '생산실' }).catch(function () { });
+  }
+  $('btnTest').onclick = function () { unlock(); busy = false; announce({ from: '시험', text: koVoice ? '소리 시험입니다. 잘 들리면 정상이에요.' : '', hasVoice: false }); if (!koVoice) alert('이 포스기에서는 한국어 읽어 주기 음성을 찾지 못했어요. 글은 화면으로, 녹음은 소리로 나와요.'); };
+
+  /* ---------- 목록 ---------- */
+  function render() {
+    var today = dayKey(Date.now());
+    var arr = msgs.filter(function (m) { return dayKey(m.t) === today || !m.ack; }).slice().reverse();
+    if (!arr.length) { $('list').innerHTML = '<div class="empty">오늘 받은 말이 아직 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div>'; return; }
+    $('list').innerHTML = arr.map(function (m) {
+      return '<div class="card' + (m.ack ? '' : ' new') + '"><div class="body"><div class="meta"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
+        (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
+        (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + '</div><div class="side">' +
+        '<button class="btn b-play" data-p="' + m.id + '">🔊 듣기</button>' +
+        (m.ack ? '<div class="done">✅ 확인 ' + hm(m.ack) + '</div>' : '<button class="btn b-ok" data-a="' + m.id + '">✅ 확인</button>') + '</div></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-p]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-p')); if (m) { busy = false; announce(m); } }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (m) { ack(m); if (current && current.id === m.id) nextOv(); } }; });
+  }
+  function byId(id) { return msgs.filter(function (m) { return m.id === id; })[0]; }
+  function notify(m) {
+    try {
+      if (window.Notification && Notification.permission === 'granted' && document.hidden) {
+        var n = new Notification('📢 ' + m.from + ' 말씀', { body: m.text || '녹음이 왔어요', requireInteraction: true, tag: m.id });
+        n.onclick = function () { window.focus(); n.close(); };
+      }
+    } catch (e) { }
+  }
+
+  /* ---------- 받아오기 ---------- */
+  function poll() {
+    return call({ op: 'poll', since: ver, n: 40 }).then(function (r) {
+      if (!r.ok) {
+        if (r.err === 'pin' || r.err === 'locked') { localStorage.removeItem(LS); pin = ''; gatePin('번호가 바뀌었어요. 새 번호를 넣어 주세요.'); return 'stop'; }
+        throw new Error(r.err);
+      }
+      failN = 0; status(true, '연결됨 · ' + hm(Date.now()));
+      if (r.same) return;
+      ver = r.v;
+      var old = {}; msgs.forEach(function (m) { old[m.id] = m; });
+      var keepAck = function (m) { var o = old[m.id]; if (o && o.ack && !m.ack) m.ack = o.ack; return m; };
+      msgs = (r.list || []).map(keepAck);
+      msgs.forEach(function (m) {
+        if (seen[m.id]) return; seen[m.id] = 1;
+        if (!first && !m.ack) { queue.push(m); notify(m); }
+      });
+      first = false;
+      if (current) { var c = byId(current.id); if (!c || c.ack) nextOv(); }
+      queue = queue.filter(function (q) { var c = byId(q.id); return c && !c.ack; });
+      render();
+      if (!current && queue.length) nextOv();
+    }).catch(function () {
+      failN++; status(false, failN > 2 ? '인터넷 끊김 · 다시 연결 중' : '다시 연결 중');
+    });
+  }
+  function loop() {
+    poll().then(function (s) {
+      if (s === 'stop') return;
+      var h = new Date().getHours(), night = h >= 21 || h < 6;
+      setTimeout(loop, night ? 30000 : (failN ? 15000 : 6000));
+    });
+  }
+
+  if (!pin) gatePin(); else gateStart();
+})();
+</script>
+</body></html>

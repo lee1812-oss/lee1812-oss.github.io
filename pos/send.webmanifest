@@ -1,0 +1,1 @@
+{"name":"생산실 방송 보내기","short_name":"생산실 방송","start_url":"send.html","scope":"./","display":"standalone","background_color":"#F4F2EF","theme_color":"#5A3A22","icons":[{"src":"bang-192.png","sizes":"192x192","type":"image/png"},{"src":"bang-512.png","sizes":"512x512","type":"image/png","purpose":"any"}]}

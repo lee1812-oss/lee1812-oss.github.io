@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>생산실 방송 보내기</title>
+<link rel="manifest" href="send.webmanifest">
+<meta name="theme-color" content="#5A3A22">
+<link rel="icon" href="bang-192.png"><link rel="apple-touch-icon" href="bang-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="생산실 방송">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F4F2EF;color:#1E1A17;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all;overflow-wrap:break-word;font-size:18px}
+header{background:#5A3A22;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px;flex:1}
+header button{height:40px;border:1.5px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:15px;padding:0 12px}
+main{padding:16px;max-width:620px;margin:0 auto}
+.box{background:#fff;border:1px solid #DDD5CB;border-radius:16px;padding:16px;margin-bottom:14px}
+h2{font-size:19px;margin:0 0 10px;color:#5A3A22}
+textarea{width:100%;min-height:120px;border:2px solid #C9B7A2;border-radius:12px;padding:12px;font-size:20px;font-family:inherit;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:#5A3A22}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chips button{border:1.5px solid #C9B7A2;background:#FBF8F4;border-radius:22px;padding:9px 14px;font-size:16px;color:#3B2716}
+.btn{width:100%;height:58px;border:0;border-radius:14px;font-size:20px;font-weight:800}
+.b-send{background:#5A3A22;color:#fff}
+.b-rec{background:#C0392B;color:#fff;height:76px;font-size:23px}
+.b-rec.on{background:#7A1F16;animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.75}}
+.b-sub{background:#EFE6DA;color:#3B2716;border:1.5px solid #C9B7A2}
+.row{display:flex;gap:10px;margin-top:10px}.row .btn{flex:1}
+label.urg{display:flex;align-items:center;gap:10px;font-size:18px;margin:6px 0 12px;font-weight:700;color:#8A2A1E}
+label.urg input{width:24px;height:24px;accent-color:#C0392B}
+audio{width:100%;margin-top:10px}
+.msg{font-weight:800;min-height:24px;margin-top:8px}
+.msg.ok{color:#1E7B45}.msg.err{color:#B42318}
+.item{border-top:1px solid #EEE7DE;padding:12px 0;display:flex;gap:10px;align-items:flex-start}
+.item:first-child{border-top:0}
+.item .b{flex:1;min-width:0}
+.item .t{font-size:15px;color:#4A4038;font-weight:700}
+.item .x{font-size:18px;white-space:pre-wrap;margin-top:3px}
+.state{font-size:15px;font-weight:800;white-space:nowrap;padding:5px 10px;border-radius:20px}
+.s-wait{background:#FFF1DC;color:#9A5B00}.s-ok{background:#E3F4EA;color:#1E7B45}
+.del{border:0;background:none;color:#8A7F75;font-size:14px;text-decoration:underline;margin-top:6px}
+.login input{width:100%;height:58px;border:2px solid #C9B7A2;border-radius:12px;padding:0 14px;font-size:22px;margin-bottom:12px}
+.login p{line-height:1.55;margin:0 0 14px;color:#3B332D}
+.who{display:flex;gap:8px;margin-bottom:12px}.who button{flex:1;height:52px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;font-size:18px;font-weight:700}
+.who button.sel{background:#5A3A22;color:#fff;border-color:#5A3A22}
+.foot{font-size:14px;color:#5E554D;text-align:center;margin:16px 0 30px}
+</style></head><body>
+<header><h1>📢 생산실 방송</h1><button id="btnOut" style="display:none">설정</button></header>
+<main id="app"></main>
+<div class="foot">v001 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbxoQ4OCTBGw06Z6ttoSHiEnLt__WQ5NL-As1t66U9vQVH-tGOl_kDMYfUuod9ouU1QFOQ/exec';
+  var pin = localStorage.getItem('bang_send_pin') || '', from = localStorage.getItem('bang_from') || '대표님';
+  var $ = function (id) { return document.getElementById(id); };
+  var rec = null, chunks = [], recBlob = null, recMime = '', recDur = 0, recT0 = 0, recTimer = null, list = [], pollT = null;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function hm(t) { var d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function call(o) { o.pin = pin; return fetch(API, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); }); }
+
+  function loginView(err) {
+    $('btnOut').style.display = 'none';
+    $('app').innerHTML = '<div class="box login"><h2>처음 한 번만 설정해요</h2><p>받은 「보내기 번호」를 넣어 주세요. 이 휴대폰이 기억해서 다음부터는 묻지 않아요.</p>' +
+      '<div class="who">' + ['대표님', '이사님', '사무실'].map(function (n) { return '<button data-w="' + n + '"' + (n === from ? ' class="sel"' : '') + '>' + n + '</button>'; }).join('') + '</div>' +
+      '<input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="보내기 번호">' +
+      '<button class="btn b-send" id="go">시작하기</button><div class="msg err" id="lerr">' + (err || '') + '</div></div>';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-w]'), function (b) {
+      b.onclick = function () { from = b.getAttribute('data-w'); Array.prototype.forEach.call(document.querySelectorAll('[data-w]'), function (x) { x.className = x === b ? 'sel' : ''; }); };
+    });
+    $('go').onclick = function () {
+      pin = $('pin').value.trim(); $('lerr').textContent = '확인 중…';
+      call({ op: 'who' }).then(function (r) {
+        if (r.ok && r.role === 'send') { localStorage.setItem('bang_send_pin', pin); localStorage.setItem('bang_from', from); mainView(); }
+        else { pin = ''; $('lerr').textContent = r.err === 'locked' ? '여러 번 틀려서 15분 동안 잠겼어요.' : '번호가 맞지 않아요.'; }
+      }).catch(function () { pin = ''; $('lerr').textContent = '인터넷 연결을 확인해 주세요.'; });
+    };
+  }
+
+  function mainView() {
+    $('btnOut').style.display = '';
+    $('app').innerHTML =
+      '<div class="box"><h2>✍️ 글로 보내기 <span style="font-weight:400;font-size:15px;color:#5E554D">(포스기가 소리 내어 읽어 줘요)</span></h2>' +
+      '<textarea id="txt" maxlength="500" placeholder="생산실에 전할 말을 쓰세요"></textarea>' +
+      '<div class="chips">' + ['잠깐 사무실로 와 주세요', '통화 가능할 때 전화 주세요', '오늘 생산 현황 알려 주세요', '점심 맛있게 드세요'].map(function (c) { return '<button data-c="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
+      '<label class="urg"><input type="checkbox" id="urg"> 급함 (확인할 때까지 1분마다 다시 울려요)</label>' +
+      '<button class="btn b-send" id="sendTxt">📨 글 보내기</button><div class="msg" id="m1"></div></div>' +
+      '<div class="box"><h2>🎤 목소리로 보내기</h2>' +
+      '<button class="btn b-rec" id="recBtn">🎤 눌러서 녹음 시작</button>' +
+      '<div id="recArea"></div><div class="msg" id="m2"></div></div>' +
+      '<div class="box"><h2>보낸 말 · 생산실 확인</h2><div id="sent">불러오는 중…</div></div>';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-c]'), function (b) { b.onclick = function () { var t = $('txt'); t.value = (t.value ? t.value + '\n' : '') + b.getAttribute('data-c'); }; });
+    $('sendTxt').onclick = function () {
+      var t = $('txt').value.trim();
+      if (!t) { msg('m1', '보낼 말을 써 주세요.', 0); return; }
+      $('sendTxt').disabled = true; msg('m1', '보내는 중…', 1);
+      call({ op: 'send', text: t, from: from, urgent: $('urg').checked }).then(function (r) {
+        $('sendTxt').disabled = false;
+        if (r.ok) { $('txt').value = ''; $('urg').checked = false; msg('m1', '✅ 보냈어요. 생산실에서 확인하면 아래에 표시돼요.', 1); refresh(); }
+        else fail('m1', r);
+      }).catch(function () { $('sendTxt').disabled = false; msg('m1', '인터넷 연결을 확인하고 다시 눌러 주세요.', 0); });
+    };
+    $('recBtn').onclick = toggleRec;
+    refresh(); clearInterval(pollT); pollT = setInterval(function () { if (!document.hidden) refresh(); }, 10000);
+  }
+  function msg(id, t, ok) { var e = $(id); if (e) { e.textContent = t; e.className = 'msg ' + (ok ? 'ok' : 'err'); } }
+  function fail(id, r) {
+    if (r.err === 'pin' || r.err === 'role') { localStorage.removeItem('bang_send_pin'); pin = ''; loginView('번호가 바뀌었어요. 새 보내기 번호를 넣어 주세요.'); return; }
+    msg(id, r.err === 'big' ? '녹음이 너무 길어요. 1분 30초 안으로 해 주세요.' : r.err === 'locked' ? '잠시 잠겼어요. 15분 뒤에 다시 해 주세요.' : '보내지 못했어요. 다시 눌러 주세요.', 0);
+  }
+
+  /* ---------- 녹음 ---------- */
+  function toggleRec() {
+    if (rec && rec.state === 'recording') { rec.stop(); return; }
+    if (!navigator.mediaDevices || !window.MediaRecorder) { msg('m2', '이 휴대폰 브라우저는 녹음을 지원하지 않아요. 크롬이나 사파리 최신판에서 열어 주세요.', 0); return; }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (st) {
+      var types = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'];
+      recMime = types.filter(function (t) { return MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t); })[0] || '';
+      var opt = { audioBitsPerSecond: 32000 }; if (recMime) opt.mimeType = recMime;
+      try { rec = new MediaRecorder(st, opt); } catch (e) { rec = new MediaRecorder(st); }
+      chunks = []; recBlob = null; $('recArea').innerHTML = '';
+      rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = function () {
+        clearInterval(recTimer); st.getTracks().forEach(function (t) { t.stop(); });
+        recDur = Math.round((Date.now() - recT0) / 1000);
+        recBlob = new Blob(chunks, { type: rec.mimeType || recMime || 'audio/webm' });
+        $('recBtn').className = 'btn b-rec'; $('recBtn').textContent = '🎤 다시 녹음하기';
+        $('recArea').innerHTML = '<audio controls src="' + URL.createObjectURL(recBlob) + '"></audio>' +
+          '<div class="row"><button class="btn b-sub" id="recCancel">지우기</button><button class="btn b-send" id="recSend">📨 녹음 보내기 (' + recDur + '초)</button></div>';
+        $('recCancel').onclick = function () { recBlob = null; $('recArea').innerHTML = ''; $('recBtn').textContent = '🎤 눌러서 녹음 시작'; };
+        $('recSend').onclick = sendRec;
+      };
+      rec.start(1000); recT0 = Date.now();
+      $('recBtn').className = 'btn b-rec on'; $('recBtn').textContent = '■ 녹음 끝내기 (0초)'; msg('m2', '', 1);
+      recTimer = setInterval(function () {
+        var s = Math.round((Date.now() - recT0) / 1000);
+        $('recBtn').textContent = '■ 녹음 끝내기 (' + s + '초)';
+        if (s >= 90 && rec.state === 'recording') rec.stop();
+      }, 500);
+    }).catch(function () { msg('m2', '마이크 사용을 허용해 주세요. (주소창 옆 자물쇠 → 마이크 허용)', 0); });
+  }
+  function sendRec() {
+    if (!recBlob) return;
+    $('recSend').disabled = true; msg('m2', '보내는 중…', 1);
+    var fr = new FileReader();
+    fr.onload = function () {
+      var b64 = String(fr.result).split(',')[1];
+      call({ op: 'send', b64: b64, mime: recBlob.type, dur: recDur, from: from, text: '' }).then(function (r) {
+        if (r.ok) { recBlob = null; $('recArea').innerHTML = ''; $('recBtn').textContent = '🎤 눌러서 녹음 시작'; msg('m2', '✅ 녹음을 보냈어요. 생산실 포스기에서 바로 재생돼요.', 1); refresh(); }
+        else { $('recSend').disabled = false; fail('m2', r); }
+      }).catch(function () { $('recSend').disabled = false; msg('m2', '인터넷 연결을 확인하고 다시 눌러 주세요.', 0); });
+    };
+    fr.readAsDataURL(recBlob);
+  }
+
+  /* ---------- 보낸 목록 ---------- */
+  function refresh() {
+    return call({ op: 'poll', since: -1, n: 15 }).then(function (r) {
+      if (!r.ok) { if (r.err === 'pin') fail('m1', r); return; }
+      list = (r.list || []).slice().reverse();
+      var el = $('sent'); if (!el) return;
+      if (!list.length) { el.innerHTML = '<div style="color:#5E554D">아직 보낸 말이 없어요.</div>'; return; }
+      el.innerHTML = list.map(function (m) {
+        return '<div class="item"><div class="b"><div class="t">' + hm(m.t) + ' · ' + esc(m.from) + (m.urgent ? ' · <span style="color:#C0392B">급함</span>' : '') + '</div>' +
+          '<div class="x">' + (m.text ? esc(m.text) : '') + (m.hasVoice ? (m.text ? '\n' : '') + '🎤 녹음 ' + (m.dur || '') + '초' : '') + '</div>' +
+          (m.ack ? '' : '<button class="del" data-d="' + m.id + '">잘못 보냈어요 (지우기)</button>') + '</div>' +
+          (m.ack ? '<span class="state s-ok">✅ 확인 ' + hm(m.ack).split(' ')[1] + '</span>' : '<span class="state s-wait">확인 전</span>') + '</div>';
+      }).join('');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-d]'), function (b) {
+        b.onclick = function () { if (!confirm('이 말을 지울까요? 생산실 화면에서도 사라져요.')) return; call({ op: 'del', id: b.getAttribute('data-d') }).then(refresh); };
+      });
+    }).catch(function () { });
+  }
+
+  $('btnOut').onclick = function () {
+    if (confirm('이 휴대폰에서 보내기 번호를 지울까요?\n(보내는 사람 이름을 바꿀 때도 이걸 눌러요)')) { localStorage.removeItem('bang_send_pin'); pin = ''; clearInterval(pollT); loginView(); }
+  };
+  if (pin) mainView(); else loginView();
+})();
+</script>
+</body></html>
