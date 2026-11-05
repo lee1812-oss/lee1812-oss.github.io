@@ -65,13 +65,13 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 </style></head><body>
 <header>
   <h1>📢 생산실 방송</h1>
-  <span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
+  <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v004 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v005 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -232,18 +232,22 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     return new Promise(function (res) { setTimeout(res, (seq.length * step + 0.6) * 1000); });
   }
   var T_START = [523, 659, 784, 1047], T_END = [1047, 784], T_URG = [988, 784, 988, 784, 988, 784];
+  /* 생산실 방송 도우미(크롬 확장)가 있으면: 방송 동안 유튜브 일시정지·다른 탭 음소거 */
+  function helper(cmd) { try { window.postMessage({ bangHelper: 1, cmd: cmd }, '*'); } catch (e) { } }
+  function hasHelper() { return document.documentElement.getAttribute('data-bang-helper') === '1'; }
   function announce(m, again) {
     if (busy) return Promise.resolve();
     busy = true;
+    helper('duck');
     try { speechSynthesis.cancel(); } catch (e) { }
     var who = m.from || '사무실', head = again ? '아직 확인하지 않은 전달사항이 있습니다. ' : (m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ');
     var once = m.text ? head + who + ' 전달입니다. ' + m.text : '';
     var twice = m.text && !again && m.text.length <= 80 ? ' 다시 한 번 알려 드립니다. ' + m.text : '';
-    return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42).then(function () {
+    return new Promise(function (r) { setTimeout(r, hasHelper() ? 500 : 0); }).then(function () { return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42); }).then(function () {
       return once ? speak(once + twice) : Promise.resolve();
     }).then(function () {
       if (m.hasVoice) return speak(m.text ? '녹음도 들려 드립니다.' : head + who + ' 녹음입니다.').then(function () { return playVoice(m); });
-    }).then(function () { return tones(T_END, 0.35); }).then(function () { busy = false; }, function () { busy = false; });
+    }).then(function () { return tones(T_END, 0.35); }).then(function () { busy = false; helper('restore'); }, function () { busy = false; helper('restore'); });
   }
 
   /* ---------- 새 소식 큰 화면 (화면 가득, 깜빡임, 글자 크기 자동) ---------- */
@@ -280,7 +284,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     tick();
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
-  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; ack(m); tones([784, 1047], 0.18); nextOv(); };
+  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; helper('restore'); ack(m); tones([784, 1047], 0.18); nextOv(); };
   /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
   var titleT = 0;
   function tick() {
@@ -291,7 +295,8 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     if (current) { $('ovAgo').textContent = ago(current.t); $('ovMore').textContent = queue.length ? '다음 전달 ' + queue.length + '건 더 있어요' : ''; }
     titleT++; document.title = un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
   }
-  setInterval(tick, 1000);  function ack(m) {
+  setInterval(tick, 1000);
+  setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m) {
     m.ack = Date.now(); render();
     call({ op: 'ack', id: m.id, by: '생산실' }).catch(function () { });
   }
