@@ -108,7 +108,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v009 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v010 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -223,8 +223,9 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
       var chunks = [], cur = '';
       parts.forEach(function (p) { if ((cur + ' ' + p).length > 120 && cur) { chunks.push(cur); cur = p; } else cur = cur ? cur + ' ' + p : p; });
       if (cur) chunks.push(cur);
-      var i = 0, guard = setTimeout(function () { res(true); }, 60000);
+      var i = 0, tk = annTok, guard = setTimeout(function () { res(true); }, 60000);
       (function next() {
+        if (tk !== annTok) { clearTimeout(guard); return res(false); }
         if (i >= chunks.length) { clearTimeout(guard); return res(true); }
         var u = new SpeechSynthesisUtterance(chunks[i++]);
         u.voice = koVoice; u.lang = koVoice.lang; u.rate = 0.95; u.volume = 1;
@@ -243,22 +244,28 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     });
   }
   function playVoice(m) {
+    var tk = annTok;
     return getAudio(m).then(function (src) {
       return new Promise(function (res) {
+        if (tk !== annTok) return res(false);
         if (actx && actx.decodeAudioData) {
           try {
             var bin = atob(src.split(',')[1]), buf = new Uint8Array(bin.length);
             for (var k = 0; k < bin.length; k++) buf[k] = bin.charCodeAt(k);
             actx.decodeAudioData(buf.buffer, function (ab) {
-              var s = actx.createBufferSource(); s.buffer = ab; s.connect(master()); s.onended = function () { res(true); }; s.start();
+              if (tk !== annTok) return res(false);
+              var s = actx.createBufferSource(); s.buffer = ab; s.connect(master()); s.onended = function () { curStop = null; res(true); }; s.start();
+              curStop = function () { s.onended = null; try { s.stop(); } catch (e) { } res(false); };
             }, function () { plain(); });
             return;
           } catch (e) { }
         }
         plain();
         function plain() {
+        if (tk !== annTok) return res(false);
         var a = new Audio(src); a.volume = 1;
-        a.onended = function () { res(true); }; a.onerror = function () { res(false); };
+        a.onended = function () { curStop = null; res(true); }; a.onerror = function () { res(false); };
+        curStop = function () { a.onended = null; try { a.pause(); } catch (e) { } res(false); };
         var p = a.play(); if (p && p.catch) p.catch(function () { res(false); });
         }
       });
@@ -282,19 +289,35 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   /* 생산실 방송 도우미(크롬 확장)가 있으면: 방송 동안 유튜브 일시정지·다른 탭 음소거 */
   function helper(cmd) { try { window.postMessage({ bangHelper: 1, cmd: cmd }, '*'); } catch (e) { } }
   function hasHelper() { return document.documentElement.getAttribute('data-bang-helper') === '1'; }
-  function announce(m, again) {
-    if (busy || replying) return Promise.resolve();
-    busy = true;
-    helper('duck');
+  /* v010: 새 전달은 쉬지 않고 연달아 5번 방송, 「확인했어요」를 누르면 그 자리에서 바로 멈춤 */
+  var ANN_TIMES = 5, annTok = 0, curStop = null;
+  function stopSound() {
+    annTok++;
     try { speechSynthesis.cancel(); } catch (e) { }
-    var who = m.from || '사무실', head = again ? '아직 확인하지 않은 전달사항이 있습니다. ' : (m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ');
-    var once = m.text ? head + who + ' 전달입니다. ' + m.text : '';
-    var twice = m.text && !again && m.text.length <= 80 ? ' 다시 한 번 알려 드립니다. ' + m.text : '';
-    return new Promise(function (r) { setTimeout(r, hasHelper() ? 500 : 0); }).then(function () { return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42); }).then(function () {
-      return once ? speak(once + twice) : Promise.resolve();
-    }).then(function () {
-      if (m.hasVoice) return speak(m.text ? '녹음도 들려 드립니다.' : head + who + ' 녹음입니다.').then(function () { return playVoice(m); });
-    }).then(function () { return tones(T_END, 0.35); }).then(function () { busy = false; helper('restore'); }, function () { busy = false; helper('restore'); });
+    if (curStop) { var f = curStop; curStop = null; try { f(); } catch (e) { } }
+    busy = false; helper('restore');
+  }
+  function announce(m) {
+    if (replying) return Promise.resolve();
+    stopSound();
+    var tok = annTok; busy = true; helper('duck');
+    var loop = current === m && !m.ack, total = loop ? ANN_TIMES : 1;
+    var alive = function () { return tok === annTok && !replying && (!loop || (current === m && !m.ack)); };
+    var who = m.from || '사무실', head = m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ';
+    function round(i) {
+      if (i > total || !alive()) return Promise.resolve();
+      var lead = i === 1 ? head + who + (m.text ? ' 전달입니다. ' : ' 녹음입니다. ') : '다시 알려 드립니다. ';
+      return speak(m.text ? lead + m.text : lead).then(function () {
+        if (!m.hasVoice || !alive()) return;
+        return (m.text && i === 1 ? speak('녹음도 들려 드립니다.') : Promise.resolve()).then(function () { if (alive()) return playVoice(m); });
+      }).then(function () { return round(i + 1); });
+    }
+    function fin() { if (tok === annTok) { busy = false; helper('restore'); } }
+    return new Promise(function (r) { setTimeout(r, hasHelper() ? 500 : 0); })
+      .then(function () { if (alive()) return tones(m.urgent ? T_URG : T_START, m.urgent ? 0.22 : 0.42); })
+      .then(function () { return round(1); })
+      .then(function () { if (alive()) return tones(T_END, 0.35); })
+      .then(fin, fin);
   }
 
   /* ---------- 새 소식 큰 화면 (화면 가득, 깜빡임, 글자 크기 자동) ---------- */
@@ -317,14 +340,9 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 10000);
     fitText(); tick();
     clearInterval(repeatT);
-    var n = 0;
-    repeatT = setInterval(function () {
-      n++; if (n > 4 || current !== m) { clearInterval(repeatT); return; }
-      ovClass(m, true); if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 6000);
-      announce(m, true);
-    }, m.urgent ? 30000 : 60000);
   }
   function nextOv() {
+    stopSound();
     current = null; $('ov').className = ''; clearInterval(repeatT);
     var m = queue.shift();
     if (m) { showOv(m); announce(m); }
@@ -332,7 +350,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
   $('ovRep').onclick = function () { if (current) openReply(current); };
-  $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; helper('restore'); ack(m); tones([784, 1047], 0.18); nextOv(); };
+  $('ovOk').onclick = function () { var m = current; if (!m) return; stopSound(); ack(m); tones([784, 1047], 0.18); nextOv(); };
   /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
   /* ---------- TV 같이 보기 (v009): 같은 PC의 두 번째 모니터 창(?tv=1)에 지금 방송을 그대로 보여 줌. 서버 호출 없음 ---------- */
   var TVQ = /[?&]tv=1/.test(location.search);
@@ -403,7 +421,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   var replying = null, picks = [], rec = null;
   function openReply(m) {
     replying = m; picks = [];
-    try { speechSynthesis.cancel(); } catch (e) { } busy = false;
+    stopSound();
     $('rpOrig').textContent = (m.from || '') + ' · ' + hm(m.t) + ' · ' + (m.text || '녹음');
     $('rpChips').innerHTML = QUICK.map(function (q, gi) {
       return '<div class="grp"><div class="gt">' + q.g + '</div><div class="chips">' + q.c.map(function (c, ci) { return '<button data-q="' + gi + '_' + ci + '">' + esc(c) + '</button>'; }).join('') + '</div></div>';
