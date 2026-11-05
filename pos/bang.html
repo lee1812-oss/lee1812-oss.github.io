@@ -72,7 +72,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v006 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v007 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -272,7 +272,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     clearInterval(repeatT);
     var n = 0;
     repeatT = setInterval(function () {
-      n++; if (n > (m.urgent ? 60 : 10) || current !== m) { clearInterval(repeatT); return; }
+      n++; if (n > 4 || current !== m) { clearInterval(repeatT); return; }
       ovClass(m, true); if (!m.urgent) setTimeout(function () { if (current === m) ovClass(m, false); }, 6000);
       announce(m, true);
     }, m.urgent ? 30000 : 60000);
