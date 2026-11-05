@@ -68,10 +68,11 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
+<div id="sndBar" style="display:none;background:#FFD24D;color:#1E1A17;font-size:30px;font-weight:900;text-align:center;padding:14px">🔈 소리가 꺼져 있어요 · 화면 아무 곳이나 한 번 눌러 주세요</div>
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v005 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v006 · 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -127,15 +128,14 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     });
   }
   function gateStart() {
-    /* 크롬을 --autoplay-policy=no-user-gesture-required 로 켠 포스기는 누르지 않아도 바로 시작 */
+    /* 소리 버튼을 안 눌러도 글은 바로 받아서 화면에 띄움. 소리는 화면을 한 번 누르면 켜짐 */
+    $('gate').style.display = 'none';
     try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
-    if (actx && actx.state === 'running') { $('gate').style.display = 'none'; loop(); return; }
-    $('gate').style.display = 'flex';
-    $('gbox').innerHTML = '<h2>📢 생산실 방송</h2><p>화면을 한 번 눌러야 소리가 나요.<br>아래 버튼을 눌러 주세요.</p><button id="start">🔊 소리 켜고 시작</button>' +
-      '<div class="note">포스기를 껐다 켜면 이 버튼을 한 번 더 눌러 주세요.</div>';
-    $('start').onclick = function () { unlock(); $('gate').style.display = 'none'; chime(1); loop(); };
-  }
-  function unlock() {
+    var bar = $('sndBar');
+    function on() { unlock(); setTimeout(function () { if (actx && actx.state === 'running') { bar.style.display = 'none'; } }, 300); }
+    if (!actx || actx.state !== 'running') { bar.style.display = 'block'; document.addEventListener('pointerdown', on, true); document.addEventListener('keydown', on, true); }
+    loop();
+  }  function unlock() {
     try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== 'running') actx.resume(); } catch (e) { }
     try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) { }
     if (window.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { } }
