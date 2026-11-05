@@ -44,6 +44,9 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 #ov .voice{font-size:40px;font-weight:800;margin-top:14px;color:#FFE7A3}
 #ov .more{text-align:center;font-size:26px;font-weight:800;color:#FFE7A3;min-height:8px}
 #ov .row{display:flex;gap:18px;padding:16px 26px 24px}
+.tvwait{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:56px;font-weight:900;color:#3B2716}
+.tvwait span{font-size:30px;font-weight:700;margin-top:18px;color:#4A4038}
+.tvhint{flex:1;text-align:center;font-size:40px;font-weight:900;background:#FFD24D;color:#1E1A17;border-radius:22px;padding:22px}
 #ov .row .btn{height:120px;font-size:44px;border-radius:22px}
 #ov .b-ok{flex:2.3;background:#1E9E5A;color:#fff;border:5px solid #fff}
 #ov .b-play{flex:1;background:#FCF1D0;color:#3B2716;border:0}
@@ -105,7 +108,7 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v008 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v009 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -331,14 +334,25 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
   $('ovRep').onclick = function () { if (current) openReply(current); };
   $('ovOk').onclick = function () { var m = current; if (!m) return; try { speechSynthesis.cancel(); } catch (e) { } busy = false; helper('restore'); ack(m); tones([784, 1047], 0.18); nextOv(); };
   /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
+  /* ---------- TV 같이 보기 (v009): 같은 PC의 두 번째 모니터 창(?tv=1)에 지금 방송을 그대로 보여 줌. 서버 호출 없음 ---------- */
+  var TVQ = /[?&]tv=1/.test(location.search);
+  var bc = null; try { bc = new BroadcastChannel('bang_tv'); } catch (e) { }
+  function tvPost() {
+    if (!bc || TVQ) return;
+    var s = current ? { on: 1, id: current.id || '', text: current.text || '', from: current.from || '', t: current.t, urgent: !!current.urgent, via: current.via || '', hasVoice: !!current.hasVoice, dur: current.dur || 0, more: queue.length } : { on: 0 };
+    try { bc.postMessage(s); } catch (e) { }
+  }
+  if (bc && !TVQ) bc.onmessage = function (e) { if (e.data && e.data.hello) tvPost(); };
   var titleT = 0;
   function tick() {
+    if (TVQ) return;
     var d = new Date(); $('clk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
     var un = msgs.filter(function (m) { return !m.ack; }).length;
     $('band').className = 'band ' + (un ? 'bad' : 'ok');
     $('bandTxt').textContent = un ? '확인 안 한 전달 ' + un + '건' : '새 전달 없음 · 모두 확인함';
     if (current) { $('ovAgo').textContent = ago(current.t); $('ovMore').textContent = queue.length ? '다음 전달 ' + queue.length + '건 더 있어요' : ''; }
-    titleT++; document.title = un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
+    titleT++; document.title = current ? (titleT % 2 ? '🔴 방송중 · 확인!' : '📢 방송중 · 생산실 방송') : un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
+    tvPost();
   }
   setInterval(tick, 1000);
   setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m) {
@@ -564,7 +578,35 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
     });
   }
 
-  if (!pin) gatePin(); else gateStart();
+  function tvMode() {
+    $('gate').style.display = 'none'; $('sndBar').style.display = 'none';
+    document.querySelector('header').style.display = 'none';
+    document.querySelector('main').innerHTML = '<div class="tvwait">📢 생산실 방송 · TV 화면<span>전달이 오면 여기에도 크게 떠요</span></div>';
+    document.querySelector('#ov .row').innerHTML = '<div class="tvhint">👉 키오스크 화면에서 「✅ 확인했어요」를 눌러 주세요</div>';
+    document.title = '📺 TV 표시 · 대기';
+    if (!bc) return;
+    var last = 0, key = '';
+    bc.onmessage = function (e) {
+      var s = e.data; if (!s || s.hello) return; last = Date.now();
+      if (!s.on) { key = ''; current = null; $('ov').className = ''; document.title = '📺 TV 표시 · 대기'; return; }
+      var k = s.id + '|' + s.t + '|' + s.text;
+      $('ovAgo').textContent = ago(s.t);
+      $('ovMore').textContent = s.more ? '다음 전달 ' + s.more + '건 더 있어요' : '';
+      document.title = '📺 TV 표시 · 전달';
+      if (k === key) return;
+      key = k; current = s;
+      $('ovBadge').textContent = s.urgent ? '🚨 긴급 전달' : '📢 전달사항';
+      $('ovWho').textContent = (s.from || '') + ' · ' + hm(s.t) + (s.via === 'slack' ? ' · 슬랙' : '');
+      $('ovTxt').textContent = s.text || ''; $('ovTxt').style.display = s.text ? 'block' : 'none';
+      $('ovVoice').textContent = s.hasVoice ? '🎤 녹음 ' + (s.dur ? s.dur + '초 ' : '') + '— 키오스크에서 소리로 들려 드려요' : '';
+      ovClass(s, true);
+      if (!s.urgent) setTimeout(function () { if (key === k) ovClass(s, false); }, 10000);
+      fitText();
+    };
+    var hi = function () { try { bc.postMessage({ hello: 1 }); } catch (e) { } };
+    hi(); setInterval(function () { if (Date.now() - last > 5000) hi(); }, 3000);
+  }
+  if (TVQ) tvMode(); else if (!pin) gatePin(); else gateStart();
 })();
 </script>
 </body></html>
