@@ -119,6 +119,20 @@ body.tv main{max-width:none;padding:0;height:100vh}
 #recBtns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 #recBtns .btn{height:90px;font-size:32px;border-radius:18px;min-width:220px}
 .b-stop{background:#B42318;color:#fff}
+/* v014: 누가 확인했는지 이름 터치 */
+#who{position:fixed;inset:0;z-index:30;background:rgba(13,28,66,.93);display:none;align-items:center;justify-content:center;padding:24px}
+#who.on{display:flex}
+#who .wb{background:#fff;border-radius:26px;padding:30px 28px;width:100%;max-width:920px;text-align:center}
+#who h2{font-size:46px;margin:0 0 6px;color:#1E1A17}
+#who .ws{font-size:24px;color:#3B2716;margin-bottom:22px}
+#who .wg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+#who .wg button{height:160px;border:4px solid #1E7B45;background:#F1FAF4;border-radius:24px;font-size:52px;font-weight:900;color:#1E1A17;cursor:pointer;line-height:1.15;font-family:inherit}
+#who .wg button small{display:block;font-size:30px;font-weight:800;color:#1E7B45}
+#who .wg button:active{background:#1E7B45;color:#fff}
+#who .wf{display:flex;gap:16px;margin-top:18px}
+#who .wf button{flex:1;height:80px;font-size:28px;font-weight:800;border-radius:18px;cursor:pointer;font-family:inherit}
+#wOther{background:#FBF8F4;border:2px solid #C9B7A2;color:#3B2716}
+#wCancel{background:#EFE6DA;border:0;color:#3B2716}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:#1E7B45;color:#fff;font-size:40px;font-weight:900;padding:26px 44px;border-radius:22px;z-index:30;display:none}
 </style></head><body>
 <header>
@@ -130,7 +144,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v013 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v014 · 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -150,6 +164,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
   <div class="foot" id="rpFoot"><div id="rpPrev">아래에서 보낼 말을 고르세요 (여러 개 고를 수 있어요)</div><button class="btn" id="rpCancel">닫기</button><button class="btn" id="rpSend" disabled>📨 보내기</button></div>
 </div>
 <div id="toast"></div>
+<div id="who"><div class="wb"><h2 id="wT">누가 확인했나요?</h2><div class="ws">본인 이름을 눌러 주세요</div><div class="wg" id="wG"></div><div class="wf"><button id="wOther">그 외 직원</button><button id="wCancel">취소</button></div></div></div>
 
 <div id="gate"><div class="box" id="gbox"></div></div>
 
@@ -384,7 +399,20 @@ body.tv main{max-width:none;padding:0;height:100vh}
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
   $('ovRep').onclick = function () { if (current) openReply(current); };
-  $('ovOk').onclick = function () { var m = current; if (!m) return; stopSound(); ack(m); tones([784, 1047], 0.18); nextOv(); };
+  $('ovOk').onclick = function () { var m = current; if (!m) return; stopSound(); pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current === m) nextOv(); }); };
+  /* v014: 확인·답장 때 누가 했는지 이름을 터치 (60초 안 누르면 닫힘, 확인 안 된 채로 남음) */
+  var STAFF = [['박태일', '상무'], ['이정현', '과장'], ['김명우', '대리'], ['오승태', '사원']];
+  var whoCb = null, whoT = 0;
+  function pickWho(title, cb) {
+    whoCb = cb; $('wT').textContent = title;
+    $('wG').innerHTML = STAFF.map(function (s) { return '<button data-w="' + s[0] + ' ' + s[1] + '">' + s[0] + '<small>' + s[1] + '</small></button>'; }).join('');
+    Array.prototype.forEach.call($('wG').querySelectorAll('[data-w]'), function (x) { x.onclick = function () { whoDone(x.getAttribute('data-w')); }; });
+    $('who').className = 'on'; clearTimeout(whoT); whoT = setTimeout(function () { whoDone(null); }, 60000);
+  }
+  function whoDone(name) { clearTimeout(whoT); $('who').className = ''; var cb = whoCb; whoCb = null; if (cb && name) cb(name); }
+  $('wOther').onclick = function () { whoDone('생산실'); };
+  $('wCancel').onclick = function () { whoDone(null); };
+  function byTxt(n) { return n && n !== '생산실' ? ' · ' + esc(n) : ''; }
   /* 위쪽 띠(시계 + 확인 안 한 건수) + 깜빡이는 탭 제목 */
   /* ---------- TV 같이 보기 (v009): 같은 PC의 두 번째 모니터 창(?tv=1)에 지금 방송을 그대로 보여 줌. 서버 호출 없음 ---------- */
   var TVQ = /[?&]tv=1/.test(location.search);
@@ -393,8 +421,8 @@ body.tv main{max-width:none;padding:0;height:100vh}
   function tvList() {
     var today = dayKey(Date.now());
     return msgs.filter(function (m) { return dayKey(m.t) === today || !m.ack; }).slice(-30).reverse().map(function (m) {
-      return { id: m.id, from: m.from || '', t: m.t, text: m.text || '', urgent: !!m.urgent, via: m.via || '', hasVoice: !!m.hasVoice, dur: m.dur || 0, ack: m.ack || 0,
-        reps: (m.replies || []).map(function (r) { return { t: r.t, text: r.text || '', voice: !!r.voice }; }) };
+      return { id: m.id, from: m.from || '', t: m.t, text: m.text || '', urgent: !!m.urgent, via: m.via || '', hasVoice: !!m.hasVoice, dur: m.dur || 0, ack: m.ack || 0, ackBy: m.ackBy || '',
+        reps: (m.replies || []).map(function (r) { return { t: r.t, text: r.text || '', voice: !!r.voice, by: r.by || '' }; }) };
     });
   }
   function tvPost() {
@@ -416,9 +444,9 @@ body.tv main{max-width:none;padding:0;height:100vh}
     tvPost();
   }
   setInterval(tick, 1000);
-  setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m) {
-    m.ack = Date.now(); render();
-    call({ op: 'ack', id: m.id, by: '생산실' }).catch(function () { });
+  setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m, by) {
+    if (m.ack) return; m.ack = Date.now(); m.ackBy = by || '생산실'; render();
+    call({ op: 'ack', id: m.id, by: m.ackBy }).catch(function () { });
   }
   $('btnVol').onclick = function () { volIdx = (volIdx + 1) % VOLS.length; localStorage.setItem('bang_vol', String(volIdx)); showVol(); unlock(); busy = false; chime(1); };
   showVol();
@@ -435,18 +463,18 @@ body.tv main{max-width:none;padding:0;height:100vh}
         (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + repHtml(m) + '</div><div class="side">' +
         '<button class="btn b-play" data-p="' + m.id + '">🔊 듣기</button>' +
         '<button class="btn b-rep" data-r="' + m.id + '">💬 답장</button>' +
-        (m.ack ? '<div class="done">✅ 확인 ' + hm(m.ack) + '</div>' : '<button class="btn b-ok" data-a="' + m.id + '">✅ 확인</button>') + '</div></div>';
+        (m.ack ? '<div class="done">✅ 확인 ' + hm(m.ack) + byTxt(m.ackBy) + '</div>' : '<button class="btn b-ok" data-a="' + m.id + '">✅ 확인</button>') + '</div></div>';
     }).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-p]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-p')); if (m) { busy = false; announce(m); } }; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-r]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-r')); if (m) openReply(m); }; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ra]'), function (b) { b.onclick = function () { var x = b.getAttribute('data-ra').split('|'); playReply(x[0], Number(x[1])); }; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (m) { ack(m); if (current && current.id === m.id) nextOv(); } }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (!m) return; if (current && current.id === m.id) stopSound(); pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current && current.id === m.id) nextOv(); }); }; });
   }
   function byId(id) { return msgs.filter(function (m) { return m.id === id; })[0]; }
   function repHtml(m) {
     if (!m.replies || !m.replies.length) return '';
     return '<div class="reps">' + m.replies.map(function (r, i) {
-      return '<div class="rep">↳ ' + (r.voice ? '🎤' : '💬') + ' 우리 답장 ' + hm(r.t) + ' · ' + esc(r.text || '(녹음)') + (r.voice ? '<button data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>';
+      return '<div class="rep">↳ ' + (r.voice ? '🎤' : '💬') + ' 우리 답장 ' + hm(r.t) + byTxt(r.by) + ' · ' + esc(r.text || '(녹음)') + (r.voice ? '<button data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>';
     }).join('') + '</div>';
   }
   function playReply(id, i) {
@@ -489,12 +517,13 @@ body.tv main{max-width:none;padding:0;height:100vh}
   $('rpSend').onclick = function () { if (picks.length) sendReply({ text: picks.join(' · ') }); };
   function sendReply(o) {
     var m = replying; if (!m) return;
+    if (!o.by) { pickWho('누가 답장하나요?', function (n) { o.by = n; sendReply(o); }); return; }
     $('rpSend').disabled = true; $('rpSend').textContent = '보내는 중…';
     o.op = 'reply'; o.id = m.id;
     call(o).then(function (r) {
       if (!r.ok) throw new Error(r.err);
-      if (!m.ack) m.ack = Date.now();
-      m.replies = (m.replies || []).concat([{ t: Date.now(), text: o.text || '', voice: !!o.b64 }]);
+      if (!m.ack) { m.ack = Date.now(); m.ackBy = o.by; }
+      m.replies = (m.replies || []).concat([{ t: Date.now(), text: o.text || '', voice: !!o.b64, by: o.by }]);
       closeReply(); render(); tones([784, 1047], 0.18);
       toast(m.sts ? '✅ 답장 보냈어요 (슬랙에 올라가요)' : '✅ 답장 보냈어요');
       if (current && current.id === m.id) nextOv();
@@ -616,7 +645,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
       if (r.same) return;
       ver = r.v;
       var old = {}; msgs.forEach(function (m) { old[m.id] = m; });
-      var keepAck = function (m) { var o = old[m.id]; if (o && o.ack && !m.ack) m.ack = o.ack; return m; };
+      var keepAck = function (m) { var o = old[m.id]; if (o && o.ack && !m.ack) { m.ack = o.ack; m.ackBy = o.ackBy; } return m; };
       msgs = (r.list || []).map(keepAck);
       msgs.forEach(function (m) {
         if (seen[m.id]) return; seen[m.id] = 1;
@@ -652,9 +681,9 @@ body.tv main{max-width:none;padding:0;height:100vh}
       $('tvList').innerHTML = list.map(function (m) {
         return '<div class="tvc' + (m.ack ? '' : ' new') + '"><div class="m"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
           (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') +
-          (m.ack ? '<span class="s ok">✅ 확인 ' + hm(m.ack) + '</span>' : '<span class="s no">● 확인 전</span>') + '</div>' +
+          (m.ack ? '<span class="s ok">✅ 확인 ' + hm(m.ack) + byTxt(m.ackBy) + '</span>' : '<span class="s no">● 확인 전</span>') + '</div>' +
           (m.text ? '<div class="x">' + esc(m.text) + '</div>' : '<div class="x">🎤 녹음 전달 (키오스크에서 들어요)</div>') +
-          m.reps.map(function (r) { return '<div class="r">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t) + ' · ' + esc(r.text || '(녹음)') + '</div>'; }).join('') + '</div>';
+          m.reps.map(function (r) { return '<div class="r">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t) + byTxt(r.by) + ' · ' + esc(r.text || '(녹음)') + '</div>'; }).join('') + '</div>';
       }).join('');
       tvFit();
     };

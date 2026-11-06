@@ -48,7 +48,7 @@ audio{width:100%;margin-top:10px}
 </style></head><body>
 <header><h1>📢 생산실 방송</h1><button id="btnOut" style="display:none">설정</button></header>
 <main id="app"></main>
-<div class="foot">v002 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
+<div class="foot">v003 · 누가 확인했는지 이름이 떠요 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
 <script>
 (function () {
   'use strict';
@@ -164,9 +164,9 @@ audio{width:100%;margin-top:10px}
       el.innerHTML = list.map(function (m) {
         return '<div class="item"><div class="b"><div class="t">' + hm(m.t) + ' · ' + esc(m.from) + (m.urgent ? ' · <span style="color:#C0392B">급함</span>' : '') + '</div>' +
           '<div class="x">' + (m.text ? esc(m.text) : '') + (m.hasVoice ? (m.text ? '\n' : '') + '🎤 녹음 ' + (m.dur || '') + '초' : '') + '</div>' +
-          (m.replies || []).map(function (r, i) { return '<div class="x" style="color:#22396F;font-weight:700;margin-top:6px">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t).split(' ')[1] + ' · ' + esc(r.text || '(녹음)') + (r.voice ? ' <button class="del" style="color:#22396F" data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>'; }).join('') +
+          (m.replies || []).map(function (r, i) { return '<div class="x" style="color:#22396F;font-weight:700;margin-top:6px">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t).split(' ')[1] + (r.by && r.by !== '생산실' ? ' (' + esc(r.by) + ')' : '') + ' · ' + esc(r.text || '(녹음)') + (r.voice ? ' <button class="del" style="color:#22396F" data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>'; }).join('') +
           (m.ack ? '' : '<button class="del" data-d="' + m.id + '">잘못 보냈어요 (지우기)</button>') + '</div>' +
-          (m.ack ? '<span class="state s-ok">✅ 확인 ' + hm(m.ack).split(' ')[1] + '</span>' : '<span class="state s-wait">확인 전</span>') + '</div>';
+          (m.ack ? '<span class="state s-ok">✅ 확인 ' + hm(m.ack).split(' ')[1] + (m.ackBy && m.ackBy !== '생산실' ? ' · ' + esc(m.ackBy) : '') + '</span>' : '<span class="state s-wait">확인 전</span>') + '</div>';
       }).join('');
       Array.prototype.forEach.call(document.querySelectorAll('[data-ra]'), function (b) {
         b.onclick = function () { var x = b.getAttribute('data-ra').split('|'); call({ op: 'raudio', id: x[0], i: Number(x[1]) }).then(function (r) { if (r.ok) new Audio('data:' + r.mime + ';base64,' + r.b64).play(); }); };
