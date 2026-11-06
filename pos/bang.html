@@ -45,28 +45,29 @@ main{padding:16px 20px 30px;max-width:1100px;margin:0 auto}
 #ov .row{display:flex;gap:18px;padding:16px 26px 24px}
 .tvwait{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:56px;font-weight:900;color:#3B2716}
 .tvwait span{font-size:30px;font-weight:700;margin-top:18px;color:#4A4038}
-/* v012: TV 모니터 = 늘 켜 두는 전달 게시판 (오늘 받은 전달 + 우리 답장) */
+/* v012~013: TV 모니터 = 늘 켜 두는 전달 게시판 (오늘 받은 전달 + 우리 답장) */
 body.tv{overflow:hidden}
 body.tv main{max-width:none;padding:0;height:100vh}
 .tvb{height:100vh;display:flex;flex-direction:column}
-.tvtop{display:flex;align-items:center;gap:24px;background:#5A3A22;color:#fff;padding:10px 28px;font-weight:900}
-.tvt{font-size:40px;flex:1;white-space:nowrap}
-#tvDate{font-size:30px;white-space:nowrap}
-#tvClk{font-size:52px;background:rgba(0,0,0,.25);padding:0 16px;border-radius:12px;white-space:nowrap}
-.tvl{flex:1;overflow:hidden;padding:16px 24px 0;min-height:0}
-.tvc{background:#fff;border:3px solid #DDD5CB;border-radius:18px;padding:12px 22px 14px;margin-bottom:14px}
+.tvtop{display:flex;align-items:center;gap:2.4vw;background:#5A3A22;color:#fff;padding:1.2vh 2.2vw;font-weight:900}
+.tvt{font-size:5vh;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tvDate{font-size:3.8vh;white-space:nowrap}
+#tvClk{font-size:6.4vh;background:rgba(0,0,0,.25);padding:0 1.2vw;border-radius:12px;white-space:nowrap}
+.tvl{flex:1;overflow:hidden;padding:1.8vh 1.8vw 0;min-height:0}
+.tvc{background:#fff;border:3px solid #DDD5CB;border-radius:16px;padding:1.2vh 1.8vw 1.4vh;margin-bottom:1.6vh}
 .tvc.new{border-color:#C0392B;background:#FFF6F4}
-.tvc .m{font-size:24px;font-weight:800;color:#4A4038;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tvc .m b{color:#5A3A22;font-size:28px}
-.tvc .x{font-size:40px;font-weight:900;line-height:1.35;white-space:pre-wrap;margin-top:4px;color:#1E1A17;text-wrap:pretty}
-.tvc:first-child .x{font-size:50px}
-.tvc .s{margin-left:auto;font-size:26px;font-weight:900;white-space:nowrap}
+.tvc .m{font-size:2.9vh;font-weight:800;color:#4A4038;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tvc .m b{color:#5A3A22;font-size:3.2vh}
+.tvc .m .tag{font-size:2.3vh}
+.tvc .x{font-size:4.9vh;font-weight:900;line-height:1.3;white-space:pre-wrap;margin-top:.4vh;color:#1E1A17;text-wrap:pretty}
+.tvc:first-child .x{font-size:5.8vh}
+.tvc .s{margin-left:auto;font-size:3vh;font-weight:900;white-space:nowrap}
 .tvc .s.ok{color:#1E7B45}.tvc .s.no{color:#B42318}
-.tvc .r{font-size:30px;font-weight:800;color:#1B4F8C;margin-top:8px;padding:4px 0 4px 14px;border-left:6px solid #9DB8DE}
-.tvempty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:52px;font-weight:900;color:#3B2716}
-.tvempty span{font-size:30px;font-weight:700;margin-top:18px;color:#4A4038}
-.tvfoot{font-size:24px;font-weight:800;padding:6px 24px 10px;color:#4A4038;text-align:center;min-height:12px}
-.tvfoot.warn{background:#B35A00;color:#fff;font-size:30px;padding:12px 24px}
+.tvc .r{font-size:3.5vh;font-weight:800;color:#1B4F8C;margin-top:.8vh;padding:.4vh 0 .4vh 14px;border-left:6px solid #9DB8DE}
+.tvempty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:6.4vh;font-weight:900;color:#3B2716}
+.tvempty span{font-size:3.8vh;font-weight:700;margin-top:2vh;color:#4A4038}
+.tvfoot{font-size:3vh;font-weight:800;padding:.6vh 2vw 1vh;color:#4A4038;text-align:center;min-height:1.4vh}
+.tvfoot.warn{background:#B35A00;color:#fff;font-size:3.6vh;padding:1.4vh 2vw}
 .tvhint{flex:1;text-align:center;font-size:40px;font-weight:900;background:#FFD24D;color:#1E1A17;border-radius:22px;padding:22px}
 #ov .row .btn{height:120px;font-size:44px;border-radius:22px}
 #ov .b-ok{flex:2.3;background:#1E9E5A;color:#fff;border:5px solid #fff}
@@ -129,7 +130,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v012 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v013 · 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
