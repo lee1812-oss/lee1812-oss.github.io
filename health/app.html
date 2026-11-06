@@ -876,6 +876,34 @@ html.ph[data-step="3"] #phoneApp #bAgain{background:transparent!important;color:
 .grtT .g1{font-size:30px;font-weight:900;color:#FEF8E8;line-height:1.4;margin-bottom:12px}
 .grtT p,.grtT p:last-of-type{font-size:24px;line-height:1.5;color:#FEF8E8;font-weight:600}
 .grtT .gx{color:#FCF1D0;font-size:16px}
+
+/* v051 얼굴로 본인 확인 (선택) */
+#faceOv{position:fixed;inset:0;z-index:9000;background:rgba(1,7,54,.6);display:flex;align-items:center;justify-content:center;padding:12px}
+#faceOv.hide{display:none}
+#faceOv .fbx{background:#fff;color:#111827;border-radius:20px;width:100%;max-width:440px;max-height:94vh;overflow:auto;padding:22px 18px;font-size:18px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+#faceOv h3{margin:0 0 10px;font-size:23px;line-height:1.35;color:#010736}
+#faceOv h3 small{font-size:17px;color:#4b5563;font-weight:600}
+#faceOv .fl{margin:0 0 12px}
+#faceOv .fok{background:#e9f7ee;color:#14532d;border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:18px}
+#faceOv .fok div+div{margin-top:4px}
+#faceOv .fin{background:#eef3fb;color:#1e3a8a;border-radius:12px;padding:10px 12px;font-size:17px;margin:0 0 6px}
+#faceOv .fwn{background:#fff4e5;color:#7c2d12;border-radius:12px;padding:10px 12px;font-size:17px;margin:0 0 6px}
+#faceOv .fbtn{display:block;width:100%;min-height:60px;border:0;border-radius:14px;background:#E8590C;color:#fff;font:inherit;font-size:20px;font-weight:800;margin-top:10px;cursor:pointer}
+#faceOv .fbtn.sub{background:#eceff3;color:#1f2937;font-weight:700;min-height:56px}
+#faceOv .fbtn.red{background:#fef2f2;color:#b91c1c;border:2px solid #fca5a5}
+#faceOv .flink{display:block;margin:10px auto 0;border:0;background:none;color:#1d4ed8;font:inherit;font-size:17px;text-decoration:underline;min-height:48px;cursor:pointer}
+#faceOv .fcam{position:relative;width:min(70vw,280px);height:min(93vw,373px);margin:4px auto 10px;border-radius:50%;overflow:hidden;background:#111}
+#faceOv video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+#faceOv .fring{position:absolute;inset:0;border-radius:50%;border:7px solid #cbd5e1;transition:border-color .2s}
+#faceOv .fring.on{border-color:#16a34a}
+#faceOv .fst{text-align:center;font-size:19px;font-weight:700;min-height:2.6em;margin:4px 0 8px}
+#faceOv .fst.ok{color:#15803d}
+#faceOv .fbar{height:10px;border-radius:5px;background:#e5e7eb;overflow:hidden}
+#faceOv .fbar i{display:block;height:100%;width:0;background:#16a34a;transition:width .25s}
+#faceOv .fbig{font-size:64px;text-align:center;line-height:1.2;margin:6px 0}
+#faceOv .fcen{text-align:center}
+.gface{margin:12px auto 0;text-align:center;font-size:18px;font-weight:800;color:#15803d}
+.fset{display:block;margin:6px auto 0;border:0;background:none;color:#1d4ed8;font:inherit;font-size:17px;text-decoration:underline;min-height:48px;cursor:pointer}
 </style></head><body><div id="boot" class="bootmsg" style="padding:40px 16px;text-align:center;color:var(--sub)">불러오는 중…</div>
 
 <div id="tabletApp" class="hide">
@@ -971,7 +999,7 @@ html.ph[data-step="3"] #phoneApp #bAgain{background:transparent!important;color:
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v050", PNAME="건강상태확인일지";
+var VER="v051", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1575,13 +1603,14 @@ function phFinish(t,dup){
   var bd=dup?"✓ 이미 제출했어요":(hit?"해당 있음 "+hit+"건 · 팀장님께 꼭 알려 주세요":"✓ 제출 완료");
   $("dn").innerHTML='<div class="gcard"><div class="gbadge">'+esc(bd)+'</div><div class="gname">'+esc(G.l1n)+'</div>'+G.rest.map(function(s){return '<p>'+esc(s)+'</p>'}).join("")+'</div>'+
    '<div class="gmeta">'+esc(fmtDate(TODAY))+' · '+esc(t||"")+' · '+VER+'</div>';
+  try{if(window.faceDone)faceDone(PH.pid,dup)}catch(x){}
   phShow(3);
 }
 function phSend(){
   if(PH.busy||pd.len<80)return;
   PH.busy=true;$("bSend").disabled=true;$("bSend").textContent="제출 중…";
   var memo=PH.a.some(function(v){return v===1})?$("memo").value.trim():"";
-  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null).then(function(r){
+  api("apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null,window.faceArg?faceArg():null).then(function(r){
     PH.busy=false;$("bSend").textContent="서명하고 제출 완료";
     if(r.day)setDay(TODAY,r.day);
     if(r.ok){var wr=!!PH.redo;PH.redo=null;PH._wasRedo=wr;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
@@ -1993,7 +2022,7 @@ document.addEventListener("click",function(e){
   if(nb&&t.dataset.id&&curDate===TODAY){
     PH.pid=t.dataset.id;PH.a=[-1,-1,-1,-1,-1];PH._all=false;PH.redo=null;$("memo").value="";
     try{localStorage.setItem("hl_pid",PH.pid)}catch(x){}
-    phQ();phShow(1);return}
+    (window.faceGate||function(p,f){f()})(PH.pid,function(){phQ();phShow(1)});return}   /* v051 얼굴 확인(선택) 뒤 질문으로 */
 });
 document.addEventListener("change",function(e){
   if(e.target.id==="aFrom"||e.target.id==="aTo"||e.target.id==="aFlt"){
@@ -2134,7 +2163,7 @@ function phDoneView(pid){
     askRedo(p.name,r.t,function(){askWhy(p.name+" 님 · 다시 체크하는 이유를 골라 주세요.\n질문부터 서명까지 다시 해요.",function(w){
       PH.redo=w;PH.pid=pid;PH.a=[-1,-1,-1,-1,-1];PH._all=false;$("memo").value="";
       try{localStorage.setItem("hl_pid",pid)}catch(x){}
-      phQ();phShow(1);toast("다시 체크해요 · 질문부터 서명까지");
+      (window.faceGate||function(p,f){f()})(pid,function(){phQ();phShow(1);toast("다시 체크해요 · 질문부터 서명까지")});
     })},function(){phDoneView(pid)});
   };
 }
@@ -2319,4 +2348,177 @@ window.__w1Open=function(){W1.force=true;w1Paint();w1Open()};   /* 시험용: �
   }
   api("apiBoot",K).then(go).catch(fail);
 })();
+</script><script>
+/* ---------- v051 얼굴로 본인 확인 (선택 기능) ----------
+   · 얼굴 특징값(숫자)은 이 휴대폰(localStorage hl_face_<사람ID>)에만 저장. 사진·특징값은 서버로 보내지 않는다.
+   · 서버에는 「얼굴 확인 Y」와 차이값(낮을수록 같은 얼굴)만 보낸다.
+   · 휴대폰 화면(MODE0=phone) + GitHub 주소(STATIC) + 모바일 기기에서만. 포스기·키오스크(윈도우 공용 기기)·옛 크롬(110 미만)에서는 나타나지 않는다.
+   · 카메라가 안 되거나 동의하지 않으면 지금처럼 체크(기존 흐름을 막지 않음). */
+var FACE={lib:"https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js",mdl:"https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model/",TH:0.45,ready:null,stream:null,run:0};
+function faceTest(){try{return new URLSearchParams(location.search).get("facetest")==="1"||localStorage.getItem("hl_facetest")==="1"}catch(e){return false}}
+function faceAvail(){
+  try{
+    if(MODE0!=="phone"||!STATIC)return false;
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)||!window.isSecureContext||!window.WebGLRenderingContext)return false;
+    var ua=navigator.userAgent||"";
+    var mob=/Android|iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+    if(!mob&&!faceTest())return false;
+    var cm=ua.match(/Chrome\/(\d+)/);if(cm&&+cm[1]<110)return false;
+    return true;
+  }catch(e){return false}
+}
+function faceGet(pid){try{var j=JSON.parse(localStorage.getItem("hl_face_"+pid)||"null");return j&&j.d&&j.d.length?j:null}catch(e){return null}}
+function faceLater(pid){try{var v=localStorage.getItem("hl_facel_"+pid)||"";if(v==="off")return true;var t=+v||0;return !!t&&Date.now()-t<7*864e5}catch(e){return false}}
+function faceArg(){var f=PH.face;return (f&&f.pid===PH.pid)?{ok:1,d:Math.round(f.d*100)/100,en:f.en?1:0}:null}
+function faceOv(html){var o=$("faceOv");if(!o){o=document.createElement("div");o.id="faceOv";document.body.appendChild(o)}o.innerHTML='<div class="fbx">'+html+'</div>';o.classList.remove("hide");return o}
+function faceStop(){try{if(FACE.stream)FACE.stream.getTracks().forEach(function(t){t.stop()})}catch(e){}FACE.stream=null}
+function faceClose(){FACE.run++;faceStop();var o=$("faceOv");if(o){o.classList.add("hide");o.innerHTML=""}}
+/* 이름을 고른 뒤 질문 화면으로 가기 전에 한 번 거치는 문. 무엇이 잘못돼도 next()로 평소 흐름을 이어 간다 */
+function faceGate(pid,next){
+  PH.face=null;
+  var go=function(){try{next()}catch(e){}};
+  try{
+    if(!faceAvail()){go();return}
+    if(faceGet(pid)){faceRun("verify",pid,go);return}
+    if(faceLater(pid)){go();return}
+    faceConsent(pid,go);
+  }catch(e){faceClose();go()}
+}
+function faceConsent(pid,next){
+  var p=person(pid),nm=p?p.name:"";
+  faceOv('<h3>🙂 얼굴로 본인 확인 <small>(선택)</small></h3>'+
+   '<p class="fl">체크할 때 휴대폰 카메라로 <b>'+esc(nm)+' 님 본인</b>인지 확인해요.</p>'+
+   '<div class="fok"><div>✓ 얼굴 사진은 <b>이 휴대폰 밖으로 나가지 않아요.</b></div><div>✓ 회사에는 <b>「얼굴 확인 ✓」 표시만</b> 저장돼요.</div><div>✓ 언제든 이 휴대폰에서 지울 수 있어요.</div></div>'+
+   '<p class="fin">처음 한 번 준비 파일(약 8MB)을 받아요. 와이파이에서 하면 좋아요.</p>'+
+   '<p class="fwn">'+esc(nm)+' 님 본인이 아니면 「나중에」를 눌러 주세요.</p>'+
+   '<button class="fbtn" id="fcYes">동의하고 얼굴 등록하기</button><button class="fbtn sub" id="fcNo">나중에 할게요</button>');
+  $("fcYes").onclick=function(){faceRun("enroll",pid,next)};
+  $("fcNo").onclick=function(){try{localStorage.setItem("hl_facel_"+pid,String(Date.now()))}catch(e){}faceClose();next()};
+}
+function faceLoad(){
+  if(FACE.ready)return FACE.ready;
+  var p=new Promise(function(res,rej){
+    if(window.faceapi){res();return}
+    var s=document.createElement("script");s.src=FACE.lib;s.async=true;s.crossOrigin="anonymous";
+    s.onload=function(){res()};s.onerror=function(){rej(new Error("lib"))};document.head.appendChild(s);
+  }).then(function(){
+    var f=window.faceapi;if(!f)throw new Error("lib");
+    return Promise.all([f.nets.tinyFaceDetector.loadFromUri(FACE.mdl),f.nets.faceLandmark68TinyNet.loadFromUri(FACE.mdl),f.nets.faceRecognitionNet.loadFromUri(FACE.mdl)]);
+  });
+  var to=new Promise(function(res,rej){setTimeout(function(){rej(new Error("timeout"))},90000)});
+  FACE.ready=Promise.race([p,to]).catch(function(e){FACE.ready=null;throw e});
+  return FACE.ready;
+}
+function faceCamErr(e){
+  var n=e&&e.name||"";
+  if(n==="NotAllowedError"||n==="SecurityError")return ["카메라 사용이 허용되지 않았어요","다시 쓰려면 휴대폰 설정 → 애플리케이션 → 크롬(또는 건강일지) → 권한 → 카메라를 「허용」으로 바꿔 주세요."];
+  if(n==="NotFoundError"||n==="OverconstrainedError")return ["카메라를 찾지 못했어요",""];
+  if(n==="NotReadableError")return ["다른 앱이 카메라를 쓰고 있어요","카메라 앱을 닫고 다시 해 보세요."];
+  if(e&&(e.message==="lib"||e.message==="timeout"))return ["얼굴 확인 준비 파일을 받지 못했어요","인터넷 연결을 확인하고 다음에 다시 해 보세요."];
+  return ["카메라를 켤 수 없어요",""];
+}
+function faceRun(kind,pid,next){
+  var my=++FACE.run,en=kind==="enroll",p=person(pid),nm=p?p.name:"";
+  faceStop();
+  faceOv('<h3>'+(en?'🙂 얼굴 등록 · '+esc(nm)+' 님':'🙂 얼굴로 본인 확인 · '+esc(nm)+' 님')+'</h3>'+
+    '<div class="fcam"><video id="fcV" playsinline muted autoplay></video><div class="fring" id="fcR"></div></div>'+
+    '<p class="fst" id="fcS">카메라를 켜는 중이에요…</p><div class="fbar"><i id="fcP"></i></div>'+
+    '<button class="fbtn sub" id="fcSkip">얼굴 없이 체크하기</button>');
+  var v=$("fcV");
+  function live(){return my===FACE.run}
+  function st(t,c){var s=$("fcS");if(s){s.textContent=t;s.className="fst"+(c?" "+c:"")}}
+  function ring(on){var r=$("fcR");if(r)r.classList.toggle("on",!!on)}
+  function prog(x){var b=$("fcP");if(b)b.style.width=Math.round(Math.min(1,x)*100)+"%"}
+  $("fcSkip").onclick=function(){faceClose();next()};
+  function fail(e,best){
+    if(!live())return;faceStop();
+    var m=e?faceCamErr(e):(en?["얼굴을 잘 찍지 못했어요","밝은 곳에서 정면을 보고 다시 해 보세요."]:["등록한 얼굴과 잘 맞지 않아요","밝은 곳에서 안경·마스크를 벗고 정면을 봐 주세요."]);
+    faceOv('<h3>😥 '+esc(m[0])+'</h3>'+(m[1]?'<p class="fin">'+esc(m[1])+'</p>':'')+
+      '<p class="fl">걱정 마세요. <b>얼굴 확인 없이도 평소처럼 체크</b>할 수 있어요.</p>'+
+      '<button class="fbtn" id="fcGo">얼굴 없이 체크하기</button><button class="fbtn sub" id="fcRe">다시 해 보기</button>'+
+      (!en&&!e?'<button class="flink" id="fcEn">얼굴 다시 등록하기</button>':''));
+    $("fcGo").onclick=function(){if(en){try{localStorage.setItem("hl_facel_"+pid,String(Date.now()))}catch(x){}}faceClose();next()};
+    $("fcRe").onclick=function(){faceRun(kind,pid,next)};
+    var b=$("fcEn");if(b)b.onclick=function(){faceRun("enroll",pid,next)};
+  }
+  var cam=navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}},audio:false}).then(function(s){
+    if(!live()){s.getTracks().forEach(function(t){t.stop()});throw new Error("closed")}
+    FACE.stream=s;v.srcObject=s;var pp=v.play();if(pp&&pp.catch)pp.catch(function(){});
+    st(FACE.ready&&window.faceapi?"얼굴을 동그라미 안에 맞춰 주세요":"얼굴 확인 준비 중이에요… (처음 한 번은 조금 걸려요)");
+  });
+  Promise.all([cam,faceLoad()]).then(function(){
+    if(!live())return;
+    st("얼굴을 동그라미 안에 맞춰 주세요");
+    loop();
+  }).catch(function(e){if(e&&e.message==="closed")return;fail(e||{name:"x"})});
+  function loop(){
+    var f=window.faceapi,opt=new f.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.45});
+    var got=[],t0=Date.now(),best=9,hits=0,LIM=en?30000:15000;
+    var ref=en?null:faceGet(pid).d.map(function(a){return new Float32Array(a)});
+    (function step(){
+      if(!live())return;
+      if(Date.now()-t0>LIM){fail(null,best);return}
+      if(!v.videoWidth||v.readyState<2){setTimeout(step,200);return}
+      f.detectSingleFace(v,opt).withFaceLandmarks(true).withFaceDescriptor().then(function(r){
+        if(!live())return;
+        if(!r){ring(0);st("얼굴이 보이지 않아요. 동그라미 안에 얼굴을 맞춰 주세요");setTimeout(step,120);return}
+        var bw=r.detection.box.width/v.videoWidth;
+        if(bw<0.2){ring(0);st("조금 더 가까이 와 주세요");setTimeout(step,120);return}
+        if(r.detection.score<0.6){ring(0);st("밝은 곳에서 정면을 봐 주세요");setTimeout(step,120);return}
+        ring(1);
+        if(en){
+          got.push(Array.prototype.slice.call(r.descriptor));prog(got.length/5);st("좋아요! 그대로 있어 주세요 ("+got.length+"/5)","ok");
+          if(got.length>=5){
+            var mx=0;for(var i=0;i<got.length;i++)for(var j=i+1;j<got.length;j++)mx=Math.max(mx,f.euclideanDistance(got[i],got[j]));
+            if(mx>0.55){got=[];prog(0);st("움직임이 많았어요. 다시 한 번 정면을 봐 주세요");setTimeout(step,400);return}
+            enrolled(got);return;
+          }
+          setTimeout(step,350);return;
+        }
+        var d=9;for(var k2=0;k2<ref.length;k2++)d=Math.min(d,f.euclideanDistance(ref[k2],r.descriptor));
+        if(d<best)best=d;
+        if(d<FACE.TH){hits++;prog(hits/3);st("확인 중이에요…","ok");if(hits>=3){verified(best,r.descriptor);return}}
+        else{hits=0;prog(0);st("확인 중이에요… 정면을 봐 주세요")}
+        setTimeout(step,120);
+      }).catch(function(){setTimeout(step,300)});
+    })();
+  }
+  function enrolled(list){
+    faceStop();
+    var keep=list.map(function(a){return a.map(function(x){return Math.round(x*10000)/10000})});
+    try{localStorage.setItem("hl_face_"+pid,JSON.stringify({v:1,at:TODAY,d:keep}));localStorage.removeItem("hl_facel_"+pid)}catch(e){fail({name:"x"});return}
+    PH.face={pid:pid,d:0,en:1};
+    faceOv('<div class="fbig">✅</div><h3 class="fcen">얼굴 등록 완료!</h3><p class="fl fcen">다음부터는 체크할 때<br><b>얼굴만 보여 주면</b> 본인 확인이 돼요.</p><button class="fbtn" id="fcGo">건강 체크 시작하기</button>');
+    $("fcGo").onclick=function(){faceClose();next()};
+  }
+  function verified(d,desc){
+    faceStop();PH.face={pid:pid,d:d,en:0};
+    /* 조명·계절이 바뀌어도 잘 맞도록, 확실히 맞은(차이 0.35 미만) 얼굴값을 최근 10개까지 이 휴대폰에만 보탠다 */
+    try{if(d<0.35&&desc){var j=faceGet(pid);if(j){j.d.push(Array.prototype.slice.call(desc).map(function(x){return Math.round(x*10000)/10000}));if(j.d.length>10)j.d.splice(5,1);localStorage.setItem("hl_face_"+pid,JSON.stringify(j))}}}catch(e){}
+    faceOv('<div class="fbig">✅</div><h3 class="fcen">본인 확인됐어요</h3><p class="fl fcen">'+esc(nm)+' 님, 이어서 건강 체크를 해 주세요.</p>');
+    setTimeout(function(){if(!live())return;faceClose();next()},1100);
+  }
+}
+/* 제출 완료 화면: 얼굴 확인 표시 + 「얼굴 확인 설정」(다시 등록·지우기) */
+function faceDone(pid,dup){
+  var dn=$("dn");if(!dn)return;
+  if(!dup&&PH.face&&PH.face.pid===pid){var g=document.createElement("div");g.className="gface";g.textContent="🙂 얼굴로 본인 확인 ✓";dn.appendChild(g)}
+  if(!faceAvail())return;
+  var b=document.createElement("button");b.className="fset";b.type="button";b.textContent=faceGet(pid)?"🙂 얼굴 확인 설정 (다시 등록·지우기)":"🙂 다음부터 얼굴로 본인 확인하기 (선택)";
+  b.onclick=function(ev){ev.stopPropagation();faceSet(pid)};dn.appendChild(b);
+}
+function faceSet(pid){
+  var p=person(pid),nm=p?p.name:"",has=!!faceGet(pid),back=function(){faceClose();try{phFinishFaceRefresh(pid)}catch(e){}};
+  if(!has){faceConsent(pid,back);return}
+  faceOv('<h3>🙂 얼굴 확인 설정 · '+esc(nm)+' 님</h3><p class="fin">이 휴대폰에 '+esc(nm)+' 님 얼굴 정보가 있어요. (사진이 아니라 숫자로만 저장돼 있어요)</p>'+
+    '<button class="fbtn" id="fcRe">얼굴 다시 등록하기</button><button class="fbtn red" id="fcDel">이 휴대폰에서 얼굴 정보 지우기</button><button class="fbtn sub" id="fcX">닫기</button>');
+  $("fcRe").onclick=function(){faceRun("enroll",pid,back)};
+  $("fcDel").onclick=function(){try{localStorage.removeItem("hl_face_"+pid);localStorage.setItem("hl_facel_"+pid,"off")}catch(e){}
+    faceOv('<div class="fbig">🗑️</div><h3 class="fcen">지웠어요</h3><p class="fl fcen">이 휴대폰에서 얼굴 정보를 지웠어요.<br>앞으로는 얼굴 확인 없이 체크해요.</p><button class="fbtn sub" id="fcX">닫기</button>');
+    $("fcX").onclick=back};
+  $("fcX").onclick=back;
+}
+function phFinishFaceRefresh(pid){var dn=$("dn");if(!dn)return;[].slice.call(dn.querySelectorAll(".fset")).forEach(function(x){x.remove()});if(!faceAvail())return;
+  var b=document.createElement("button");b.className="fset";b.type="button";b.textContent=faceGet(pid)?"🙂 얼굴 확인 설정 (다시 등록·지우기)":"🙂 다음부터 얼굴로 본인 확인하기 (선택)";b.onclick=function(ev){ev.stopPropagation();faceSet(pid)};dn.appendChild(b)}
+window.faceGate=faceGate;window.faceArg=faceArg;window.faceDone=faceDone;
 </script></body></html>

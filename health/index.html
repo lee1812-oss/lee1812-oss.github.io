@@ -29,12 +29,12 @@ html,body{margin:0;height:100%;background:#FAF4EA;font-family:"Malgun Gothic","A
 </style></head><body>
 <div id="msg" class="hide">잘못된 링크입니다.<br>팀장에게 받은 QR 또는 링크로 한 번 열어 주세요.<br><br><small style="color:#667">홈 화면 아이콘으로 열었는데 이 화면이 나오면:<br>① 홈 화면의 「건강일지」 앱을 지우고<br>② 팀장에게 받은 QR(링크)을 <b>크롬</b>으로 열어<br>③ ⋮ → 「앱 설치」로 다시 설치해 주세요.</small></div>
 <div id="ib" class="hide"></div><div id="pb" class="hide"></div><button id="sv" class="hide">🔊 9시 안내 소리 시험</button><div id="say" class="hide"></div><div id="isht" class="hide"></div>
-<iframe id="fr" class="hide" allow="fullscreen" title="건강상태확인일지"></iframe>
+<iframe id="fr" class="hide" allow="fullscreen; camera" title="건강상태확인일지"></iframe>
 <button class="fb hide" id="bFs">⛶ 화면 채우기</button>
 <button class="fb hide" id="bEx" style="background:rgba(200,40,40,.85);opacity:1">✕ 채우기 취소</button>
 <script>
 var HL_EXEC="";
-var APP_V="v050";   /* 이 껍데기가 여는 화면 버전. version.json의 app과 다르면 새 주소로 다시 열어 저장본을 건너뜀 */
+var APP_V="v051";   /* 이 껍데기가 여는 화면 버전. version.json의 app과 다르면 새 주소로 다시 열어 저장본을 건너뜀 */
 (function(){
   var EXEC=HL_EXEC="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec";
   var q=new URLSearchParams(location.search),k=q.get("k")||"",m=q.get("m")||"tablet";
@@ -63,7 +63,7 @@ var APP_V="v050";   /* 이 껍데기가 여는 화면 버전. version.json의 ap
   verCheck();
 })();
 /* ---------- 설치 상태 안내 (바로연락 v007과 같은 방식) ---------- */
-var WRAP_VER="w7";
+var WRAP_VER="w8";
 function instFix(){var s=document.getElementById("isht");s.innerHTML='<div class="in"><h3>앱이 안 보이거나 안 열릴 때 (완전히 지우고 다시 설치)</h3>'+
  '<div class="n b"><b>1. 먼저 찾아보기</b><br>홈 화면을 위로 쓸어 올려 <b>앱스 화면</b> 맨 위 검색 칸에 <b>「건강일지」</b>를 쳐 보세요. 보이면 꾹 눌러 홈 화면으로 끌어오면 돼요.</div>'+
  '<div class="n w"><b>2. 「앱을 열 수 없음」이나 「잘못된 링크」가 뜨면</b><br>① 설정 → 애플리케이션 → 「건강일지」 → <b>삭제</b><br>② 휴대폰을 껐다 켜기<br>③ 팀장에게 받은 <b>QR(링크)</b>을 <b>크롬</b>으로 열기<br>④ ⋮ → <b>「앱 설치」</b> → 1분쯤 기다리기</div>'+
