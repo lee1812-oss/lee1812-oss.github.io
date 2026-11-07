@@ -38,7 +38,7 @@ html,body{height:100%;background:#1E120B;color:#FFF7EC;font-family:"Malgun Gothi
 </div>
 <div id="shield"></div>
 <script>
-/* 빵을그리다 신발장 영상 v001 (2026-11-07)
+/* 빵을그리다 신발장 영상 v002 (2026-11-07, 첫 홍보영상 때 다음 영상 이름 표시)
    회사 홍보 영상(45초) → 이번 달 위생교육 영상 3분 → 홍보 영상 → 다음 위생교육 영상 3분 … 끝없이 반복.
    위생교육 영상은 이어서 재생(다음에 같은 영상 차례가 오면 멈췄던 곳부터). 매월 1일 자동으로 그달 영상으로 바뀜.
    주소 뒤 ?sound=1 이면 소리 켬, ?chunk=초 로 위생교육 한 번 재생 길이 변경. */
@@ -90,7 +90,7 @@ function showCard(){mode='card';show('card');bar(0);
 window.onYouTubeIframeAPIReady=function(){
  player=new YT.Player('yt',{host:'https://www.youtube-nocookie.com',
   playerVars:{autoplay:0,mute:1,controls:0,cc_load_policy:1,cc_lang_pref:'ko',hl:'ko',rel:0,playsinline:1,iv_load_policy:3,disablekb:1,fs:0,modestbranding:1},
-  events:{onReady:function(){ytOk=true},
+  events:{onReady:function(){ytOk=true;if(mode==='promo'&&HV.length)$('next').textContent='다음: '+mLabel+' · '+hTitle(st.hi%HV.length)},
    onStateChange:function(e){if(mode!=='h')return;if(e.data===1||e.data===3)lastGood=Date.now();if(e.data===0)endH(true)},
    onError:function(){if(mode==='h'){ytFail=true;setTimeout(function(){endH(false)},1000)}}}});};
 (function(){var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=function(){ytFail=true};document.head.appendChild(s);
