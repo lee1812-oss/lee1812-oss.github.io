@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>기기 전원 관리 · 빵을그리다</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="devices.webmanifest">
+<link rel="icon" href="devices_icon_192.png">
+<link rel="apple-touch-icon" href="devices_icon_192.png">
+<meta name="theme-color" content="#5b3a22">
+<style>
+:root{--br:#5b3a22;--br2:#8a5a35;--bg:#f3f1ee;--card:#fff;--ink:#1d1d1f;--sub:#4a4a4f;--line:#dcd7d0;--ok:#1f8a3b;--warn:#c25e00;--bad:#c62828;--info:#1f5fa8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:17px;word-break:keep-all;overflow-wrap:break-word;line-height:1.5}
+button,input,select{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--br);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:22px;margin:0;flex:1;min-width:180px}
+.top .t{font-size:15px;opacity:.9;white-space:nowrap}
+.btn{min-height:54px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);padding:8px 16px;font-weight:700;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--br);border-color:var(--br);color:#fff}
+.btn.add{background:#fff;color:var(--br);border-color:#fff}
+.btn.red{color:var(--bad);border-color:#e9b7b7}
+.btn.redf{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.grn{color:var(--ok);border-color:#b6dcc0}
+.btn[disabled]{opacity:.45;cursor:default}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.hd{display:flex;gap:12px;align-items:flex-start}
+.ic{width:52px;height:52px;border-radius:12px;background:#f1e8df;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none}
+.nm{font-size:21px;font-weight:800;line-height:1.3}
+.pl{color:var(--sub);font-size:16px}
+.more{margin-left:auto;min-height:48px;min-width:48px;padding:4px 12px}
+.st{font-weight:700;font-size:17px;padding:8px 12px;border-radius:10px;background:#f5f5f5}
+.st.on{color:var(--ok);background:#eaf6ed}
+.st.off{color:#555;background:#efefef}
+.st.wait{color:var(--warn);background:#fff3e6}
+.st small{display:block;font-weight:500;color:var(--sub);font-size:15px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.last{font-size:15px;color:var(--sub);border-top:1px dashed var(--line);padding-top:10px}
+.sch{font-size:16px;background:#faf7f3;border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.sch b{color:var(--br)}
+.sch .btn{min-height:46px;padding:4px 14px}
+.empty{background:#fff;border:2px dashed var(--line);border-radius:16px;padding:30px;text-align:center;color:var(--sub)}
+.nw{white-space:nowrap}
+/* 아래에서 올라오는 창 */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.show{display:flex}
+.pane{background:#fff;width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow:auto}
+@media(min-width:700px){.sheet{align-items:center}.pane{border-radius:20px}}
+.pane h2{margin:0 0 12px;font-size:22px}
+label.f{display:block;font-weight:700;margin:14px 0 6px}
+input.in,select.in{width:100%;min-height:54px;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days button{min-width:48px;min-height:48px;border-radius:24px;border:2px solid var(--line);background:#fff;font-weight:700}
+.days button.on{background:var(--br);border-color:var(--br);color:#fff}
+.acts{display:flex;gap:10px;margin-top:18px}
+.acts .btn{flex:1}
+.note{font-size:15px;color:var(--sub);margin-top:6px}
+.warnbox{background:#fdecea;color:#8a1c1c;border-radius:12px;padding:12px;font-weight:600;margin-top:10px}
+.infobox{background:#e9f1fb;color:#123d6b;border-radius:12px;padding:12px;margin-top:10px}
+.code{font-size:44px;font-weight:900;letter-spacing:8px;text-align:center;color:var(--br);background:#faf7f3;border-radius:14px;padding:12px;margin:10px 0}
+ol.steps{padding-left:22px;margin:8px 0}
+ol.steps li{margin:6px 0}
+.pin{max-width:420px;margin:60px auto;background:#fff;border-radius:18px;padding:24px;border:1px solid var(--line)}
+.pin input{font-size:30px;letter-spacing:10px;text-align:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:14px 20px;border-radius:12px;font-weight:700;z-index:30;display:none;max-width:92vw}
+.ver{color:var(--sub);font-size:14px;text-align:center;margin:24px 0}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>⚡ 기기 전원 관리</h1>
+  <span class="t" id="tm"></span>
+  <button class="btn add" id="addBtn" style="display:none">＋ 기기 추가</button>
+</div>
+<main id="app"></main>
+<div class="sheet" id="sh"><div class="pane" id="pane"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const VER='v001', API='https://script.google.com/macros/s/AKfycbzjUsV8qyoOoJ4pQqD3M1osmkCfHsSA5qzKNZpCVQAOyUw92OQCuQhQRyFul2JzkgZk/exec';
+const KIND={kiosk:['키오스크','🖥️'],pos:['포스기','🧾'],pc:['사무실 PC','💻'],etc:['기타','🔌']};
+const OPN={screen_off:'화면 끄기',screen_on:'화면 켜기',restart:'다시 시작',shutdown:'컴퓨터 끄기',cancel:'끄기 취소',wake:'원격으로 켜기'};
+const RES={sent:'보냄 · 기기가 받기 전',ok:'실행됨',err:'실패',badmac:'실패(기기 주소 오류)',unknown:'실패'};
+const DAYN=['','월','화','수','목','금','토','일'];
+let A=localStorage.getItem('dm_a')||'', DATA=null, timer=null, skew=0;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hm=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const ago=ms=>{const s=Math.round(ms/1000);if(s<60)return s+'초 전';const m=Math.round(s/60);if(m<60)return m+'분 전';const h=Math.floor(m/60);return h+'시간 '+(m%60)+'분 전'};
+function toast(m,ms){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms||2600)}
+async function call(o){
+  const r=await fetch(API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({a:A},o))});
+  return r.json();
+}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+
+function pinView(msg){
+  $('#addBtn').style.display='none';
+  $('#app').innerHTML=`<div class="pin"><h2 style="margin-top:0">관리 번호를 넣어 주세요</h2>
+  <p class="note">처음 한 번만 넣으면 이 기기에서는 다시 묻지 않아요.</p>
+  <input class="in" id="pin" type="password" inputmode="numeric" maxlength="12" autocomplete="current-password" placeholder="● ● ● ● ● ●">
+  ${msg?`<div class="warnbox">${esc(msg)}</div>`:''}
+  <div class="acts"><button class="btn pri" id="pinGo">열기</button></div></div>`;
+  const go=async()=>{const v=$('#pin').value.replace(/\D/g,'');if(v.length<6)return toast('6자리 번호를 넣어 주세요');A=await sha('dm|'+v);const r=await call({op:'list'});
+    if(r.ok){localStorage.setItem('dm_a',A);DATA=r;skew=r.now-Date.now();render();loop()}else{A='';pinView(r.err==='locked'?'번호를 여러 번 틀려 30분 동안 잠겼어요.':'번호가 맞지 않아요.')}};
+  $('#pinGo').onclick=go;$('#pin').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#pin').focus(),50);
+}
+async function load(){
+  try{const r=await call({op:'list'});
+    if(!r.ok){if(r.err==='auth'||r.err==='locked'){localStorage.removeItem('dm_a');A='';clearInterval(timer);return pinView(r.err==='locked'?'번호를 여러 번 틀려 30분 동안 잠겼어요.':'')}toast('불러오기 실패: '+r.err);return}
+    DATA=r;skew=r.now-Date.now();render();
+  }catch(e){$('#tm').textContent='⚠ 연결 안 됨 · 다시 시도 중'}
+}
+function loop(){clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&!$('#sh').classList.contains('show'))load()},10000)}
+function schedText(s){
+  s=s||{};const p=[];if(s.on)p.push(`<span class="nw">${s.on} 화면 켜기</span>`);if(s.off)p.push(`<span class="nw">${s.off} 화면 끄기</span>`);if(s.shut)p.push(`<span class="nw">${s.shut} 컴퓨터 끄기</span>`);
+  if(!p.length)return '자동 켜고 끄기 <b>없음</b>';
+  const d=String(s.days||'1234567');const dd=d==='1234567'?'매일':d==='12345'?'평일':d==='67'?'주말':d.split('').map(x=>DAYN[x]).join('·');
+  return `<b>${dd}</b> ${p.join(' · ')}`;
+}
+function devState(d,now){
+  if(!d.enrolled)return {c:'wait',t:'설치 기다리는 중',s:'그 컴퓨터에 도우미를 설치해야 해요'};
+  if(!d.st)return {c:'off',t:'꺼짐 또는 연결 끊김',s:'아직 연결 기록이 없어요'};
+  const gap=now-d.st.seen;
+  if(gap<90000){const idle=d.st.idle||0;return {c:'on',t:'● 켜져 있음',s:(idle<60?'지금 누가 쓰는 중 · ':idle<3600?Math.round(idle/60)+'분째 손 안 댐 · ':'')+'연결 '+ago(gap)}}
+  return {c:'off',t:'○ 꺼짐 또는 연결 끊김',s:'마지막 연결 '+hm(d.st.seen)+' ('+ago(gap)+')'};
+}
+function render(){
+  $('#addBtn').style.display='';
+  const now=Date.now()+skew;$('#tm').textContent='새로 읽음 '+hm(now);
+  const ds=DATA.devs||[];
+  if(!ds.length){$('#app').innerHTML=`<div class="empty"><p style="font-size:20px;font-weight:800;color:var(--ink)">아직 등록된 기기가 없어요</p><p>위의 「＋ 기기 추가」를 눌러 키오스크·포스기·PC를 넣어 주세요.</p></div><div class="ver">${VER}</div>`;return}
+  $('#app').innerHTML='<div class="grid">'+ds.map(d=>{
+    const k=KIND[d.kind]||KIND.etc,st=devState(d,now),on=st.c==='on';
+    const L=d.last;let last='';
+    if(L){last=`마지막 명령: <b>${OPN[L.op]||L.op}</b> · <span class="nw">${hm(L.at)} 보냄</span> → `+(L.res==='sent'?(now-L.at>60000&&L.op!=='wake'?'<span style="color:var(--warn)">아직 기기가 못 받음</span>':'기다리는 중'):`<span style="color:${L.res==='ok'?'var(--ok)':'var(--bad)'}">${RES[L.res]||L.res}${L.done?' '+hm(L.done):''}</span>`)+(L.op==='wake'&&L.by?` <span class="nw">(${esc(L.by)}이 신호 보냄)</span>`:'')}
+    const sdRecent=L&&(L.op==='restart'||L.op==='shutdown')&&now-L.at<70000;
+    return `<div class="card" data-id="${d.id}">
+      <div class="hd"><div class="ic">${k[1]}</div><div><div class="nm">${esc(d.name)}</div><div class="pl">${k[0]}${d.place?' · '+esc(d.place):''}</div></div>
+        <button class="btn more" data-a="edit">⋯ 관리</button></div>
+      <div class="st ${st.c}">${st.t}<small>${st.s}</small></div>
+      ${!d.enrolled?`<button class="btn pri" data-a="code">설치 번호 받기</button>`:on?`
+      <div class="row"><button class="btn" data-a="screen_off">🌙 화면 끄기</button><button class="btn" data-a="screen_on">☀️ 화면 켜기</button></div>
+      <div class="row"><button class="btn" data-a="restart">🔄 다시 시작</button><button class="btn red" data-a="shutdown">⏻ 컴퓨터 끄기</button></div>
+      ${sdRecent?`<button class="btn grn" data-a="cancel">✋ 끄기·다시 시작 취소 (1분 안에)</button>`:''}`
+      :`<button class="btn pri" data-a="wake">⏻ 원격으로 켜기</button><div class="note">꺼진 컴퓨터는 같은 매장에 켜져 있는 다른 기기가 깨우는 신호를 보내요. 처음엔 안 될 수 있어요(아래 안내 참고).</div>`}
+      <div class="sch"><span>${schedText(d.sched)}</span><button class="btn" data-a="sched">설정</button></div>
+      ${last?`<div class="last">${last}</div>`:''}
+    </div>`}).join('')+`</div><div class="ver">${VER} · 화면 켜기·끄기는 컴퓨터는 켜 둔 채 화면만 끄는 것이라 언제든 앱으로 다시 켤 수 있어요.</div>`;
+  document.querySelectorAll('.card button[data-a]').forEach(b=>b.onclick=()=>act(b.closest('.card').dataset.id,b.dataset.a));
+}
+const devById=id=>(DATA.devs||[]).find(d=>d.id===id);
+function sheet(html){$('#pane').innerHTML=html;$('#sh').classList.add('show')}
+function close_(){$('#sh').classList.remove('show')}
+$('#sh').onclick=e=>{if(e.target.id==='sh')close_()};
+async function send(d,op){
+  const r=await call({op:'cmd',dev:d.id,cmd:op});
+  if(r.ok){toast(`「${d.name}」에 ${OPN[op]} 보냈어요`+(op==='wake'?' (켜지기까지 1~2분)':''));load()}
+  else toast(({nomac:'이 기기의 네트워크 주소(MAC)를 아직 몰라요. 한 번 켜져 연결되면 자동으로 알게 돼요.',nohelper:'지금 켜져 있는 다른 기기가 없어서 깨울 수 없어요.'})[r.err]||('실패: '+r.err),5000);
+}
+function act(id,a){
+  const d=devById(id);if(!d)return;
+  if(a==='screen_off'||a==='screen_on'||a==='cancel')return send(d,a);
+  if(a==='wake')return send(d,'wake');
+  if(a==='restart'||a==='shutdown'){
+    const busy=d.st&&(d.st.idle||0)<120;
+    sheet(`<h2>${esc(d.name)} ${a==='restart'?'다시 시작':'컴퓨터 끄기'}</h2>
+      <p>누르면 그 화면에 안내가 뜨고 <b>1분 뒤</b> ${a==='restart'?'다시 시작해요':'꺼져요'}. 1분 안에는 「취소」로 멈출 수 있어요.</p>
+      ${busy?`<div class="warnbox">⚠ 지금 누가 이 기기를 쓰고 있어요(2분 안에 터치). 쓰던 내용이 사라질 수 있어요.</div>`:''}
+      ${a==='shutdown'?`<div class="warnbox">⚠ 완전히 끄면 「원격으로 켜기」가 이 기기에서 시험되기 전까지는 앱으로 다시 못 켤 수 있어요. 그땐 현장에서 전원 버튼을 눌러야 해요. 밤에는 「화면 끄기」를 추천해요.</div>`:''}
+      <div class="acts"><button class="btn" id="no">그만두기</button><button class="btn redf" id="yes">${a==='restart'?'다시 시작':'끄기'}</button></div>`);
+    $('#no').onclick=close_;$('#yes').onclick=()=>{close_();send(d,a)};return;
+  }
+  if(a==='sched')return schedSheet(d);
+  if(a==='edit')return editSheet(d);
+  if(a==='code')return codeFor(d);
+}
+function schedSheet(d){
+  const s=d.sched||{};let days=String(s.days||'1234567');
+  sheet(`<h2>${esc(d.name)} 자동 켜고 끄기</h2>
+    <p class="note">정한 시각에 이 기기가 스스로 해요. 비워 두면 안 해요. 누가 쓰고 있으면(5분 안에 터치) 끄기를 잠깐 미뤄요.</p>
+    <label class="f">☀️ 화면 켜기</label><input class="in" type="time" id="s_on" value="${s.on||''}">
+    <label class="f">🌙 화면 끄기 <span class="note">(밤사이 누가 깨우면 15분 뒤 다시 꺼요)</span></label><input class="in" type="time" id="s_off" value="${s.off||''}">
+    <label class="f">⏻ 컴퓨터 끄기 <span class="note">(보통은 비워 두세요)</span></label><input class="in" type="time" id="s_shut" value="${s.shut||''}">
+    <label class="f">요일</label><div class="days" id="s_days">${[1,2,3,4,5,6,7].map(i=>`<button data-d="${i}" class="${days.includes(i)?'on':''}">${DAYN[i]}</button>`).join('')}</div>
+    <div class="acts"><button class="btn" id="no">닫기</button><button class="btn pri" id="yes">저장</button></div>`);
+  document.querySelectorAll('#s_days button').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+  $('#no').onclick=close_;
+  $('#yes').onclick=async()=>{const dd=[...document.querySelectorAll('#s_days button.on')].map(b=>b.dataset.d).join('');if(!dd)return toast('요일을 하나 이상 골라 주세요');
+    const r=await call({op:'edit',dev:d.id,sched:{on:$('#s_on').value,off:$('#s_off').value,shut:$('#s_shut').value,days:dd}});
+    if(r.ok){close_();toast('저장했어요. 기기에는 15초 안에 들어가요.');load()}else toast('저장 실패: '+r.err)};
+}
+function editSheet(d){
+  sheet(`<h2>기기 관리</h2>
+    <label class="f">이름</label><input class="in" id="e_nm" maxlength="30" value="${esc(d.name)}">
+    <label class="f">종류</label><select class="in" id="e_k">${Object.keys(KIND).map(k=>`<option value="${k}" ${d.kind===k?'selected':''}>${KIND[k][1]} ${KIND[k][0]}</option>`).join('')}</select>
+    <label class="f">위치</label><input class="in" id="e_pl" maxlength="30" value="${esc(d.place)}" placeholder="예: 생산실, 사무실 입구">
+    <label class="f">네트워크 주소(MAC) <span class="note">자동으로 채워져요. 원격으로 켜기에 써요.</span></label><input class="in" id="e_mac" value="${esc(d.mac)}" placeholder="AA:BB:CC:DD:EE:FF">
+    ${d.st?`<p class="note">컴퓨터 이름 ${esc(d.st.host||'-')} · IP ${esc(d.st.ip||'-')} · ${esc(d.st.os||'')} · 도우미 ${esc(d.st.ver||'')}</p>`:''}
+    <div class="acts"><button class="btn" id="no">닫기</button><button class="btn pri" id="yes">저장</button></div>
+    <div class="acts"><button class="btn" id="re">설치 번호 다시 받기<br><span class="note">컴퓨터를 바꿨거나 다시 설치할 때</span></button></div>
+    <div class="acts"><button class="btn red" id="del">이 기기 삭제</button></div>`);
+  $('#no').onclick=close_;
+  $('#yes').onclick=async()=>{const r=await call({op:'edit',dev:d.id,name:$('#e_nm').value,kind:$('#e_k').value,place:$('#e_pl').value,mac:$('#e_mac').value});
+    if(r.ok){close_();toast('저장했어요');load()}else toast(r.err==='mac'?'MAC 주소 모양이 맞지 않아요 (예: AA:BB:CC:DD:EE:FF)':'저장 실패: '+r.err,4000)};
+  $('#re').onclick=()=>codeFor(d);
+  $('#del').onclick=()=>{sheet(`<h2>「${esc(d.name)}」 삭제</h2><div class="warnbox">삭제하면 이 앱에서 사라지고, 그 컴퓨터의 도우미도 다음 연결 때 스스로 꺼져요. 다시 쓰려면 기기 추가부터 다시 해야 해요.</div>
+    <div class="acts"><button class="btn" id="no">그만두기</button><button class="btn redf" id="yes">삭제</button></div>`);
+    $('#no').onclick=close_;$('#yes').onclick=async()=>{const r=await call({op:'del',dev:d.id});close_();toast(r.ok?'삭제했어요':'삭제 실패: '+r.err);load()}};
+}
+const INSTALL='https://lee1812-oss.github.io/pos/agent.html';
+function codeView(name,code,exp){
+  sheet(`<h2>「${esc(name)}」 설치 번호</h2>
+    <div class="code">${code}</div><p class="note" style="text-align:center">이 번호는 <b id="cd"></b> 동안만 쓸 수 있어요. 한 번 쓰면 없어져요.</p>
+    <div class="infobox"><b>그 컴퓨터(윈도우)에서</b><ol class="steps">
+      <li>크롬에서 <b class="nw">lee1812-oss.github.io/pos/agent.html</b> 열기</li>
+      <li>「설치 파일 받기」 누르고 받은 파일 실행 (경고 창이 뜨면 「실행」)</li>
+      <li>번호 넣는 창에 위 6자리 넣기 → 「기기 등록 완료」 창이 뜨면 끝</li></ol></div>
+    <p class="note">윈도우 PC만 돼요(태블릿·휴대폰은 안 돼요). 원격 접속(팀뷰어·크롬 원격 데스크톱)으로 해도 돼요.</p>
+    <div class="acts"><button class="btn" id="cp">설치 주소 복사</button><button class="btn pri" id="no">닫기</button></div>`);
+  const tk=()=>{const s=Math.max(0,Math.round((exp-Date.now()-skew)/1000));const e=$('#cd');if(!e)return clearInterval(t);e.textContent=Math.floor(s/60)+'분 '+(s%60)+'초';if(!s)clearInterval(t)};const t=setInterval(tk,1000);tk();
+  $('#no').onclick=()=>{close_();load()};$('#cp').onclick=()=>{navigator.clipboard.writeText(INSTALL).then(()=>toast('설치 주소를 복사했어요'))};
+}
+async function codeFor(d){const r=await call({op:'code',dev:d.id});if(r.ok)codeView(d.name,r.code,r.exp);else toast('실패: '+r.err)}
+$('#addBtn').onclick=()=>{
+  sheet(`<h2>＋ 기기 추가</h2>
+    <label class="f">이름</label><input class="in" id="a_nm" maxlength="30" placeholder="예: 사무실 PC, 생산실 키오스크">
+    <label class="f">종류</label><select class="in" id="a_k">${Object.keys(KIND).map(k=>`<option value="${k}" ${k==='pc'?'selected':''}>${KIND[k][1]} ${KIND[k][0]}</option>`).join('')}</select>
+    <label class="f">위치</label><input class="in" id="a_pl" maxlength="30" placeholder="예: 생산실">
+    <p class="note">다음 화면에 나오는 6자리 번호를 그 컴퓨터에 넣으면 연결돼요.</p>
+    <div class="acts"><button class="btn" id="no">닫기</button><button class="btn pri" id="yes">추가하고 번호 받기</button></div>`);
+  $('#no').onclick=close_;
+  $('#yes').onclick=async()=>{const nm=$('#a_nm').value.trim();if(!nm)return toast('이름을 넣어 주세요');
+    const r=await call({op:'add',name:nm,kind:$('#a_k').value,place:$('#a_pl').value});
+    if(r.ok)codeView(nm,r.code,r.exp);else toast('추가 실패: '+r.err)};
+};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&A)load()});
+if(A){load().then(()=>{if(A)loop()})}else pinView();
+</script>
+</body>
+</html>
