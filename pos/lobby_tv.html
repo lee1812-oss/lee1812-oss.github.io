@@ -30,7 +30,7 @@ html,body{height:100%;background:#1E120B;color:#FFF7EC;font-family:"Malgun Gothi
 </style></head><body>
 <div id="wrap">
  <div id="hd"><b>🍞 빵을그리다</b><span id="tag">회사 소개</span><span id="clock"></span></div>
- <div id="stage"><div id="box"><div id="yt"></div><video id="pv" muted playsinline preload="auto"></video>
+ <div id="stage"><div id="box"><div id="yt"></div><video id="pv" playsinline preload="auto"></video>
   <div id="card"><div class="m" id="cm"></div><div class="t" id="ct"></div><div class="s" id="cs"></div></div>
   <div id="bar"></div></div></div>
  <div id="info"><div id="cnt"></div><div id="now"></div><div id="next"></div></div>
@@ -38,14 +38,14 @@ html,body{height:100%;background:#1E120B;color:#FFF7EC;font-family:"Malgun Gothi
 </div>
 <div id="shield"></div>
 <script>
-/* 빵을그리다 신발장 영상 v002 (2026-11-07, 첫 홍보영상 때 다음 영상 이름 표시)
+/* 빵을그리다 신발장 영상 v003 (2026-11-07, 소리 켜기)
    회사 홍보 영상(45초) → 이번 달 위생교육 영상 3분 → 홍보 영상 → 다음 위생교육 영상 3분 … 끝없이 반복.
    위생교육 영상은 이어서 재생(다음에 같은 영상 차례가 오면 멈췄던 곳부터). 매월 1일 자동으로 그달 영상으로 바뀜.
-   주소 뒤 ?sound=1 이면 소리 켬, ?chunk=초 로 위생교육 한 번 재생 길이 변경. */
+   v003: 소리 켬이 기본(?sound=0 이면 소리 끔), ?chunk=초 로 위생교육 한 번 재생 길이 변경. */
 var MONTHS=[{"t":"작업실 및 제조시설 관리","v":[{"id":"dPaFuNSH1FM","t":"HACCP 인증 선행요건 - 기본편"}]},{"t":"제조공정 위생 관리","v":[{"id":"RECWbov5UkU","t":"HACCP 운영개선 - 보관관리"}]},{"t":"제조공정 위생 관리","v":[{"id":"gxCKrXuZF0o","t":"개인위생과 세척소독관리"}]},{"t":"위생전실 및 위생설비 청소관리","v":[{"id":"Lzn4N6YEHSM","t":"HACCP 인증 선행요건 - 심화편"},{"id":"HaY3arYBsUs","t":"공정흐름도 작성 · 현장확인 (준비 4·5단계)"}]},{"t":"제조설비 및 작업장 청결관리","v":[{"id":"cOD_H2HQWSo","t":"시설·설비관리"}]},{"t":"이물관리","v":[{"id":"j1g5B1aavNw","t":"HACCP 운영개선 - 이물관리"},{"id":"y4TH0ZWrhy4","t":"HACCP 운영개선 - 방충방서"}]},{"t":"원·부재료 관리 및 공정별 위생·안전 수행 지침","v":[{"id":"CMvMFJWrN3Q","t":"위해요소 분석 (기본원칙 1)"},{"id":"VvqTKz4cVwA","t":"중요관리점(CCP) 결정 (기본원칙 2)"},{"id":"bKRBdlVL1fo","t":"한계기준(CL) 설정 (기본원칙 3)"},{"id":"QOTXuGDB5CY","t":"HACCP 7원칙 12절차"}]},{"t":"HACCP 운영 개선 사례 · 영업장 관리","v":[{"id":"ELIrOXSHS-Q","t":"식품제조가공업소 식품 위생 관리 방안과 사례"},{"id":"O9oCfgpUiMM","t":"영업장 관리"}]},{"t":"HACCP 운영 개선 사례 · 위생관리","v":[{"id":"roQkrCNL8mI","t":"HACCP 주요 지적사항 및 평가사례 (선행요건관리)"},{"id":"09Sv1tHiQvA","t":"작업장 위생관리"}]},{"t":"HACCP 운영 개선 사례 · 제조·가공시설 설비 관리","v":[{"id":"9_Bs_2Dtg9o","t":"모니터링 체계 확립 & 개선조치 방법 수립 (기본원칙 4, 5)"},{"id":"qniTp878jS8","t":"검증 절차 및 방법 수립, 문서화 및 기록 유지 (기본원칙 6, 7)"}]},{"t":"HACCP 운영 개선 사례 · 용수관리 · 보관·운송관리","v":[{"id":"IY1lo_dgwp8","t":"HACCP 인증 사후관리 Tip & Talk"},{"id":"gc30CFf3G98","t":"용수 및 원부자재 보관·운송 관리"}]},{"t":"HACCP 운영 개선 사례 · 검사관리","v":[{"id":"0ZX4P3RmUx4","t":"제품 검사 및 회수 프로그램 관리"}]}];
 var PROMO='drawbread_promo.mp4?v=20261106';
 var Q=(function(){var o={};location.search.replace(/[?&]([^=&]+)=([^&]*)/g,function(a,k,v){o[k]=decodeURIComponent(v)});return o})();
-var SOUND=Q.sound==='1', CHUNK=Math.max(30,parseInt(Q.chunk,10)||180), EDU_LAST_DAY=25;
+var SOUND=Q.sound!=='0', CHUNK=Math.max(30,parseInt(Q.chunk,10)||180), EDU_LAST_DAY=25;
 var KEY='lobbyTv_v1', st={hi:0,pos:{}};
 try{var s0=JSON.parse(localStorage.getItem(KEY)||'null');if(s0&&s0.pos)st=s0}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
@@ -66,7 +66,7 @@ function playPromo(){mode='promo';bar(0);lastGood=Date.now();
  try{if(player&&player.pauseVideo)player.pauseVideo()}catch(e){}
  show('pv');var nx=canH()?'다음: '+mLabel+' · '+hTitle(st.hi%HV.length):(HV.length?'다음: '+mLabel+' 안내':'');
  info('회사 소개 영상','빵을그리다를 소개합니다',nx,'회사 소개');
- var v=$('pv');v.muted=!SOUND;try{v.currentTime=0}catch(e){}
+ var v=$('pv');v.muted=!SOUND;v.volume=1;try{v.currentTime=0}catch(e){}
  var p=v.play();if(p&&p.catch)p.catch(function(){v.muted=true;v.play()});}
 $('pv').addEventListener('ended',function(){afterPromo()});
 $('pv').addEventListener('timeupdate',function(){var v=$('pv');lastGood=Date.now();if(v.duration)bar(v.currentTime/v.duration*100)});
@@ -77,7 +77,7 @@ function afterPromo(){if(mode!=='promo')return; if(canH())playH();else if(HV.len
 function playH(){mode='h';var i=st.hi%HV.length,v=HV[i];curH=v;chunkLeft=CHUNK;lastGood=Date.now();bar(0);
  show('yt');info(mLabel+' · 영상 '+(i+1)+' / '+HV.length+(MON.t?' · '+MON.t:''),v.t,'다음: 회사 소개 영상 · 수강 기간 '+(MI+1)+'월 1일~'+EDU_LAST_DAY+'일',mLabel);
  var at=Math.max(0,(st.pos[v.id]||0)-3);
- try{player.loadVideoById({videoId:v.id,startSeconds:at});if(SOUND)player.unMute();else player.mute()}catch(e){endH(false)}}
+ try{player.loadVideoById({videoId:v.id,startSeconds:at});if(SOUND){player.unMute();player.setVolume(100)}else player.mute()}catch(e){endH(false)}}
 function endH(finished){if(mode!=='h')return;mode='';
  if(curH){if(finished)st.pos[curH.id]=0;}
  st.hi=(st.hi+1)%Math.max(1,HV.length);save();playPromo()}
@@ -90,7 +90,7 @@ function showCard(){mode='card';show('card');bar(0);
 window.onYouTubeIframeAPIReady=function(){
  player=new YT.Player('yt',{host:'https://www.youtube-nocookie.com',
   playerVars:{autoplay:0,mute:1,controls:0,cc_load_policy:1,cc_lang_pref:'ko',hl:'ko',rel:0,playsinline:1,iv_load_policy:3,disablekb:1,fs:0,modestbranding:1},
-  events:{onReady:function(){ytOk=true;if(mode==='promo'&&HV.length)$('next').textContent='다음: '+mLabel+' · '+hTitle(st.hi%HV.length)},
+  events:{onReady:function(){ytOk=true;try{player.setVolume(100)}catch(e){};if(mode==='promo'&&HV.length)$('next').textContent='다음: '+mLabel+' · '+hTitle(st.hi%HV.length)},
    onStateChange:function(e){if(mode!=='h')return;if(e.data===1||e.data===3)lastGood=Date.now();if(e.data===0)endH(true)},
    onError:function(){if(mode==='h'){ytFail=true;setTimeout(function(){endH(false)},1000)}}}});};
 (function(){var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=function(){ytFail=true};document.head.appendChild(s);
@@ -101,6 +101,7 @@ setInterval(function(){
   if(s===1){lastGood=Date.now();chunkLeft--;try{st.pos[curH.id]=Math.floor(player.getCurrentTime())}catch(e){}
    bar((CHUNK-chunkLeft)/CHUNK*100);if(chunkLeft%5===0)save();if(chunkLeft<=0)endH(false)}
   else if(s===2||s===5||s===-1){try{if(!SOUND)player.mute();player.playVideo()}catch(e){}}
+  if(s===1&&SOUND){try{if(player.isMuted())player.unMute()}catch(e){}}
   if(Date.now()-lastGood>45000){ytFail=true;endH(false)}}
  if(mode==='promo'){var v=$('pv');if(v.paused&&!v.ended){try{v.play()}catch(e){}}if(Date.now()-lastGood>30000){mode='promo';afterPromo()}}
 },1000);
