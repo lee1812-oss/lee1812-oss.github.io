@@ -15,17 +15,18 @@ html,body{margin:0;height:100%;background:#f2f3f5;font-family:"Malgun Gothic","A
 .hide{display:none!important}
 #ib{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:20;border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.18);display:flex;gap:8px;align-items:flex-start;background:#fff8d6;color:#3c2a1e;border:1px solid #e8d36a}
 #ib .t{flex:1}#ib button{font:inherit;font-weight:700;border-radius:10px;border:1px solid currentColor;background:#fff;color:inherit;min-height:44px;padding:0 12px;margin-top:4px}#ib .x{border:0;background:transparent;font-size:20px;min-width:40px}
-#vbar{position:fixed;top:0;left:0;right:0;z-index:25;box-sizing:border-box;height:calc(28px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;background:#2b1d14;color:#f3e3c3;display:flex;align-items:center;justify-content:space-between;font-size:14px;cursor:pointer}#vbar b{background:#f5c518;color:#2b1d14;border-radius:999px;padding:1px 10px;font-size:14px}
-#fr{top:calc(28px + env(safe-area-inset-top))!important;height:calc(100% - 28px - env(safe-area-inset-top))!important}
+#vbar{position:fixed;top:0;left:0;right:0;z-index:25;box-sizing:border-box;height:calc(44px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;background:#2b1d14;color:#f3e3c3;display:flex;align-items:center;justify-content:space-between;font-size:14px;gap:8px}#vbar button{font:inherit;font-weight:700;border:1px solid #806a56;border-radius:8px;background:transparent;color:inherit;min-height:36px;padding:0 10px;cursor:pointer}#vbar b{background:#f5c518;color:#2b1d14;border-radius:999px;padding:1px 10px;font-size:14px}
+#fr{top:calc(44px + env(safe-area-inset-top))!important;height:calc(100% - 44px - env(safe-area-inset-top))!important}
 #msg{padding-top:calc(64px + env(safe-area-inset-top))!important}
 </style></head><body>
 <div id="msg" class="hide"><div style="font-size:22px;font-weight:700;margin-bottom:6px">🔑 처음 한 번만 열쇠를 넣어 주세요</div>카톡 「나에게」로 받은 <b>전광판 주소</b>를 길게 눌러 복사한 뒤<br>아래 칸에 붙여 넣고 <b>열기</b>를 눌러 주세요.<br><input id="kin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="여기에 주소 붙여넣기" style="width:min(520px,92%);font-size:18px;padding:14px;margin-top:16px;border:2px solid #b9a27a;border-radius:12px;box-sizing:border-box"><br><button id="kgo" style="font-size:19px;font-weight:700;min-height:56px;padding:0 34px;margin-top:12px;border:0;border-radius:12px;background:#3c2a1e;color:#fff">열기</button><div id="kerr" style="color:#c0392b;margin-top:10px"></div></div>
-<div id="ib" class="hide"></div><div id="vbar" title="눌러서 새로고침" onclick="location.reload()"><span>↻ 누르면 새로고침</span><b>버전 v6</b></div>
-<iframe id="fr" class="hide" title="조조 알림 전광판" allow="autoplay; screen-wake-lock"></iframe>
+<div id="ib" class="hide"></div><div id="vbar"><button type="button" id="refresh">새로고침</button><button type="button" id="repair">연결 복구</button><b>버전 v7</b></div>
+<iframe id="fr" class="hide" title="조조 알림 전광판" referrerpolicy="no-referrer" allow="autoplay; screen-wake-lock"></iframe>
 <script>
-// 조조 알림 전광판 앱 껍데기 v6 (2026-10-25, 맨 위 띠에 버전 표시, v4: 아이패드 홈 화면 열쇠 유지·붙여넣기 칸). 열쇠는 주소 # 뒤(또는 ?k=)로 한 번 받아 이 기기에만 기억한다. 이 파일·저장소에는 열쇠가 없다.
+// 조조 알림 전광판 앱 껍데기 v7 (2026-11-08, 안드로이드 Google Drive 연결 오류 우회·연결 복구, v6: 2026-10-25, 맨 위 띠에 버전 표시, v4: 아이패드 홈 화면 열쇠 유지·붙여넣기 칸). 열쇠는 주소 # 뒤(또는 ?k=)로 한 번 받아 이 기기에만 기억한다. 이 파일·저장소에는 열쇠가 없다.
 (function(){
   var EXEC="https://script.google.com/macros/s/AKfycbzHH0cAFytvYowJoHLHfSZ2NtixRRBFUkYw76lyLwv3iAooKnegWLYCS5ecSuojob9Fkw/exec";
+  document.getElementById("refresh").onclick=function(){location.reload()};
   var ok=/^[a-z0-9]{8,40}$/i;
   var k=(location.hash.slice(1)||new URLSearchParams(location.search).get("k")||"").replace(/[^a-z0-9]/gi,"");
   try{if(ok.test(k))localStorage.setItem("jbk",k);else k=localStorage.getItem("jbk")||"";}catch(e){}
@@ -40,7 +41,21 @@ html,body{margin:0;height:100%;background:#f2f3f5;font-family:"Malgun Gothic","A
     return}
   if(!isIOS){var lk=document.createElement("link");lk.rel="manifest";lk.href="manifest.webmanifest";document.head.appendChild(lk)}
   if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){})}catch(e){}}
-  var fr=document.getElementById("fr");fr.src=EXEC+"?k="+encodeURIComponent(k);fr.classList.remove("hide");
+  var fr=document.getElementById("fr"), route="auto";
+  try{route=localStorage.getItem("jb_route_v7")||"auto"}catch(e){}
+  function connect(){
+    var base=route==="first"?EXEC:EXEC.replace("/macros/","/a/*/macros/");
+    fr.src=base+"?"+(route==="first"?"authuser=0&":"")+"k="+encodeURIComponent(k)+"&v=7&t="+Date.now();
+    fr.classList.remove("hide");
+  }
+  document.getElementById("repair").onclick=function(){
+    route=route==="auto"?"first":"auto";
+    try{localStorage.setItem("jb_route_v7",route)}catch(e){}
+    connect();
+    this.textContent="다시 연결 중";var btn=this;
+    setTimeout(function(){btn.textContent="연결 복구"},3500);
+  };
+  connect();
   var standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;if(standalone)return;
   var ib=document.getElementById("ib"),evt=null;
   function show(h){try{if(sessionStorage.getItem("jb_x"))return}catch(e){}ib.innerHTML='<div class="t">'+h+'</div><button class="x" aria-label="닫기">✕</button>';ib.classList.remove("hide");
