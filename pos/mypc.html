@@ -1,0 +1,78 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>내 컴퓨터 · 빵을그리다</title><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer"><link rel="manifest" href="mypc.webmanifest"><link rel="icon" href="devices_icon_192.png"><meta name="theme-color" content="#5b3a22"><style>
+:root{--br:#5b3a22;--br2:#8a5a35;--bg:#f3f1ee;--card:#fff;--ink:#1d1d1f;--sub:#4a4a4f;--line:#dcd7d0;--ok:#1f8a3b;--warn:#c25e00;--bad:#c62828;--info:#1f5fa8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:17px;word-break:keep-all;overflow-wrap:break-word;line-height:1.5}
+button,input,select{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--br);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:22px;margin:0;flex:1;min-width:180px}
+.top .t{font-size:15px;opacity:.9;white-space:nowrap}
+.btn{min-height:54px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);padding:8px 16px;font-weight:700;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--br);border-color:var(--br);color:#fff}
+.btn.add{background:#fff;color:var(--br);border-color:#fff}
+.btn.red{color:var(--bad);border-color:#e9b7b7}
+.btn.redf{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.grn{color:var(--ok);border-color:#b6dcc0}
+.btn[disabled]{opacity:.45;cursor:default}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.hd{display:flex;gap:12px;align-items:flex-start}
+.ic{width:52px;height:52px;border-radius:12px;background:#f1e8df;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none}
+.nm{font-size:21px;font-weight:800;line-height:1.3}
+.pl{color:var(--sub);font-size:16px}
+.more{margin-left:auto;min-height:48px;min-width:48px;padding:4px 12px}
+.st{font-weight:700;font-size:17px;padding:8px 12px;border-radius:10px;background:#f5f5f5}
+.st.on{color:var(--ok);background:#eaf6ed}
+.st.off{color:#555;background:#efefef}
+.st.wait{color:var(--warn);background:#fff3e6}
+.st small{display:block;font-weight:500;color:var(--sub);font-size:15px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.last{font-size:15px;color:var(--sub);border-top:1px dashed var(--line);padding-top:10px}
+.sch{font-size:16px;background:#faf7f3;border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.sch b{color:var(--br)}
+.sch .btn{min-height:46px;padding:4px 14px}
+.empty{background:#fff;border:2px dashed var(--line);border-radius:16px;padding:30px;text-align:center;color:var(--sub)}
+.nw{white-space:nowrap}
+/* 아래에서 올라오는 창 */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.show{display:flex}
+.pane{background:#fff;width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow:auto}
+@media(min-width:700px){.sheet{align-items:center}.pane{border-radius:20px}}
+.pane h2{margin:0 0 12px;font-size:22px}
+label.f{display:block;font-weight:700;margin:14px 0 6px}
+input.in,select.in{width:100%;min-height:54px;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days button{min-width:48px;min-height:48px;border-radius:24px;border:2px solid var(--line);background:#fff;font-weight:700}
+.days button.on{background:var(--br);border-color:var(--br);color:#fff}
+.acts{display:flex;gap:10px;margin-top:18px}
+.acts .btn{flex:1}
+.note{font-size:15px;color:var(--sub);margin-top:6px}
+.warnbox{background:#fdecea;color:#8a1c1c;border-radius:12px;padding:12px;font-weight:600;margin-top:10px}
+.infobox{background:#e9f1fb;color:#123d6b;border-radius:12px;padding:12px;margin-top:10px}
+.code{font-size:44px;font-weight:900;letter-spacing:8px;text-align:center;color:var(--br);background:#faf7f3;border-radius:14px;padding:12px;margin:10px 0}
+ol.steps{padding-left:22px;margin:8px 0}
+ol.steps li{margin:6px 0}
+.pin{max-width:420px;margin:60px auto;background:#fff;border-radius:18px;padding:24px;border:1px solid var(--line)}
+.pin input{font-size:30px;letter-spacing:10px;text-align:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:14px 20px;border-radius:12px;font-weight:700;z-index:30;display:none;max-width:92vw}
+.ver{color:var(--sub);font-size:14px;text-align:center;margin:24px 0}
+.hero{font-size:24px;font-weight:800}.grid{display:block;max-width:560px;margin:auto}.codein{text-transform:uppercase;letter-spacing:2px}.top button{font-size:15px}.btn:disabled{opacity:.5}a{color:#214f87}.row .btn{min-height:64px}</style></head><body><header class="top"><h1>내 컴퓨터</h1><button class="btn" id="refresh" hidden>새로 읽기</button><button class="btn" id="disconnect" hidden>연결 해제</button></header><main id="app"></main><div class="sheet" id="sh"><div class="pane" id="pane"></div></div><div class="toast" id="toast"></div><script>
+const API='https://script.google.com/macros/s/AKfycbzjUsV8qyoOoJ4pQqD3M1osmkCfHsSA5qzKNZpCVQAOyUw92OQCuQhQRyFul2JzkgZk/exec',VERSION='v002',STORE='dm_my_pc_v2';
+let T=localStorage.getItem(STORE)||'',D=null,clock=0,timer=null,busy=false;
+const $=s=>document.querySelector(s),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const OP={screen_on:'화면 켜기',screen_off:'화면 끄기',restart:'다시 시작',shutdown:'컴퓨터 끄기',cancel:'종료 취소',wake:'컴퓨터 켜기 요청'};
+function toast(s){$('#toast').textContent=s;$('#toast').style.display='block';setTimeout(()=>$('#toast').style.display='none',4500)}
+async function call(o){const r=await fetch(API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({p:T},o))});return r.json()}
+function sheet(s){$('#pane').innerHTML=s;$('#sh').classList.add('show')}
+function closeSheet(){$('#sh').classList.remove('show')}
+$('#sh').onclick=e=>{if(e.target.id==='sh')closeSheet()};
+function clearLocal(){localStorage.removeItem(STORE);T='';D=null;clearInterval(timer);$('#refresh').hidden=true;$('#disconnect').hidden=true}
+function connectView(msg){$('#app').innerHTML='<section class="pin"><h2>내 휴대폰과 내 PC 연결</h2><p>관리자에게 받은 <b>개인 연결 번호</b>를 처음 한 번만 넣으세요. 회사 관리 번호가 아닙니다.</p><label for="code">개인 연결 번호 12자리</label><input class="in codein" id="code" maxlength="16" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예: 4자리씩 3묶음"><div class="acts"><button class="btn pri" id="connect">내 컴퓨터 연결</button></div>'+(msg?'<div class="warnbox">'+esc(msg)+'</div>':'')+'<div class="infobox">내 PC만 표시됩니다. 다른 직원의 PC는 볼 수도, 제어할 수도 없습니다.</div><p class="note">연결 번호는 30분 동안 한 번만 쓸 수 있습니다. 휴대폰을 잃어버리면 관리자에게 연결 해제를 요청하세요.</p><a href="agent.html">PC 도우미 설치 안내</a></section><div class="ver">'+VERSION+'</div>';$('#connect').onclick=async()=>{const code=$('#code').value.replace(/[^a-f0-9]/gi,'').toUpperCase();if(code.length!==12)return toast('연결 번호 12자리를 확인해 주세요');$('#connect').disabled=true;try{const r=await call({op:'phone_claim',code});if(!r.ok){$('#connect').disabled=false;return toast(r.err==='claimlocked'?'잘못된 입력이 많아 잠시 잠겼습니다. 30분 뒤 다시 시도하세요.':'번호가 틀렸거나 만료·사용됐습니다. 관리자에게 새 번호를 받으세요.')}T=r.token;localStorage.setItem(STORE,T);await load();startLoop()}catch(e){$('#connect').disabled=false;toast('연결하지 못했습니다. 인터넷을 확인해 주세요.')}}}
+async function load(){if(!T)return connectView();try{const r=await call({op:'phone_list'});if(!r.ok){clearLocal();return connectView('연결이 해제됐습니다. 관리자에게 새 연결 번호를 받으세요.')}D=(r.devs||[])[0];clock=(r.now||Date.now())-Date.now();render()}catch(e){toast('연결 상태를 확인하지 못했습니다. 제어 전 다시 읽어 주세요.')}}
+function render(){if(!D){clearLocal();return connectView('연결된 PC가 없습니다.')}$('#refresh').hidden=false;$('#disconnect').hidden=false;const now=Date.now()+clock,on=D.st&&now-D.st.seen<90000,safe=D.st&&D.st.ver==='a002';const status=!D.enrolled?'PC 설치 기다리는 중':on?'연결됨 · PC 켜져 있음':'꺼짐 또는 인터넷 연결 끊김';const last=D.last;const results={sent:'PC가 받기 전',pending:'1분 취소 대기 · 종료가 막힐 수 있음',ok:'요청 처리됨',err:'실패'};$('#app').innerHTML='<div class="grid"><section class="card"><div class="hero">'+esc(D.owner||'나')+' 님의 컴퓨터</div><div class="nm">'+esc(D.name)+'</div><div class="pl">'+esc(D.place||'')+'</div><div class="st '+(on?'on':'off')+'">'+status+'<small>확인 시각 '+new Date(now).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+'</small></div>'+(!D.enrolled?'<div class="warnbox">이 PC에서 먼저 도우미를 설치해야 합니다. 관리자에게 PC 설치 번호를 받아 <a href="agent.html">설치 안내</a>를 여세요.</div>':on?'<div class="row"><button class="btn" data-op="screen_off">화면 끄기</button><button class="btn" data-op="screen_on">화면 켜기</button></div><div class="row"><button class="btn" data-op="restart" '+(!safe?'disabled':'')+'>다시 시작</button><button class="btn red" data-op="shutdown" '+(!safe?'disabled':'')+'>컴퓨터 끄기</button></div>': '<button class="btn pri" data-op="wake">컴퓨터 켜기 요청</button><div class="infobox">유선 인터넷·PC 깨우기 설정·같은 장소의 켜진 도우미가 필요합니다. 요청을 보냈다고 실제로 켜진 것은 아닙니다.</div>')+'<button class="btn grn" data-op="cancel" '+(!on?'disabled':'')+'>끄기·다시 시작 취소</button>'+(on&&!safe?'<div class="warnbox">자료 보호를 위해 종료·재시작은 새 도우미 설치 후 사용할 수 있습니다.</div>':'')+'<div class="infobox"><b>추천: 잠시 쉬거나 밤사이에는 화면 끄기</b><br>컴퓨터는 켜 둬서 휴대폰에서 화면을 다시 켤 수 있습니다.</div>'+(last?'<div class="last">최근 요청: '+esc(OP[last.op]||last.op)+' · '+esc(results[last.res]||last.res)+'</div>':'')+'<p class="note">종료·재시작은 1분 취소 대기 후 강제 종료 없이 요청합니다. 저장 안 한 앱이 있으면 종료가 막힐 수 있습니다. 업무 파일과 화면 내용은 이 앱에 전송하지 않습니다.</p></section></div><div class="ver">'+VERSION+' · 자기 PC 전용</div>';document.querySelectorAll('[data-op]').forEach(b=>b.onclick=()=>action(b.dataset.op))}
+async function send(op){if(busy)return;busy=true;try{const r=await call({op:'phone_cmd',dev:D.id,cmd:op});if(r.ok){toast(op==='wake'?'깨우기 신호를 요청했습니다. 1~2분 뒤 상태를 확인하세요.':OP[op]+' 요청을 보냈습니다.');await load()}else{const errs={nohelper:'같은 장소에 켜진 도우미가 없어 켜기 요청을 보낼 수 없습니다.',nomac:'PC의 네트워크 주소를 아직 모릅니다. 먼저 한 번 연결하세요.',unsafeagent:'자료 보호용 새 도우미를 설치해 주세요.',forbidden:'내 PC에만 요청할 수 있습니다.',relayonly:'이 기기는 깨우기 전용입니다.'};toast(errs[r.err]||'요청이 거절됐습니다. 연결을 다시 확인하세요.')}}catch(e){toast('요청 결과를 확인하지 못했습니다. 상태를 새로 읽어 주세요.')}finally{busy=false}}
+function action(op){if(op==='shutdown'||op==='restart'){sheet('<h2>'+OP[op]+'</h2><p><b>'+esc(D.name)+'</b>에 요청합니다. 먼저 업무 파일을 저장하세요.</p><div class="warnbox">1분 안에 휴대폰에서 취소할 수 있습니다. 저장 안 한 프로그램이 있으면 종료가 막힐 수 있습니다.'+(op==='shutdown'?'<br>완전히 끈 PC는 깨우기 설정을 확인하기 전까지 현장에서 전원 버튼을 눌러야 할 수 있습니다.':'')+'</div><div class="acts"><button class="btn" id="no">그만두기</button><button class="btn redf" id="yes">확인 · '+OP[op]+'</button></div>');$('#no').onclick=closeSheet;$('#yes').onclick=()=>{closeSheet();send(op)}}else send(op)}
+$('#refresh').onclick=load;$('#disconnect').onclick=()=>{sheet('<h2>이 휴대폰 연결 해제</h2><p>이 휴대폰의 연결 권한을 해제합니다. 다시 쓰려면 관리자에게 새 번호를 받으세요. 분실한 휴대폰은 관리자 화면에서 해제해야 합니다. 진행 중인 종료 요청도 취소합니다.</p><div class="acts"><button class="btn" id="no">유지</button><button class="btn red" id="yes">연결 해제</button></div>');$('#no').onclick=closeSheet;$('#yes').onclick=async()=>{try{const r=await call({op:'phone_disconnect'});if(!r.ok&&r.err!=='phoneauth')return toast('연결 해제 실패: 다시 시도하세요.');closeSheet();clearLocal();connectView()}catch(e){toast('인터넷 연결 후 다시 해제하세요.')}}};
+function startLoop(){clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&!$('#sh').classList.contains('show'))load()},15000)}document.addEventListener('visibilitychange',()=>{if(!document.hidden&&T)load()});if(T){load();startLoop()}else connectView();
+</script></body></html>
