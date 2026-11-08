@@ -134,7 +134,7 @@ function render(){
   const ds=DATA.devs||[];
   if(!ds.length){$('#app').innerHTML=`<div class="empty"><p style="font-size:20px;font-weight:800;color:var(--ink)">아직 등록된 기기가 없어요</p><p>위의 「＋ 기기 추가」를 눌러 키오스크·포스기·PC를 넣어 주세요.</p></div><div class="ver">${VER}</div>`;return}
   $('#app').innerHTML='<div class="grid">'+ds.map(d=>{
-    const k=KIND[d.kind]||KIND.etc,st=devState(d,now),on=st.c==='on';
+    const k=KIND[d.kind]||KIND.etc,st=devState(d,now),on=st.c==='on',safe=d.st&&d.st.ver==='a002';
     const L=d.last;let last='';
     if(L){last=`마지막 명령: <b>${OPN[L.op]||L.op}</b> · <span class="nw">${hm(L.at)} 보냄</span> → `+(L.res==='sent'?(now-L.at>60000&&L.op!=='wake'?'<span style="color:var(--warn)">아직 기기가 못 받음</span>':'기다리는 중'):`<span style="color:${L.res==='ok'?'var(--ok)':'var(--bad)'}">${RES[L.res]||L.res}${L.done?' '+hm(L.done):''}</span>`)+(L.op==='wake'&&L.by?` <span class="nw">(${esc(L.by)}이 신호 보냄)</span>`:'')}
     const sdRecent=L&&(L.op==='restart'||L.op==='shutdown')&&now-L.at<70000;
@@ -142,13 +142,13 @@ function render(){
       <div class="hd"><div class="ic">${k[1]}</div><div><div class="nm">${esc(d.name)}</div><div class="pl">${k[0]}${d.place?' · '+esc(d.place):''}</div></div>
         <button class="btn more" data-a="edit">⋯ 관리</button></div>
       <div class="st ${st.c}">${st.t}<small>${st.s}</small></div>
-      ${!d.enrolled?`<button class="btn pri" data-a="code">설치 번호 받기</button>`:on?`
+      ${d.relayOnly?`<div class="infobox">깨우기 신호 전달 전용 · 이 PC의 화면과 전원은 제어하지 않습니다.</div>${!d.enrolled?'<button class="btn pri" data-a="code">도우미 설치 번호 받기</button>':''}`:!d.enrolled?`<button class="btn pri" data-a="code">설치 번호 받기</button>`:on?`
       <div class="row"><button class="btn" data-a="screen_off">🌙 화면 끄기</button><button class="btn" data-a="screen_on">☀️ 화면 켜기</button></div>
-      <div class="row"><button class="btn" data-a="restart">🔄 다시 시작</button><button class="btn red" data-a="shutdown">⏻ 컴퓨터 끄기</button></div>
+      <div class="row"><button class="btn" data-a="restart" ${safe?'':'disabled'}>🔄 다시 시작</button><button class="btn red" data-a="shutdown" ${safe?'':'disabled'}>⏻ 컴퓨터 끄기</button></div>
       ${sdRecent?`<button class="btn grn" data-a="cancel">✋ 끄기·다시 시작 취소 (1분 안에)</button>`:''}`
       :`<button class="btn pri" data-a="wake">⏻ 원격으로 켜기</button><div class="note">꺼진 컴퓨터는 같은 매장에 켜져 있는 다른 기기가 깨우는 신호를 보내요. 처음엔 안 될 수 있어요(아래 안내 참고).</div>`}
       ${d.kind==='pc'&&!d.relayOnly?`<div class="infobox"><b>담당자: ${esc(d.owner||'아직 지정 안 함')}</b><div class="note">휴대폰 ${d.phoneConnected?'연결됨':'미연결'} · 자기 컴퓨터만 제어</div><button class="btn" data-a="phone">개인 휴대폰 연결 관리</button></div>`:''}
-      <div class="sch"><span>${schedText(d.sched)}</span><button class="btn" data-a="sched">설정</button></div>
+      ${!d.relayOnly?`<div class="sch"><span>${schedText(d.sched)}</span><button class="btn" data-a="sched">설정</button></div>`:''}${on&&!safe&&!d.relayOnly?'<div class="note">자료 보호를 위해 종료·재시작은 도우미 v002 업데이트 후 사용할 수 있습니다.</div>':''}
       ${last?`<div class="last">${last}</div>`:''}
     </div>`}).join('')+`</div><div class="ver">${VER} · 화면 켜기·끄기는 컴퓨터는 켜 둔 채 화면만 끄는 것이라 언제든 앱으로 다시 켤 수 있어요.</div>`;
   document.querySelectorAll('.card button[data-a]').forEach(b=>b.onclick=()=>act(b.closest('.card').dataset.id,b.dataset.a));
@@ -200,13 +200,13 @@ function editSheet(d){
     <label class="f">이름</label><input class="in" id="e_nm" maxlength="30" value="${esc(d.name)}">
     <label class="f">종류</label><select class="in" id="e_k">${Object.keys(KIND).map(k=>`<option value="${k}" ${d.kind===k?'selected':''}>${KIND[k][1]} ${KIND[k][0]}</option>`).join('')}</select>
     <label class="f">위치</label><input class="in" id="e_pl" maxlength="30" value="${esc(d.place)}" placeholder="예: 생산실, 사무실 입구">
-    <label class="f">네트워크 주소(MAC) <span class="note">자동으로 채워져요. 원격으로 켜기에 써요.</span></label><input class="in" id="e_mac" value="${esc(d.mac)}" placeholder="AA:BB:CC:DD:EE:FF">
+    <label class="f"><input type="checkbox" id="e_relay" ${d.relayOnly?'checked':''}> 깨우기 신호 전달 전용 (이 PC 전원 제어 안 함)</label><label class="f">네트워크 주소(MAC) <span class="note">자동으로 채워져요. 원격으로 켜기에 써요.</span></label><input class="in" id="e_mac" value="${esc(d.mac)}" placeholder="AA:BB:CC:DD:EE:FF">
     ${d.st?`<p class="note">컴퓨터 이름 ${esc(d.st.host||'-')} · IP ${esc(d.st.ip||'-')} · ${esc(d.st.os||'')} · 도우미 ${esc(d.st.ver||'')}</p>`:''}
     <div class="acts"><button class="btn" id="no">닫기</button><button class="btn pri" id="yes">저장</button></div>
     <div class="acts"><button class="btn" id="re">설치 번호 다시 받기<br><span class="note">컴퓨터를 바꿨거나 다시 설치할 때</span></button></div>
     <div class="acts"><button class="btn red" id="del">이 기기 삭제</button></div>`);
   $('#no').onclick=close_;
-  $('#yes').onclick=async()=>{const r=await call({op:'edit',dev:d.id,name:$('#e_nm').value,kind:$('#e_k').value,place:$('#e_pl').value,mac:$('#e_mac').value});
+  $('#yes').onclick=async()=>{const r=await call({op:'edit',dev:d.id,name:$('#e_nm').value,kind:$('#e_k').value,place:$('#e_pl').value,mac:$('#e_mac').value,relayOnly:$('#e_relay').checked});
     if(r.ok){close_();toast('저장했어요');load()}else toast(r.err==='mac'?'MAC 주소 모양이 맞지 않아요 (예: AA:BB:CC:DD:EE:FF)':'저장 실패: '+r.err,4000)};
   $('#re').onclick=()=>codeFor(d);
   $('#del').onclick=()=>{sheet(`<h2>「${esc(d.name)}」 삭제</h2><div class="warnbox">삭제하면 이 앱에서 사라지고, 그 컴퓨터의 도우미도 다음 연결 때 스스로 꺼져요. 다시 쓰려면 기기 추가부터 다시 해야 해요.</div>
