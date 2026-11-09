@@ -13,35 +13,50 @@
 :root{--navy:#0D1C42;--navy2:#22396F;--cream:#FCF1D0;--ink:#111827;--sub:#374151;--line:#d1d5db;--bg:#f3f4f6;--ok:#15803d;--warn:#c2410c;--bad:#b91c1c}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 -apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;word-break:keep-all;overflow-wrap:break-word}
-header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:10px 16px calc(10px) ;padding-top:max(10px,env(safe-area-inset-top))}
+header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
 header .row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 header h1{margin:0;font-size:20px;font-weight:800}
 .ver{font-size:14px;background:var(--cream);color:var(--navy);border-radius:999px;padding:3px 10px;font-weight:700;white-space:nowrap}
-main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
-.big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:38vh;border:0;border-radius:22px;background:var(--navy2);color:#fff;font-size:28px;font-weight:800;box-shadow:0 4px 14px rgba(13,28,66,.25);cursor:pointer}
-.big .ico{font-size:64px;line-height:1}
+main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.chip{min-height:54px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);font-size:17px;font-weight:700;cursor:pointer;padding:4px 8px}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.none{grid-column:1/-1}
+.catnow{margin:8px 2px 0;font-size:16px;color:var(--sub)}
+.catnow b{color:var(--navy)}
+.big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:30vh;margin-top:12px;border:0;border-radius:22px;background:var(--navy2);color:#fff;font-size:27px;font-weight:800;box-shadow:0 4px 14px rgba(13,28,66,.25);cursor:pointer}
+.big .ico{font-size:58px;line-height:1}
 .big small{font-size:17px;font-weight:600;opacity:.95}
 .big:active{transform:scale(.99)}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:2px solid var(--navy2);border-radius:14px;background:#fff;color:var(--navy);font-size:18px;font-weight:700;cursor:pointer}
+.btn.go{background:var(--ok);border-color:var(--ok);color:#fff;font-size:20px;min-height:62px}
+.btn.cancel{border-color:var(--line);color:var(--sub)}
 .row2{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
 .memo{width:100%;min-height:54px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:18px;background:#fff;color:var(--ink)}
 .memo:focus{outline:none;border-color:var(--navy2)}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
 .card h2{margin:0 0 8px;font-size:18px}
+.tray{border:2px solid var(--ok)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-bottom:10px}
+.th{position:relative}
+.th img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#e5e7eb;display:block}
+.th button{position:absolute;top:4px;right:4px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:18px;font-weight:800}
+.th span{position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.65);color:#fff;border-radius:6px;padding:0 6px;font-size:14px;font-weight:700}
 .opt{display:flex;align-items:center;gap:10px;min-height:54px;font-size:17px;font-weight:600}
 .opt input{width:26px;height:26px;flex:none}
 .hint{font-size:16px;color:var(--sub);margin:6px 0 0}
 .list{list-style:none;margin:0;padding:0}
-.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #e5e7eb}
+.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #e5e7eb;flex-wrap:wrap}
 .item:first-child{border-top:0}
 .item img{width:64px;height:64px;object-fit:cover;border-radius:10px;background:#e5e7eb;flex:none}
-.item .t{flex:1;min-width:0}
+.item .t{flex:1;min-width:150px}
 .item .t b{display:block;font-size:17px}
 .item .t span{font-size:16px;color:var(--sub)}
 .tag{display:inline-block;font-size:15px;font-weight:800;border-radius:8px;padding:2px 8px;white-space:nowrap}
 .tag.ok{background:#dcfce7;color:var(--ok)}
 .tag.wait{background:#ffedd5;color:var(--warn)}
 .tag.bad{background:#fee2e2;color:var(--bad)}
+.tag.cat{background:#e0e7ff;color:var(--navy)}
 .retry{min-height:48px;padding:0 14px;border-radius:10px;border:2px solid var(--bad);background:#fff;color:var(--bad);font-weight:800;font-size:16px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--navy);color:#fff;padding:14px 20px;border-radius:14px;font-size:18px;font-weight:700;max-width:92vw;text-align:center;display:none;z-index:9}
 .lock{text-align:center;padding:40px 10px}
@@ -50,7 +65,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v002 · 11/09 14:48 업데이트</span></div></header>
+<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v003 · 11/09 15:08 업데이트</span></div></header>
 <main>
   <section id="locked" class="lock hide">
     <b>설치 링크로 처음 한 번 열어 주세요</b>
@@ -58,9 +73,23 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
   </section>
 
   <section id="app" class="hide">
-    <button class="big" id="shoot"><span class="ico">📸</span>찍으면 바로 나에게<small>찍고 ✓(확인)만 누르면 카톡으로 가요</small></button>
+    <div class="cats" id="cats"></div>
+    <p class="catnow" id="catnow"></p>
+
+    <button class="big" id="shoot"><span class="ico">📸</span><span id="shootT">찍으면 바로 나에게</span><small id="shootS">찍고 ✓(확인)만 누르면 카톡으로 가요</small></button>
+
+    <div class="card tray hide" id="tray">
+      <h2 id="trayT">모아 찍기</h2>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="row2" style="margin-top:0">
+        <button class="btn go" id="trayGo">✅ 한 번에 보내기</button>
+        <button class="btn cancel" id="trayNo">모아 찍기 그만두기</button>
+      </div>
+    </div>
+
     <div class="row2">
       <input class="memo" id="memo" placeholder="같이 보낼 한 줄 메모 (선택)" maxlength="100" autocomplete="off">
+      <button class="btn" id="multi">📸📸 여러 장 찍고 한 번에 보내기</button>
       <button class="btn" id="pick">🖼 앨범에서 골라 보내기 (여러 장)</button>
     </div>
 
@@ -73,7 +102,12 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
     <div class="card">
       <h2>설정</h2>
       <label class="opt"><input type="checkbox" id="optOrig" checked> 원본도 구글 드라이브에 보관</label>
-      <p class="hint">카톡에는 보기 좋은 크기(긴 쪽 2048픽셀)로 가고, 원본은 구글 드라이브 「사진바로나에게」 폴더에 월별로 쌓여요. 카톡 사진 카드는 카카오가 100일 뒤 지우므로 오래 둘 사진은 드라이브에서 보세요.</p>
+      <label class="opt"><input type="checkbox" id="optStamp" checked> 카톡 사진 구석에 날짜·시간 넣기</label>
+      <p class="hint">사진은 PC 구글 드라이브 「플랫폼 › 어사이드_Aside」 안에 분류별로 쌓여요.</p>
+      <p class="hint">1. 영수증·현장·제품·납품 → 빵을그리다 › 사진바로나에게 › 분류 › 월</p>
+      <p class="hint">2. UTCA → UTCA › 사진바로나에게 › 월</p>
+      <p class="hint">3. 개인·선택 안 함 → 기타 › 사진바로나에게 › 월</p>
+      <p class="hint">영수증·명세서는 글자를 읽어 상호·날짜·금액을 카톡 카드와 월별 구글 시트에 적어요. 영수증은 글자를 가리지 않게 날짜 도장을 넣지 않아요. 날짜 도장은 카톡 사진에만 들어가고 드라이브 원본은 그대로예요.</p>
       <p class="hint">이 앱으로 찍은 사진은 휴대폰 사진첩에 따로 남지 않아요. 휴대폰에도 필요하면 「보낸 사진」의 「📥 폰에 저장」을 눌러 주세요(앱을 닫기 전까지 가능).</p>
     </div>
   </section>
@@ -83,8 +117,10 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const VER='v002', UPDATED='2026-11-09 14:48';
+const VER='v003', UPDATED='2026-11-09 15:08';
 const API='https://script.google.com/macros/s/AKfycbyZe-ApxE2s_m6_NfAnrAzC_w66ZnFNqcdpb_Yw2GO3j1lDyUZwGhIqKTNLzfcJmuIzMQ/exec';
+const CATS=[['receipt','🧾 영수증·명세서'],['site','🏭 현장·시설'],['prod','🍞 제품·생산'],['deliv','🚚 납품·배송'],['utca','💼 UTCA'],['me','🏠 개인'],['none','선택 안 함']];
+const CATNAME={receipt:'영수증·명세서',site:'현장·시설',prod:'제품·생산',deliv:'납품·배송',utca:'UTCA',me:'개인',none:''};
 const $=id=>document.getElementById(id);
 let KEY='';
 (function initKey(){
@@ -94,11 +130,21 @@ let KEY='';
   KEY=localStorage.getItem('snap_key')||'';
   $(KEY?'app':'locked').classList.remove('hide');
 })();
-['optOrig'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
+['optOrig','optStamp'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
 
 function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display='none',ms);}
 const pad=n=>String(n).padStart(2,'0');
 function baseName(d,i){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+pad(d.getSeconds())+(i?'_'+i:'');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+// ── 분류 ──
+let CAT=localStorage.getItem('snap_cat')||'none'; if(!CATNAME.hasOwnProperty(CAT)) CAT='none';
+function renderCats(){
+  const box=$('cats'); box.innerHTML='';
+  CATS.forEach(([k,t])=>{const b=document.createElement('button');b.className='chip'+(k===CAT?' on':'')+(k==='none'?' none':'');b.textContent=t;b.onclick=()=>{CAT=k;localStorage.setItem('snap_cat',k);renderCats();};box.appendChild(b);});
+  $('catnow').innerHTML=CAT==='none'?'분류 없이 보내요 (기타 폴더)':'지금 분류: <b>'+CATNAME[CAT]+'</b> · 카톡 제목 앞에 [ '+CATNAME[CAT]+' ]'+(CAT==='receipt'?' · 글자 읽어 금액 정리':'');
+}
+renderCats();
 
 // ── 보낸 기록(작은 미리보기만 저장) ──
 let hist=[]; try{hist=JSON.parse(localStorage.getItem('snap_hist')||'[]')}catch(e){}
@@ -109,7 +155,8 @@ function render(){
   hist.forEach(h=>{
     const li=document.createElement('li'); li.className='item';
     const st=h.st==='ok'?'<span class="tag ok">완료</span>':h.st==='bad'?'<span class="tag bad">실패</span>':'<span class="tag wait">'+(h.st==='orig'?'원본 보관 중':'보내는 중')+'</span>';
-    li.innerHTML='<img alt="" src="'+(h.th||'')+'"><div class="t"><b>'+h.when+' '+st+'</b><span>'+(h.msg||'')+'</span></div>';
+    const ct=h.cat&&h.cat!=='none'?' <span class="tag cat">'+esc(CATNAME[h.cat]||'')+'</span>':'';
+    li.innerHTML='<img alt="" src="'+(h.th||'')+'"><div class="t"><b>'+esc(h.when)+(h.n>1?' ('+h.i+'/'+h.n+')':'')+' '+st+ct+'</b><span>'+esc(h.msg||'')+'</span></div>';
     if(h.st==='ok' && h._keep){const s=document.createElement('button');s.className='retry';s.style.borderColor='var(--navy2)';s.style.color='var(--navy)';s.textContent='📥 폰에 저장';s.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(h._keep);a.download=h.base+'.jpg';document.body.appendChild(a);a.click();a.remove();};li.appendChild(s);}
     if(h.st==='bad' && h._small){const b=document.createElement('button');b.className='retry';b.textContent='다시 보내기';b.onclick=()=>sendItem(h);li.appendChild(b);}
     ul.appendChild(li);
@@ -117,15 +164,24 @@ function render(){
 }
 render();
 
-// ── 사진 줄이기 ──
+// ── 사진 줄이기·날짜 도장 ──
 async function loadImg(file){
   if(window.createImageBitmap){ try{ return await createImageBitmap(file,{imageOrientation:'from-image'}); }catch(e){} }
   return await new Promise((ok,no)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>ok(im);im.onerror=()=>no(new Error('이 사진 형식은 읽을 수 없어요'));im.src=u;});
 }
-function draw(img,max,q){
+function stampOn(c,d){
+  const x=c.getContext('2d'), fs=Math.max(18,Math.round(Math.min(c.width,c.height)*0.042));
+  const t=d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  x.font='700 '+fs+'px "Malgun Gothic",sans-serif'; x.textBaseline='middle';
+  const w=x.measureText(t).width, p=Math.round(fs*0.4), bw=w+p*2, bh=fs+p*1.4, bx=c.width-bw-p*1.5, by=c.height-bh-p*1.5;
+  x.fillStyle='rgba(0,0,0,.55)'; x.beginPath(); if(x.roundRect) x.roundRect(bx,by,bw,bh,p); else x.rect(bx,by,bw,bh); x.fill();
+  x.fillStyle='#FFD54F'; x.fillText(t,bx+p,by+bh/2);
+}
+function draw(img,max,q,stampDate){
   const w0=img.width,h0=img.height,s=Math.min(1,max/Math.max(w0,h0));
   const c=document.createElement('canvas');c.width=Math.round(w0*s);c.height=Math.round(h0*s);
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  if(stampDate) stampOn(c,stampDate);
   return {c,w:c.width,h:c.height,url:c.toDataURL('image/jpeg',q)};
 }
 function b64(dataUrl){return dataUrl.slice(dataUrl.indexOf(',')+1);}
@@ -138,37 +194,45 @@ async function post(body){
   return j;
 }
 
-async function handle(files){
+// items: [{file, ts}]
+async function handle(items){
   const memo=$('memo').value.trim(); $('memo').value='';
-  const now=new Date();
-  for(let i=0;i<files.length;i++){
-    const f=files[i];
-    const h={id:Date.now()+'_'+i, base:baseName(now,files.length>1?i+1:0), when:pad(now.getMonth()+1)+'/'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes()), st:'wait', msg:'사진 준비 중', memo, ts:now.getTime()};
+  const cat=CAT, n=items.length, made=[];
+  const useStamp=$('optStamp').checked && cat!=='receipt';
+  for(let i=0;i<n;i++){
+    const d=new Date(items[i].ts);
+    const h={id:Date.now()+'_'+i, base:baseName(d,n>1?i+1:0), when:pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()), st:'wait', msg:'사진 준비 중', memo, ts:d.getTime(), cat, i:i+1, n};
     hist.unshift(h); render();
     try{
-      const img=await loadImg(f);
-      let d=draw(img,2048,0.85);
-      if(d.url.length>6.4e6) d=draw(img,1600,0.8);
-      h.th=draw(img,160,0.7).url; h._small={b:b64(d.url),w:d.w,h:d.h}; h._orig=f;
+      const img=await loadImg(items[i].file);
+      let dd=draw(img,2048,0.85,useStamp?d:null);
+      if(dd.url.length>6.4e6) dd=draw(img,1600,0.8,useStamp?d:null);
+      h.th=draw(img,160,0.7).url; h._small={b:b64(dd.url),w:dd.w,h:dd.h}; h._orig=items[i].file;
       if(img.close) try{img.close()}catch(e){}
-    }catch(e){ h.st='bad'; h.msg=e.message; render(); saveHist(); continue; }
-    sendItem(h);
+      made.push(h);
+    }catch(e){ h.st='bad'; h.msg=e.message; render(); saveHist(); }
   }
+  // 순서대로 보내야 카톡에도 1/n, 2/n 순서로 쌓임
+  for(const h of made) await sendItem(h);
 }
 
 async function sendItem(h){
-  h.st='wait'; h.msg='카톡으로 보내는 중…'; render();
+  h.st='wait'; h.msg=h.cat==='receipt'?'영수증 글자 읽고 카톡으로 보내는 중…':'카톡으로 보내는 중…'; render();
   try{
-    await post({op:'send', img:h._small.b, w:h._small.w, h:h._small.h, base:h.base, memo:h.memo, ts:h.ts});
-    toast('✅ 나와의 채팅으로 보냈어요');
+    const j=await post({op:'send', img:h._small.b, w:h._small.w, h:h._small.h, base:h.base, memo:h.memo, ts:h.ts, cat:h.cat||'none', i:h.i||1, n:h.n||1});
+    let rmsg='';
+    if(j.receipt){const r=j.receipt; rmsg=[r.shop,r.date,r.amount?String(r.amount).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'원':''].filter(Boolean).join(' · ')||'글자를 못 읽었어요';}
+    else if(h.cat==='receipt' && j.ocrErr) rmsg='글자 읽기 실패';
+    toast('✅ 나와의 채팅으로 보냈어요'+(h.n>1?' ('+h.i+'/'+h.n+')':''));
+    const pre=rmsg?rmsg+' | ':'';
     if($('optOrig').checked && h._orig){
-      h.st='orig'; h.msg='카톡 완료 · 원본 드라이브 보관 중'; render();
+      h.st='orig'; h.msg=pre+'카톡 완료 · 원본 드라이브 보관 중'; render();
       try{
         if(h._orig.size>35*1024*1024) throw new Error('원본이 너무 커서 줄인 사진만 보관');
-        await post({op:'orig', b64:await fileB64(h._orig), mime:h._orig.type||'image/jpeg', base:h.base, memo:h.memo});
-        h.msg='카톡 완료 · 원본 드라이브 보관';
-      }catch(e){ h.msg='카톡 완료 · 드라이브에는 줄인 사진만 ('+e.message+')'; }
-    } else h.msg='카톡 완료 · 드라이브 보관';
+        await post({op:'orig', b64:await fileB64(h._orig), mime:h._orig.type||'image/jpeg', base:h.base, memo:h.memo, cat:h.cat||'none'});
+        h.msg=pre+'카톡 완료 · 원본 드라이브 보관';
+      }catch(e){ h.msg=pre+'카톡 완료 · 드라이브에는 줄인 사진만 ('+e.message+')'; }
+    } else h.msg=pre+'카톡 완료 · 드라이브 보관';
     h.st='ok'; h._small=null; h._keep=h._orig; h._orig=null;
     hist.forEach((x,i)=>{ if(i>=5) x._keep=null; });
   }catch(e){
@@ -178,11 +242,41 @@ async function sendItem(h){
   render(); saveHist();
 }
 
-$('shoot').onclick=()=>{ $('cam').value=''; $('cam').click(); };
+// ── 모아 찍기(여러 장 찍고 한 번에) ──
+let batch=false, tray=[];
+function renderTray(){
+  $('tray').classList.toggle('hide',!batch);
+  $('multi').classList.toggle('hide',batch);
+  $('pick').classList.toggle('hide',batch);
+  $('shootT').textContent=batch?(tray.length?'한 장 더 찍기':'첫 장 찍기'):'찍으면 바로 나에게';
+  $('shootS').textContent=batch?'지금 '+tray.length+'장 모음 · 다 찍으면 아래 「한 번에 보내기」':'찍고 ✓(확인)만 누르면 카톡으로 가요';
+  $('trayT').textContent='모아 찍기 · '+tray.length+'장';
+  $('trayGo').textContent='✅ '+tray.length+'장 한 번에 보내기';
+  $('trayGo').disabled=!tray.length; $('trayGo').style.opacity=tray.length?1:.5;
+  const box=$('thumbs'); box.innerHTML='';
+  tray.forEach((t,i)=>{const d=document.createElement('div');d.className='th';d.innerHTML='<img alt=""><span>'+(i+1)+'</span><button aria-label="빼기">✕</button>';d.querySelector('img').src=t.url;d.querySelector('button').onclick=()=>{URL.revokeObjectURL(t.url);tray.splice(i,1);renderTray();};box.appendChild(d);});
+}
+function endBatch(){ tray.forEach(t=>URL.revokeObjectURL(t.url)); tray=[]; batch=false; renderTray(); }
+$('multi').onclick=()=>{ batch=true; tray=[]; renderTray(); openCam(); };
+$('trayGo').onclick=()=>{ if(!tray.length) return; const items=tray.map(t=>({file:t.file,ts:t.ts})); endBatch(); handle(items); window.scrollTo({top:0,behavior:'smooth'}); };
+$('trayNo').onclick=()=>{ if(tray.length && !confirm('모은 '+tray.length+'장을 보내지 않고 버릴까요?')) return; endBatch(); };
+
+function openCam(){ $('cam').value=''; $('cam').click(); }
+$('shoot').onclick=openCam;
 $('pick').onclick=()=>{ $('album').value=''; $('album').click(); };
-$('cam').onchange=e=>{ if(e.target.files.length) handle([...e.target.files]); };
-$('album').onchange=e=>{ if(e.target.files.length) handle([...e.target.files]); };
-window.addEventListener('beforeunload',e=>{ if(hist.some(h=>h.st==='wait'||h.st==='orig')){e.preventDefault();e.returnValue='';} });
+$('cam').onchange=e=>{
+  const fs=[...e.target.files]; if(!fs.length) return;
+  const now=Date.now();
+  if(batch){ fs.forEach((f,i)=>tray.push({file:f,ts:now+i,url:URL.createObjectURL(f)})); renderTray(); toast('📥 '+tray.length+'장째 모았어요',1500); }
+  else handle(fs.map((f,i)=>({file:f,ts:now+i})));
+};
+$('album').onchange=e=>{
+  const fs=[...e.target.files]; if(!fs.length) return;
+  const now=Date.now();
+  handle(fs.map((f,i)=>({file:f,ts:(f.lastModified&&f.lastModified<=now&&f.lastModified>now-3650*864e5)?f.lastModified:now+i})));
+};
+renderTray();
+window.addEventListener('beforeunload',e=>{ if(tray.length||hist.some(h=>h.st==='wait'||h.st==='orig')){e.preventDefault();e.returnValue='';} });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
