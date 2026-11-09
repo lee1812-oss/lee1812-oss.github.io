@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0D1C42">
+<script>/* v006: 휴대폰이 넓은 화면(데스크톱 사이트 등)으로 열면 글자가 작아짐 → 휴대폰 폭에 맞춰 키움 */
+(function(){var d=document.documentElement;function fit(){d.style.zoom='';d.style.setProperty('--z','1');var sw=screen.width,vw=window.innerWidth;if(matchMedia('(pointer:coarse)').matches&&sw>0&&sw<1100&&vw>sw*1.25){var z=Math.min(vw/sw,3.5);d.style.zoom=z;d.style.setProperty('--z',String(z));}}fit();addEventListener('orientationchange',function(){setTimeout(fit,300)});})();</script>
 <meta name="robots" content="noindex,nofollow">
 <title>사진 바로 나에게</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -24,7 +26,7 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 .chip.none{grid-column:1/-1}
 .catnow{margin:8px 2px 0;font-size:16px;color:var(--sub)}
 .catnow b{color:var(--navy)}
-.big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:30vh;margin-top:12px;border:0;border-radius:22px;background:var(--navy2);color:#fff;font-size:27px;font-weight:800;box-shadow:0 4px 14px rgba(13,28,66,.25);cursor:pointer}
+.big{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:calc(30vh / var(--z,1));margin-top:12px;border:0;border-radius:22px;background:var(--navy2);color:#fff;font-size:27px;font-weight:800;box-shadow:0 4px 14px rgba(13,28,66,.25);cursor:pointer}
 .big .ico{font-size:58px;line-height:1}
 .big small{font-size:17px;font-weight:600;opacity:.95}
 .big:active{transform:scale(.99)}
@@ -60,12 +62,13 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 .retry{min-height:48px;padding:0 14px;border-radius:10px;border:2px solid var(--bad);background:#fff;color:var(--bad);font-weight:800;font-size:16px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--navy);color:#fff;padding:14px 20px;border-radius:14px;font-size:18px;font-weight:700;max-width:92vw;text-align:center;display:none;z-index:9}
 .lock{text-align:center;padding:40px 10px}
-.lock b{font-size:22px}
+.lock b{font-size:24px}
+.lock .hint{font-size:17px}
 .hide{display:none!important}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v005 · 11/09 15:23 업데이트</span></div></header>
+<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v006 · 11/09 19:20 업데이트</span></div></header>
 <main>
   <section id="locked" class="lock hide">
     <b>이 브라우저는 처음이에요</b>
@@ -119,7 +122,7 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const VER='v005', UPDATED='2026-11-09 15:23';
+const VER='v006', UPDATED='2026-11-09 19:20';
 const API='https://script.google.com/macros/s/AKfycbyZe-ApxE2s_m6_NfAnrAzC_w66ZnFNqcdpb_Yw2GO3j1lDyUZwGhIqKTNLzfcJmuIzMQ/exec';
 const CATS=[['receipt','🧾 영수증·명세서'],['site','🏭 현장·시설'],['prod','🍞 제품·생산'],['deliv','🚚 납품·배송'],['utca','💼 UTCA'],['me','🏠 개인'],['none','선택 안 함']];
 const CATNAME={receipt:'영수증·명세서',site:'현장·시설',prod:'제품·생산',deliv:'납품·배송',utca:'UTCA',me:'개인',none:''};
