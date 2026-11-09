@@ -136,7 +136,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:#1E7B45;color:#fff;font-size:40px;font-weight:900;padding:26px 44px;border-radius:22px;z-index:30;display:none}
 </style></head><body>
 <header>
-  <h1>📢 생산실 방송</h1>
+  <h1>📢 생산실 방송 <small style="font-size:.5em;font-weight:700;opacity:.9">v015 · 11/09 16:28</small></h1>
   <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
@@ -144,7 +144,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v014 · 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v015 (11/09 16:28) · 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -432,6 +432,13 @@ body.tv main{max-width:none;padding:0;height:100vh}
     try { bc.postMessage(s); } catch (e) { }
   }
   if (bc && !TVQ) bc.onmessage = function (e) { if (e.data && e.data.hello) tvPost(); };
+  /* v015 (2026-11-09): 화면이 다른 창(생산일지)에 가려지면 크롬이 그 창의 시계를 느리게 돌려 새 전달이 몇 분 늦게 떴음 → 시계는 Worker로, 창 얼림은 Web Lock으로 막아 가려져 있어도 5초마다 받기 */
+  var wkT = null, wkCb = {}, wkN = 0;
+  try { wkT = new Worker(URL.createObjectURL(new Blob(['var t={};onmessage=function(e){var d=e.data;if(d.r){t[d.i]=setInterval(function(){postMessage(d.i)},d.ms);}else{t[d.i]=setTimeout(function(){delete t[d.i];postMessage(d.i)},d.ms);}}'], { type: 'text/javascript' })));
+    wkT.onmessage = function (e) { var f = wkCb[e.data]; if (!f) return; if (!f.r) delete wkCb[e.data]; try { f.fn(); } catch (x) { } }; } catch (e) { wkT = null; }
+  function wTimeout(fn, ms) { if (!wkT) return setTimeout(fn, ms); var i = ++wkN; wkCb[i] = { fn: fn }; wkT.postMessage({ i: i, ms: ms }); return i; }
+  function wInterval(fn, ms) { if (!wkT) return setInterval(fn, ms); var i = ++wkN; wkCb[i] = { fn: fn, r: 1 }; wkT.postMessage({ i: i, ms: ms, r: 1 }); return i; }
+  try { if (!TVQ && navigator.locks) navigator.locks.request('bang-awake', function () { return new Promise(function () { }); }); } catch (e) { }
   var titleT = 0;
   function tick() {
     if (TVQ) return;
@@ -443,7 +450,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
     titleT++; document.title = current ? (titleT % 2 ? '🔴 방송중 · 확인!' : '📢 방송중 · 생산실 방송') : un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
     tvPost();
   }
-  setInterval(tick, 1000);
+  wInterval(tick, 1000);
   setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m, by) {
     if (m.ack) return; m.ack = Date.now(); m.ackBy = by || '생산실'; render();
     call({ op: 'ack', id: m.id, by: m.ackBy }).catch(function () { });
@@ -664,7 +671,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
     poll().then(function (s) {
       if (s === 'stop') return;
       var h = new Date().getHours(), night = h >= 21 || h < 6;
-      setTimeout(loop, night ? 15000 : (failN ? 15000 : 5000));
+      wTimeout(loop, night ? 15000 : (failN ? 15000 : 5000));
     });
   }
 
