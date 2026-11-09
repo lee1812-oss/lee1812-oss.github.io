@@ -65,11 +65,13 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v004 · 11/09 15:17 업데이트</span></div></header>
+<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v005 · 11/09 15:23 업데이트</span></div></header>
 <main>
   <section id="locked" class="lock hide">
-    <b>설치 링크로 처음 한 번 열어 주세요</b>
-    <p class="hint">카톡 「나와의 채팅」으로 받은 설치 링크를 누르면 이 휴대폰이 등록돼요. 그다음부터는 홈 화면 아이콘으로 열면 됩니다.</p>
+    <b>이 브라우저는 처음이에요</b>
+    <p class="hint">아래 버튼을 누르면 카톡 「나와의 채팅」으로 열쇠 링크가 와요. 그 링크의 「앱 열기」만 누르면 끝이에요.</p>
+    <button class="btn go" id="invite" style="margin-top:16px">📩 카톡으로 열쇠 받기</button>
+    <p class="hint" id="inviteMsg"></p>
   </section>
 
   <section id="app" class="hide">
@@ -117,19 +119,31 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const VER='v004', UPDATED='2026-11-09 15:17';
+const VER='v005', UPDATED='2026-11-09 15:23';
 const API='https://script.google.com/macros/s/AKfycbyZe-ApxE2s_m6_NfAnrAzC_w66ZnFNqcdpb_Yw2GO3j1lDyUZwGhIqKTNLzfcJmuIzMQ/exec';
 const CATS=[['receipt','🧾 영수증·명세서'],['site','🏭 현장·시설'],['prod','🍞 제품·생산'],['deliv','🚚 납품·배송'],['utca','💼 UTCA'],['me','🏠 개인'],['none','선택 안 함']];
 const CATNAME={receipt:'영수증·명세서',site:'현장·시설',prod:'제품·생산',deliv:'납품·배송',utca:'UTCA',me:'개인',none:''};
 const $=id=>document.getElementById(id);
 let KEY='';
+const IN_KAKAO=/KAKAOTALK/i.test(navigator.userAgent);
 (function initKey(){
   const h=new URLSearchParams(location.hash.slice(1));
   const k=h.get('k');
+  // 카톡 안 브라우저로 열리면 휴대폰 기본 브라우저로 넘긴다(열쇠도 같이 넘어감)
+  if(IN_KAKAO){ if(k) localStorage.setItem('snap_key',k); location.replace('kakaotalk://web/openExternal?url='+encodeURIComponent(location.href)); }
   if(k){ localStorage.setItem('snap_key',k); history.replaceState(null,'',location.pathname); }
   KEY=localStorage.getItem('snap_key')||'';
   $(KEY?'app':'locked').classList.remove('hide');
 })();
+$('invite').onclick=async()=>{
+  const b=$('invite'), m=$('inviteMsg'); b.disabled=true; m.textContent='보내는 중…';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'invite'})});
+    const j=await r.json(); if(!j.ok) throw new Error(j.err||'실패');
+    m.innerHTML='<b style="color:var(--ok)">✅ 보냈어요'+(j.again?'(방금 보낸 링크를 쓰세요)':'')+'</b><br>카톡 「나와의 채팅」에서 「앱 열기」를 눌러 주세요.';
+  }catch(e){ m.innerHTML='<b style="color:var(--bad)">❌ 못 보냈어요</b><br>'+esc(e.message); }
+  setTimeout(()=>{b.disabled=false;},60000);
+};
 ['optOrig','optStamp'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
 
 function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display='none',ms);}
