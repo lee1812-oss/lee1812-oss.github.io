@@ -50,7 +50,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v001 · 11/09 14:40 업데이트</span></div></header>
+<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v002 · 11/09 14:48 업데이트</span></div></header>
 <main>
   <section id="locked" class="lock hide">
     <b>설치 링크로 처음 한 번 열어 주세요</b>
@@ -74,8 +74,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
       <h2>설정</h2>
       <label class="opt"><input type="checkbox" id="optOrig" checked> 원본도 구글 드라이브에 보관</label>
       <p class="hint">카톡에는 보기 좋은 크기(긴 쪽 2048픽셀)로 가고, 원본은 구글 드라이브 「사진바로나에게」 폴더에 월별로 쌓여요. 카톡 사진 카드는 카카오가 100일 뒤 지우므로 오래 둘 사진은 드라이브에서 보세요.</p>
-      <label class="opt"><input type="checkbox" id="optSave"> 휴대폰 사진첩에도 저장</label>
-      <p class="hint">이 앱으로 찍은 사진은 휴대폰 사진첩에 자동으로 남지 않을 수 있어요. 켜 두면 보낼 때 「다운로드」 폴더에도 저장해요.</p>
+      <p class="hint">이 앱으로 찍은 사진은 휴대폰 사진첩에 따로 남지 않아요. 휴대폰에도 필요하면 「보낸 사진」의 「📥 폰에 저장」을 눌러 주세요(앱을 닫기 전까지 가능).</p>
     </div>
   </section>
 
@@ -84,7 +83,7 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const VER='v001', UPDATED='2026-11-09 14:40';
+const VER='v002', UPDATED='2026-11-09 14:48';
 const API='https://script.google.com/macros/s/AKfycbyZe-ApxE2s_m6_NfAnrAzC_w66ZnFNqcdpb_Yw2GO3j1lDyUZwGhIqKTNLzfcJmuIzMQ/exec';
 const $=id=>document.getElementById(id);
 let KEY='';
@@ -95,7 +94,7 @@ let KEY='';
   KEY=localStorage.getItem('snap_key')||'';
   $(KEY?'app':'locked').classList.remove('hide');
 })();
-['optOrig','optSave'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
+['optOrig'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
 
 function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display='none',ms);}
 const pad=n=>String(n).padStart(2,'0');
@@ -103,7 +102,7 @@ function baseName(d,i){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate(
 
 // ── 보낸 기록(작은 미리보기만 저장) ──
 let hist=[]; try{hist=JSON.parse(localStorage.getItem('snap_hist')||'[]')}catch(e){}
-function saveHist(){ hist=hist.slice(0,30); localStorage.setItem('snap_hist',JSON.stringify(hist.map(h=>({...h, _small:undefined, _orig:undefined})))); }
+function saveHist(){ hist=hist.slice(0,30); localStorage.setItem('snap_hist',JSON.stringify(hist.map(h=>({...h, _small:undefined, _orig:undefined, _keep:undefined})))); }
 function render(){
   const ul=$('list'); ul.innerHTML='';
   $('empty').classList.toggle('hide',hist.length>0);
@@ -111,6 +110,7 @@ function render(){
     const li=document.createElement('li'); li.className='item';
     const st=h.st==='ok'?'<span class="tag ok">완료</span>':h.st==='bad'?'<span class="tag bad">실패</span>':'<span class="tag wait">'+(h.st==='orig'?'원본 보관 중':'보내는 중')+'</span>';
     li.innerHTML='<img alt="" src="'+(h.th||'')+'"><div class="t"><b>'+h.when+' '+st+'</b><span>'+(h.msg||'')+'</span></div>';
+    if(h.st==='ok' && h._keep){const s=document.createElement('button');s.className='retry';s.style.borderColor='var(--navy2)';s.style.color='var(--navy)';s.textContent='📥 폰에 저장';s.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(h._keep);a.download=h.base+'.jpg';document.body.appendChild(a);a.click();a.remove();};li.appendChild(s);}
     if(h.st==='bad' && h._small){const b=document.createElement('button');b.className='retry';b.textContent='다시 보내기';b.onclick=()=>sendItem(h);li.appendChild(b);}
     ul.appendChild(li);
   });
@@ -151,7 +151,6 @@ async function handle(files){
       if(d.url.length>6.4e6) d=draw(img,1600,0.8);
       h.th=draw(img,160,0.7).url; h._small={b:b64(d.url),w:d.w,h:d.h}; h._orig=f;
       if(img.close) try{img.close()}catch(e){}
-      if($('optSave').checked){ try{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=h.base+'.jpg';document.body.appendChild(a);a.click();a.remove();}catch(e){} }
     }catch(e){ h.st='bad'; h.msg=e.message; render(); saveHist(); continue; }
     sendItem(h);
   }
@@ -170,7 +169,8 @@ async function sendItem(h){
         h.msg='카톡 완료 · 원본 드라이브 보관';
       }catch(e){ h.msg='카톡 완료 · 드라이브에는 줄인 사진만 ('+e.message+')'; }
     } else h.msg='카톡 완료 · 드라이브 보관';
-    h.st='ok'; h._small=null; h._orig=null;
+    h.st='ok'; h._small=null; h._keep=h._orig; h._orig=null;
+    hist.forEach((x,i)=>{ if(i>=5) x._keep=null; });
   }catch(e){
     h.st='bad'; h.msg=(navigator.onLine?'':'인터넷 연결 없음 · ')+e.message;
     toast('❌ 못 보냈어요. 「다시 보내기」를 눌러 주세요',3500);
