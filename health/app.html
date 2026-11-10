@@ -1009,7 +1009,7 @@ body.tstOn{padding-top:66px}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v052", PNAME="건강상태확인일지";
+var VER="v053", VUPD="11/10 18:13", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -2240,7 +2240,7 @@ if(MODE0==="phone"){
   document.addEventListener("focusout",function(e){if(e.target&&e.target.id==="memo"){document.documentElement.classList.remove("kb")}});
   if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(PH.step===2&&pd.cv&&!pd.drawing)fitPad(false)});var pe=document.querySelector("#phoneApp .pad");if(pe)ro.observe(pe)}
 }
-var vtg=$("verTag");if(vtg)vtg.textContent=PNAME+" "+VER;
+var vtg=$("verTag");if(vtg)vtg.textContent=PNAME+" "+VER+" · "+VUPD+" 업데이트";
 $("chips").innerHTML=["팀장 확인 후 작업 가능","팀장 확인 후 작업 제외"].map(function(s){return '<button class="chip">'+s+'</button>'}).join("");
 /* ===== v050 [W1] 생산실 직원 위생 점검: 매주 첫 근무일(보통 월요일) 태블릿 위쪽 「🧼 위생 점검」 → 출근자별 이상 없음/문제 있음/휴무 → 점검자 PIN 서명 → 17:30 조조가 K-HACCP에 옮겨 적음 ===== */
 var W1={info:null,loading:false,force:false,rows:null};
@@ -2268,20 +2268,25 @@ function w1Day(d){                       /* 그 주의 첫 근무일인가 (보�
   for(var i=1;i<w;i++){if(!restOf(addDay(d,-i)))return false}
   return true;
 }
+function w1Target(){ /* 이번 주 첫 근무일 (오늘 또는 그 전) */ if(!TODAY)return null; var p=TODAY.split("-"),w=new Date(+p[0],+p[1]-1,+p[2]).getDay(); if(w===0||w===6)return null; for(var i=w-1;i>=0;i--){var d=addDay(TODAY,-i); if(w1Day(d))return d} return null; }
 function w1Load(cb){
   if(W1.loading)return;W1.loading=true;
-  api("apiW1Get",K,TODAY).then(function(r){W1.loading=false;if(r&&r.ok){W1.info=r;w1Paint()}if(cb)cb(r)}).catch(function(e){W1.loading=false;if(cb)cb(null)});
+  api("apiW1Get",K,W1.date||TODAY).then(function(r){W1.loading=false;if(r&&r.ok){W1.info=r;w1Paint()}if(cb)cb(r)}).catch(function(e){W1.loading=false;if(cb)cb(null)});
 }
 function w1Paint(){
   if(UI!=="tablet")return;
   var b=$("w1Btn");
   if(!b){var tb=document.querySelector("#tabletApp .tabs");if(!tb)return;b=document.createElement("button");b.id="w1Btn";b.className="tab w1b hide";b.onclick=function(){w1Open()};tb.insertBefore(b,tb.firstChild)}
-  var inf=W1.info&&W1.info.date===TODAY?W1.info:null, show=curDate===TODAY&&(W1.force||w1Day(TODAY)||!!(inf&&inf.rec));
+  /* v053 늦은 작성: 이번 주 첫 근무일 점검을 못 했으면, 같은 주 안에서는 그날 날짜로 늦게 기록할 수 있음 */
+  var D=W1.force?TODAY:(w1Target()||TODAY), lateD=D<TODAY; if(W1.date!==D){W1.date=D;W1.info=null}
+  var inf=W1.info&&W1.info.date===D?W1.info:null;
+  if(lateD&&curDate===TODAY&&!inf){b.classList.add("hide");if(!W1.loading)w1Load();return}
+  var show=curDate===TODAY&&(W1.force||w1Day(TODAY)||(lateD&&!(inf&&inf.rec))||(!lateD&&!!(inf&&inf.rec)));
   b.classList.toggle("hide",!show);if(!show)return;
   if(!inf&&!W1.loading)w1Load();
   var done=!!(inf&&inf.rec);
   b.classList.toggle("done",done);b.classList.toggle("todo",!done);
-  b.textContent=done?"✅ 위생 점검 완료":"🧼 위생 점검 (오늘)";
+  b.textContent=done?"✅ 위생 점검 완료":(lateD?"🧼 위생 점검 ("+(+D.split("-")[1])+"/"+(+D.split("-")[2])+" "+wd(D)+" 늦은 작성)":"🧼 위생 점검 (오늘)");
 }
 function w1Open(){
   busy("위생 점검 불러오는 중…");
@@ -2298,9 +2303,10 @@ function w1Open(){
 function w1Close(){$("ovHost").innerHTML="";W1.rows=null}
 function w1Left(){return W1.rows.filter(function(r){return !r.st||(r.st==="bad"&&!r.bad.length)}).length}
 function w1Draw(){
-  var r=W1.info,ck=r.checker,H=$("ovHost"),late=hm(new Date())>="17:30";
-  var h='<div class="w1ov"><div class="w1p"><div class="w1h"><div><b>🧼 생산실 직원 위생 점검</b><span>'+esc(mdW(TODAY))+' · 점검자 '+esc(ck?ck.name:"(지정 안 됨)")+'</span></div><button class="w1x" id="w1X">닫기</button></div><div class="w1bd">';
+  var r=W1.info,ck=r.checker,H=$("ovHost"),D=W1.date||TODAY,lateD=D<TODAY,late=!lateD&&hm(new Date())>="17:30";
+  var h='<div class="w1ov"><div class="w1p"><div class="w1h"><div><b>🧼 생산실 직원 위생 점검</b><span>'+esc(mdW(D))+(lateD?' 늦은 작성':'')+' · 점검자 '+esc(ck?ck.name:"(지정 안 됨)")+'</span></div><button class="w1x" id="w1X">닫기</button></div><div class="w1bd">';
   if(r.rec)h+='<p class="w1sv">✅ '+esc(String(r.rec.at).slice(11,16))+' '+esc(r.rec.by)+' 님이 저장했어요. 고치면 다시 서명해야 해요.</p>';
+  if(lateD&&!r.rec)h+='<p class="w1late">⏰ '+esc(mdW(D))+' 위생 점검을 오늘 늦게 기록해요. 그날 점검한 결과를 골라 주세요. 저장 시각이 함께 남고, 조조가 K-HACCP에 옮겨 적어요.</p>';
   if(late)h+='<p class="w1late">⚠ 17시 30분이 지났어요. 지금 고치면 K-HACCP 일지에는 자동으로 들어가지 않으니, 저장 후 관리자에게 알려 주세요.</p>';
   h+='<p class="w1g">출근한 사람마다 복장·위생 상태를 보고 하나를 눌러 주세요. 문제가 있으면 해당 항목을 골라 주세요.</p>';
   W1.rows.forEach(function(x,i){
@@ -2330,7 +2336,7 @@ function w1Save(){
   var rows=W1.rows.map(function(x){return {name:x.name,st:x.st,bad:x.bad.slice().sort(function(a,b){return a-b}),memo:x.memo}});
   askPin(ck.id,"위생 점검 서명",function(pin,isNew){
     busy("저장 중…");
-    api("apiW1Save",K,TODAY,rows,pin,!!isNew,"["+VER+"] "+navigator.userAgent).then(function(r){
+    api("apiW1Save",K,W1.date||TODAY,rows,pin,!!isNew,"["+VER+"] "+navigator.userAgent).then(function(r){
       unbusy();
       if(r&&r.ok){W1.info.rec=r.rec;if(r.checker)W1.info.checker=r.checker;var pp=person(ck.id);if(pp)pp.hasPin=true;w1Close();w1Paint();toast(r.msg);return}
       if(r&&r.needPin){W1.info.checker.hasPin=false;w1Save();return}
