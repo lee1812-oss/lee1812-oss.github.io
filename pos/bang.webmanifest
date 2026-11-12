@@ -1,0 +1,33 @@
+{
+ "id": "/pos/bang.html",
+ "name": "빵을그리다 방송실 받기",
+ "short_name": "방송실 받기",
+ "description": "생산실·사무실·휴대폰에서 방송실 전달을 소리와 큰 글씨로 받는 화면",
+ "lang": "ko",
+ "start_url": "bang.html",
+ "scope": "bang.html",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#F2EFEA",
+ "theme_color": "#5A3A22",
+ "icons": [
+  {
+   "src": "app_recv_192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "app_recv_512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "app_recv_mask_512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "id": "/pos/bang_admin.html",
+ "name": "빵을그리다 방송실 관리",
+ "short_name": "방송실 관리",
+ "description": "방송 받는 화면 이름·그룹을 관리하는 화면 (이사님 전용)",
+ "lang": "ko",
+ "start_url": "bang_admin.html",
+ "scope": "bang_admin.html",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#F2F2F0",
+ "theme_color": "#5A3A22",
+ "icons": [
+  {
+   "src": "app_admin_192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "app_admin_512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "app_admin_mask_512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

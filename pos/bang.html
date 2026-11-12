@@ -3,6 +3,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>빵을그리다 방송실 · 생산실 방송 받는 화면</title>
+<!-- v023: 앱으로 설치(PWA) — 받기 전용 설치 정보. 서비스워커는 넣지 않음(/pos/ 다른 화면에 영향 없게) -->
+<link rel="manifest" href="bang.webmanifest">
+<meta name="theme-color" content="#5A3A22">
+<link rel="icon" href="app_recv_192.png"><link rel="apple-touch-icon" href="app_recv_180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="방송실 받기"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="app_install.js" data-app="방송실 받기" defer></script>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -144,19 +150,85 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
 .gps button.on{background:#1E7B45;border-color:#1E7B45;color:#fff}
 .rgRow{display:flex;gap:12px;margin-top:20px}.rgRow .btn{flex:1;height:64px;font-size:24px}
 .tag.to{background:#22396F}
+/* v023: 휴대폰 화면 맞춤 (폭 700px 이하) — 포스기·키오스크·TV 큰 화면은 그대로 */
+.mobNote{display:none;background:#FFF4CC;border:2px solid #E0A800;border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:17px;font-weight:700;line-height:1.5;color:#1E1A17}
+body.mob .mobNote{display:block}
+body.tv .mobNote{display:none!important}
+@media (max-width:700px){
+header{flex-wrap:wrap;padding:10px 12px;gap:8px}
+header h1{font-size:22px;flex:1 1 100%;line-height:1.25}
+header h1 small{font-size:17px!important;white-space:nowrap;display:inline-block}
+#pcTag{font-size:15px!important}
+.hbtn{height:auto;min-height:54px;font-size:17px;padding:0 12px}
+.st{font-size:17px;white-space:normal}
+#regBar{font-size:18px!important;padding:10px 12px!important}
+#regBar span{min-width:0!important;flex:1 1 100%!important}
+#regBar .btn{width:100%}
+#sndBar{font-size:20px!important;padding:12px!important}
+main{padding:12px 12px 24px}
+.band{font-size:24px;gap:12px;padding:12px 14px;flex-wrap:wrap}
+.band #clk{font-size:38px}
+.empty{padding:22px 14px;font-size:19px}
+.card{flex-direction:column;gap:10px;padding:14px}
+.card .txt{font-size:22px}
+.card .side{min-width:0;width:100%;flex-direction:row;flex-wrap:wrap}
+.card .side .btn{flex:1 1 140px}
+.btn{height:auto;min-height:58px;font-size:19px}
+.rep{font-size:18px}.rep button{min-height:44px;font-size:17px}
+#ov .bar{font-size:20px;gap:10px;padding:12px 14px;flex-wrap:wrap}
+#ov .ago{font-size:18px}
+#ov .msg{padding:12px 16px}
+#ov .more{font-size:18px}
+#ov .row{flex-wrap:wrap;gap:10px;padding:10px 12px 16px}
+#ov .row .btn{height:auto;min-height:64px;font-size:21px;border-radius:16px;flex:1 1 40%}
+#ov .b-ok{flex:1 1 100%!important;order:-1;border-width:3px}
+.tvhint{font-size:22px;padding:14px}
+#who{padding:12px}
+#who .wb{padding:20px 14px}
+#who h2{font-size:28px}
+#who .ws{font-size:19px;margin-bottom:14px}
+#who .wg{gap:10px}
+#who .wg button{height:auto;min-height:84px;font-size:28px}
+#who .wg button small{font-size:18px}
+#who .wf{gap:10px}
+#who .wf button{height:auto;min-height:60px;font-size:20px}
+#toast{font-size:24px;padding:18px 20px;width:88%;text-align:center}
+#rp .top{padding:10px 12px;flex-wrap:wrap}
+#rp .top h2{font-size:24px}
+#rp .orig{font-size:17px}
+#rp .body{padding:12px}
+#rpMic{height:auto;min-height:68px;font-size:22px}
+.chips button{min-height:54px;font-size:19px;padding:6px 14px}
+#rp .foot{flex-wrap:wrap;padding:10px 12px;gap:8px}
+#rpPrev{flex:1 1 100%;font-size:18px}
+#rp .foot .btn{height:auto;min-height:60px;font-size:20px;flex:1}
+#rpCancel{min-width:0}#rpSend{min-width:0;flex:2!important}
+#recState{font-size:28px}#recTxt{font-size:22px}
+#recBtns .btn{height:auto;min-height:64px;font-size:20px;min-width:0;flex:1 1 40%}
+#gate{padding:10px;align-items:flex-start;overflow:auto}
+#gate .box{padding:18px 14px}
+#gate h2{font-size:24px}
+#gate p{font-size:18px}
+#pinv{height:58px;font-size:30px}
+.pad button{height:62px;font-size:28px}
+#start{height:auto;min-height:72px;font-size:26px}
+#rgName{font-size:22px}
+.exs button,.gps button{font-size:18px}
+.rgRow .btn{height:auto;min-height:60px;font-size:21px}
+}
 </style></head><body>
 <header>
-  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v022</small> -->
-  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v022 · 11/12 16:29</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC</span></h1>
+  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v023</small> -->
+  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v023 · 11/12 20:15</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC</span></h1>
   <button class="hbtn" id="meTag" style="display:none" title="이 화면 이름 바꾸기"></button><span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <div id="sndBar" style="display:none;background:#FFD24D;color:#1E1A17;font-size:30px;font-weight:900;text-align:center;padding:14px">🔈 소리가 꺼져 있어요 · 화면 아무 곳이나 한 번 눌러 주세요</div>
 <div id="regBar" style="display:none;background:#FFF4CC;border-bottom:3px solid #E0A800;color:#1E1A17;font-size:21px;font-weight:800;padding:12px 20px;align-items:center;gap:14px;flex-wrap:wrap"><span style="flex:1;min-width:260px">🏷 [확인 필요] 이 화면 이름이 아직 없어요. 이름을 정하면 이 화면에만 보내는 전달도 받아요.</span><button class="btn b-ok" id="regBtn">이름 정하기</button></div>
 <main>
-  <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
+  <div class="mobNote">📱 [참고] 휴대폰은 이 앱을 <b>켜 둔 동안만</b> 받아요. 앱을 닫거나 화면이 꺼지면 소리·알림이 오지 않아요.</div><div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v022 (11/12 16:29) · 화면마다 이름표가 생겼어요(위쪽 🏷 단추를 누르면 이름·그룹을 바꿀 수 있어요). 슬랙 글 맨 앞에 @이름이나 @그룹을 쓰면 그 화면에만 떠요(예: @서재우 @키오스크 회의 2시). 아무것도 안 쓰면 모든 화면에 떠요. 생산실 그룹 화면끼리는 한 곳에서 확인하면 같이 확인돼요. 사무실 PC도 「✅ 확인」을 누르면 누가 확인했는지 남아요. v021 · 이름을 「빵을그리다 방송실」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 답장 없이 「확인」만 돼요. 사무실 PC에서 확인해도 생산실 확인에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v023 (11/12 20:15) · 앱으로 설치할 수 있어요(설치 안내: lee1812-oss.github.io/pos/apps.html). 휴대폰 화면에 맞게 고쳤어요. 휴대폰은 앱을 켜 둔 동안만 받아요. v022 · 화면마다 이름표가 생겼어요(위쪽 🏷 단추를 누르면 이름·그룹을 바꿀 수 있어요). 슬랙 글 맨 앞에 @이름이나 @그룹을 쓰면 그 화면에만 떠요(예: @서재우 @키오스크 회의 2시). 아무것도 안 쓰면 모든 화면에 떠요. 생산실 그룹 화면끼리는 한 곳에서 확인하면 같이 확인돼요. 사무실 PC도 「✅ 확인」을 누르면 누가 확인했는지 남아요. v021 · 이름을 「빵을그리다 방송실」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 답장 없이 「확인」만 돼요. 사무실 PC에서 확인해도 생산실 확인에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -191,7 +263,10 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
   function pcClose(id) { try { var a = JSON.parse(localStorage.getItem(PCK) || '[]'); if (a.indexOf(id) < 0) a.push(id); localStorage.setItem(PCK, JSON.stringify(a.slice(-300))); } catch (e) { } }
   var pin = localStorage.getItem(LS) || '';
   /* v022: 화면 이름표 — 화면마다 서버가 준 열쇠(bang_dev_key)로 받음. 받는 번호는 처음 등록할 때만 씀 */
-  var LSK = 'bang_dev_key', LSM = 'bang_me', CV = 22, MODE = PCM ? 'pc' : 'pos';
+  var LSK = 'bang_dev_key', LSM = 'bang_me', CV = 23, MODE = PCM ? 'pc' : 'pos';
+  /* v023: 휴대폰·태블릿이면 안내 문구·이름 예시·기본 그룹(사무실)을 휴대폰에 맞춤 */
+  var MOB = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+  if (MOB) document.body.classList.add('mob');
   var key = localStorage.getItem(LSK) || '', me = null, tvSeen = 0; try { me = JSON.parse(localStorage.getItem(LSM) || 'null'); } catch (e) { }
   var ver = -1, msgs = [], first = true, seen = {}, queue = [], busy = false, actx = null, koVoice = null, current = null, repeatT = null, failN = 0;
   var $ = function (id) { return document.getElementById(id); };
@@ -210,10 +285,10 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
   function gatePin(err) {
     var typed = '';
     $('gate').style.display = 'flex'; $('gbox').className = 'box';
-    $('gbox').innerHTML = (PCM ? '<h2>빵을그리다 방송실 받는 번호</h2><p>처음 한 번만 넣으면 이 PC가 기억해요. 번호는 이혜영 이사님께 따로 받아 주세요.</p>' : '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>') +
+    $('gbox').innerHTML = (MOB && !PCM ? '<h2>빵을그리다 방송실 받는 번호</h2><p>처음 한 번만 넣으면 이 휴대폰이 기억해요. 번호는 이혜영 이사님께 1:1로 받아 주세요.</p><p style="font-size:17px;background:#FFF4CC;border-radius:10px;padding:8px 10px">📱 [참고] 휴대폰은 이 앱을 켜 둔 동안만 받아요.</p>' : PCM ? '<h2>빵을그리다 방송실 받는 번호</h2><p>처음 한 번만 넣으면 이 PC가 기억해요. 번호는 이혜영 이사님께 따로 받아 주세요.</p>' : '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>') +
       '<div id="pinv">&nbsp;</div><div class="pad">' +
       [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0, '확인'].map(function (k) { return '<button data-k="' + k + '">' + k + '</button>'; }).join('') +
-      '</div><div style="font-size:16px;color:#5A4030;margin-top:6px">키보드 숫자로 넣고 Enter를 눌러도 돼요</div><div id="gerr">' + (err || '') + '</div>';
+      '</div><div style="font-size:17px;color:#5A4030;margin-top:6px">키보드 숫자로 넣고 Enter를 눌러도 돼요</div><div id="gerr">' + (err || '') + '</div>';
     var show = function () { $('pinv').textContent = typed ? typed.replace(/./g, '●') : '\u00a0'; };
     Array.prototype.forEach.call(document.querySelectorAll('.pad button'), function (b) {
       b.onclick = function () {
@@ -256,12 +331,12 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
   function hintTxt() { return (tvSeen && Date.now() - tvSeen < 120000 ? 'TV 같이 보기 연결됨 · ' : '') + '화면 ' + screen.width + '×' + screen.height + (PCM ? ' · 사무실 PC 모드' : ''); }
   function regForm(rename, err) {
     $('gate').style.display = 'flex';
-    var gs = rename && me ? (me.groups || []).slice() : [PCM ? '사무실' : '생산실'];
-    var ex = PCM ? ['서재우', '이혜영 노트북', '이혜영 PC', '사무실 PC', '키오스크', '포스기'] : ['키오스크', '포스기', '서재우', '이혜영 노트북', '이혜영 PC'];
+    var gs = rename && me ? (me.groups || []).slice() : [PCM || MOB ? '사무실' : '생산실'];
+    var ex = MOB ? ['이혜영 휴대폰', '김영복 휴대폰', '서재우 휴대폰', '이혜영 태블릿'] : PCM ? ['서재우', '이혜영 노트북', '이혜영 PC', '사무실 PC', '키오스크', '포스기', '이혜영 휴대폰'] : ['키오스크', '포스기', '서재우', '이혜영 노트북', '이혜영 PC', '이혜영 휴대폰'];
     var G = ['생산실', '사무실']; gs.forEach(function (g) { if (G.indexOf(g) < 0) G.push(g); });
     $('gbox').className = 'box reg';
     $('gbox').innerHTML = '<h2>' + (rename ? '이 화면 이름 바꾸기' : '이 화면 이름 정하기') + '</h2><p>방송을 보낼 때 이 이름으로 골라 보내요. 사람 이름이나 자리 이름을 넣어 주세요.</p>' +
-      '<input id="rgName" maxlength="20" autocomplete="off" placeholder="예: 키오스크, 서재우" value="' + esc(rename ? meName() : '') + '">' +
+      '<input id="rgName" maxlength="20" autocomplete="off" placeholder="' + (MOB ? '예: 이혜영 휴대폰' : '예: 키오스크, 서재우') + '" value="' + esc(rename ? meName() : '') + '">' +
       '<div class="exs">' + ex.map(function (n) { return '<button data-ex="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>' +
       '<h3>그룹 (여러 개 고를 수 있어요)</h3><div class="gps">' + G.map(function (g) { var on = gs.indexOf(g) >= 0; return '<button data-g="' + esc(g) + '"' + (on ? ' class="on"' : '') + '>' + (on ? '✔ ' : '') + esc(g) + '</button>'; }).join('') + '</div>' +
       '<div style="font-size:17px;color:#4A4038;margin-top:10px;line-height:1.5">생산실 그룹 화면끼리는 한 곳에서 「확인」하면 같이 확인돼요. 키보드로 이름을 쓰고 Enter를 눌러도 돼요.</div>' +
@@ -453,7 +528,7 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
   function fitText() {
     var box = $('ovMsg'), el = $('ovTxt'); if (!current || !el.textContent) return;
     var size = 170; el.style.fontSize = size + 'px';
-    while (size > 40 && (box.scrollHeight > box.clientHeight + 2 || el.scrollWidth > box.clientWidth - 20)) { size -= 6; el.style.fontSize = size + 'px'; }
+    while (size > (MOB ? 22 : 40) && (box.scrollHeight > box.clientHeight + 2 || el.scrollWidth > box.clientWidth - 20)) { size -= 6; el.style.fontSize = size + 'px'; }
   }
   window.addEventListener('resize', fitText);
   function ovClass(m, flash) { $('ov').className = 'on' + (flash ? ' flash' : '') + (m.urgent ? ' urg' : ''); }
@@ -549,7 +624,7 @@ body.pcm #ovRep,body.pcm .b-rep{display:none!important}
   wInterval(tick, 1000);
 
   /* v016: 새 버전 자동 받기 — 10분마다 배포본 번호를 보고, 방송·답장 중이 아닐 때만 새로 고침 (현장 원격 접속 없이 고침 반영) */
-  var MY_V = 22;
+  var MY_V = 23;
   function selfUpdate() {
     if (current || queue.length || busy || replying || $('gate').style.display === 'flex') return;
     fetch(location.pathname + '?vc=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {

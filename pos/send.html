@@ -2,24 +2,27 @@
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>생산실 방송 보내기</title>
+<title>빵을그리다 방송실 보내기</title>
 <link rel="manifest" href="send.webmanifest">
 <meta name="theme-color" content="#5A3A22">
-<link rel="icon" href="bang-192.png"><link rel="apple-touch-icon" href="bang-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="생산실 방송">
+<link rel="icon" href="app_send_192.png"><link rel="apple-touch-icon" href="app_send_180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="방송실 보내기"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="app_install.js" data-app="방송실 보내기" defer></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#F4F2EF;color:#1E1A17;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all;overflow-wrap:break-word;font-size:18px}
 header{background:#5A3A22;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
 header h1{margin:0;font-size:22px;flex:1}
-header button{height:40px;border:1.5px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:15px;padding:0 12px}
+header{flex-wrap:wrap;padding-top:calc(14px + env(safe-area-inset-top))}
+header h1 small{white-space:nowrap;display:inline-block}
+header button{min-height:54px;border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:17px;font-weight:700;padding:0 14px}
 main{padding:16px;max-width:620px;margin:0 auto}
 .box{background:#fff;border:1px solid #DDD5CB;border-radius:16px;padding:16px;margin-bottom:14px}
 h2{font-size:19px;margin:0 0 10px;color:#5A3A22}
 textarea{width:100%;min-height:120px;border:2px solid #C9B7A2;border-radius:12px;padding:12px;font-size:20px;font-family:inherit;resize:vertical}
 textarea:focus,input:focus{outline:none;border-color:#5A3A22}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-.chips button{border:1.5px solid #C9B7A2;background:#FBF8F4;border-radius:22px;padding:9px 14px;font-size:16px;color:#3B2716}
+.chips button{min-height:54px;border:1.5px solid #C9B7A2;background:#FBF8F4;border-radius:22px;padding:6px 16px;font-size:17px;color:#3B2716}
 .btn{width:100%;height:58px;border:0;border-radius:14px;font-size:20px;font-weight:800}
 .b-send{background:#5A3A22;color:#fff}
 .b-rec{background:#C0392B;color:#fff;height:76px;font-size:23px}
@@ -35,26 +38,26 @@ audio{width:100%;margin-top:10px}
 .item{border-top:1px solid #EEE7DE;padding:12px 0;display:flex;gap:10px;align-items:flex-start}
 .item:first-child{border-top:0}
 .item .b{flex:1;min-width:0}
-.item .t{font-size:15px;color:#4A4038;font-weight:700}
+.item .t{font-size:17px;color:#4A4038;font-weight:700}
 .item .x{font-size:18px;white-space:pre-wrap;margin-top:3px}
-.state{font-size:15px;font-weight:800;white-space:nowrap;padding:5px 10px;border-radius:20px}
+.state{font-size:16px;font-weight:800;white-space:nowrap;padding:5px 10px;border-radius:20px}
 .s-wait{background:#FFF1DC;color:#9A5B00}.s-ok{background:#E3F4EA;color:#1E7B45}
 .to{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
-.to button{min-height:50px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;padding:0 14px;font-size:18px;font-weight:800;color:#1E1A17}
+.to button{min-height:54px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;padding:0 14px;font-size:18px;font-weight:800;color:#1E1A17}
 .to button.on{background:#22396F;border-color:#22396F;color:#fff}
-.to .gl{width:100%;font-size:15px;color:#4A4038;font-weight:700;margin-top:4px}
-.tot{display:inline-block;font-size:14px;padding:2px 9px;border-radius:14px;background:#22396F;color:#fff;margin-left:6px}
-.acks{font-size:15px;color:#1E7B45;font-weight:700;margin-top:5px}
-.del{border:0;background:none;color:#8A7F75;font-size:14px;text-decoration:underline;margin-top:6px}
+.to .gl{width:100%;font-size:17px;color:#4A4038;font-weight:700;margin-top:4px}
+.tot{display:inline-block;font-size:16px;padding:2px 9px;border-radius:14px;background:#22396F;color:#fff;margin-left:6px}
+.acks{font-size:17px;color:#1E7B45;font-weight:700;margin-top:5px}
+.del{border:0;background:none;color:#6B5F55;font-size:17px;text-decoration:underline;margin-top:6px;min-height:44px;padding:0 4px}
 .login input{width:100%;height:58px;border:2px solid #C9B7A2;border-radius:12px;padding:0 14px;font-size:22px;margin-bottom:12px}
 .login p{line-height:1.55;margin:0 0 14px;color:#3B332D}
-.who{display:flex;gap:8px;margin-bottom:12px}.who button{flex:1;height:52px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;font-size:18px;font-weight:700}
+.who{display:flex;gap:8px;margin-bottom:12px}.who button{flex:1;height:56px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;font-size:18px;font-weight:700}
 .who button.sel{background:#5A3A22;color:#fff;border-color:#5A3A22}
-.foot{font-size:14px;color:#5E554D;text-align:center;margin:16px 0 30px}
+.foot{font-size:17px;color:#4A4038;text-align:center;margin:16px 0 30px}
 </style></head><body>
-<header><h1>📢 생산실 방송 <small style="font-size:.62em;font-weight:700">v004 · 11/12 16:29</small></h1><button id="btnOut" style="display:none">설정</button></header>
+<header><h1>📢 방송실 보내기 <small style="font-size:17px;font-weight:700">v005 · 11/12 20:15</small></h1><button id="btnOut" style="display:none">설정</button></header>
 <main id="app"></main>
-<div class="foot">v004 (11/12 16:29) · 받는 곳(전체·그룹·화면 이름)을 골라 보낼 수 있어요 · v003 · 누가 확인했는지 이름이 떠요 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
+<div class="foot">v005 (11/12 20:15) · 앱 이름 「방송실 보내기」로 설치할 수 있어요(설치 안내: lee1812-oss.github.io/pos/apps.html) · v004 · 받는 곳(전체·그룹·화면 이름)을 골라 보낼 수 있어요 · v003 · 누가 확인했는지 이름이 떠요 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
 <script>
 (function () {
   'use strict';
@@ -101,8 +104,8 @@ audio{width:100%;margin-top:10px}
   function mainView() {
     $('btnOut').style.display = '';
     $('app').innerHTML =
-      '<div class="box"><h2>📍 받는 곳 <span style="font-weight:400;font-size:15px;color:#5E554D">(여러 개 고를 수 있어요)</span></h2><div class="to" id="toBox"></div><div style="font-weight:800;color:#22396F" id="toNow"></div></div>' +
-      '<div class="box"><h2>✍️ 글로 보내기 <span style="font-weight:400;font-size:15px;color:#5E554D">(포스기가 소리 내어 읽어 줘요)</span></h2>' +
+      '<div class="box"><h2>📍 받는 곳 <span style="font-weight:600;font-size:17px;color:#4A4038">(여러 개 고를 수 있어요)</span></h2><div class="to" id="toBox"></div><div style="font-weight:800;color:#22396F" id="toNow"></div></div>' +
+      '<div class="box"><h2>✍️ 글로 보내기 <span style="font-weight:600;font-size:17px;color:#4A4038">(포스기가 소리 내어 읽어 줘요)</span></h2>' +
       '<textarea id="txt" maxlength="500" placeholder="생산실에 전할 말을 쓰세요"></textarea>' +
       '<div class="chips">' + ['잠깐 사무실로 와 주세요', '통화 가능할 때 전화 주세요', '오늘 생산 현황 알려 주세요', '점심 맛있게 드세요'].map(function (c) { return '<button data-c="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
       '<label class="urg"><input type="checkbox" id="urg"> 급함 (확인할 때까지 1분마다 다시 울려요)</label>' +

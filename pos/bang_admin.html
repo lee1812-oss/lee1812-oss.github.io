@@ -4,14 +4,17 @@
 <meta name="robots" content="noindex, nofollow">
 <title>방송실 화면 관리</title>
 <meta name="theme-color" content="#5A3A22">
-<link rel="icon" href="bang-192.png">
+<link rel="manifest" href="bang_admin.webmanifest">
+<link rel="icon" href="app_admin_192.png"><link rel="apple-touch-icon" href="app_admin_180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="방송실 관리"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="app_install.js" data-app="방송실 관리" defer></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#F2F2F0;color:#1E1A17;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;word-break:keep-all;overflow-wrap:break-word;line-break:strict}
 header{background:#5A3A22;color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
 header h1{margin:0;font-size:24px;flex:1;min-width:220px}
-header small{font-size:.66em;font-weight:700;white-space:nowrap}
-header button{min-height:46px;border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:17px;font-weight:700;padding:0 14px;cursor:pointer}
+header small{font-size:17px;font-weight:700;white-space:nowrap}
+header button{min-height:54px;border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;font-size:17px;font-weight:700;padding:0 14px;cursor:pointer}
 main{max-width:980px;margin:0 auto;padding:16px}
 .box{background:#fff;border:1px solid #D9D6D2;border-radius:16px;padding:18px;margin-bottom:14px}
 h2{font-size:21px;margin:0 0 10px;color:#3B2416}
@@ -32,15 +35,16 @@ h2{font-size:21px;margin:0 0 10px;color:#3B2416}
 .b1{background:#22396F;color:#fff}.b2{background:#EFE6DA;color:#3B2716;border:2px solid #C9B7A2}.b3{background:#fff;color:#B42318;border:2px solid #B42318}.b4{background:#1E7B45;color:#fff}
 input.in{width:100%;height:56px;border:2px solid #C9B7A2;border-radius:12px;padding:0 14px;font-size:22px;font-weight:700}
 .gps{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.gps button{min-height:50px;padding:0 16px;font-size:18px;font-weight:800;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;cursor:pointer}
+.gps button{min-height:54px;padding:0 16px;font-size:18px;font-weight:800;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;cursor:pointer}
 .gps button.sel{background:#1E7B45;border-color:#1E7B45;color:#fff}
 .edit{width:100%;background:#FBF8F4;border:1px solid #E6E2DD;border-radius:12px;padding:12px;margin-top:8px}
 .msg{font-weight:800;min-height:26px;margin-top:8px}.msg.err{color:#B42318}.msg.ok{color:#1E7B45}
 .help li{margin:6px 0;line-height:1.5}
 code{background:#EFE6DA;padding:1px 6px;border-radius:6px;font-size:17px}
-@media (max-width:600px){.sum b{font-size:30px}.sum span{font-size:15px}header h1{font-size:20px}}
+header{padding-top:calc(12px + env(safe-area-inset-top))}
+@media (max-width:600px){.sum{gap:8px}.sum div{padding:10px 6px}.sum b{font-size:30px}.sum span{font-size:16px}header h1{font-size:21px;min-width:0;flex:1 1 100%}header button{flex:1}main{padding:12px}.box{padding:14px}.dev .b{min-width:0;flex:1 1 100%}.acts{width:100%}.acts .btn{flex:1 1 140px}}
 </style></head><body>
-<header><h1>🏷 방송실 화면 관리 <small>v001 · 11/12 16:29</small></h1><button id="btnRe" style="display:none">새로 보기</button><button id="btnOut" style="display:none">이 기기에서 잊기</button></header>
+<header><h1>🏷 방송실 화면 관리 <small>v002 · 11/12 20:15</small></h1><button id="btnRe" style="display:none">새로 보기</button><button id="btnOut" style="display:none">이 기기에서 잊기</button></header>
 <main id="app"></main>
 <script>
 (function () {
