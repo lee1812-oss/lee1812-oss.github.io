@@ -136,7 +136,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:#1E7B45;color:#fff;font-size:40px;font-weight:900;padding:26px 44px;border-radius:22px;z-index:30;display:none}
 </style></head><body>
 <header>
-  <h1>📢 생산실 방송 <small style="font-size:.5em;font-weight:700;opacity:.9">v015 · 11/09 16:28</small></h1>
+  <h1>📢 생산실 방송 <small style="font-size:.5em;font-weight:700;opacity:.9">v016 · 11/12 14:52</small></h1>
   <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
@@ -144,7 +144,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v015 (11/09 16:28) · 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v016 (11/12 14:52) · 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -222,7 +222,7 @@ body.tv main{max-width:none;padding:0;height:100vh}
   }  function unlock() {
     try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== 'running') actx.resume(); } catch (e) { }
     try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) { }
-    if (window.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { } }
+    /* v016: 크롬 알림(오른쪽 아래 팝업) 권한은 더 이상 묻지 않음 */
   }
 
   /* ---------- 소리 ---------- */
@@ -451,6 +451,17 @@ body.tv main{max-width:none;padding:0;height:100vh}
     tvPost();
   }
   wInterval(tick, 1000);
+
+  /* v016: 새 버전 자동 받기 — 10분마다 배포본 번호를 보고, 방송·답장 중이 아닐 때만 새로 고침 (현장 원격 접속 없이 고침 반영) */
+  var MY_V = 16;
+  function selfUpdate() {
+    if (current || queue.length || busy || replying) return;
+    fetch(location.pathname + '?vc=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      var mm = /생산실 방송 <small[^>]*>v(\d{3})/.exec(t || ''); if (!mm) return;
+      if (Number(mm[1]) > MY_V && !current && !queue.length && !busy && !replying) location.reload();
+    }).catch(function () { });
+  }
+  wInterval(selfUpdate, 10 * 60 * 1000);
   setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m, by) {
     if (m.ack) return; m.ack = Date.now(); m.ackBy = by || '생산실'; render();
     call({ op: 'ack', id: m.id, by: m.ackBy }).catch(function () { });
@@ -632,14 +643,8 @@ body.tv main{max-width:none;padding:0;height:100vh}
     for (var p = 0; p < bytes.length; p += CH) bin += String.fromCharCode.apply(null, bytes.subarray(p, p + CH));
     return btoa(bin);
   }
-  function notify(m) {
-    try {
-      if (window.Notification && Notification.permission === 'granted' && document.hidden) {
-        var n = new Notification('📢 ' + m.from + ' 말씀', { body: m.text || '녹음이 왔어요', requireInteraction: true, tag: m.id });
-        n.onclick = function () { window.focus(); n.close(); };
-      }
-    } catch (e) { }
-  }
+  /* v016 (2026-11-12): 오른쪽 아래 크롬 알림 팝업을 없앰. 대신 포스기·키오스크 도우미가 「방송중」 창을 맨 앞으로 올린다. */
+  function notify(m) { }
 
   /* ---------- 받아오기 ---------- */
   function poll() {
