@@ -39,6 +39,12 @@ audio{width:100%;margin-top:10px}
 .item .x{font-size:18px;white-space:pre-wrap;margin-top:3px}
 .state{font-size:15px;font-weight:800;white-space:nowrap;padding:5px 10px;border-radius:20px}
 .s-wait{background:#FFF1DC;color:#9A5B00}.s-ok{background:#E3F4EA;color:#1E7B45}
+.to{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
+.to button{min-height:50px;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;padding:0 14px;font-size:18px;font-weight:800;color:#1E1A17}
+.to button.on{background:#22396F;border-color:#22396F;color:#fff}
+.to .gl{width:100%;font-size:15px;color:#4A4038;font-weight:700;margin-top:4px}
+.tot{display:inline-block;font-size:14px;padding:2px 9px;border-radius:14px;background:#22396F;color:#fff;margin-left:6px}
+.acks{font-size:15px;color:#1E7B45;font-weight:700;margin-top:5px}
 .del{border:0;background:none;color:#8A7F75;font-size:14px;text-decoration:underline;margin-top:6px}
 .login input{width:100%;height:58px;border:2px solid #C9B7A2;border-radius:12px;padding:0 14px;font-size:22px;margin-bottom:12px}
 .login p{line-height:1.55;margin:0 0 14px;color:#3B332D}
@@ -46,15 +52,29 @@ audio{width:100%;margin-top:10px}
 .who button.sel{background:#5A3A22;color:#fff;border-color:#5A3A22}
 .foot{font-size:14px;color:#5E554D;text-align:center;margin:16px 0 30px}
 </style></head><body>
-<header><h1>📢 생산실 방송</h1><button id="btnOut" style="display:none">설정</button></header>
+<header><h1>📢 생산실 방송 <small style="font-size:.62em;font-weight:700">v004 · 11/12 16:29</small></h1><button id="btnOut" style="display:none">설정</button></header>
 <main id="app"></main>
-<div class="foot">v003 · 누가 확인했는지 이름이 떠요 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
+<div class="foot">v004 (11/12 16:29) · 받는 곳(전체·그룹·화면 이름)을 골라 보낼 수 있어요 · v003 · 누가 확인했는지 이름이 떠요 · 생산실 답장도 여기에 떠요 · 보낸 말은 생산실 포스기에서 소리와 함께 크게 떠요</div>
 <script>
 (function () {
   'use strict';
   var API = 'https://script.google.com/macros/s/AKfycbxoQ4OCTBGw06Z6ttoSHiEnLt__WQ5NL-As1t66U9vQVH-tGOl_kDMYfUuod9ouU1QFOQ/exec';
   var pin = localStorage.getItem('bang_send_pin') || '', from = localStorage.getItem('bang_from') || '대표님';
   var $ = function (id) { return document.getElementById(id); };
+  var toSel = [], devInfo = null;
+  function toLine() { return toSel.length ? toSel.join('·') + '에게만' : '모든 화면에'; }
+  function drawTo() {
+    var el = $('toBox'); if (!el) return;
+    var gs = devInfo ? devInfo.groups : ['생산실', '사무실'];
+    var ns = devInfo ? devInfo.list.map(function (d) { return d.name; }).filter(function (n, i, a) { return n !== '이름 미등록' && a.indexOf(n) === i; }) : [];
+    var b = function (v, lab) { var on = v === '' ? !toSel.length : toSel.indexOf(v) >= 0; return '<button data-to="' + esc(v) + '"' + (on ? ' class="on"' : '') + '>' + (on ? '✔ ' : '') + esc(lab) + '</button>'; };
+    el.innerHTML = b('', '전체') + '<div class="gl">그룹</div>' + gs.map(function (g) { return b(g, g); }).join('') + (ns.length ? '<div class="gl">화면 이름</div>' + ns.map(function (n) { return b(n, n); }).join('') : '');
+    Array.prototype.forEach.call(el.querySelectorAll('[data-to]'), function (x) {
+      x.onclick = function () { var v = x.getAttribute('data-to'); if (!v) toSel = []; else { var i = toSel.indexOf(v); if (i >= 0) toSel.splice(i, 1); else toSel.push(v); } drawTo(); };
+    });
+    $('toNow').textContent = '→ ' + toLine() + ' 보내요';
+  }
+  function loadDevs() { call({ op: 'devs' }).then(function (r) { if (r.ok) { devInfo = r; drawTo(); } }).catch(function () { }); }
   var rec = null, chunks = [], recBlob = null, recMime = '', recDur = 0, recT0 = 0, recTimer = null, list = [], pollT = null;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function hm(t) { var d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
@@ -81,6 +101,7 @@ audio{width:100%;margin-top:10px}
   function mainView() {
     $('btnOut').style.display = '';
     $('app').innerHTML =
+      '<div class="box"><h2>📍 받는 곳 <span style="font-weight:400;font-size:15px;color:#5E554D">(여러 개 고를 수 있어요)</span></h2><div class="to" id="toBox"></div><div style="font-weight:800;color:#22396F" id="toNow"></div></div>' +
       '<div class="box"><h2>✍️ 글로 보내기 <span style="font-weight:400;font-size:15px;color:#5E554D">(포스기가 소리 내어 읽어 줘요)</span></h2>' +
       '<textarea id="txt" maxlength="500" placeholder="생산실에 전할 말을 쓰세요"></textarea>' +
       '<div class="chips">' + ['잠깐 사무실로 와 주세요', '통화 가능할 때 전화 주세요', '오늘 생산 현황 알려 주세요', '점심 맛있게 드세요'].map(function (c) { return '<button data-c="' + c + '">' + c + '</button>'; }).join('') + '</div>' +
@@ -95,19 +116,20 @@ audio{width:100%;margin-top:10px}
       var t = $('txt').value.trim();
       if (!t) { msg('m1', '보낼 말을 써 주세요.', 0); return; }
       $('sendTxt').disabled = true; msg('m1', '보내는 중…', 1);
-      call({ op: 'send', text: t, from: from, urgent: $('urg').checked }).then(function (r) {
+      call({ op: 'send', text: t, from: from, urgent: $('urg').checked, to: toSel }).then(function (r) {
         $('sendTxt').disabled = false;
-        if (r.ok) { $('txt').value = ''; $('urg').checked = false; msg('m1', '✅ 보냈어요. 생산실에서 확인하면 아래에 표시돼요.', 1); refresh(); }
+        if (r.ok) { $('txt').value = ''; $('urg').checked = false; msg('m1', '✅ 보냈어요. ' + (r.line || '') + (r.missing && r.missing.length ? ' (못 찾은 이름: ' + r.missing.join('·') + ')' : '') + ' 확인하면 아래에 표시돼요.', 1); refresh(); }
         else fail('m1', r);
       }).catch(function () { $('sendTxt').disabled = false; msg('m1', '인터넷 연결을 확인하고 다시 눌러 주세요.', 0); });
     };
     $('recBtn').onclick = toggleRec;
+    drawTo(); loadDevs();
     refresh(); clearInterval(pollT); pollT = setInterval(function () { if (!document.hidden) refresh(); }, 10000);
   }
   function msg(id, t, ok) { var e = $(id); if (e) { e.textContent = t; e.className = 'msg ' + (ok ? 'ok' : 'err'); } }
   function fail(id, r) {
     if (r.err === 'pin' || r.err === 'role') { localStorage.removeItem('bang_send_pin'); pin = ''; loginView('번호가 바뀌었어요. 새 보내기 번호를 넣어 주세요.'); return; }
-    msg(id, r.err === 'big' ? '녹음이 너무 길어요. 1분 30초 안으로 해 주세요.' : r.err === 'locked' ? '잠시 잠겼어요. 15분 뒤에 다시 해 주세요.' : '보내지 못했어요. 다시 눌러 주세요.', 0);
+    msg(id, r.err === 'noto' ? '받을 화면을 찾지 못했어요: ' + (r.missing || []).join('·') : r.err === 'big' ? '녹음이 너무 길어요. 1분 30초 안으로 해 주세요.' : r.err === 'locked' ? '잠시 잠겼어요. 15분 뒤에 다시 해 주세요.' : '보내지 못했어요. 다시 눌러 주세요.', 0);
   }
 
   /* ---------- 녹음 ---------- */
@@ -146,8 +168,8 @@ audio{width:100%;margin-top:10px}
     var fr = new FileReader();
     fr.onload = function () {
       var b64 = String(fr.result).split(',')[1];
-      call({ op: 'send', b64: b64, mime: recBlob.type, dur: recDur, from: from, text: '' }).then(function (r) {
-        if (r.ok) { recBlob = null; $('recArea').innerHTML = ''; $('recBtn').textContent = '🎤 눌러서 녹음 시작'; msg('m2', '✅ 녹음을 보냈어요. 생산실 포스기에서 바로 재생돼요.', 1); refresh(); }
+      call({ op: 'send', b64: b64, mime: recBlob.type, dur: recDur, from: from, text: '', to: toSel }).then(function (r) {
+        if (r.ok) { recBlob = null; $('recArea').innerHTML = ''; $('recBtn').textContent = '🎤 눌러서 녹음 시작'; msg('m2', '✅ 녹음을 보냈어요. ' + (r.line || ''), 1); refresh(); }
         else { $('recSend').disabled = false; fail('m2', r); }
       }).catch(function () { $('recSend').disabled = false; msg('m2', '인터넷 연결을 확인하고 다시 눌러 주세요.', 0); });
     };
@@ -162,9 +184,10 @@ audio{width:100%;margin-top:10px}
       var el = $('sent'); if (!el) return;
       if (!list.length) { el.innerHTML = '<div style="color:#5E554D">아직 보낸 말이 없어요.</div>'; return; }
       el.innerHTML = list.map(function (m) {
-        return '<div class="item"><div class="b"><div class="t">' + hm(m.t) + ' · ' + esc(m.from) + (m.urgent ? ' · <span style="color:#C0392B">급함</span>' : '') + '</div>' +
+        return '<div class="item"><div class="b"><div class="t">' + hm(m.t) + ' · ' + esc(m.from) + (m.urgent ? ' · <span style="color:#C0392B">급함</span>' : '') + (m.to && m.to.length ? '<span class="tot">📍 ' + esc(m.to.join('·')) + '</span>' : '') + '</div>' +
           '<div class="x">' + (m.text ? esc(m.text) : '') + (m.hasVoice ? (m.text ? '\n' : '') + '🎤 녹음 ' + (m.dur || '') + '초' : '') + '</div>' +
           (m.replies || []).map(function (r, i) { return '<div class="x" style="color:#22396F;font-weight:700;margin-top:6px">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t).split(' ')[1] + (r.by && r.by !== '생산실' ? ' (' + esc(r.by) + ')' : '') + ' · ' + esc(r.text || '(녹음)') + (r.voice ? ' <button class="del" style="color:#22396F" data-ra="' + m.id + '|' + i + '">▶ 듣기</button>' : '') + '</div>'; }).join('') +
+          (m.acks && m.acks.length ? '<div class="acks">✅ ' + m.acks.map(function (a) { return esc(a.n && a.by && a.n !== a.by && a.by !== '생산실' ? a.by + '(' + a.n + ')' : (a.by && a.by !== '생산실' ? a.by : a.n || '생산실')) + ' ' + hm(a.t).split(' ')[1]; }).join(' · ') + '</div>' : '') +
           (m.ack ? '' : '<button class="del" data-d="' + m.id + '">잘못 보냈어요 (지우기)</button>') + '</div>' +
           (m.ack ? '<span class="state s-ok">✅ 확인 ' + hm(m.ack).split(' ')[1] + (m.ackBy && m.ackBy !== '생산실' ? ' · ' + esc(m.ackBy) : '') + '</span>' : '<span class="state s-wait">확인 전</span>') + '</div>';
       }).join('');

@@ -134,19 +134,29 @@ body.tv main{max-width:none;padding:0;height:100vh}
 #wOther{background:#FBF8F4;border:2px solid #C9B7A2;color:#3B2716}
 #wCancel{background:#EFE6DA;border:0;color:#3B2716}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:#1E7B45;color:#fff;font-size:40px;font-weight:900;padding:26px 44px;border-radius:22px;z-index:30;display:none}
-body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
+body.pcm #ovRep,body.pcm .b-rep{display:none!important}
+#gate .box.reg{max-width:680px;text-align:left}
+#gate .reg h3{font-size:21px;margin:18px 0 8px;color:#3B2416}
+#rgName{width:100%;height:62px;font-size:26px;font-weight:800;border:3px solid #C9B7A2;border-radius:12px;padding:0 14px;color:#1E1A17}
+.exs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.exs button,.gps button{min-height:54px;padding:0 18px;font-size:20px;font-weight:800;border:2px solid #C9B7A2;background:#FBF8F4;border-radius:12px;cursor:pointer;color:#1E1A17}
+.gps{display:flex;flex-wrap:wrap;gap:10px}
+.gps button.on{background:#1E7B45;border-color:#1E7B45;color:#fff}
+.rgRow{display:flex;gap:12px;margin-top:20px}.rgRow .btn{flex:1;height:64px;font-size:24px}
+.tag.to{background:#22396F}
 </style></head><body>
 <header>
-  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v021</small> -->
-  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v021 · 11/12 16:01</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC · 보기 전용</span></h1>
-  <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
+  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v022</small> -->
+  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v022 · 11/12 16:29</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC</span></h1>
+  <button class="hbtn" id="meTag" style="display:none" title="이 화면 이름 바꾸기"></button><span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <div id="sndBar" style="display:none;background:#FFD24D;color:#1E1A17;font-size:30px;font-weight:900;text-align:center;padding:14px">🔈 소리가 꺼져 있어요 · 화면 아무 곳이나 한 번 눌러 주세요</div>
+<div id="regBar" style="display:none;background:#FFF4CC;border-bottom:3px solid #E0A800;color:#1E1A17;font-size:21px;font-weight:800;padding:12px 20px;align-items:center;gap:14px;flex-wrap:wrap"><span style="flex:1;min-width:260px">🏷 [확인 필요] 이 화면 이름이 아직 없어요. 이름을 정하면 이 화면에만 보내는 전달도 받아요.</span><button class="btn b-ok" id="regBtn">이름 정하기</button></div>
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v021 (11/12 16:01) · 이름을 「빵을그리다 방송실」로 바꿈. v020 · 번호 화면에서 키보드 숫자·Enter도 돼요. v019 · 사무실 PC 번호 화면 문구를 「생산실 방송 받는 번호」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 보기 전용이에요: 「닫기」는 이 PC에서만 닫히고 생산실 「확인」에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v022 (11/12 16:29) · 화면마다 이름표가 생겼어요(위쪽 🏷 단추를 누르면 이름·그룹을 바꿀 수 있어요). 슬랙 글 맨 앞에 @이름이나 @그룹을 쓰면 그 화면에만 떠요(예: @서재우 @키오스크 회의 2시). 아무것도 안 쓰면 모든 화면에 떠요. 생산실 그룹 화면끼리는 한 곳에서 확인하면 같이 확인돼요. 사무실 PC도 「✅ 확인」을 누르면 누가 확인했는지 남아요. v021 · 이름을 「빵을그리다 방송실」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 답장 없이 「확인」만 돼요. 사무실 PC에서 확인해도 생산실 확인에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -180,13 +190,16 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   function pcClosed(id) { try { return (JSON.parse(localStorage.getItem(PCK) || '[]')).indexOf(id) >= 0; } catch (e) { return false; } }
   function pcClose(id) { try { var a = JSON.parse(localStorage.getItem(PCK) || '[]'); if (a.indexOf(id) < 0) a.push(id); localStorage.setItem(PCK, JSON.stringify(a.slice(-300))); } catch (e) { } }
   var pin = localStorage.getItem(LS) || '';
+  /* v022: 화면 이름표 — 화면마다 서버가 준 열쇠(bang_dev_key)로 받음. 받는 번호는 처음 등록할 때만 씀 */
+  var LSK = 'bang_dev_key', LSM = 'bang_me', CV = 22, MODE = PCM ? 'pc' : 'pos';
+  var key = localStorage.getItem(LSK) || '', me = null, tvSeen = 0; try { me = JSON.parse(localStorage.getItem(LSM) || 'null'); } catch (e) { }
   var ver = -1, msgs = [], first = true, seen = {}, queue = [], busy = false, actx = null, koVoice = null, current = null, repeatT = null, failN = 0;
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function hm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
   function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function call(o) {
-    o.pin = pin;
+    if (key) o.key = key; else o.pin = pin;
     return fetch(API, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); });
   }
   function status(ok, t) { $('dot').className = 'dot ' + (ok ? 'ok' : 'bad'); $('stt').textContent = t; }
@@ -196,7 +209,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   var gateKey = null;
   function gatePin(err) {
     var typed = '';
-    $('gate').style.display = 'flex';
+    $('gate').style.display = 'flex'; $('gbox').className = 'box';
     $('gbox').innerHTML = (PCM ? '<h2>빵을그리다 방송실 받는 번호</h2><p>처음 한 번만 넣으면 이 PC가 기억해요. 번호는 이혜영 이사님께 따로 받아 주세요.</p>' : '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>') +
       '<div id="pinv">&nbsp;</div><div class="pad">' +
       [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0, '확인'].map(function (k) { return '<button data-k="' + k + '">' + k + '</button>'; }).join('') +
@@ -210,7 +223,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
           if (typed.length < 6) { $('gerr').textContent = '번호를 끝까지 넣어 주세요.'; return; }
           pin = typed; $('gerr').textContent = '확인 중…';
           call({ op: 'who' }).then(function (r) {
-            if (r.ok) { localStorage.setItem(LS, pin); gateStart(); }
+            if (r.ok && (r.role === 'recv' || r.role === 'send')) { regForm(false); }
             else { pin = ''; typed = ''; show(); $('gerr').textContent = r.err === 'locked' ? '여러 번 틀려서 15분 동안 잠겼어요.' : '번호가 맞지 않아요. 다시 넣어 주세요.'; }
           }).catch(function () { pin = ''; $('gerr').textContent = '인터넷 연결을 확인해 주세요.'; });
           return;
@@ -221,7 +234,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     var pad = function (k) { var b = document.querySelector('.pad button[data-k="' + k + '"]'); if (b) b.click(); };
     if (gateKey) document.removeEventListener('keydown', gateKey, true);
     gateKey = function (e) {
-      if ($('gate').style.display === 'none') return;
+      if ($('gate').style.display === 'none' || !$('pinv')) return;
       var k = e.key, c = e.code || '';
       if (/^Numpad[0-9]$/.test(c)) k = c.slice(6);
       if (/^[0-9]$/.test(k)) { pad(k); e.preventDefault(); }
@@ -230,6 +243,63 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     };
     document.addEventListener('keydown', gateKey, true);
   }
+  /* ---------- v022 화면 이름표 ---------- */
+  function meName() { return me && me.name && me.name !== '이름 미등록' ? me.name : ''; }
+  function showMe() {
+    if (TVQ || !me) return;
+    $('meTag').textContent = '🏷 ' + me.name + (me.groups && me.groups.length ? ' · ' + me.groups.join('·') : '');
+    $('meTag').style.display = '';
+    $('regBar').style.display = meName() ? 'none' : 'flex';
+  }
+  function setMe(m) { if (!m) return; me = m; try { localStorage.setItem(LSM, JSON.stringify(m)); } catch (e) { } showMe(); }
+  function setKey(k) { key = k; localStorage.setItem(LSK, k); localStorage.removeItem(LS); pin = ''; }
+  function hintTxt() { return (tvSeen && Date.now() - tvSeen < 120000 ? 'TV 같이 보기 연결됨 · ' : '') + '화면 ' + screen.width + '×' + screen.height + (PCM ? ' · 사무실 PC 모드' : ''); }
+  function regForm(rename, err) {
+    $('gate').style.display = 'flex';
+    var gs = rename && me ? (me.groups || []).slice() : [PCM ? '사무실' : '생산실'];
+    var ex = PCM ? ['서재우', '이혜영 노트북', '이혜영 PC', '사무실 PC', '키오스크', '포스기'] : ['키오스크', '포스기', '서재우', '이혜영 노트북', '이혜영 PC'];
+    var G = ['생산실', '사무실']; gs.forEach(function (g) { if (G.indexOf(g) < 0) G.push(g); });
+    $('gbox').className = 'box reg';
+    $('gbox').innerHTML = '<h2>' + (rename ? '이 화면 이름 바꾸기' : '이 화면 이름 정하기') + '</h2><p>방송을 보낼 때 이 이름으로 골라 보내요. 사람 이름이나 자리 이름을 넣어 주세요.</p>' +
+      '<input id="rgName" maxlength="20" autocomplete="off" placeholder="예: 키오스크, 서재우" value="' + esc(rename ? meName() : '') + '">' +
+      '<div class="exs">' + ex.map(function (n) { return '<button data-ex="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>' +
+      '<h3>그룹 (여러 개 고를 수 있어요)</h3><div class="gps">' + G.map(function (g) { var on = gs.indexOf(g) >= 0; return '<button data-g="' + esc(g) + '"' + (on ? ' class="on"' : '') + '>' + (on ? '✔ ' : '') + esc(g) + '</button>'; }).join('') + '</div>' +
+      '<div style="font-size:17px;color:#4A4038;margin-top:10px;line-height:1.5">생산실 그룹 화면끼리는 한 곳에서 「확인」하면 같이 확인돼요. 키보드로 이름을 쓰고 Enter를 눌러도 돼요.</div>' +
+      '<div class="rgRow">' + (rename ? '<button class="btn b-play" id="rgNo">취소</button>' : '') + '<button class="btn b-ok" id="rgGo">' + (rename ? '바꾸기' : '등록하기') + '</button></div><div id="gerr">' + (err || '') + '</div>';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ex]'), function (b) { b.onclick = function () { $('rgName').value = b.getAttribute('data-ex'); }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-g]'), function (b) { b.onclick = function () { var on = b.className !== 'on'; b.className = on ? 'on' : ''; b.textContent = (on ? '✔ ' : '') + b.getAttribute('data-g'); }; });
+    if (rename) $('rgNo').onclick = function () { $('gate').style.display = 'none'; $('gbox').className = 'box'; };
+    var go = function () {
+      var name = $('rgName').value.replace(/\s+/g, ' ').trim();
+      var groups = Array.prototype.filter.call(document.querySelectorAll('[data-g]'), function (b) { return b.className === 'on'; }).map(function (b) { return b.getAttribute('data-g'); });
+      if (!name) { $('gerr').textContent = '이름을 넣어 주세요.'; $('rgName').focus(); return; }
+      $('gerr').textContent = '저장 중…'; $('rgGo').disabled = true;
+      var o = rename ? { op: 'me_set', name: name, groups: groups } : { op: 'reg', name: name, groups: groups, mode: MODE, hint: hintTxt() };
+      call(o).then(function (r) {
+        $('rgGo').disabled = false;
+        if (!r.ok) {
+          if (!rename && (r.err === 'pin' || r.err === 'locked')) { pin = ''; gatePin('번호가 맞지 않아요. 다시 넣어 주세요.'); return; }
+          $('gerr').textContent = r.err === 'full' ? '등록할 수 있는 화면 수가 다 찼어요. 관리 화면에서 안 쓰는 화면을 끊어 주세요.' : r.err === 'busy' ? '등록이 너무 많아요. 잠시 뒤에 다시 해 주세요.' : '저장하지 못했어요. 다시 눌러 주세요.';
+          return;
+        }
+        if (r.key) setKey(r.key);
+        setMe(r.me); $('gbox').className = 'box';
+        if (rename) { $('gate').style.display = 'none'; ver = -1; toast('🏷 이름을 바꿨어요: ' + r.me.name); } else gateStart();
+      }).catch(function () { $('rgGo').disabled = false; $('gerr').textContent = '인터넷 연결을 확인해 주세요.'; });
+    };
+    $('rgGo').onclick = go;
+    $('rgName').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } };
+    if (!rename) setTimeout(function () { try { $('rgName').focus(); } catch (e) { } }, 50);
+  }
+  /* 옛 화면(받는 번호만 있음)은 계속 받으면서, 뒤에서 「이름 미등록」 화면으로 자동 등록 → 관리 화면에서 이름을 붙이면 됨 */
+  function autoReg() {
+    if (key || !pin || TVQ) return;
+    call({ op: 'reg', name: '', groups: [PCM ? '사무실' : '생산실'], mode: MODE, hint: hintTxt(), auto: 1 }).then(function (r) {
+      if (r.ok && r.key && !key) { setKey(r.key); setMe(r.me); ver = -1; first = true; }
+    }).catch(function () { });
+  }
+  $('meTag').onclick = function () { if (key) regForm(true); };
+  $('regBtn').onclick = function () { if (key) regForm(true); };
   function gateStart() {
     /* 소리 버튼을 안 눌러도 글은 바로 받아서 화면에 띄움. 소리는 화면을 한 번 누르면 켜짐 */
     $('gate').style.display = 'none';
@@ -402,7 +472,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   function showOv(m) {
     current = m; ovShownAt = Date.now(); flashFs = Date.now(); flashFe = m.urgent ? 0 : flashFs + 10000; annRound = 0;
     setBadge();
-    $('ovWho').textContent = (m.from || '') + ' · ' + hm(m.t) + (m.via === 'slack' ? ' · 슬랙' : '');
+    $('ovWho').textContent = (m.from || '') + ' · ' + hm(m.t) + (m.via === 'slack' ? ' · 슬랙' : '') + (m.to && m.to.length ? ' · 📍 ' + m.to.join('·') + '에게' : '');
     $('ovTxt').textContent = m.text || '';
     $('ovTxt').style.display = m.text ? 'block' : 'none';
     $('ovVoice').textContent = m.hasVoice ? '🎤 녹음 ' + (m.dur ? m.dur + '초 ' : '') + '— 소리로 들려 드려요' : '';
@@ -425,7 +495,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   }
   $('ovAgain').onclick = function () { if (current) { busy = false; announce(current); } };
   $('ovRep').onclick = function () { if (current) openReply(current); };
-  $('ovOk').onclick = function () { var m = current; if (!m) return; stopSound(); if (PCM) { pcClose(m.id); tones([784, 1047], 0.18); nextOv(); return; } pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current === m) nextOv(); }); };
+  $('ovOk').onclick = function () { var m = current; if (!m) return; stopSound(); if (PCM) { pcClose(m.id); if (key) ack(m, meName() || '사무실 PC'); tones([784, 1047], 0.18); nextOv(); return; } pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current === m) nextOv(); }); };
   /* v014: 확인·답장 때 누가 했는지 이름을 터치 (60초 안 누르면 닫힘, 확인 안 된 채로 남음) */
   var STAFF = [['박태일', '상무'], ['이정현', '과장'], ['김명우', '대리'], ['오승태', '사원']];
   var whoCb = null, whoT = 0;
@@ -447,17 +517,17 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   function tvList() {
     var today = dayKey(Date.now());
     return msgs.filter(function (m) { return dayKey(m.t) === today || !m.ack; }).slice(-30).reverse().map(function (m) {
-      return { id: m.id, from: m.from || '', t: m.t, text: m.text || '', urgent: !!m.urgent, via: m.via || '', hasVoice: !!m.hasVoice, dur: m.dur || 0, ack: m.ack || 0, ackBy: m.ackBy || '',
+      return { id: m.id, from: m.from || '', t: m.t, text: m.text || '', urgent: !!m.urgent, to: m.to || [], via: m.via || '', hasVoice: !!m.hasVoice, dur: m.dur || 0, ack: m.ack || 0, ackBy: m.ackBy || '',
         reps: (m.replies || []).map(function (r) { return { t: r.t, text: r.text || '', voice: !!r.voice, by: r.by || '' }; }) };
     });
   }
   function tvPost() {
     if (!bc || TVQ) return;
-    var s = current ? { on: 1, id: current.id || '', text: current.text || '', from: current.from || '', t: current.t, urgent: !!current.urgent, via: current.via || '', hasVoice: !!current.hasVoice, dur: current.dur || 0, more: queue.length, fs: flashFs, fe: flashFe, rd: annRound, rt: annTotal } : { on: 0 };
+    var s = current ? { on: 1, to: current.to || [], id: current.id || '', text: current.text || '', from: current.from || '', t: current.t, urgent: !!current.urgent, via: current.via || '', hasVoice: !!current.hasVoice, dur: current.dur || 0, more: queue.length, fs: flashFs, fe: flashFe, rd: annRound, rt: annTotal } : { on: 0 };
     s.list = tvList(); s.net = failN > 2 ? 0 : 1;
     try { bc.postMessage(s); } catch (e) { }
   }
-  if (bc && !TVQ) bc.onmessage = function (e) { if (e.data && e.data.hello) tvPost(); };
+  if (bc && !TVQ) bc.onmessage = function (e) { if (e.data && e.data.hello) { tvSeen = Date.now(); tvPost(); } };
   /* v015 (2026-11-09): 화면이 다른 창(생산일지)에 가려지면 크롬이 그 창의 시계를 느리게 돌려 새 전달이 몇 분 늦게 떴음 → 시계는 Worker로, 창 얼림은 Web Lock으로 막아 가려져 있어도 5초마다 받기 */
   var wkT = null, wkCb = {}, wkN = 0;
   try { wkT = new Worker(URL.createObjectURL(new Blob(['var t={};onmessage=function(e){var d=e.data;if(d.r){t[d.i]=setInterval(function(){postMessage(d.i)},d.ms);}else{t[d.i]=setTimeout(function(){delete t[d.i];postMessage(d.i)},d.ms);}}'], { type: 'text/javascript' })));
@@ -469,7 +539,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   function tick() {
     if (TVQ) return;
     var d = new Date(); $('clk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
-    var un = msgs.filter(function (m) { return !m.ack; }).length;
+    var un = msgs.filter(function (m) { return !m.ack && !(PCM && pcClosed(m.id)); }).length;
     $('band').className = 'band ' + (un ? 'bad' : 'ok');
     $('bandTxt').textContent = un ? '확인 안 한 전달 ' + un + '건' : '새 전달 없음 · 모두 확인함';
     if (current) { $('ovAgo').textContent = ago(current.t); $('ovMore').textContent = queue.length ? '다음 전달 ' + queue.length + '건 더 있어요' : ''; }
@@ -479,15 +549,16 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   wInterval(tick, 1000);
 
   /* v016: 새 버전 자동 받기 — 10분마다 배포본 번호를 보고, 방송·답장 중이 아닐 때만 새로 고침 (현장 원격 접속 없이 고침 반영) */
-  var MY_V = 21;
+  var MY_V = 22;
   function selfUpdate() {
-    if (current || queue.length || busy || replying) return;
+    if (current || queue.length || busy || replying || $('gate').style.display === 'flex') return;
     fetch(location.pathname + '?vc=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
       var mm = /생산실 방송 <small[^>]*>v(\d{3})/.exec(t || '') || /방송실 <small[^>]*>v(\d{3})/.exec(t || ''); if (!mm) return;
       if (Number(mm[1]) > MY_V && !current && !queue.length && !busy && !replying) location.reload();
     }).catch(function () { });
   }
   wInterval(selfUpdate, 10 * 60 * 1000);
+  wInterval(function () { if (!key && pin && !TVQ) autoReg(); }, 10 * 60 * 1000);
   setTimeout(function () { if (hasHelper()) $('hlp').style.display = ''; }, 1500);  function ack(m, by) {
     if (m.ack) return; m.ack = Date.now(); m.ackBy = by || '생산실'; render();
     call({ op: 'ack', id: m.id, by: m.ackBy }).catch(function () { });
@@ -503,7 +574,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     if (!arr.length) { $('list').innerHTML = '<div class="empty">오늘 받은 말이 아직 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div>'; return; }
     $('list').innerHTML = arr.map(function (m) {
       return '<div class="card' + (m.ack ? '' : ' new') + '"><div class="body"><div class="meta"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
-        (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
+        (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.to && m.to.length ? '<span class="tag to">📍 ' + esc(m.to.join('·')) + '</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') + '</div>' +
         (m.text ? '<div class="txt">' + esc(m.text) + '</div>' : '') + repHtml(m) + '</div><div class="side">' +
         '<button class="btn b-play" data-p="' + m.id + '">🔊 듣기</button>' +
         '<button class="btn b-rep" data-r="' + m.id + '">💬 답장</button>' +
@@ -512,7 +583,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     Array.prototype.forEach.call(document.querySelectorAll('[data-p]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-p')); if (m) { busy = false; announce(m); } }; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-r]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-r')); if (m) openReply(m); }; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ra]'), function (b) { b.onclick = function () { var x = b.getAttribute('data-ra').split('|'); playReply(x[0], Number(x[1])); }; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (!m) return; if (current && current.id === m.id) stopSound(); pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current && current.id === m.id) nextOv(); }); }; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var m = byId(b.getAttribute('data-a')); if (!m) return; if (current && current.id === m.id) stopSound(); if (PCM) { pcClose(m.id); ack(m, meName() || '사무실 PC'); tones([784, 1047], 0.18); if (current && current.id === m.id) nextOv(); return; } pickWho('누가 확인했나요?', function (n) { ack(m, n); tones([784, 1047], 0.18); if (current && current.id === m.id) nextOv(); }); }; });
   }
   function byId(id) { return msgs.filter(function (m) { return m.id === id; })[0]; }
   function repHtml(m) {
@@ -674,12 +745,14 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
 
   /* ---------- 받아오기 ---------- */
   function poll() {
-    return call({ op: 'poll', since: ver, n: 40 }).then(function (r) {
+    return call({ op: 'poll', since: ver, n: 40, cv: CV, mode: MODE }).then(function (r) {
       if (!r.ok) {
+        if (r.err === 'key') { key = ''; me = null; localStorage.removeItem(LSK); localStorage.removeItem(LSM); $('meTag').style.display = 'none'; $('regBar').style.display = 'none'; gatePin('이 화면 연결이 끊겼어요. 받는 번호를 다시 넣어 주세요.'); return 'stop'; }
         if (r.err === 'pin' || r.err === 'locked') { localStorage.removeItem(LS); pin = ''; gatePin('번호가 바뀌었어요. 새 번호를 넣어 주세요.'); return 'stop'; }
         throw new Error(r.err);
       }
       failN = 0; status(true, '연결됨 · ' + hm(Date.now()));
+      if (r.me) setMe(r.me);
       if (r.same) return;
       ver = r.v;
       var old = {}; msgs.forEach(function (m) { old[m.id] = m; });
@@ -687,11 +760,11 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
       msgs = (r.list || []).map(keepAck);
       msgs.forEach(function (m) {
         if (seen[m.id]) return; seen[m.id] = 1;
-        if (!first && (PCM ? !pcClosed(m.id) : !m.ack)) { queue.push(m); notify(m); }
+        if (!first && (PCM ? !pcClosed(m.id) && !(key && m.ack) : !m.ack)) { queue.push(m); notify(m); }
       });
       first = false;
-      if (current) { var c = byId(current.id); if (!c || (!PCM && c.ack)) nextOv(); }
-      queue = queue.filter(function (q) { var c = byId(q.id); return c && (PCM ? !pcClosed(q.id) : !c.ack); });
+      if (current) { var c = byId(current.id); if (!c || (c.ack && (!PCM || key))) nextOv(); }
+      queue = queue.filter(function (q) { var c = byId(q.id); return c && (PCM ? !pcClosed(q.id) && !(key && c.ack) : !c.ack); });
       render();
       if (!current && queue.length) nextOv();
     }).catch(function () {
@@ -718,7 +791,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
       if (!list.length) { $('tvList').innerHTML = '<div class="tvempty">오늘 받은 전달이 아직 없어요<span>슬랙 #생산실-방송에 글이 오면 여기에 크게 보여요</span></div>'; tvHid = 0; return; }
       $('tvList').innerHTML = list.map(function (m) {
         return '<div class="tvc' + (m.ack ? '' : ' new') + '"><div class="m"><b>' + esc(m.from) + '</b> · ' + hm(m.t) +
-          (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') +
+          (m.urgent ? '<span class="tag u">급함</span>' : '') + (m.via === 'slack' ? '<span class="tag">슬랙</span>' : '') + (m.to && m.to.length ? '<span class="tag to">📍 ' + esc(m.to.join('·')) + '</span>' : '') + (m.hasVoice ? '<span class="tag">🎤 녹음' + (m.dur ? ' ' + m.dur + '초' : '') + '</span>' : '') +
           (m.ack ? '<span class="s ok">✅ 확인 ' + hm(m.ack) + byTxt(m.ackBy) + '</span>' : '<span class="s no">● 확인 전</span>') + '</div>' +
           (m.text ? '<div class="x">' + esc(m.text) + '</div>' : '<div class="x">🎤 녹음 전달 (키오스크에서 들어요)</div>') +
           m.reps.map(function (r) { return '<div class="r">↳ ' + (r.voice ? '🎤' : '💬') + ' 생산실 답장 ' + hm(r.t) + byTxt(r.by) + ' · ' + esc(r.text || '(녹음)') + '</div>'; }).join('') + '</div>';
@@ -756,7 +829,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
       flashFs = s.fs || flashFs; flashFe = s.fe || 0; annRound = s.rd || 0; annTotal = s.rt || 0;
       if (k === key) { setBadge(); return; }
       key = k; current = s; setBadge();
-      $('ovWho').textContent = (s.from || '') + ' · ' + hm(s.t) + (s.via === 'slack' ? ' · 슬랙' : '');
+      $('ovWho').textContent = (s.from || '') + ' · ' + hm(s.t) + (s.via === 'slack' ? ' · 슬랙' : '') + (s.to && s.to.length ? ' · 📍 ' + s.to.join('·') + '에게' : '');
       $('ovTxt').textContent = s.text || ''; $('ovTxt').style.display = s.text ? 'block' : 'none';
       $('ovVoice').textContent = s.hasVoice ? '🎤 녹음 ' + (s.dur ? s.dur + '초 ' : '') + '— 키오스크에서 소리로 들려 드려요' : '';
       ovClass(s, true); flashSync();
@@ -766,8 +839,11 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     hi(); setInterval(function () { if (Date.now() - last > 5000) hi(); }, 3000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) { hi(); flashSync(); fitText(); } });
   }
-  if (PCM && !TVQ) { document.body.classList.add('pcm'); $('pcTag').style.display = ''; $('ovOk').textContent = '✖ 닫기 (이 PC만)'; }
-  if (TVQ) tvMode(); else if (!pin) gatePin(); else gateStart();
+  if (PCM && !TVQ) { document.body.classList.add('pcm'); $('pcTag').style.display = ''; $('ovOk').textContent = '✅ 확인 · 닫기 (이 PC)'; }
+  if (TVQ) tvMode();
+  else if (key) { showMe(); gateStart(); }
+  else if (pin) { gateStart(); setTimeout(autoReg, 8000); }
+  else gatePin();
 })();
 </script>
 </body></html>
