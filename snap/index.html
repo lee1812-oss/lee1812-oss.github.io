@@ -65,19 +65,30 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 .lock b{font-size:24px}
 .lock .hint{font-size:17px}
 .hide{display:none!important}
+.btn.kakao{background:#FEE500;border-color:#FEE500;color:#191919;font-size:20px;min-height:62px;font-weight:800}
+.admin{margin-top:28px;text-align:left;border-top:1px solid var(--line);padding-top:10px}
+.admin summary{font-size:16px;color:var(--sub);cursor:pointer;min-height:44px;display:flex;align-items:center}
+.who{margin:0 2px 4px;font-size:17px;color:var(--navy);font-weight:700}
 </style>
 </head>
 <body>
-<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v007 · 11/11 11:06 업데이트</span></div></header>
+<header><div class="row"><h1>📷 사진 바로 나에게</h1><span class="ver" id="ver">v008 · 11/12 12:24 업데이트</span></div></header>
 <main>
   <section id="locked" class="lock hide">
-    <b>이 브라우저는 처음이에요</b>
-    <p class="hint">아래 버튼을 누르면 카톡 「나와의 채팅」으로 열쇠 링크가 와요. 그 링크의 「앱 열기」만 누르면 끝이에요.</p>
-    <button class="btn go" id="invite" style="margin-top:16px">📩 카톡으로 열쇠 받기</button>
-    <p class="hint" id="inviteMsg"></p>
+    <b>처음 한 번만 시작해 주세요</b>
+    <p class="hint">카카오로 시작하면 찍은 사진이 <b style="font-size:17px">내 카톡 「나와의 채팅」</b>으로만 가요. 다른 사람에게는 가지 않아요.</p>
+    <button class="btn kakao" id="kstart" style="margin-top:16px">카카오로 시작하기</button>
+    <p class="hint" id="kmsg"></p>
+    <p class="hint">동의 화면에서 「카카오톡 메시지 전송」에 꼭 체크해 주세요.</p>
+    <details class="admin"><summary>관리자(이혜영) 전용</summary>
+      <p class="hint">누르면 이혜영 님 카톡 「나와의 채팅」으로 열쇠 링크가 가요. 다른 분은 누르지 마세요.</p>
+      <button class="btn" id="invite" style="margin-top:10px">📩 카톡으로 열쇠 받기</button>
+      <p class="hint" id="inviteMsg"></p>
+    </details>
   </section>
 
   <section id="app" class="hide">
+    <p class="who hide" id="who"></p>
     <div class="cats" id="cats"></div>
     <p class="catnow" id="catnow"></p>
 
@@ -104,7 +115,15 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
       <p class="hint" id="empty">아직 보낸 사진이 없어요.</p>
     </div>
 
-    <div class="card">
+    <div class="card hide" id="guestSet">
+      <h2>설정</h2>
+      <label class="opt"><input type="checkbox" id="optStampG" checked> 카톡 사진 구석에 날짜·시간 넣기</label>
+      <p class="hint"><b>원본 보관: 꺼짐</b> · 사진은 내 카톡 「나와의 채팅」에만 가고, 다른 곳(드라이브 등)에는 저장하지 않아요.</p>
+      <p class="hint">카톡 사진 카드는 카카오가 100일 뒤 지워요. 오래 둘 사진은 「보낸 사진」의 「📥 폰에 저장」을 눌러 두세요(앱을 닫기 전까지 가능).</p>
+      <button class="btn cancel" id="logout" style="margin-top:10px">이 휴대폰에서 카카오 연결 끊기</button>
+    </div>
+
+    <div class="card" id="ownerSet">
       <h2>설정</h2>
       <label class="opt"><input type="checkbox" id="optOrig" checked> 원본도 구글 드라이브에 보관</label>
       <label class="opt"><input type="checkbox" id="optStamp" checked> 카톡 사진 구석에 날짜·시간 넣기</label>
@@ -122,22 +141,69 @@ main{max-width:640px;margin:0 auto;padding:12px 14px 40px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const VER='v007', UPDATED='2026-11-11 11:06';
+const VER='v008', UPDATED='2026-11-12 12:24';
 const API='https://script.google.com/macros/s/AKfycbyZe-ApxE2s_m6_NfAnrAzC_w66ZnFNqcdpb_Yw2GO3j1lDyUZwGhIqKTNLzfcJmuIzMQ/exec';
 const CATS=[['receipt','🧾 영수증·명세서'],['site','🏭 현장·시설'],['prod','🍞 제품·생산'],['deliv','🚚 납품·배송'],['utca','💼 UTCA'],['me','🏠 개인'],['none','선택 안 함']];
 const CATNAME={receipt:'영수증·명세서',site:'현장·시설',prod:'제품·생산',deliv:'납품·배송',utca:'UTCA',me:'개인',none:''};
 const $=id=>document.getElementById(id);
 let KEY='';
+// v008: GUEST = 카카오로 시작한 사람(자기 카톡으로만, 드라이브 보관 없음). 주인(이혜영)은 예전처럼 열쇠 링크
+let GUEST=localStorage.getItem('snap_mode')==='guest';
 const IN_KAKAO=/KAKAOTALK/i.test(navigator.userAgent);
+function showMode(){
+  $('locked').classList.toggle('hide',!!KEY); $('app').classList.toggle('hide',!KEY);
+  ['cats','catnow','ownerSet'].forEach(id=>$(id).classList.toggle('hide',GUEST));
+  $('guestSet').classList.toggle('hide',!GUEST); $('who').classList.toggle('hide',!GUEST);
+  const nk=localStorage.getItem('snap_nick')||'';
+  $('who').textContent=(nk?nk+' 님 ':'내 ')+'카톡 「나와의 채팅」으로 보내요';
+}
+function lockAgain(msg){
+  KEY=''; localStorage.removeItem('snap_key'); localStorage.removeItem('snap_mode'); localStorage.removeItem('snap_nick'); GUEST=false;
+  showMode(); if(msg) $('kmsg').innerHTML='<b style="color:var(--bad)">'+esc(msg)+'</b>';
+}
 (function initKey(){
   const h=new URLSearchParams(location.hash.slice(1));
   const k=h.get('k');
   // 카톡 안 브라우저로 열리면 휴대폰 기본 브라우저로 넘긴다(열쇠도 같이 넘어감)
-  if(IN_KAKAO){ if(k) localStorage.setItem('snap_key',k); location.replace('kakaotalk://web/openExternal?url='+encodeURIComponent(location.href)); }
-  if(k){ localStorage.setItem('snap_key',k); history.replaceState(null,'',location.pathname); }
+  if(IN_KAKAO){ if(k){ localStorage.setItem('snap_key',k); localStorage.removeItem('snap_mode'); } location.replace('kakaotalk://web/openExternal?url='+encodeURIComponent(location.href)); }
+  if(k){ localStorage.setItem('snap_key',k); localStorage.removeItem('snap_mode'); localStorage.removeItem('snap_nick'); GUEST=false; history.replaceState(null,'',location.pathname); }
   KEY=localStorage.getItem('snap_key')||'';
-  $(KEY?'app':'locked').classList.remove('hide');
+  showMode();
+  const s=new URLSearchParams(location.search);
+  if(s.get('code')||s.get('error')) kakaoBack(s);
 })();
+// 카카오로 시작하기: 서버가 로그인 주소를 만들어 줌 → 카카오 동의 → 이 주소로 ?code= 를 들고 돌아옴
+$('kstart').onclick=async()=>{
+  const b=$('kstart'); b.disabled=true; $('kmsg').textContent='카카오로 이동하는 중…';
+  try{
+    const st=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');
+    localStorage.setItem('snap_state',st);
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'authurl',state:st})});
+    const j=await r.json(); if(!j.ok||!j.url) throw new Error(j.err||'서버 연결 실패');
+    location.href=j.url;
+  }catch(e){ $('kmsg').innerHTML='<b style="color:var(--bad)">❌ '+esc(e.message)+'</b>'; b.disabled=false; }
+};
+async function kakaoBack(s){
+  history.replaceState(null,'',location.pathname);
+  const m=$('kmsg');
+  if(s.get('error')){ m.innerHTML='<b style="color:var(--warn)">카카오 동의를 취소했어요.</b><br>다시 「카카오로 시작하기」를 눌러 주세요.'; return; }
+  const st=localStorage.getItem('snap_state')||''; localStorage.removeItem('snap_state');
+  if(!st || s.get('state')!==st){ m.innerHTML='<b style="color:var(--bad)">로그인 확인이 맞지 않아요.</b><br>이 화면에서 「카카오로 시작하기」를 다시 눌러 주세요.'; return; }
+  m.textContent='등록하는 중…'; $('kstart').disabled=true;
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'login',code:s.get('code')})});
+    const j=await r.json();
+    if(!j.ok){ if(j.owner){ const d=document.querySelector('details.admin'); if(d) d.open=true; } throw new Error(j.err||'등록 실패'); }
+    localStorage.setItem('snap_key',j.key); localStorage.setItem('snap_mode','guest'); localStorage.setItem('snap_nick',j.nick||'');
+    KEY=j.key; GUEST=true; showMode(); toast('✅ 준비 끝! 이제 찍으면 내 카톡으로 가요',4000);
+  }catch(e){ m.innerHTML='<b style="color:var(--bad)">❌ '+esc(e.message)+'</b>'; }
+  $('kstart').disabled=false;
+}
+$('logout').onclick=async()=>{
+  if(!confirm('이 휴대폰에서 카카오 연결을 끊을까요? 다시 쓰려면 「카카오로 시작하기」를 눌러요.')) return;
+  try{ await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'logout',key:KEY})}); }catch(e){}
+  lockAgain('연결을 끊었어요.');
+};
 $('invite').onclick=async()=>{
   const b=$('invite'), m=$('inviteMsg'); b.disabled=true; m.textContent='보내는 중…';
   try{
@@ -147,7 +213,7 @@ $('invite').onclick=async()=>{
   }catch(e){ m.innerHTML='<b style="color:var(--bad)">❌ 못 보냈어요</b><br>'+esc(e.message); }
   setTimeout(()=>{b.disabled=false;},60000);
 };
-['optOrig','optStamp'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
+['optOrig','optStamp','optStampG'].forEach(id=>{const v=localStorage.getItem('snap_'+id); if(v!==null) $(id).checked=v==='1'; $(id).onchange=()=>localStorage.setItem('snap_'+id,$(id).checked?'1':'0');});
 
 function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display='none',ms);}
 const pad=n=>String(n).padStart(2,'0');
@@ -207,15 +273,15 @@ function fileB64(file){return new Promise((ok,no)=>{const r=new FileReader();r.o
 async function post(body){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({key:KEY},body))});
   const j=await r.json().catch(()=>({ok:false,err:'서버 응답을 읽지 못했어요'}));
-  if(!j.ok) throw new Error(j.err||'실패');
+  if(!j.ok){ if(j.relogin && GUEST) lockAgain(String(j.err||'').replace(/^RELOGIN\s*/,'')); throw new Error(String(j.err||'실패').replace(/^RELOGIN\s*/,'')); }
   return j;
 }
 
 // items: [{file, ts}]
 async function handle(items){
   const memo=$('memo').value.trim(); $('memo').value='';
-  const cat=CAT, n=items.length, made=[];
-  const useStamp=$('optStamp').checked && cat!=='receipt';
+  const cat=GUEST?'none':CAT, n=items.length, made=[];
+  const useStamp=GUEST?$('optStampG').checked:($('optStamp').checked && cat!=='receipt');
   for(let i=0;i<n;i++){
     const d=new Date(items[i].ts);
     const h={id:Date.now()+'_'+i, base:baseName(d,n>1?i+1:0), when:pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()), st:'wait', msg:'사진 준비 중', memo, ts:d.getTime(), cat, i:i+1, n};
@@ -242,7 +308,8 @@ async function sendItem(h){
     else if(h.cat==='receipt' && j.ocrErr) rmsg='글자 읽기 실패';
     toast('✅ 나와의 채팅으로 보냈어요'+(h.n>1?' ('+h.i+'/'+h.n+')':''));
     const pre=rmsg?rmsg+' | ':'';
-    if($('optOrig').checked && h._orig){
+    if(GUEST){ h.msg='카톡 완료 · 나와의 채팅'; }
+    else if($('optOrig').checked && h._orig){
       h.st='orig'; h.msg=pre+'카톡 완료 · 원본 드라이브 보관 중'; render();
       try{
         if(h._orig.size>35*1024*1024) throw new Error('원본이 너무 커서 줄인 사진만 보관');
