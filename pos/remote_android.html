@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>미니포스기 원격 설치 안내 · 빵을그리다</title>
+<meta name="theme-color" content="#5b3a22">
+<meta name="robots" content="noindex">
+<link rel="icon" href="remote_icon_192.png">
+<style>
+:root{--br:#5b3a22;--bg:#f3f1ee;--ink:#1d1d1f;--sub:#3f3f44;--line:#dcd7d0;--ok:#1f7a35;--warn:#b35300;--bad:#c62828;--info:#1f5fa8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:19px;word-break:keep-all;overflow-wrap:break-word;line-height:1.6}
+.nw{white-space:nowrap}
+.top{position:sticky;top:0;z-index:5;background:var(--br);color:#fff;padding:10px 16px 12px}
+.top h1{font-size:22px;margin:0;max-width:820px;margin:0 auto}
+.vbar{max-width:820px;margin:6px auto 0;display:flex;gap:8px;flex-wrap:wrap;font-size:15px}
+.vb{background:#fff;color:var(--br);border-radius:999px;padding:2px 12px;font-weight:800;white-space:nowrap}
+main{max-width:820px;margin:0 auto;padding:14px}
+.box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:14px}
+.prep{border-left:6px solid var(--info)}
+.step{display:flex;gap:14px;align-items:flex-start}
+.num{flex:none;width:46px;height:46px;border-radius:50%;background:var(--br);color:#fff;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center}
+.step h2{margin:4px 0 6px;font-size:22px;line-height:1.35}
+.step ol{margin:4px 0 0;padding-left:22px}
+.step li{margin:4px 0}
+.tag{display:inline-block;font-size:15px;font-weight:800;border-radius:8px;padding:1px 8px;margin-right:4px}
+.t-warn{background:#fff1e0;color:var(--warn)}
+.t-ok{background:#e7f5ea;color:var(--ok)}
+.t-info{background:#eaf1fb;color:var(--info)}
+.qr{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.qr img{width:200px;height:200px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.url{font-family:Consolas,monospace;font-size:18px;background:#f6f4f1;border:1px solid var(--line);border-radius:10px;padding:8px 10px;word-break:break-all}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;border-radius:12px;border:2px solid var(--br);background:var(--br);color:#fff;padding:8px 18px;font-weight:800;text-decoration:none;font-size:18px}
+.key{background:#fff7e8;border:1px solid #f0d9ab;border-radius:12px;padding:8px 12px}
+.foot{font-size:16px;color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="top"><h1>📱 미니포스기 원격 설치 안내 (RustDesk)</h1>
+<div class="vbar"><span class="vb">v001</span><span>업데이트 2026-11-12 21:40</span></div></div>
+<main>
+<div class="box prep"><b>준비</b> <span class="tag t-info">약 10분</span><br>
+1. 미니포스기 앞에서, 와이파이가 연결된 상태로 해요.<br>
+2. 막히면 조조에게 말해 주세요. 팀뷰어 QuickSupport로 화면을 보면서 도와드려요(현장에서 「허용」 한 번).<br>
+3. 비밀번호는 보관함 <b>「RustDesk - 미니포스기」</b>에 있어요.</div>
+
+<div class="box step"><div class="num">1</div><div><h2>설치 파일 받기</h2>
+미니포스기의 인터넷(크롬)을 열고 아래 주소를 넣거나, 카메라가 있으면 QR을 찍어요.
+<div class="qr"><img src="remote_apk_qr.png" alt="설치 파일 주소 QR"><div style="flex:1;min-width:220px"><div class="url">lee1812-oss.github.io/pos/rdapk.html</div>
+<p style="margin:8px 0 0"><a class="btn" href="rdapk.html">⬇ 이 기기에서 바로 받기</a></p></div></div>
+<p class="foot">받는 파일: RustDesk 1.5.3 안드로이드(모든 기기용, 약 75MB). 공식 GitHub에서 받아요.</p></div></div>
+
+<div class="box step"><div class="num">2</div><div><h2>설치하기</h2><ol>
+<li>다운로드가 끝나면 알림이나 「다운로드」에서 파일을 눌러요.</li>
+<li>「이 출처의 앱 설치 허용」이 나오면 <b>설정 → 허용</b>을 켜고 뒤로 와요.</li>
+<li><b>설치</b> → <b>열기</b>를 눌러요.</li></ol></div></div>
+
+<div class="box step"><div class="num">3</div><div><h2>「제한된 설정 허용」 <span class="tag t-warn">안드로이드 13 이상만</span></h2><ol>
+<li>4번에서 접근성을 켜려는데 회색으로 막히면 이 단계를 해요.</li>
+<li>설정 → 애플리케이션 → <b>RustDesk</b> → 오른쪽 위 <b>⋮</b> → <b>「제한된 설정 허용」</b>을 눌러요.</li>
+<li>화면 잠금 비밀번호를 물으면 넣어요.</li></ol></div></div>
+
+<div class="box step"><div class="num">4</div><div><h2>화면 공유·조작 허락하기</h2><ol>
+<li>RustDesk 아래쪽 <b>「화면 공유」</b> 탭을 눌러요.</li>
+<li><b>「서비스 시작」</b> → 「지금 시작」(화면 녹화 허락)을 눌러요.</li>
+<li><b>「입력 제어」</b>를 켜면 접근성 화면으로 가요. <b>설치된 앱(서비스) → RustDesk Input → 사용</b>을 켜고 돌아와요.</li>
+<li>「파일 전송」은 켜지 않아도 돼요.</li></ol></div></div>
+
+<div class="box step"><div class="num">5</div><div><h2>고정 비밀번호 넣기</h2><ol>
+<li>「화면 공유」 탭 오른쪽 위 <b>⋮</b> → <b>「영구 비밀번호 설정」</b>을 눌러요.</li>
+<li>보관함 「RustDesk - 미니포스기」 비밀번호를 두 칸에 똑같이 넣어요.</li>
+<li>같은 메뉴에서 <b>「영구 비밀번호 사용」</b>을 골라요(일회용 비밀번호 끄기).</li></ol>
+<div class="key">🔑 비밀번호는 사진·카톡으로 보내지 마세요. 보관함에서만 봐요.</div></div></div>
+
+<div class="box step"><div class="num">6</div><div><h2>켜질 때 자동 시작 · 꺼지지 않게</h2><ol>
+<li>RustDesk 「설정」에 <b>「부팅 시 시작」</b>이 보이면 켜요. 「다른 앱 위에 표시」를 물으면 허용해요.</li>
+<li>설정 → 배터리 → RustDesk → <b>「제한 없음(최적화 안 함)」</b>으로 해요.</li>
+<li><span class="tag t-warn">주의</span>안드로이드는 다시 켠 뒤 「서비스 시작」(화면 녹화 허락)을 한 번 더 눌러야 할 수 있어요.</li></ol></div></div>
+
+<div class="box step"><div class="num">7</div><div><h2>ID 알려 주기 <span class="tag t-ok">마지막</span></h2><ol>
+<li>「화면 공유」 탭 위쪽의 <b>ID 숫자(9~10자리)</b>를 조조에게 알려 주세요.</li>
+<li>조조가 원격 센터에 넣고 접속 시험을 해요.</li></ol>
+<p style="margin:10px 0 0"><a class="btn" href="remote.html">🖥 기기 원격 센터로</a></p></div></div>
+<p class="foot">이 안내에는 비밀번호가 없어요. 화면 이름은 기종마다 조금 다를 수 있어요.</p>
+</main>
+</body>
+</html>

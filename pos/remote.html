@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>기기 원격 센터 · 빵을그리다</title>
+<meta name="theme-color" content="#5b3a22">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="remote.webmanifest">
+<link rel="icon" href="remote_icon_192.png">
+<link rel="apple-touch-icon" href="remote_icon_192.png">
+<style>
+:root{--br:#5b3a22;--br2:#8a5a35;--bg:#f3f1ee;--card:#fff;--ink:#1d1d1f;--sub:#3f3f44;--line:#dcd7d0;--ok:#1f7a35;--warn:#b35300;--bad:#c62828;--info:#1f5fa8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:17px;word-break:keep-all;overflow-wrap:break-word;line-height:1.55}
+button,input,select{font:inherit}
+.nw{white-space:nowrap}
+.top{position:sticky;top:0;z-index:5;background:var(--br);color:#fff;padding:10px 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.top .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.top h1{font-size:22px;margin:0;flex:1;min-width:170px}
+.vbar{max-width:1100px;margin:6px auto 0;display:flex;gap:8px;flex-wrap:wrap;font-size:15px}
+.vb{background:#fff;color:var(--br);border-radius:999px;padding:2px 12px;font-weight:800;white-space:nowrap}
+.vt{opacity:.95;white-space:nowrap}
+.btn{min-height:54px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);padding:8px 16px;font-weight:800;cursor:pointer;font-size:17px}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--br);border-color:var(--br);color:#fff}
+.btn.top2{background:#fff;color:var(--br);border-color:#fff;min-height:48px}
+.btn.sm{min-height:48px;font-size:16px;padding:6px 12px}
+.btn.lnk{border-color:#c9d6ea;color:var(--info)}
+main{max-width:1100px;margin:0 auto;padding:14px}
+.guide{background:#fff;border:1px solid var(--line);border-left:6px solid var(--info);border-radius:14px;padding:12px 16px;margin-bottom:14px}
+.guide ol{margin:6px 0 0;padding-left:24px}
+.guide li{margin:3px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.hd{display:flex;gap:12px;align-items:center}
+.ic{width:52px;height:52px;border-radius:12px;background:#f1e8df;display:flex;align-items:center;justify-content:center;font-size:28px;flex:none}
+.nm{font-size:21px;font-weight:800;line-height:1.3}
+.pl{font-size:16px;color:var(--sub)}
+.st{border-radius:12px;padding:8px 12px;font-weight:800}
+.st.on{background:#e7f5ea;color:var(--ok)}
+.st.off{background:#f4f1ee;color:#5a5048}
+.st.na{background:#eef3fa;color:var(--info)}
+.st small{display:block;font-weight:600;font-size:16px;color:var(--sub)}
+.shot{position:relative;background:#222;border-radius:12px;overflow:hidden;display:flex;justify-content:center;align-items:center;min-height:120px;cursor:zoom-in}
+.shot img{max-width:100%;max-height:260px;display:block}
+.shot .cap{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.65);color:#fff;font-size:15px;padding:2px 10px;border-radius:999px}
+.idbox{border:2px dashed var(--line);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.idbox .lab{font-size:16px;color:var(--sub);font-weight:700}
+.idbox .val{font-size:26px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;flex:1;min-width:150px}
+.idbox .none{font-size:17px;color:var(--warn);font-weight:800;flex:1}
+.acts{display:grid;grid-template-columns:1fr;gap:8px}
+.acts2{display:flex;gap:8px;flex-wrap:wrap}
+.acts2 .btn{flex:1;min-width:140px}
+.note{font-size:16px;color:var(--sub);margin:0}
+.pw{background:#fff7e8;border:1px solid #f0d9ab;border-radius:12px;padding:8px 12px;font-size:16px}
+.pw b{color:var(--warn)}
+.bk{font-size:16px;color:var(--sub)}
+.pin{max-width:420px;margin:40px auto;background:#fff;border-radius:16px;padding:22px;border:1px solid var(--line)}
+.in{width:100%;min-height:56px;border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-size:22px;letter-spacing:4px}
+.warnbox{background:#fdecec;color:var(--bad);border-radius:10px;padding:8px 12px;margin-top:10px;font-weight:700}
+.sec{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-top:16px;font-size:16px;color:var(--sub)}
+.sec b{color:var(--ink)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:12px;font-weight:700;display:none;z-index:20;max-width:92vw;text-align:center}
+#big{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;z-index:15;align-items:center;justify-content:center;flex-direction:column;padding:12px}
+#big.show{display:flex}
+#big img{max-width:100%;max-height:85vh}
+#big .btn{margin-top:10px}
+#sh{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:12;align-items:flex-end;justify-content:center}
+#sh.show{display:flex}
+.pane{background:#fff;width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow:auto}
+.pane h2{margin:0 0 8px;font-size:21px}
+.pane label{display:block;font-weight:800;margin:12px 0 4px}
+.pane .in{font-size:20px;letter-spacing:1px}
+.pane select.in{letter-spacing:0}
+.pane .row2{display:flex;gap:8px;margin-top:16px}
+.pane .row2 .btn{flex:1}
+@media (max-width:520px){.top h1{font-size:20px}.grid{grid-template-columns:1fr}.idbox .val{font-size:24px}main{padding:10px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="row"><h1>🖥 기기 원격 센터</h1><button class="btn top2" id="addBtn" style="display:none">＋ 기기 추가</button></div>
+  <div class="vbar"><span class="vb" id="ver"></span><span class="vt" id="upd"></span><span class="vt" id="tm"></span></div>
+</div>
+<main>
+  <div class="guide" id="guide" style="display:none"><b>쓰는 법 (PC·휴대폰 같음)</b>
+    <ol>
+      <li>기기 카드에서 <b>「🖥 원격 조작 열기」</b>를 누르면 ID가 복사되고 RustDesk 웹 화면이 새 창으로 열려요.</li>
+      <li>열린 화면의 「원격 ID」 칸에 붙여 넣고(길게 누르기 → 붙여넣기) → 화살표를 눌러요.</li>
+      <li>비밀번호는 <b>보관함 「RustDesk - 기기이름」</b> 값을 넣어요. 끝나면 위쪽 ✕로 연결을 끊어요.</li>
+    </ol>
+  </div>
+  <div id="app"><p class="note" style="text-align:center;margin-top:40px">불러오는 중…</p></div>
+  <div class="sec" id="secNote" style="display:none">
+    <b>보안 안내</b><br>
+    1. 이 화면과 페이지 파일에는 비밀번호가 없어요. 기기 ID만으로는 들어갈 수 없어요.<br>
+    2. 기기 ID는 관리 번호로 연 이 기기 안에만 저장돼요(처음 한 번 「ID 넣기」).<br>
+    3. 기기마다 비밀번호가 달라요. 남에게 보내지 말고 보관함에서만 확인해요.
+  </div>
+</main>
+<div id="big"><img alt="기기 화면 크게 보기"><button class="btn" id="bigClose">닫기</button></div>
+<div id="sh"><div class="pane" id="pane"></div></div>
+<div id="toast"></div>
+<script>
+'use strict';
+const VER='v001', BUILT='2026-11-12 21:40';
+const API='https://script.google.com/macros/s/AKfycbzjUsV8qyoOoJ4pQqD3M1osmkCfHsSA5qzKNZpCVQAOyUw92OQCuQhQRyFul2JzkgZk/exec';
+const SCR_API='https://script.google.com/macros/s/AKfycby9gg2nvnirIbBheaFs7sa6Mqdkj6qhFz4OIfl7j6fiJDBY6IldV4NeACtv_Dhm44jbRw/exec';
+const RD_WEB='https://rustdesk.com/web/';
+const KIND={kiosk:['키오스크','🖥️'],pos:['포스기','🧾'],pc:['PC','💻'],android:['안드로이드 단말기','📱'],etc:['기타','🔌']};
+const BACKUP={
+  kiosk:{t:'예비: 크롬 원격 데스크톱',u:'https://remotedesktop.google.com/access',n:'drawbread01 계정으로 열기'},
+  pos:{t:'예비: 팀뷰어 웹',u:'https://web.teamviewer.com/remote-support',n:'포스기 화면의 팀뷰어 비밀번호가 필요해요'},
+  android:{t:'예비: 팀뷰어 QuickSupport',u:'',n:'현장에서 화면 공유를 허락해야 해요(보기만 됨)'}
+};
+// 전원 관리 서버에 없는 기기(안드로이드 등). 이름만 있고 ID·비밀번호는 없음.
+const BUILTIN=[{id:'x_minipos',name:'미니포스기',kind:'android',place:'안드로이드 · 방송실 받기 앱',guide:'remote_android.html'}];
+const LS_IDS='rc_ids_v1', LS_EXTRA='rc_extra_v1';
+let A=localStorage.getItem('dm_a')||'', DATA=null, timer=null, skew=0;
+const SH={rt:'',have:{},img:{},meta:{},busy:false};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hm=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const ago=ms=>{const s=Math.max(0,Math.round(ms/1000));if(s<60)return s+'초 전';const m=Math.round(s/60);if(m<60)return m+'분 전';const h=Math.floor(m/60);return h+'시간 '+(m%60)+'분 전'};
+const fmtId=v=>String(v||'').replace(/\D/g,'').replace(/^(\d)(\d{3})(\d{3})(\d{3})$/,'$1 $2 $3 $4').replace(/^(\d{3})(\d{3})(\d{3})$/,'$1 $2 $3');
+function jget(k,d){try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(_){return d}}
+function jset(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}
+function toast(m,ms){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms||2800)}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function call(o){const r=await fetch(API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({a:A},o))});return r.json()}
+$('#ver').textContent=VER;$('#upd').textContent='업데이트 '+BUILT;
+
+function pinView(msg){
+  $('#addBtn').style.display='none';$('#guide').style.display='none';$('#secNote').style.display='none';
+  $('#app').innerHTML=`<div class="pin"><h2 style="margin-top:0">관리 번호를 넣어 주세요</h2>
+  <p class="note">「기기 전원 관리」와 같은 6자리 번호예요. 처음 한 번만 넣으면 이 기기에서는 다시 묻지 않아요.</p>
+  <input class="in" id="pin" type="password" inputmode="numeric" maxlength="12" autocomplete="current-password" placeholder="● ● ● ● ● ●">
+  ${msg?`<div class="warnbox">${esc(msg)}</div>`:''}
+  <div style="margin-top:14px"><button class="btn pri" id="pinGo" style="width:100%">열기</button></div></div>`;
+  const go=async()=>{const v=$('#pin').value.replace(/\D/g,'');if(v.length<6)return toast('6자리 번호를 넣어 주세요');A=await sha('dm|'+v);
+    let r;try{r=await call({op:'list'})}catch(_){A='';return pinView('인터넷 연결을 확인해 주세요.')}
+    if(r.ok){localStorage.setItem('dm_a',A);DATA=r;skew=r.now-Date.now();render();loop();shotInit()}else{A='';pinView(r.err==='locked'?'번호를 여러 번 틀려 30분 동안 잠겼어요.':'번호가 맞지 않아요.')}};
+  $('#pinGo').onclick=go;$('#pin').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#pin').focus(),50);
+}
+async function load(){
+  try{const r=await call({op:'list'});
+    if(!r.ok){if(r.err==='auth'||r.err==='locked'){localStorage.removeItem('dm_a');A='';clearInterval(timer);return pinView(r.err==='locked'?'번호를 여러 번 틀려 30분 동안 잠겼어요.':'')}toast('불러오기 실패: '+r.err);return}
+    DATA=r;skew=r.now-Date.now();render();
+  }catch(e){$('#tm').textContent='⚠ 연결 안 됨 · 다시 시도 중'}
+}
+function loop(){clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&!$('#sh').classList.contains('show'))load()},15000)}
+
+function devList(){
+  const srv=(DATA&&DATA.devs||[]).filter(d=>!d.relayOnly).map(d=>Object.assign({},d,{srv:true}));
+  const hidden=jget(LS_EXTRA,{hide:[],add:[]});
+  const loc=BUILTIN.filter(b=>!(hidden.hide||[]).includes(b.id)).concat(hidden.add||[]);
+  return srv.concat(loc);
+}
+function devState(d,now){
+  if(!d.srv)return {c:'na',t:'켜짐·꺼짐은 여기서 안 보여요',s:'원격 조작을 눌러 연결되면 켜져 있는 거예요'};
+  if(!d.st)return {c:'off',t:'○ 꺼짐 또는 연결 끊김',s:'아직 연결 기록이 없어요'};
+  const gap=now-d.st.seen;
+  if(gap<90000){const idle=d.st.idle||0;return {c:'on',t:'● 켜져 있음',s:(idle<60?'지금 누가 쓰는 중 · ':idle<3600?Math.round(idle/60)+'분째 손 안 댐 · ':'')+'연결 '+ago(gap)}}
+  return {c:'off',t:'○ 꺼짐 또는 연결 끊김',s:'마지막 연결 '+hm(d.st.seen)+' ('+ago(gap)+')'};
+}
+function shotKey(d){return d.srv&&(d.kind==='kiosk'||d.kind==='pos')?d.kind:''}
+function render(){
+  $('#addBtn').style.display='';$('#guide').style.display='';$('#secNote').style.display='';
+  const now=Date.now()+skew;$('#tm').textContent='· 새로 읽음 '+hm(now);
+  const ids=jget(LS_IDS,{});
+  $('#app').innerHTML='<div class="grid">'+devList().map(d=>{
+    const k=KIND[d.kind]||KIND.etc,st=devState(d,now),rid=ids[d.id]||'',bk=BACKUP[d.kind];
+    const sk=shotKey(d),img=sk&&SH.img[sk],meta=sk&&SH.meta[sk];
+    const shot=img?`<div class="shot" data-a="big" data-k="${sk}"><img src="${img}" alt="${esc(d.name)} 지금 화면"><span class="cap">화면 사진 ${meta&&meta.t?hm(meta.t):''}</span></div>`:'';
+    return `<div class="card" data-id="${esc(d.id)}">
+      <div class="hd"><div class="ic">${k[1]}</div><div style="flex:1"><div class="nm">${esc(d.name)}</div><div class="pl">${esc(k[0])}${d.place?' · '+esc(d.place):''}</div></div></div>
+      <div class="st ${st.c}">${st.t}<small>${st.s}</small></div>
+      ${shot}
+      <div class="idbox"><span class="lab">RustDesk ID</span>${rid?`<span class="val">${esc(fmtId(rid))}</span><button class="btn sm" data-a="setid">고치기</button>`:`<span class="none">ID 아직 없음</span><button class="btn sm pri" data-a="setid">ID 넣기</button>`}</div>
+      <div class="acts">
+        <button class="btn pri" data-a="open" ${rid?'':'disabled style="opacity:.5"'}>🖥 원격 조작 열기 <span style="font-weight:600">(ID 자동 복사)</span></button>
+        <div class="acts2"><button class="btn" data-a="copy" ${rid?'':'disabled style="opacity:.5"'}>📋 ID만 복사</button>${d.guide?`<a class="btn lnk" href="${esc(d.guide)}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;text-decoration:none">📱 현장 설치 안내</a>`:''}</div>
+      </div>
+      <div class="pw">🔑 비밀번호: <b>보관함 「RustDesk - ${esc(d.name)}」</b>에서 확인해요. (화면에 적지 않아요)</div>
+      <p class="note">📱 휴대폰은 <b>RustDesk 앱</b>(안드로이드·아이폰)에서도 같은 ID·비밀번호로 접속돼요.</p>
+      ${bk?`<div class="bk">🛟 ${esc(bk.t)}${bk.u?` · <a href="${esc(bk.u)}" target="_blank" rel="noopener">열기</a>`:''}<br><span style="font-size:15px">${esc(bk.n)}</span></div>`:''}
+      ${d.srv?'':`<div><button class="btn sm" data-a="hide" style="color:var(--bad);border-color:#e9b7b7">이 카드 숨기기</button></div>`}
+    </div>`}).join('')+'</div>';
+}
+function findDev(id){return devList().find(d=>d.id===id)}
+async function copyId(rid){
+  const v=String(rid).replace(/\D/g,'');
+  try{await navigator.clipboard.writeText(v);return true}catch(_){}
+  try{const t=document.createElement('textarea');t.value=v;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();return ok}catch(_){return false}
+}
+function sheet(h){$('#pane').innerHTML=h;$('#sh').classList.add('show')}
+function closeSheet(){$('#sh').classList.remove('show')}
+$('#sh').addEventListener('click',e=>{if(e.target.id==='sh')closeSheet()});
+function idSheet(d){
+  const ids=jget(LS_IDS,{});
+  sheet(`<h2>${esc(d.name)} RustDesk ID</h2>
+  <p class="note">그 기기의 RustDesk 화면 왼쪽 위 「ID」 숫자(9~10자리)를 넣어요. 보관함 「RustDesk - ${esc(d.name)}」 제목에도 적혀 있어요.</p>
+  <label for="rid">ID</label><input class="in" id="rid" inputmode="numeric" placeholder="예) 1 234 567 890" value="${esc(fmtId(ids[d.id]||''))}">
+  <div class="row2"><button class="btn" id="cx">취소</button>${ids[d.id]?'<button class="btn" id="rm" style="color:var(--bad)">지우기</button>':''}<button class="btn pri" id="ok">저장</button></div>`);
+  $('#cx').onclick=closeSheet;
+  if($('#rm'))$('#rm').onclick=()=>{const v=jget(LS_IDS,{});delete v[d.id];jset(LS_IDS,v);closeSheet();render();toast('지웠어요')};
+  const save=()=>{const v=$('#rid').value.replace(/\D/g,'');if(v.length<8||v.length>12)return toast('숫자 9~10자리를 넣어 주세요');const m=jget(LS_IDS,{});m[d.id]=v;jset(LS_IDS,m);closeSheet();render();toast('저장했어요 (이 기기에만)')};
+  $('#ok').onclick=save;$('#rid').onkeydown=e=>{if(e.key==='Enter')save()};setTimeout(()=>$('#rid').focus(),50);
+}
+function addSheet(){
+  sheet(`<h2>원격 기기 추가</h2>
+  <p class="note">전원 관리에 없는 기기(안드로이드 단말기 등)를 이 기기 화면에만 추가해요. 키오스크·포스기·PC는 「기기 전원 관리」에서 추가하면 여기에도 자동으로 나와요.</p>
+  <label for="an">이름</label><input class="in" id="an" maxlength="20" placeholder="예) 배송 태블릿">
+  <label for="ak">종류</label><select class="in" id="ak"><option value="android">안드로이드 단말기</option><option value="pc">PC</option><option value="etc">기타</option></select>
+  <label for="ai">RustDesk ID (몰라도 나중에 넣을 수 있어요)</label><input class="in" id="ai" inputmode="numeric" placeholder="예) 1 234 567 890">
+  <div class="row2"><button class="btn" id="cx">취소</button><button class="btn pri" id="ok">추가</button></div>`);
+  $('#cx').onclick=closeSheet;
+  $('#ok').onclick=()=>{const n=$('#an').value.trim();if(!n)return toast('이름을 넣어 주세요');const x=jget(LS_EXTRA,{hide:[],add:[]});x.add=x.add||[];const id='x_'+Date.now().toString(36);
+    x.add.push({id,name:n.slice(0,20),kind:$('#ak').value,place:''});jset(LS_EXTRA,x);const v=$('#ai').value.replace(/\D/g,'');if(v.length>=8){const m=jget(LS_IDS,{});m[id]=v;jset(LS_IDS,m)}closeSheet();render();toast('추가했어요')};
+}
+$('#addBtn').onclick=addSheet;
+$('#app').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const card=b.closest('.card');const d=card&&findDev(card.dataset.id);const a=b.dataset.a;
+  if(a==='big'){const k=b.dataset.k;if(SH.img[k]){$('#big img').src=SH.img[k];$('#big').classList.add('show')}return}
+  if(!d)return;const rid=jget(LS_IDS,{})[d.id];
+  if(a==='setid')return idSheet(d);
+  if(a==='copy'){if(!rid)return;toast(await copyId(rid)?'ID를 복사했어요: '+fmtId(rid):'복사가 안 됐어요. ID를 직접 보고 넣어 주세요');return}
+  if(a==='open'){if(!rid)return;const ok=await copyId(rid);const w=window.open(RD_WEB,'_blank');if(w){try{w.opener=null}catch(_){}}
+    toast((ok?'ID 복사됨 → ':'')+'새 창의 「원격 ID」 칸에 '+fmtId(rid)+' 넣고 화살표',6000);if(!w)location.href=RD_WEB;return}
+  if(a==='hide'){if(!confirm(d.name+' 카드를 이 화면에서 숨길까요?'))return;const x=jget(LS_EXTRA,{hide:[],add:[]});
+    if(BUILTIN.some(z=>z.id===d.id)){x.hide=(x.hide||[]).concat(d.id)}else{x.add=(x.add||[]).filter(z=>z.id!==d.id)}jset(LS_EXTRA,x);render();}
+});
+$('#bigClose').onclick=()=>$('#big').classList.remove('show');
+$('#big').addEventListener('click',e=>{if(e.target.id==='big')$('#big').classList.remove('show')});
+
+// 지금 화면 사진: 업무 대시보드 대표 열쇠가 이 브라우저에 있을 때만 (읽기만, 열쇠는 바꾸거나 지우지 않음)
+async function shotInit(){
+  if(SH.rt)return;let k=null;try{k=localStorage.getItem('dash_key_v1')||localStorage.getItem('dash_key_bak')}catch(_){}
+  if(!k)return;SH.rt=await sha('scr|'+k);shotPull();setInterval(shotPull,15000);
+}
+async function shotPull(){
+  if(!SH.rt||document.hidden||SH.busy)return;SH.busy=true;let ch=false;
+  try{const r=await fetch(SCR_API,{method:'POST',body:JSON.stringify({op:'get',rt:SH.rt,have:SH.have}),cache:'no-store',credentials:'omit'});const j=await r.json();
+    if(j&&j.ok){Object.keys(j.dev||{}).forEach(k=>{const x=j.dev[k];if(!x){if(SH.img[k]){delete SH.img[k];delete SH.have[k];ch=true}return}
+      SH.meta[k]={t:x.t};if(x.img){SH.img[k]='data:image/jpeg;base64,'+x.img;SH.have[k]=x.id;ch=true}else if(x.miss){delete SH.have[k]}})}
+    else if(j&&j.err==='auth'){SH.rt=''}
+  }catch(_){}finally{SH.busy=false;if(ch&&DATA&&!$('#sh').classList.contains('show'))render()}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&A){load();shotPull()}});
+if(A){load().then(()=>{if(A){loop();shotInit()}})}else pinView('');
+</script>
+</body>
+</html>
