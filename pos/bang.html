@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>생산실 방송 · 받는 화면</title>
+<title>빵을그리다 방송실 · 생산실 방송 받는 화면</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -137,7 +137,8 @@ body.tv main{max-width:none;padding:0;height:100vh}
 body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
 </style></head><body>
 <header>
-  <h1>📢 생산실 방송 <small style="font-size:.5em;font-weight:700;opacity:.9">v020 · 11/12 15:55</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC · 보기 전용</span></h1>
+  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v021</small> -->
+  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v021 · 11/12 16:01</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC · 보기 전용</span></h1>
   <span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
@@ -145,7 +146,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
 <main>
   <div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v020 (11/12 15:55) · 번호 화면에서 키보드 숫자·Enter도 돼요. v019 · 사무실 PC 번호 화면 문구를 「생산실 방송 받는 번호」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 보기 전용이에요: 「닫기」는 이 PC에서만 닫히고 생산실 「확인」에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v021 (11/12 16:01) · 이름을 「빵을그리다 방송실」로 바꿈. v020 · 번호 화면에서 키보드 숫자·Enter도 돼요. v019 · 사무실 PC 번호 화면 문구를 「생산실 방송 받는 번호」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 보기 전용이에요: 「닫기」는 이 PC에서만 닫히고 생산실 「확인」에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -196,7 +197,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
   function gatePin(err) {
     var typed = '';
     $('gate').style.display = 'flex';
-    $('gbox').innerHTML = (PCM ? '<h2>생산실 방송 받는 번호</h2><p>처음 한 번만 넣으면 이 PC가 기억해요. 번호는 이혜영 이사님께 따로 받아 주세요.</p>' : '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>') +
+    $('gbox').innerHTML = (PCM ? '<h2>빵을그리다 방송실 받는 번호</h2><p>처음 한 번만 넣으면 이 PC가 기억해요. 번호는 이혜영 이사님께 따로 받아 주세요.</p>' : '<h2>포스기 연결 번호</h2><p>처음 한 번만 넣으면 이 포스기가 기억해요.</p>') +
       '<div id="pinv">&nbsp;</div><div class="pad">' +
       [1, 2, 3, 4, 5, 6, 7, 8, 9, '지움', 0, '확인'].map(function (k) { return '<button data-k="' + k + '">' + k + '</button>'; }).join('') +
       '</div><div style="font-size:16px;color:#5A4030;margin-top:6px">키보드 숫자로 넣고 Enter를 눌러도 돼요</div><div id="gerr">' + (err || '') + '</div>';
@@ -359,7 +360,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     /* v018: 기본 3번 방송 후 큰 화면 자동 닫기 (사무실 PC 보기 전용도 같음) */
     var loop = current === m && (PCM || !m.ack), total = loop ? ANN_TIMES : 1;
     var alive = function () { return tok === annTok && !replying && (!loop || (current === m && (PCM || !m.ack))); };
-    var who = m.from || '사무실', head = m.urgent ? '긴급 전달입니다. ' : '생산실 안내 방송입니다. ';
+    var who = m.from || '사무실', head = m.urgent ? '긴급 전달입니다. ' : '빵을그리다 방송실 안내입니다. ';
     function round(i) {
       if (i > total || !alive()) return Promise.resolve();
       annRound = i; annTotal = total; setBadge(); tvPost();
@@ -472,17 +473,17 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     $('band').className = 'band ' + (un ? 'bad' : 'ok');
     $('bandTxt').textContent = un ? '확인 안 한 전달 ' + un + '건' : '새 전달 없음 · 모두 확인함';
     if (current) { $('ovAgo').textContent = ago(current.t); $('ovMore').textContent = queue.length ? '다음 전달 ' + queue.length + '건 더 있어요' : ''; }
-    titleT++; document.title = current ? (titleT % 2 ? '🔴 방송중 · 확인!' : '📢 방송중 · 생산실 방송') : un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 생산실 방송') : '생산실 방송 · 받는 화면';
+    titleT++; document.title = current ? (titleT % 2 ? '🔴 방송중 · 확인!' : '📢 방송중 · 생산실 방송') : un ? (titleT % 2 ? '🔴 전달 ' + un + '건 확인!' : '📢 빵을그리다 방송실 · 생산실 방송') : '빵을그리다 방송실 · 생산실 방송 받는 화면';
     tvPost();
   }
   wInterval(tick, 1000);
 
   /* v016: 새 버전 자동 받기 — 10분마다 배포본 번호를 보고, 방송·답장 중이 아닐 때만 새로 고침 (현장 원격 접속 없이 고침 반영) */
-  var MY_V = 20;
+  var MY_V = 21;
   function selfUpdate() {
     if (current || queue.length || busy || replying) return;
     fetch(location.pathname + '?vc=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
-      var mm = /생산실 방송 <small[^>]*>v(\d{3})/.exec(t || ''); if (!mm) return;
+      var mm = /생산실 방송 <small[^>]*>v(\d{3})/.exec(t || '') || /방송실 <small[^>]*>v(\d{3})/.exec(t || ''); if (!mm) return;
       if (Number(mm[1]) > MY_V && !current && !queue.length && !busy && !replying) location.reload();
     }).catch(function () { });
   }
@@ -709,7 +710,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
     $('gate').style.display = 'none'; $('sndBar').style.display = 'none';
     document.querySelector('header').style.display = 'none';
     document.body.classList.add('tv');
-    document.querySelector('main').innerHTML = '<div class="tvb"><div class="tvtop"><span class="tvt">📢 생산실 방송 · 오늘 전달</span><span id="tvDate"></span><span id="tvClk">--:--</span></div>' +
+    document.querySelector('main').innerHTML = '<div class="tvb"><div class="tvtop"><span class="tvt">📢 빵을그리다 방송실 · 오늘 전달</span><span id="tvDate"></span><span id="tvClk">--:--</span></div>' +
       '<div class="tvl" id="tvList"><div class="tvempty">키오스크 화면과 연결하는 중…</div></div><div class="tvfoot" id="tvFoot"></div></div>';
     var tvKey = '', tvHid = 0, tvNet = 1, WD = ['일', '월', '화', '수', '목', '금', '토'];
     var tvBoard = function (list) {
@@ -734,7 +735,7 @@ body.pcm #ovRep,body.pcm .b-rep,body.pcm [data-a]{display:none!important}
       $('tvDate').textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + WD[d.getDay()] + ')';
       var f = $('tvFoot'), gone = Date.now() - last > 15000;
       if (gone && current) { current = null; key = ''; $('ov').className = ''; document.title = '📺 TV 표시 · 대기'; }
-      if (gone) { f.className = 'tvfoot warn'; f.textContent = '⚠️ 키오스크의 「생산실 방송」 화면이 꺼져 있어요 · 키오스크에서 다시 열어 주세요'; }
+      if (gone) { f.className = 'tvfoot warn'; f.textContent = '⚠️ 키오스크의 「빵을그리다 방송실」 화면이 꺼져 있어요 · 키오스크에서 다시 열어 주세요'; }
       else if (!tvNet) { f.className = 'tvfoot warn'; f.textContent = '⚠️ 인터넷 연결을 다시 잇는 중이에요'; }
       else { f.className = 'tvfoot'; f.textContent = tvHid ? '이전 전달 ' + tvHid + '건은 키오스크 화면에서 볼 수 있어요' : ''; }
     };
