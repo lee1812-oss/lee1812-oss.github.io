@@ -1009,7 +1009,7 @@ body.tstOn{padding-top:66px}
 <div class="toast" id="toast"></div>
 <script>"use strict";
 var PHOTO_IDS={"0":"photo-1609178072967-d4279d8babf8","1":"photo-1600245892018-3826141b0822","2":"photo-1629031662322-486399584436","3":"photo-1618707588897-f39b1d11556e","4":"photo-1593455071238-92dd081a39b1","5":"photo-1546746186-bae4b464581d","6":"photo-1603346996604-cd77fc859e1d"};(function(){try{var id=PHOTO_IDS[new Date().getDay()],b="https://images.unsplash.com/"+id+"?auto=format&fit=crop&q=60&w=",r=document.documentElement.style;r.setProperty("--ph",'url("'+b+'900")');r.setProperty("--phL",'url("'+b+'1600")')}catch(e){}})();
-var VER="v053", VUPD="11/10 18:13", PNAME="건강상태확인일지";
+var VER="v054", VUPD="11/13 10:16", PNAME="건강상태확인일지";
 var K="__K__", MODE0="__MODE__", BOOT0="__BOOT__";
 /* v033 빠른 열기: GitHub의 app.html로 열리면(STATIC) 화면은 바로 뜨고, 자료는 아래 주소로 직접 주고받는다. 실패하면 예전 방식 주소로 넘어간다 */
 var EXEC_URL="https://script.google.com/macros/s/AKfycbzNl5rHzO50ma6wfpor9ScTccQkmXTviCfofLdq0E0EV3n1yRaA1lplrtoOgMfTPF0pDQ/exec", STATIC=!/googleusercontent\.com$/.test(location.hostname)&&!(window.google&&window.google.script&&window.google.script.run);
@@ -1420,7 +1420,7 @@ function drawEntry(){
 function drawSigStep(){
   var p=person(draft.id),k=draft.a.reduce(function(a,b){return a+b},0);
   var h='<div class="ov"><div class="mo"><div class="mh"><span class="nm">'+esc(p.name)+'</span><span style="color:var(--sub)">본인 서명 · 작업장 출입 전</span><button class="x" id="eX">✕</button></div><div class="mb">'+
-   '<div style="padding:6px 0 4px;font-weight:700;font-size:20px;color:'+(k?'var(--bad)':'var(--ok)')+'">'+(k?'해당 있음 '+k+'건 — 작업 전에 팀장에게 알려 주세요':'모든 항목 해당 없음')+'</div>'+
+   '<div style="padding:6px 0 4px;font-weight:700;font-size:20px;color:'+(k?'var(--bad)':'var(--ok)')+'">'+(k?'해당 있음 '+k+'건 — 작업 전에 팀장에게 알려 주세요':'모든 항목 해당 없음')+(draft.w1&&draft.w1.pid===draft.id?w1SelfLine(draft.w1):'')+'</div>'+
    '<p style="margin:4px 0 0;color:var(--sub)">아래 칸에 손가락(또는 펜)으로 서명해 주세요</p>'+
    '<div class="sigpad"><canvas id="tcv"></canvas><div class="ph" id="tph">여기에 서명</div><div class="ln"></div></div></div>'+
    '<div class="mf"><button class="del" id="eBack" style="color:var(--ink)">← 질문으로</button><button class="del" id="tClr" style="color:var(--ink)">다시 쓰기</button><button class="sub" id="tSend" disabled>서명하고 제출</button></div></div></div>';
@@ -1437,14 +1437,14 @@ function afterSave(p,date){
   }).catch(function(){pend--;toast("저장 상태를 확인하지 못했어요. 새로고침해 주세요");resyncDay()});
 }
 function submitEntry(sig,off){
-  var d=day(true),now=new Date(),by=mode==="proxy"?"proxy":"self",id=draft.id,a=off?[0,0,0,0,0]:draft.a.slice(),rd=(by==="self"&&draft.redo)?draft.redo:null,old=d.rec[id];
+  var d=day(true),now=new Date(),by=mode==="proxy"?"proxy":"self",id=draft.id,a=off?[0,0,0,0,0]:draft.a.slice(),rd=(by==="self"&&draft.redo)?draft.redo:null,old=d.rec[id],w1a=(by==="self"&&!off&&draft.w1&&draft.w1.pid===id)?draft.w1:null;
   d.rec[id]={a:a,by:by,t:hm(now),sg:!!sig,off:!!off,ed:((old&&old.ed)||0)+(rd&&old?1:0)};
   var nm=nameOf(id),k=cnt(d.rec[id]);
   closeOv();render();
   toast(nm+(off?" 님 휴무 처리":" 님 제출 완료")+(k?" · 특이사항을 적어 주세요":""));
   if(by==="self"&&!off&&curDate===TODAY)greetTablet(id,hm(now),!!rd,!!k);   /* v047 본인 제출 뒤 인사 카드 */
   if(k){setTimeout(function(){var n=$("note");if(n&&!n.classList.contains("hide"))n.scrollIntoView({behavior:"smooth",block:"center"})},120)}
-  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),!!off,rd?{why:rd}:null),curDate);
+  afterSave(api("apiRec",K,curDate,id,a,by,"",sig||"",("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),!!off,rd?{why:rd}:null,null,w1SelfArg(w1a)).then(function(r){w1SelfAfter(r,w1a);return r}),curDate);
 }
 function resyncDay(){
   return api("apiDay",K,curDate).then(function(r){if(r.ok){setDay(curDate,r.day);applyCfg(r.cfg);render()}}).catch(function(){});
@@ -1624,8 +1624,8 @@ function phSend(){
   if(PH.busy||pd.len<80)return;
   PH.busy=true;$("bSend").disabled=true;$("bSend").textContent="제출 중…";
   var memo=PH.a.some(function(v){return v===1})?$("memo").value.trim():"";
-  api((HLTEST&&MODE0==="phone")?"apiTestRec":"apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null,window.faceArg?faceArg():null).then(function(r){
-    PH.busy=false;$("bSend").textContent="서명하고 제출 완료";
+  api((HLTEST&&MODE0==="phone")?"apiTestRec":"apiRec",K,TODAY,PH.pid,PH.a.slice(),"phone",memo,exportSig(),("["+VER+"] "+(navigator.userAgent||"")).slice(0,120),false,PH.redo?{why:PH.redo}:null,window.faceArg?faceArg():null,w1SelfArg(PH.w1&&PH.w1.pid===PH.pid?PH.w1:null)).then(function(r){
+    PH.busy=false;w1SelfAfter(r,PH.w1&&PH.w1.pid===PH.pid?PH.w1:null);if(r&&r.ok)PH.w1=null;$("bSend").textContent="서명하고 제출 완료";
     if(r.day)setDay(TODAY,r.day);
     if(r.ok){var wr=!!PH.redo;PH.redo=null;PH._wasRedo=wr;phFinish(r.t,false);if(wr)toast("다시 체크 완료 · 앞 기록은 수정 이력에 남았어요");return}
     if(r.dup){PH.redo=null;phFinish(r.t,true);return}
@@ -1982,7 +1982,7 @@ document.addEventListener("click",function(e){
   if(t.parentNode&&t.parentNode.classList.contains("seg")&&draft){draft.a[+t.dataset.i]=+t.dataset.v;drawEntry();return}
   if(id==="eX"){closeOv();return}
   if(id==="eOff"){submitEntry("",true);return}
-  if(id==="eOk"){if(mode==="proxy"){submitEntry("")}else{draft.step="sig";drawEntry()}return}
+  if(id==="eOk"){if(mode==="proxy"){submitEntry("")}else{var dId=draft.id;w1SelfGate(dId,function(w){if(!draft||draft.id!==dId)return;draft.w1=w;draft.step="sig";drawEntry()})}return}
   if(id==="eBack"){draft.step="q";drawEntry();return}
   if(id==="tClr"){clearPad();return}
   if(id==="tSend"){if(pd.len<80)return;var sg=exportSig();submitEntry(sg);return}
@@ -2021,12 +2021,7 @@ document.addEventListener("click",function(e){
   if(id==="bAllX"){PH.a=[0,0,0,0,0];phQ();return}
   if(id==="bBack1"){phShow(0);renderPhone();return}
   if(id==="bBack2"){phShow(1);return}
-  if(id==="bNext"){
-    var hit=PH.a.filter(function(v){return v===1}).length;
-    $("w2").textContent=person(PH.pid).name+" 님";
-    $("memoBox").classList.toggle("hide",!hit);
-    $("sum").innerHTML=hit?'<b style="color:var(--bad)">해당 있음 '+hit+'건</b> — 팀장님께 먼저 알려 주세요':'<b style="color:var(--ok)">모든 항목 해당 없음</b>';
-    phShow(2);setupPad("cv","ph","bSend");return}
+  if(id==="bNext"){var nPid=PH.pid;w1SelfGate(nPid,function(w){if(PH.pid!==nPid)return;PH.w1=w;phGoSig()});return}
   if(id==="bClr"){clearPad();return}
   if(id==="bSend"){phSend();return}
   if(id==="bAgain"){PH.step=0;PH.pid="";renderPhone();return}
@@ -2281,12 +2276,12 @@ function w1Paint(){
   var D=W1.force?TODAY:(w1Target()||TODAY), lateD=D<TODAY; if(W1.date!==D){W1.date=D;W1.info=null}
   var inf=W1.info&&W1.info.date===D?W1.info:null;
   if(lateD&&curDate===TODAY&&!inf){b.classList.add("hide");if(!W1.loading)w1Load();return}
-  var show=curDate===TODAY&&(W1.force||w1Day(TODAY)||(lateD&&!(inf&&inf.rec))||(!lateD&&!!(inf&&inf.rec)));
+  var show=curDate===TODAY&&(W1.force||w1Day(TODAY)||(lateD&&!(inf&&inf.rec&&!(inf.pend&&inf.pend.length)))||(!lateD&&!!(inf&&inf.rec)));
   b.classList.toggle("hide",!show);if(!show)return;
   if(!inf&&!W1.loading)w1Load();
-  var done=!!(inf&&inf.rec);
+  var pn=inf&&inf.rec&&inf.pend?inf.pend.length:0,done=!!(inf&&inf.rec)&&!pn;   /* v054: 자가점검이 일부만 있으면 남은 인원 표시 */
   b.classList.toggle("done",done);b.classList.toggle("todo",!done);
-  b.textContent=done?"✅ 위생 점검 완료":(lateD?"🧼 위생 점검 ("+(+D.split("-")[1])+"/"+(+D.split("-")[2])+" "+wd(D)+" 늦은 작성)":"🧼 위생 점검 (오늘)");
+  b.textContent=done?"✅ 위생 점검 완료":pn&&!lateD?"🧼 위생 점검 (남은 "+pn+"명)":(lateD?"🧼 위생 점검 ("+(+D.split("-")[1])+"/"+(+D.split("-")[2])+" "+wd(D)+" 늦은 작성)":"🧼 위생 점검 (오늘)");
 }
 function w1Open(){
   busy("위생 점검 불러오는 중…");
@@ -2347,6 +2342,82 @@ function w1Save(){
 }
 (function(){var r0=render;render=function(){r0.apply(this,arguments);try{w1Paint()}catch(e){}}})();
 window.__w1Open=function(){W1.force=true;w1Paint();w1Open()};   /* 시험용: 월요일이 아니어도 화면 열기 */
+
+/* ===== v054 위생 자가점검 (2026-11-13 사용자 요청): 매주 첫 근무일(보통 월요일)에 생산실 점검 대상자가 건강 체크 질문 다음에
+   위생 상태 9가지를 본인이 하나씩 직접 고른다(「모두 양호」 버튼 없음, 확인 체크 필수). 건강 체크 서명과 함께 제출되고,
+   서버가 「위생점검」 탭에 그 사람 줄을 채운다. 17:00 조조가 이 기록으로 K-HACCP [W1] 일지를 쓴다. */
+var W1S={inf:null,at:0,ans:{}};
+var W1S_IT=[["상의","깨끗하고 찢어진 곳이 없다"],["하의","깨끗하고 찢어진 곳이 없다"],["위생모","머리카락이 밖으로 나오지 않게 썼다"],["위생화","작업장 전용 위생화를 신었고 깨끗하다"],["위생마스크","코와 입을 모두 가렸다"],["앞치마·토시","깨끗하게 바르게 착용했다"],["위생장갑","찢어지거나 더럽지 않다"],["액세서리","반지·시계·귀걸이·목걸이·팔찌를 하지 않았다"],["상처","손·팔에 상처나 고름이 없다"]];
+var W1S_G=["양호","양호","양호","양호","양호","양호","양호","안 함","없음"],W1S_B=["불량","불량","불량","불량","불량","불량","불량","착용","있음"];
+(function(){var st=document.createElement("style");st.textContent=
+'.w1s .mo{max-width:820px;width:100%;max-height:96vh;display:flex;flex-direction:column}.w1s .mb{overflow:auto;-webkit-overflow-scrolling:touch}'+
+'.w1s .w1i{margin:0 0 10px;padding:10px 14px;border-radius:12px;background:#eef3ff;color:#0D1C42;font-size:17px;font-weight:700;word-break:keep-all;line-height:1.45}'+
+'.w1s .w1r{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #e3e6ee}.w1s .w1r .no{flex:none;width:30px;height:30px;border-radius:50%;background:#0D1C42;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px}'+
+'.w1s .w1r .tx{flex:1;min-width:0;word-break:keep-all}.w1s .w1r .tx b{display:block;font-size:19px;color:#111}.w1s .w1r .tx span{display:block;font-size:16px;color:#333;line-height:1.35}'+
+'.w1s .w1r .sg{flex:none;display:flex;gap:6px}.w1s .w1r .sg button{min-width:84px;height:56px;border-radius:12px;border:2px solid #c9ced9;background:#fff;color:#222;font-size:18px;font-weight:800}'+
+'.w1s .w1r .sg button.g.on{background:#1f7a3a;border-color:#1f7a3a;color:#fff}.w1s .w1r .sg button.b.on{background:#c62828;border-color:#c62828;color:#fff}.w1s .w1r.miss .tx b::after{content:"  ← 고르세요";color:#b54708;font-size:16px}'+
+'.w1s .w1bad{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:#fdecec;border:2px solid #c62828;color:#8e1b1b;font-size:17px;font-weight:700;word-break:keep-all}.w1s .w1bad input{display:block;width:100%;margin-top:8px;height:52px;font-size:18px;padding:0 12px;border:2px solid #c9ced9;border-radius:10px;box-sizing:border-box}'+
+'.w1s .w1cf{display:flex;align-items:center;gap:12px;margin:12px 0 4px;padding:12px 14px;border-radius:12px;border:2px solid #0D1C42;background:#fff;font-size:18px;font-weight:800;color:#0D1C42;width:100%;text-align:left;min-height:58px}.w1s .w1cf .bx{flex:none;width:30px;height:30px;border:3px solid #0D1C42;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px}.w1s .w1cf.on{background:#e8f5ec;border-color:#1f7a3a;color:#1f7a3a}.w1s .w1cf.on .bx{border-color:#1f7a3a;background:#1f7a3a;color:#fff}'+
+'@media (max-width:560px){.w1s .w1r{flex-wrap:wrap}.w1s .w1r .sg{width:100%;padding-left:40px}.w1s .w1r .sg button{flex:1}}'+
+'#verTop{position:fixed;top:4px;right:8px;z-index:30;pointer-events:none;background:#ffffffe6;color:#1d2433;font-size:13px;font-weight:700;padding:3px 9px;border-radius:9px;border:1px solid #d5d9e2;white-space:nowrap}';
+document.head.appendChild(st);
+try{var vt=document.createElement("div");vt.id="verTop";vt.textContent=VER+" · "+VUPD+" 업데이트";document.body.appendChild(vt)}catch(e){}})();
+function w1SelfInfo(cb){
+  if(W1S.inf&&W1S.inf.date===TODAY&&Date.now()-W1S.at<60000){cb(W1S.inf);return}
+  busy("불러오는 중…");
+  api("apiW1Get",K,TODAY).then(function(r){unbusy();if(r&&r.ok){W1S.inf=r;W1S.at=Date.now()}cb(r&&r.ok?r:null)}).catch(function(){unbusy();cb(null)});
+}
+function w1SelfGate(pid,cb){            /* 위생 자가점검이 필요한 사람·날이면 화면을 띄우고, 아니면 바로 다음으로 */
+  if(!TODAY||(UI==="tablet"&&curDate!==TODAY)||!(W1.force||w1Day(TODAY))){cb(null);return}
+  w1SelfInfo(function(inf){
+    if(!inf){cb(null);return}
+    var s=(inf.staff||[]).filter(function(x){return x.id===pid})[0];if(!s){cb(null);return}
+    var done=inf.rec&&(inf.rec.rows||[]).filter(function(x){return x.name===s.name&&x.self})[0];
+    if(done){cb(null);return}
+    var o=W1S.ans[pid]||{ans:[-1,-1,-1,-1,-1,-1,-1,-1,-1],memo:"",ok:false};W1S.ans[pid]=o;
+    w1SelfDraw(pid,s.name,o,cb);
+  });
+}
+function w1SelfDraw(pid,name,o,cb){
+  var left=o.ans.filter(function(v){return v!==0&&v!==1}).length,nb=o.ans.filter(function(v){return v===1}).length,ready=!left&&o.ok&&(!nb||o.memo.trim().length>=2);
+  var h='<div class="ov w1s"><div class="mo"><div class="mh"><span class="nm">'+esc(name)+'</span><span style="color:var(--sub)">🧼 위생 자가점검 · 이번 주 첫 근무일</span><button class="x" id="w1sX">✕</button></div><div class="mb">'+
+   '<div class="w1i">거울을 보면서 9가지를 <u>하나씩 직접</u> 확인하고 고르세요. 「모두 양호」 버튼은 없어요. 이 점검은 HACCP 위생 점검일지에 그대로 올라가요.</div>';
+  W1S_IT.forEach(function(it,i){var v=o.ans[i];
+    h+='<div class="w1r'+(v!==0&&v!==1&&o.tried?' miss':'')+'"><span class="no">'+(i+1)+'</span><div class="tx"><b>'+it[0]+'</b><span>'+it[1]+'</span></div><div class="sg"><button class="g'+(v===0?' on':'')+'" data-w1s="'+i+'" data-v="0">'+W1S_G[i]+'</button><button class="b'+(v===1?' on':'')+'" data-w1s="'+i+'" data-v="1">'+W1S_B[i]+'</button></div></div>';
+  });
+  if(nb)h+='<div class="w1bad">불량 '+nb+'건: 작업장에 들어가기 전에 바로 고치고, 고친 방법을 적어 주세요. (팀장님께도 알려 주세요)<input id="w1sMemo" maxlength="100" placeholder="예: 위생모 새것으로 교체함" value="'+esc(o.memo)+'"></div>';
+  h+='<button class="w1cf'+(o.ok?' on':'')+'" id="w1sOk"><span class="bx">'+(o.ok?'✓':'')+'</span>거울을 보고 9가지를 직접 확인했어요</button>';
+  h+='</div><div class="mf"><button class="del" id="w1sBack" style="color:var(--ink)">← 건강 질문으로</button><button class="sub'+(nb?' hit':'')+'" id="w1sGo"'+(ready?'':' style="opacity:.55"')+'>'+(left?'남은 항목 '+left+'개':(!o.ok?'확인 체크를 눌러 주세요':(nb&&o.memo.trim().length<2?'고친 방법을 적어 주세요':'다음: 서명하기')))+'</button></div></div></div>';
+  var H=$("ovHost"),bd=H.querySelector(".w1s .mb"),y=bd?bd.scrollTop:0;
+  H.innerHTML=h;bd=H.querySelector(".w1s .mb");if(bd)bd.scrollTop=y;
+  var re=function(){w1SelfDraw(pid,name,o,cb)};
+  [].slice.call(H.querySelectorAll("[data-w1s]")).forEach(function(b){b.onclick=function(ev){ev.stopPropagation();o.ans[+b.dataset.w1s]=+b.dataset.v;if(!o.ans.some(function(v){return v===1}))o.memo="";re()}});
+  var m=$("w1sMemo");if(m)m.oninput=function(){o.memo=m.value;var g=$("w1sGo");var ok2=o.ok&&o.memo.trim().length>=2;if(g){g.textContent=!o.ok?"확인 체크를 눌러 주세요":(ok2?"다음: 서명하기":"고친 방법을 적어 주세요");g.style.opacity=ok2?"":".55"}};
+  $("w1sOk").onclick=function(ev){ev.stopPropagation();o.ok=!o.ok;re()};
+  var leave=function(){H.innerHTML="";if(UI==="tablet"&&draft){drawEntry()}};
+  $("w1sBack").onclick=function(ev){ev.stopPropagation();leave()};
+  $("w1sX").onclick=function(ev){ev.stopPropagation();H.innerHTML="";if(UI==="tablet")closeOv()};
+  $("w1sGo").onclick=function(ev){ev.stopPropagation();
+    var l=o.ans.filter(function(v){return v!==0&&v!==1}).length;
+    if(l){o.tried=true;re();toast("아직 "+l+"개 항목을 안 골랐어요");return}
+    if(!o.ok){toast("「직접 확인했어요」를 눌러 주세요");return}
+    if(o.ans.some(function(v){return v===1})&&o.memo.trim().length<2){toast("불량 항목을 어떻게 고쳤는지 적어 주세요");if(m)m.focus();return}
+    H.innerHTML="";cb({pid:pid,ans:o.ans.slice(),memo:o.memo.trim(),ok:true});
+  };
+}
+function w1SelfArg(w){return w?{ans:w.ans.slice(),memo:w.memo,ok:true}:null}
+function w1SelfLine(w){if(!w)return "";var nb=w.ans.filter(function(v){return v===1}).length;return nb?'<div style="margin-top:6px;font-weight:800;color:var(--bad)">🧼 위생 자가점검: 불량 '+nb+'건 (고친 방법 적음)</div>':'<div style="margin-top:6px;font-weight:800;color:var(--ok)">🧼 위생 자가점검: 9가지 모두 양호</div>'}
+function w1SelfAfter(r,w){
+  if(!w||!r)return;
+  if(r.ok){delete W1S.ans[w.pid];W1S.inf=null;try{W1.info=null;w1Paint()}catch(e){}if(r.w1&&!r.w1.ok&&r.w1.msg)toast("위생 자가점검 저장 안 됨: "+r.w1.msg)}
+}
+function phGoSig(){                 /* v054: 건강 질문 → (월요일이면 위생 자가점검) → 서명 */
+  var hit=PH.a.filter(function(v){return v===1}).length;
+  $("w2").textContent=person(PH.pid).name+" 님";
+  $("memoBox").classList.toggle("hide",!hit);
+  $("sum").innerHTML=(hit?'<b style="color:var(--bad)">해당 있음 '+hit+'건</b> — 팀장님께 먼저 알려 주세요':'<b style="color:var(--ok)">모든 항목 해당 없음</b>')+w1SelfLine(PH.w1&&PH.w1.pid===PH.pid?PH.w1:null);
+  phShow(2);setupPad("cv","ph","bSend");
+}
 (function boot(){
   function fail(){$("boot").innerHTML='연결이 잘 안 돼요.<br>잠시 후 다시 시도해 주세요.<br><br><button class="go2" id="bRetry" style="height:56px;padding:0 24px;border-radius:14px;background:var(--pri);color:#fff;font-weight:800">다시 불러오기</button>';$("bRetry").onclick=function(){$("boot").textContent="불러오는 중…";BOOT0=null;boot()}}
   function go(r){
