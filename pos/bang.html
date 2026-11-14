@@ -58,8 +58,16 @@ body.tv main{max-width:none;padding:0;height:100vh}
 .tvb{height:100vh;display:flex;flex-direction:column}
 .tvtop{display:flex;align-items:center;gap:2.4vw;background:#5A3A22;color:#fff;padding:1.2vh 2.2vw;font-weight:900}
 .tvt{font-size:5vh;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#tvDate{font-size:3.8vh;white-space:nowrap}
-#tvClk{font-size:6.4vh;background:rgba(0,0,0,.25);padding:0 1.2vw;border-radius:12px;white-space:nowrap}
+/* v029: 날짜·요일·시계 카드 (크림 바탕 + 남색 글자, 요일 의미색: 토 파랑·일 빨강) */
+.dclk{display:inline-flex;align-items:center;flex:none;background:#FCF1D0;color:#010736;border:1px solid rgba(232,89,12,.55);border-radius:16px;box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.7);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1}
+.dclk .dd{display:flex;flex-direction:column;align-items:flex-end;gap:.18em;font-weight:800}
+.dclk .dw{font-weight:900}
+.dclk .dw.sat{color:#1D4ED8}.dclk .dw.sun{color:#C62828}
+.dclk .dl{align-self:stretch;width:3px;border-radius:2px;background:#E8590C;opacity:.85}
+.dclk .dt{font-weight:900;letter-spacing:-.01em}
+.tvtop .dclk{gap:1.6vw;padding:1vh 1.6vw 1vh 1.8vw}
+.tvtop .dclk .dd{font-size:5vh}
+.tvtop .dclk .dt{font-size:12.8vh;margin-top:-.04em}
 .tvl{flex:1;overflow:hidden;padding:1.8vh 1.8vw 0;min-height:0}
 .tvc{background:#fff;border:3px solid #DDD5CB;border-radius:16px;padding:1.2vh 1.8vw 1.4vh;margin-bottom:1.6vh}
 .tvc.new{border-color:#C0392B;background:#FFF6F4}
@@ -82,7 +90,10 @@ body.tv main{max-width:none;padding:0;height:100vh}
 .band{display:flex;align-items:center;gap:20px;border-radius:16px;padding:16px 24px;margin-bottom:16px;font-size:38px;font-weight:900;color:#fff}
 .band.ok{background:#1E7B45}.band.bad{background:#B42318;animation:fu2 1.2s steps(1) infinite}
 @keyframes fu2{50%{background:#7A1F16}}
-.band #clk{font-size:60px;background:rgba(0,0,0,.2);padding:2px 14px;border-radius:10px}
+.band #bandTxt{flex:1;min-width:0}
+.band .dclk{gap:16px;padding:8px 18px 8px 20px;margin-left:auto}
+.band .dclk .dd{font-size:30px}
+.band .dclk .dt{font-size:64px}
 /* 시작 화면 */
 #gate{position:fixed;inset:0;background:#F2EFEA;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px}
 #gate .box{background:#fff;border:1px solid #DDD5CB;border-radius:20px;padding:26px 30px;width:100%;max-width:560px;text-align:center}
@@ -168,7 +179,10 @@ header h1 small{font-size:17px!important;white-space:nowrap;display:inline-block
 #sndBar{font-size:20px!important;padding:12px!important}
 main{padding:12px 12px 24px}
 .band{font-size:24px;gap:12px;padding:12px 14px;flex-wrap:wrap}
-.band #clk{font-size:38px}
+.band #bandTxt{flex:1 1 100%}
+.band .dclk{gap:10px;padding:6px 12px;border-radius:12px;margin-left:0}
+.band .dclk .dd{font-size:18px}
+.band .dclk .dt{font-size:42px}
 .empty{padding:22px 14px;font-size:19px}
 .card{flex-direction:column;gap:10px;padding:14px}
 .card .txt{font-size:22px}
@@ -219,17 +233,17 @@ main{padding:12px 12px 24px}
 }
 </style></head><body>
 <header>
-  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v028</small> -->
-  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v028 · 11/12 22:27</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC</span></h1>
+  <!-- 옛 화면 자동 업데이트용 버전 표시(지우지 말 것, 버전 올릴 때 같이 고침): 생산실 방송 <small>v029</small> -->
+  <h1>📢 빵을그리다 방송실 <small style="font-size:.5em;font-weight:700;opacity:.9">v029 · 11/15 03:27</small><span id="pcTag" style="display:none;margin-left:10px;font-size:.55em;background:#FCF1D0;color:#3B2416;padding:3px 10px;border-radius:8px">사무실 PC</span></h1>
   <button class="hbtn" id="meTag" style="display:none" title="이 화면 이름 바꾸기"></button><span class="st" id="hlp" style="display:none">🔇 유튜브 자동 멈춤 켜짐</span><span class="st"><span class="dot" id="dot"></span><span id="stt">연결 중</span></span>
   <button class="hbtn" id="btnVol">🔊 최대</button> <button class="hbtn" id="btnTest">소리 시험</button>
 </header>
 <div id="sndBar" style="display:none;background:#FFD24D;color:#1E1A17;font-size:30px;font-weight:900;text-align:center;padding:14px">🔈 소리가 꺼져 있어요 · 화면 아무 곳이나 한 번 눌러 주세요</div>
 <div id="regBar" style="display:none;background:#FFF4CC;border-bottom:3px solid #E0A800;color:#1E1A17;font-size:21px;font-weight:800;padding:12px 20px;align-items:center;gap:14px;flex-wrap:wrap"><span style="flex:1;min-width:260px">🏷 [확인 필요] 이 화면 이름이 아직 없어요. 이름을 정하면 이 화면에만 보내는 전달도 받아요.</span><button class="btn b-ok" id="regBtn">이름 정하기</button></div>
 <main>
-  <div class="mobNote">📱 [참고] 휴대폰은 이 앱을 <b>켜 둔 동안만</b> 받아요. 앱을 닫거나 화면이 꺼지면 소리·알림이 오지 않아요.</div><div id="band" class="band ok"><span id="clk">--:--</span><span id="bandTxt">새 전달 없음</span></div>
+  <div class="mobNote">📱 [참고] 휴대폰은 이 앱을 <b>켜 둔 동안만</b> 받아요. 앱을 닫거나 화면이 꺼지면 소리·알림이 오지 않아요.</div><div id="band" class="band ok"><span id="bandTxt">새 전달 없음</span><span class="dclk"><span class="dd"><span id="clkD"></span><span class="dw" id="clkW"></span></span><span class="dl"></span><span class="dt" id="clk">--:--</span></span></div>
   <div id="list"><div class="empty">아직 받은 말이 없어요. 대표님이 보내시면 소리와 함께 크게 떠요.</div></div>
-  <div class="note">v028 (11/12 22:27) · 키오스크·포스기·미니포스기 모두 같은 목소리(구글 한국어 여자 음성)로 읽어요. 인터넷이 안 되면 기기 음성으로 대신 읽어요. 안내 말투를 「안녕하세요, 빵을그리다 방송실입니다 … 감사합니다」로, 구글 음성은 조금 밝게. 기기에 한국어 음성이 없으면(안드로이드 미니포스기 등) 구글 한국어 음성으로 읽어 줘요. 안드로이드 기기에서 한국어 읽어 주기를 다시 찾고, 안 되면 화면에 설정 방법을 보여 줘요. 앱으로 설치할 수 있어요(설치 안내: lee1812-oss.github.io/pos/apps.html). 휴대폰 화면에 맞게 고쳤어요. 휴대폰은 앱을 켜 둔 동안만 받아요. v022 · 화면마다 이름표가 생겼어요(위쪽 🏷 단추를 누르면 이름·그룹을 바꿀 수 있어요). 슬랙 글 맨 앞에 @이름이나 @그룹을 쓰면 그 화면에만 떠요(예: @서재우 @키오스크 회의 2시). 아무것도 안 쓰면 모든 화면에 떠요. 생산실 그룹 화면끼리는 한 곳에서 확인하면 같이 확인돼요. 사무실 PC도 「✅ 확인」을 누르면 누가 확인했는지 남아요. v021 · 이름을 「빵을그리다 방송실」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 답장 없이 「확인」만 돼요. 사무실 PC에서 확인해도 생산실 확인에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
+  <div class="note">v029 (11/15 03:27) · 오른쪽 위 날짜·요일·시계를 크게, 한눈에 보이게 바꿨어요(토 파랑·일 빨강). v028 · 키오스크·포스기·미니포스기 모두 같은 목소리(구글 한국어 여자 음성)로 읽어요. 인터넷이 안 되면 기기 음성으로 대신 읽어요. 안내 말투를 「안녕하세요, 빵을그리다 방송실입니다 … 감사합니다」로, 구글 음성은 조금 밝게. 기기에 한국어 음성이 없으면(안드로이드 미니포스기 등) 구글 한국어 음성으로 읽어 줘요. 안드로이드 기기에서 한국어 읽어 주기를 다시 찾고, 안 되면 화면에 설정 방법을 보여 줘요. 앱으로 설치할 수 있어요(설치 안내: lee1812-oss.github.io/pos/apps.html). 휴대폰 화면에 맞게 고쳤어요. 휴대폰은 앱을 켜 둔 동안만 받아요. v022 · 화면마다 이름표가 생겼어요(위쪽 🏷 단추를 누르면 이름·그룹을 바꿀 수 있어요). 슬랙 글 맨 앞에 @이름이나 @그룹을 쓰면 그 화면에만 떠요(예: @서재우 @키오스크 회의 2시). 아무것도 안 쓰면 모든 화면에 떠요. 생산실 그룹 화면끼리는 한 곳에서 확인하면 같이 확인돼요. 사무실 PC도 「✅ 확인」을 누르면 누가 확인했는지 남아요. v021 · 이름을 「빵을그리다 방송실」로 바꿈. 새 전달은 3번 읽어 준 뒤 큰 화면이 저절로 닫히고 원래 화면으로 돌아가요(확인 안 누르면 목록에 「확인 안 함」으로 남아요). 사무실 PC용(주소 끝 ?pc=1)은 답장 없이 「확인」만 돼요. 사무실 PC에서 확인해도 생산실 확인에는 영향이 없어요. 오른쪽 아래 크롬 알림 창은 더 이상 띄우지 않아요(포스기는 도우미가 방송 화면을 맨 앞으로 올려요). 새 버전이 나오면 쉬는 동안 저절로 새로 고쳐요. 화면이 다른 창에 가려져 있어도 5초마다 새 전달을 받아요. 「✅ 확인」을 누르면 이름을 골라 주세요. 「💬 답장」을 누르면 골라서 또는 말로 답할 수 있어요. 이 화면은 켜 두기만 하면 돼요. 슬랙 #생산실-방송 글도 여기에 떠요. 결제 화면이 위에 있어도 소리는 나요.</div>
 </main>
 
 <div id="ov">
@@ -272,6 +286,8 @@ main{padding:12px 12px 24px}
   var ver = -1, msgs = [], first = true, seen = {}, queue = [], busy = false, actx = null, koVoice = null, current = null, repeatT = null, failN = 0;
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var WD7 = ['일', '월', '화', '수', '목', '금', '토'];
+  function setDay(dId, wId, d) { var e = $(dId), w = $(wId), k = d.getDay(); if (e) e.textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; if (w) { w.textContent = WD7[k] + '요일'; w.className = 'dw' + (k === 6 ? ' sat' : k === 0 ? ' sun' : ''); } }
   function hm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
   function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
   function call(o) {
@@ -648,7 +664,7 @@ main{padding:12px 12px 24px}
   var titleT = 0;
   function tick() {
     if (TVQ) return;
-    var d = new Date(); $('clk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    var d = new Date(); $('clk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); setDay('clkD', 'clkW', d);
     var un = msgs.filter(function (m) { return !m.ack && !(PCM && pcClosed(m.id)); }).length;
     $('band').className = 'band ' + (un ? 'bad' : 'ok');
     $('bandTxt').textContent = un ? '확인 안 한 전달 ' + un + '건' : '새 전달 없음 · 모두 확인함';
@@ -659,7 +675,7 @@ main{padding:12px 12px 24px}
   wInterval(tick, 1000);
 
   /* v016: 새 버전 자동 받기 — 10분마다 배포본 번호를 보고, 방송·답장 중이 아닐 때만 새로 고침 (현장 원격 접속 없이 고침 반영) */
-  var MY_V = 28;
+  var MY_V = 29;
   function selfUpdate() {
     if (current || queue.length || busy || replying || $('gate').style.display === 'flex') return;
     fetch(location.pathname + '?vc=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
@@ -901,7 +917,7 @@ main{padding:12px 12px 24px}
     $('gate').style.display = 'none'; $('sndBar').style.display = 'none';
     document.querySelector('header').style.display = 'none';
     document.body.classList.add('tv');
-    document.querySelector('main').innerHTML = '<div class="tvb"><div class="tvtop"><span class="tvt">📢 빵을그리다 방송실 · 오늘 전달</span><span id="tvDate"></span><span id="tvClk">--:--</span></div>' +
+    document.querySelector('main').innerHTML = '<div class="tvb"><div class="tvtop"><span class="tvt">📢 빵을그리다 방송실 · 오늘 전달</span><span class="dclk"><span class="dd"><span id="tvDate"></span><span class="dw" id="tvWd"></span></span><span class="dl"></span><span class="dt" id="tvClk">--:--</span></span></div>' +
       '<div class="tvl" id="tvList"><div class="tvempty">키오스크 화면과 연결하는 중…</div></div><div class="tvfoot" id="tvFoot"></div></div>';
     var tvKey = '', tvHid = 0, tvNet = 1, WD = ['일', '월', '화', '수', '목', '금', '토'];
     var tvBoard = function (list) {
@@ -923,7 +939,7 @@ main{padding:12px 12px 24px}
     };
     var tvTick = function () {
       var d = new Date(); $('tvClk').textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
-      $('tvDate').textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + WD[d.getDay()] + ')';
+      setDay('tvDate', 'tvWd', d);
       var f = $('tvFoot'), gone = Date.now() - last > 15000;
       if (gone && current) { current = null; key = ''; $('ov').className = ''; document.title = '📺 TV 표시 · 대기'; }
       if (gone) { f.className = 'tvfoot warn'; f.textContent = '⚠️ 키오스크의 「빵을그리다 방송실」 화면이 꺼져 있어요 · 키오스크에서 다시 열어 주세요'; }
