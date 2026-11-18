@@ -34,5 +34,17 @@
         "E4:F3:1D:D9:0F:37:34:2F:D5:D0:6B:1D:F1:68:26:C0:AD:DB:D7:78:1C:7D:2F:74:C1:D0:B7:E4:29:92:DD:51"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "kr.co.drawbread.send",
+      "sha256_cert_fingerprints": [
+        "9C:5A:76:14:42:97:EF:24:E6:B8:F7:AE:DA:FC:45:C7:75:DB:0B:60:85:84:5E:C6:DB:C2:C1:B2:EC:3F:A6:59"
+      ]
+    }
   }
 ]
