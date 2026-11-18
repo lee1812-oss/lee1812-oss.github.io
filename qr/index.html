@@ -60,7 +60,7 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 <div id="cam">
   <video id="v" playsinline muted autoplay></video>
   <div class="frame" id="frame"><div class="line"></div></div>
-  <div class="top"><b>QR 바로 찍기</b><small>v005</small></div>
+  <div class="top"><b>QR 바로 찍기</b><small>v006 · 11/18 17:02</small></div>
   <div class="hint" id="hint">네모 안에 QR을 비춰 주세요</div>
   <div class="bar">
     <button id="bLight" style="display:none">손전등</button>
@@ -148,7 +148,7 @@ function parse(code){
   if(/^www\./i.test(s))return{type:'url',url:'https://'+s,host:s.split('/')[0]};
   if(/^WIFI:/i.test(s)){const g=k=>{const m=s.match(new RegExp('[;:]'+k+':((?:\\\\.|[^;])*)','i'));return m?m[1].replace(/\\(.)/g,'$1'):''};return{type:'wifi',ssid:g('S'),pw:g('P')}}
   if(/^tel:/i.test(s))return{type:'tel',url:s,num:s.slice(4)};
-  if(/^(mailto|sms|smsto|geo|market|intent|kakao\w*|nmap|naver\w*):/i.test(s))return{type:'link',url:s};
+  if(/^smsto:/i.test(s)){const m=s.match(/^smsto:([^:]*):?([\s\S]*)$/i);return{type:'sms',num:m[1],body:m[2]||''}} if(/^(mailto|sms|smsto|geo|market|intent|kakao\w*|nmap|naver\w*):/i.test(s))return{type:'link',url:s};
   return{type:'text'};
 }
 function found(code){
@@ -179,7 +179,7 @@ function showResult(code,p){
   }else if(p.type==='tel'){
     k.textContent='전화번호';h.textContent=p.num;h.style.display='';
     bs.append(btn('전화 걸기',()=>{location.href=p.url},'main'));
-  }else if(p.type==='link'){
+  }else if(p.type==='sms'){ k.textContent='문자';h.textContent=p.num;h.style.display=''; $('val').textContent=p.body; n.textContent='「문자 보내기」를 누르면 문자 앱에 번호와 글이 채워집니다. 「전송」만 누르세요.';n.style.display=''; bs.append(btn('문자 보내기',()=>{const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);location.href='sms:'+p.num+(ios?'&':'?')+'body='+encodeURIComponent(p.body)},'main')); }else if(p.type==='link'){
     k.textContent='앱 연결';bs.append(btn('열기',()=>{location.href=p.url},'main'));
   }else{k.textContent='글자';k.className='kind txt'}
   const r=document.createElement('div');r.className='row';
