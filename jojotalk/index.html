@@ -1,0 +1,47 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>조조톡</title>
+<meta name="theme-color" content="#010736"><link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="조조톡"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Pretendard,"Malgun Gothic",sans-serif;font-size:18px;color:#111;background:#f2f3f5;height:100dvh;display:flex;flex-direction:column}
+header{background:#010736;color:#FCF1D0;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+header .sub{font-size:14px;opacity:.8}header b{font-size:29px;font-weight:800;display:block;line-height:1.2}
+.mode{font-size:15px;font-weight:700;background:#fff3e0;color:#9a5b00;border:1px solid #f0c27a;border-radius:8px;padding:5px 9px;text-align:center;line-height:1.3}
+#log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:85%;padding:12px 14px;border-radius:14px;line-height:1.5;word-break:keep-all;overflow-wrap:break-word}
+.me{align-self:flex-end;background:#dfe7f5;border:1px solid #b9c8e6}.jo{align-self:flex-start;background:#fff;border:1px solid #d5d8dd}
+.who{font-size:14px;color:#555;margin-bottom:2px}
+#set{background:#fff;border-top:1px solid #d5d8dd;padding:8px 12px;display:flex;gap:8px;align-items:center;font-size:16px;flex-wrap:wrap}
+#set select{flex:1;min-width:120px;height:44px;font-size:16px}
+button{font-family:inherit;font-size:18px;border:1px solid #9aa1ab;background:#fff;border-radius:12px;min-height:54px;padding:0 16px;color:#111}
+#bar{background:#fff;padding:8px 12px calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px}
+#txt{flex:1;height:54px;font-size:18px;border:1px solid #9aa1ab;border-radius:12px;padding:0 12px}
+#send{background:#2f4f7f;color:#fff;border-color:#2f4f7f;min-width:70px}
+#mic{width:100%;min-height:68px;background:#2f4f7f;color:#fff;border:0;font-size:20px;font-weight:bold;border-radius:14px}
+#mic.on{background:#b3261e}#micw{background:#fff;padding:0 12px 6px}
+</style></head><body>
+<header><div><span class="sub">조조 · 이혜영 님 전용 · v002 · 11/22 16:35 업데이트</span><b>조조톡</b></div><span class="mode">시험판<br>아직 조조와 연결 전</span></header>
+<div id="log"></div>
+<div id="set"><span>목소리</span><select id="voice"></select><span>속도</span>
+<button id="slow">느리게</button><button id="fast">빠르게</button><label><input type="checkbox" id="auto" checked style="width:24px;height:24px"> 자동 읽기</label></div>
+<div id="micw"><button id="mic">눌러서 말하기</button></div>
+<div id="bar"><input id="txt" placeholder="글로 쓰기"><button id="send">보내기</button></div>
+<script>
+const log=document.getElementById('log'),$=id=>document.getElementById(id);let rate=1,voices=[];
+function add(t,me){const d=document.createElement('div');d.className='m '+(me?'me':'jo');d.innerHTML='<div class="who">'+(me?'혜영 님':'조조')+'</div>';d.append(document.createTextNode(t));log.append(d);log.scrollTop=log.scrollHeight}
+function speak(t){if(!$('auto').checked||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=rate;const v=voices[$('voice').value];if(v)u.voice=v;speechSynthesis.speak(u)}
+function load(){voices=speechSynthesis.getVoices().filter(v=>v.lang.startsWith('ko'));$('voice').innerHTML=voices.map((v,i)=>'<option value="'+i+'">'+v.name+'</option>').join('')||'<option>기본 목소리</option>'}
+if(window.speechSynthesis){load();speechSynthesis.onvoiceschanged=load}
+$('slow').onclick=()=>{rate=Math.max(.6,rate-.1);speak('이 속도로 읽어 드립니다')};$('fast').onclick=()=>{rate=Math.min(1.6,rate+.1);speak('이 속도로 읽어 드립니다')};
+function send(t){t=t.trim();if(!t)return;add(t,1);setTimeout(()=>{const a='시험 모드 답변입니다. "'+t+'"라고 말씀하셨네요. 실제 연결 후에는 조조가 직접 답합니다.';add(a);speak(a)},600)}
+$('send').onclick=()=>{send($('txt').value);$('txt').value=''};$('txt').onkeydown=e=>{if(e.key==='Enter')$('send').click()};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec;
+$('mic').onclick=()=>{if(!SR){add('이 화면은 음성 인식을 지원하지 않습니다. 휴대폰 크롬에서 열어 주세요.');return}
+if(rec){rec.stop();return}rec=new SR();rec.lang='ko-KR';$('mic').classList.add('on');$('mic').textContent='듣는 중... 다시 누르면 끝';
+rec.onresult=e=>send(e.results[0][0].transcript);rec.onend=()=>{rec=null;$('mic').classList.remove('on');$('mic').textContent='눌러서 말하기'};rec.start()}
+add('안녕하세요, 혜영 님. 조조입니다. 아래 큰 버튼을 누르고 말씀해 보세요.');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
